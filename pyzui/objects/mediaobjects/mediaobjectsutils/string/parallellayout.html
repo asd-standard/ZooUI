@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout module &#8212; PyZui 0.5.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=cc7d0dec" />
+    <script src="../../../../../_static/documentation_options.js?v=b9afe91b"></script>
+    <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="pyzui.objects.mediaobjects.mediaobjectsutils.string.textlayout module" href="textlayout.html" />
+    <link rel="prev" title="pyzui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgtriangleutils module" href="../svg/utils/svgtriangleutils.html" />
+   
+  <link rel="stylesheet" href="../../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout">
+<span id="pyzui-objects-mediaobjects-mediaobjectsutils-string-parallellayout-module"></span><h1>pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout module<a class="headerlink" href="#module-pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout" title="Link to this heading">¶</a></h1>
+<p>ParallelLayoutCalculator class for parallel text layout calculation.</p>
+<p>This class manages parallel calculation of text layouts using thread pools,
+ensuring thread safety and efficient resource usage.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.CalculationStatus">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.</span></span><span class="sig-name descname"><span class="pre">CalculationStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/pyzui/objects/mediaobjects/mediaobjectsutils/string/parallellayout.html#CalculationStatus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.CalculationStatus" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Status of layout calculation.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.CalculationStatus.PENDING">
+<span class="sig-name descname"><span class="pre">PENDING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.CalculationStatus.PENDING" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.CalculationStatus.IN_PROGRESS">
+<span class="sig-name descname"><span class="pre">IN_PROGRESS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.CalculationStatus.IN_PROGRESS" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.CalculationStatus.COMPLETED">
+<span class="sig-name descname"><span class="pre">COMPLETED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.CalculationStatus.COMPLETED" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.CalculationStatus.FAILED">
+<span class="sig-name descname"><span class="pre">FAILED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.CalculationStatus.FAILED" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.CalculationStatus.CANCELLED">
+<span class="sig-name descname"><span class="pre">CANCELLED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.CalculationStatus.CANCELLED" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.CalculationResult">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.</span></span><span class="sig-name descname"><span class="pre">CalculationResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout_data=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processing_time_ms=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/pyzui/objects/mediaobjects/mediaobjectsutils/string/parallellayout.html#CalculationResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.CalculationResult" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Result of a layout calculation.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.CalculationResult.status">
+<span class="sig-name descname"><span class="pre">status</span></span><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.CalculationResult.status" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.CalculationResult.layout_data">
+<span class="sig-name descname"><span class="pre">layout_data</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.CalculationResult.layout_data" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.CalculationResult.error">
+<span class="sig-name descname"><span class="pre">error</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.CalculationResult.error" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.CalculationResult.processing_time_ms">
+<span class="sig-name descname"><span class="pre">processing_time_ms</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.CalculationResult.processing_time_ms" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.CalculationResult.timestamp">
+<span class="sig-name descname"><span class="pre">timestamp</span></span><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.CalculationResult.timestamp" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.</span></span><span class="sig-name descname"><span class="pre">ParallelLayoutCalculator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_timeout_ms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_profiling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/pyzui/objects/mediaobjects/mediaobjectsutils/string/parallellayout.html#ParallelLayoutCalculator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Manages parallel calculation of text layouts using thread pools.</p>
+<p>This class provides thread-safe parallel calculation of text layouts
+for batches of objects, with progress tracking and error handling.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.max_workers">
+<span class="sig-name descname"><span class="pre">max_workers</span></span><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.max_workers" title="Link to this definition">¶</a></dt>
+<dd><p>Maximum number of worker threads</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.batch_timeout_ms">
+<span class="sig-name descname"><span class="pre">batch_timeout_ms</span></span><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.batch_timeout_ms" title="Link to this definition">¶</a></dt>
+<dd><p>Timeout for batch calculations in milliseconds</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.enable_profiling">
+<span class="sig-name descname"><span class="pre">enable_profiling</span></span><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.enable_profiling" title="Link to this definition">¶</a></dt>
+<dd><p>Whether to enable performance profiling</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.thread_pool">
+<span class="sig-name descname"><span class="pre">thread_pool</span></span><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.thread_pool" title="Link to this definition">¶</a></dt>
+<dd><p>Thread pool executor for parallel calculations</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.calculation_queue">
+<span class="sig-name descname"><span class="pre">calculation_queue</span></span><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.calculation_queue" title="Link to this definition">¶</a></dt>
+<dd><p>Queue for pending calculations</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.results_cache">
+<span class="sig-name descname"><span class="pre">results_cache</span></span><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.results_cache" title="Link to this definition">¶</a></dt>
+<dd><p>Cache for calculation results</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.lock">
+<span class="sig-name descname"><span class="pre">lock</span></span><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.lock" title="Link to this definition">¶</a></dt>
+<dd><p>Thread lock for thread-safe operations</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.shutdown_event">
+<span class="sig-name descname"><span class="pre">shutdown_event</span></span><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.shutdown_event" title="Link to this definition">¶</a></dt>
+<dd><p>Event to signal shutdown</p>
+</dd></dl>
+
+<p>Initialize the ParallelLayoutCalculator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>max_workers</strong> – Maximum number of worker threads (default: CPU count)</p></li>
+<li><p><strong>batch_timeout_ms</strong> – Timeout for batch calculations (default: 5000ms)</p></li>
+<li><p><strong>enable_profiling</strong> – Enable performance profiling (default: False)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator._start_workers">
+<span class="sig-name descname"><span class="pre">_start_workers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/pyzui/objects/mediaobjects/mediaobjectsutils/string/parallellayout.html#ParallelLayoutCalculator._start_workers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator._start_workers" title="Link to this definition">¶</a></dt>
+<dd><p>Start worker threads for processing calculations.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator._worker_loop">
+<span class="sig-name descname"><span class="pre">_worker_loop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/pyzui/objects/mediaobjects/mediaobjectsutils/string/parallellayout.html#ParallelLayoutCalculator._worker_loop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator._worker_loop" title="Link to this definition">¶</a></dt>
+<dd><p>Worker thread main loop.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator._process_calculation">
+<span class="sig-name descname"><span class="pre">_process_calculation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prioritized_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">viewport_rect</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/pyzui/objects/mediaobjects/mediaobjectsutils/string/parallellayout.html#ParallelLayoutCalculator._process_calculation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator._process_calculation" title="Link to this definition">¶</a></dt>
+<dd><p>Process a single layout calculation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> – Object index</p></li>
+<li><p><strong>prioritized_obj</strong> – Prioritized object to calculate layout for</p></li>
+<li><p><strong>viewport_rect</strong> – Current viewport rectangle</p></li>
+<li><p><strong>callback</strong> – Optional callback function for completion</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.submit_batch">
+<span class="sig-name descname"><span class="pre">submit_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">viewport_rect</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/pyzui/objects/mediaobjects/mediaobjectsutils/string/parallellayout.html#ParallelLayoutCalculator.submit_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.submit_batch" title="Link to this definition">¶</a></dt>
+<dd><p>Submit a batch of objects for parallel layout calculation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> – List of prioritized objects</p></li>
+<li><p><strong>viewport_rect</strong> – Current viewport rectangle</p></li>
+<li><p><strong>callback</strong> – Optional callback for individual completions</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary mapping object indices to calculation results</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.wait_for_batch">
+<span class="sig-name descname"><span class="pre">wait_for_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout_ms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/pyzui/objects/mediaobjects/mediaobjectsutils/string/parallellayout.html#ParallelLayoutCalculator.wait_for_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.wait_for_batch" title="Link to this definition">¶</a></dt>
+<dd><p>Wait for a batch of calculations to complete.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch_indices</strong> – List of object indices to wait for</p></li>
+<li><p><strong>timeout_ms</strong> – Timeout in milliseconds (default: batch_timeout_ms)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary mapping object indices to calculation results</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.get_result">
+<span class="sig-name descname"><span class="pre">get_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/pyzui/objects/mediaobjects/mediaobjectsutils/string/parallellayout.html#ParallelLayoutCalculator.get_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.get_result" title="Link to this definition">¶</a></dt>
+<dd><p>Get calculation result for a specific object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> – Object index</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>CalculationResult if available, None otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.invalidate_cache">
+<span class="sig-name descname"><span class="pre">invalidate_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/pyzui/objects/mediaobjects/mediaobjectsutils/string/parallellayout.html#ParallelLayoutCalculator.invalidate_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.invalidate_cache" title="Link to this definition">¶</a></dt>
+<dd><p>Invalidate cache for specific object or all objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> – Object index to invalidate, or None for all objects</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.get_statistics">
+<span class="sig-name descname"><span class="pre">get_statistics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/pyzui/objects/mediaobjects/mediaobjectsutils/string/parallellayout.html#ParallelLayoutCalculator.get_statistics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.get_statistics" title="Link to this definition">¶</a></dt>
+<dd><p>Get statistics about calculator performance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary with statistics</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.shutdown">
+<span class="sig-name descname"><span class="pre">shutdown</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wait</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/pyzui/objects/mediaobjects/mediaobjectsutils/string/parallellayout.html#ParallelLayoutCalculator.shutdown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.shutdown" title="Link to this definition">¶</a></dt>
+<dd><p>Shutdown the calculator and worker threads.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wait</strong> – Whether to wait for pending calculations to complete</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.calculate_layout_sync">
+<span class="sig-name descname"><span class="pre">calculate_layout_sync</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prioritized_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">viewport_rect</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/pyzui/objects/mediaobjects/mediaobjectsutils/string/parallellayout.html#ParallelLayoutCalculator.calculate_layout_sync"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.calculate_layout_sync" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate layout synchronously (for testing/debugging).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prioritized_obj</strong> – Prioritized object to calculate layout for</p></li>
+<li><p><strong>viewport_rect</strong> – Current viewport rectangle</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>CalculationResult</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><span class="xref std std-doc">pyzui/objects/mediaobjects/mediaobject</span> - Base media object class</p></li>
+<li><p><span class="xref std std-doc">pyzui/objects/mediaobjects/mediaobjectsutils/string/textlayout</span> - Text layout utilities</p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../../index.html">PyZui</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../gettingstarted/installation.html">PyZui installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../gettingstarted/installation.html#running-pyzui">Running PyZUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../usageinstructions/userinterface.html">User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../usageinstructions/svgfeatures.html">SVG Features</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/configsystem.html">Configuration System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/objectsystem.html">Object System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/windowsystem.html">Window System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/backup.html">Backup System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../testingdocumentation/unittest.html">Unit Testing Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../testingdocumentation/integrationtest.html">Integration Testing Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../benchmarksdocumentation/qzuibenchmark.html">QZUI Benchmark Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../benchmarksdocumentation/converterbenchmark.html">Converter Benchmark Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../pyzui.html">pyzui package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../backup.html">backup package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../converters.html">converters package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../objects.html">objects package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../tilesystem.html">tilesystem package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../windows.html">windows package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../config.html">pyzui.config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../logger.html">pyzui.logger module</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../../pyzui.html">pyzui package</a><ul>
+  <li><a href="../../../../objects.html">objects package</a><ul>
+      <li>Previous: <a href="../svg/utils/svgtriangleutils.html" title="previous chapter">pyzui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgtriangleutils module</a></li>
+      <li>Next: <a href="textlayout.html" title="next chapter">pyzui.objects.mediaobjects.mediaobjectsutils.string.textlayout module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, David Roberts, Andrea Silvestri.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../../../../../_sources/pyzui/objects/mediaobjects/mediaobjectsutils/string/parallellayout.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

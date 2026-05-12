@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>pyzui.objects.scene.sceneutils.parallel module &#8212; PyZui 0.5.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=cc7d0dec" />
+    <script src="../../../../_static/documentation_options.js?v=b9afe91b"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="pyzui.objects.scene.sceneutils.prioritybatcher module" href="prioritybatcher.html" />
+    <link rel="prev" title="pyzui.objects.scene.sceneutils.clipboard module" href="clipboard.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-pyzui.objects.scene.sceneutils.parallel">
+<span id="pyzui-objects-scene-sceneutils-parallel-module"></span><h1>pyzui.objects.scene.sceneutils.parallel module<a class="headerlink" href="#module-pyzui.objects.scene.sceneutils.parallel" title="Link to this heading">¶</a></h1>
+<p>SceneParallelRenderer class for parallel rendering operations.</p>
+<p>This class encapsulates all parallel rendering functionality that was
+previously part of the Scene class, providing better separation of concerns.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyzui.objects.scene.sceneutils.parallel.</span></span><span class="sig-name descname"><span class="pre">SceneParallelRenderer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scene</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pyzui/objects/scene/sceneutils/parallel.html#SceneParallelRenderer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Manages parallel rendering operations for a Scene.</p>
+<p>This class encapsulates all parallel rendering functionality that was
+previously part of the Scene class, providing better separation of concerns.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer._scene">
+<span class="sig-name descname"><span class="pre">_scene</span></span><a class="headerlink" href="#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer._scene" title="Link to this definition">¶</a></dt>
+<dd><p>Reference to parent Scene</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer._config">
+<span class="sig-name descname"><span class="pre">_config</span></span><a class="headerlink" href="#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer._config" title="Link to this definition">¶</a></dt>
+<dd><p>Parallel rendering configuration</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer._enabled">
+<span class="sig-name descname"><span class="pre">_enabled</span></span><a class="headerlink" href="#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer._enabled" title="Link to this definition">¶</a></dt>
+<dd><p>Whether parallel rendering is enabled</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer._layout_calculator">
+<span class="sig-name descname"><span class="pre">_layout_calculator</span></span><a class="headerlink" href="#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer._layout_calculator" title="Link to this definition">¶</a></dt>
+<dd><p>Parallel layout calculator instance</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer._priority_batcher">
+<span class="sig-name descname"><span class="pre">_priority_batcher</span></span><a class="headerlink" href="#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer._priority_batcher" title="Link to this definition">¶</a></dt>
+<dd><p>Priority batcher for text objects</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer._last_viewport_center">
+<span class="sig-name descname"><span class="pre">_last_viewport_center</span></span><a class="headerlink" href="#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer._last_viewport_center" title="Link to this definition">¶</a></dt>
+<dd><p>Last known viewport center</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer._last_viewport_rect">
+<span class="sig-name descname"><span class="pre">_last_viewport_rect</span></span><a class="headerlink" href="#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer._last_viewport_rect" title="Link to this definition">¶</a></dt>
+<dd><p>Last known viewport rectangle</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer._stats">
+<span class="sig-name descname"><span class="pre">_stats</span></span><a class="headerlink" href="#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer._stats" title="Link to this definition">¶</a></dt>
+<dd><p>Parallel rendering statistics</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer._logger">
+<span class="sig-name descname"><span class="pre">_logger</span></span><a class="headerlink" href="#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer._logger" title="Link to this definition">¶</a></dt>
+<dd><p>Logger instance</p>
+</dd></dl>
+
+<p>Initialize the SceneParallelRenderer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scene</strong> – Reference to parent Scene</p></li>
+<li><p><strong>config</strong> – Configuration dictionary (may contain ‘parallel_rendering’ key)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.is_enabled">
+<span class="sig-name descname"><span class="pre">is_enabled</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pyzui/objects/scene/sceneutils/parallel.html#SceneParallelRenderer.is_enabled"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.is_enabled" title="Link to this definition">¶</a></dt>
+<dd><p>Check if parallel rendering is enabled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if parallel rendering is enabled, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.initialize">
+<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pyzui/objects/scene/sceneutils/parallel.html#SceneParallelRenderer.initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.initialize" title="Link to this definition">¶</a></dt>
+<dd><p>Initialize parallel rendering components if not already initialized.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.update_viewport">
+<span class="sig-name descname"><span class="pre">update_viewport</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pyzui/objects/scene/sceneutils/parallel.html#SceneParallelRenderer.update_viewport"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.update_viewport" title="Link to this definition">¶</a></dt>
+<dd><p>Update viewport information for parallel rendering components.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer._get_text_objects">
+<span class="sig-name descname"><span class="pre">_get_text_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pyzui/objects/scene/sceneutils/parallel.html#SceneParallelRenderer._get_text_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer._get_text_objects" title="Link to this definition">¶</a></dt>
+<dd><p>Get all StringMediaObjects in the scene.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of StringMediaObject instances</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.precalculate_text_layouts">
+<span class="sig-name descname"><span class="pre">precalculate_text_layouts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pyzui/objects/scene/sceneutils/parallel.html#SceneParallelRenderer.precalculate_text_layouts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.precalculate_text_layouts" title="Link to this definition">¶</a></dt>
+<dd><p>Pre-calculate text layouts for parallel rendering.</p>
+<p>This method should be called before rendering when the scene is moving
+to prepare layout data for parallel rendering.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer._on_layout_calculation_complete">
+<span class="sig-name descname"><span class="pre">_on_layout_calculation_complete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pyzui/objects/scene/sceneutils/parallel.html#SceneParallelRenderer._on_layout_calculation_complete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer._on_layout_calculation_complete" title="Link to this definition">¶</a></dt>
+<dd><p>Callback for when layout calculation completes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> – Object index</p></li>
+<li><p><strong>result</strong> – CalculationResult</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.render_text">
+<span class="sig-name descname"><span class="pre">render_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">painter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pyzui/objects/scene/sceneutils/parallel.html#SceneParallelRenderer.render_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.render_text" title="Link to this definition">¶</a></dt>
+<dd><p>Render text objects using parallel rendering.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>painter</strong> – QPainter object to render with</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if parallel rendering was used, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.enable">
+<span class="sig-name descname"><span class="pre">enable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">enabled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pyzui/objects/scene/sceneutils/parallel.html#SceneParallelRenderer.enable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.enable" title="Link to this definition">¶</a></dt>
+<dd><p>Enable or disable parallel rendering.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>enabled</strong> – Whether to enable parallel rendering</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.shutdown">
+<span class="sig-name descname"><span class="pre">shutdown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pyzui/objects/scene/sceneutils/parallel.html#SceneParallelRenderer.shutdown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.shutdown" title="Link to this definition">¶</a></dt>
+<dd><p>Shut down parallel rendering and release resources.</p>
+<p>Stops the layout calculator and clears the priority batcher.
+Safe to call multiple times.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.get_stats">
+<span class="sig-name descname"><span class="pre">get_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pyzui/objects/scene/sceneutils/parallel.html#SceneParallelRenderer.get_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.get_stats" title="Link to this definition">¶</a></dt>
+<dd><p>Get parallel rendering statistics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary with parallel rendering statistics</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.invalidate_cache">
+<span class="sig-name descname"><span class="pre">invalidate_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pyzui/objects/scene/sceneutils/parallel.html#SceneParallelRenderer.invalidate_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.invalidate_cache" title="Link to this definition">¶</a></dt>
+<dd><p>Invalidate parallel rendering cache.</p>
+</dd></dl>
+
+</dd></dl>
+
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><span class="xref std std-doc">pyzui/objects/scene/scene</span> - Scene management</p></li>
+<li><p><span class="xref std std-doc">pyzui/objects/scene/sceneutils/prioritybatcher</span> - Priority-based object batching</p></li>
+<li><p><span class="xref std std-doc">pyzui/objects/mediaobjects/mediaobjectsutils/string/parallellayout</span> - Parallel text layout calculation</p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">PyZui</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html">PyZui installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#running-pyzui">Running PyZUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/userinterface.html">User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/svgfeatures.html">SVG Features</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/configsystem.html">Configuration System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/objectsystem.html">Object System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/windowsystem.html">Window System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/backup.html">Backup System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testingdocumentation/unittest.html">Unit Testing Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testingdocumentation/integrationtest.html">Integration Testing Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../benchmarksdocumentation/qzuibenchmark.html">QZUI Benchmark Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../benchmarksdocumentation/converterbenchmark.html">Converter Benchmark Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../pyzui.html">pyzui package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../backup.html">backup package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../converters.html">converters package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../objects.html">objects package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tilesystem.html">tilesystem package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../windows.html">windows package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../config.html">pyzui.config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../logger.html">pyzui.logger module</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../pyzui.html">pyzui package</a><ul>
+  <li><a href="../../../objects.html">objects package</a><ul>
+      <li>Previous: <a href="clipboard.html" title="previous chapter">pyzui.objects.scene.sceneutils.clipboard module</a></li>
+      <li>Next: <a href="prioritybatcher.html" title="next chapter">pyzui.objects.scene.sceneutils.prioritybatcher module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, David Roberts, Andrea Silvestri.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../../../../_sources/pyzui/objects/scene/sceneutils/parallel.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

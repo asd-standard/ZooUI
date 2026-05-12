@@ -4,11 +4,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>pyzui.objects.mediaobjects.mediaobject &#8212; PyZui 0.11 documentation</title>
+    <title>pyzui.objects.mediaobjects.mediaobject &#8212; PyZui 0.5.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=cc7d0dec" />
-    <script src="../../../../_static/documentation_options.js?v=086c1757"></script>
+    <script src="../../../../_static/documentation_options.js?v=b9afe91b"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -50,13 +50,19 @@
 <span class="sd">&quot;&quot;&quot;Media to be displayed in the ZUI (abstract base class).&quot;&quot;&quot;</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
+<span class="c1">## Performance optimization note:</span>
+<span class="c1">## Phase 2 optimizations replace 2**x with math.exp2(x) (1.85x faster)</span>
+<span class="c1">## and math.log(x, 2) with math.log2(x) (2x faster) throughout the codebase.</span>
+<span class="c1">## These changes are performance-critical for zoom operations.</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.objects.physicalobject</span><span class="w"> </span><span class="kn">import</span> <span class="n">PhysicalObject</span>
 
+
 <div class="viewcode-block" id="MediaObject">
-<a class="viewcode-back" href="../../../../pyzui/mediaobject.html#pyzui.objects.mediaobjects.mediaobject.MediaObject">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">MediaObject</span><span class="p">(</span><span class="n">PhysicalObject</span><span class="p">)</span> <span class="p">:</span>
+<a class="viewcode-back" href="../../../../pyzui/objects/mediaobjects/mediaobject.html#pyzui.objects.mediaobjects.mediaobject.MediaObject">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MediaObject</span><span class="p">(</span><span class="n">PhysicalObject</span><span class="p">):</span>
+    <span class="n">transparent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># Set True by subclasses that support transparency</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Constructor :</span>
 <span class="sd">        MediaObject(media_id, scene)</span>
@@ -112,12 +118,12 @@
 <span class="sd">        MediaObject.topleft[0-1] = self._scene.origin[0-1] + self.pos[0-1] * (2 ** self._scene.zoomlevel)</span>
 
 <span class="sd">    Where *self.pos[0-1]* it&#39;s MediaObject position relative to Scene reference</span>
-<span class="sd">    system wich get&#39;s scaled by 2** of scene zoom level</span>
+<span class="sd">    system wich get&#39;s scaled by math.exp2() of scene zoom level</span>
 
 <span class="sd">    MediaObject centre coordinates relative to screen view are given firstly by</span>
 <span class="sd">    calculating image center coordinates relative to Scene reference coordinates::</span>
 
-<span class="sd">        C_s[0-1] = self.pos[0-1] + self._centre[0-1] * 2**self._z</span>
+<span class="sd">        C_s[0-1] = self.pos[0-1] + self._centre[0-1] * math.exp2(self._z)</span>
 
 <span class="sd">    Where *self._centre[0-1]* are center coordinates relative to the mediaobject</span>
 <span class="sd">    frame of reference and *self._z* it&#39;s MediaObject reference frame scaling</span>
@@ -128,10 +134,11 @@
 
 <span class="sd">    Then we can calculate MediaObject centre coordinates relative to screen view as::</span>
 
-<span class="sd">        MediaObject.centre[0-1] = self._scene.origin[0] + C_s[0-1] * 2**self._scene.zoomlevel</span>
+<span class="sd">        MediaObject.centre[0-1] = self._scene.origin[0] + C_s[0-1] * math.exp2(self._scene.zoomlevel)</span>
 
 
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">media_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">scene</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a new MediaObject from the media identified by media_id,</span>
@@ -140,14 +147,14 @@
 <span class="sd">        Initializes PhysicalObject center, position and velocity attributes,</span>
 <span class="sd">        then sets the _media_id and _scene instance variables.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1">#initialize mediobject centre, position and velocity</span>
+        <span class="c1"># initialize mediobject centre, position and velocity</span>
         <span class="n">PhysicalObject</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">media_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">scene</span>
 
 <div class="viewcode-block" id="MediaObject.render">
-<a class="viewcode-back" href="../../../../pyzui/mediaobject.html#pyzui.objects.mediaobjects.mediaobject.MediaObject.render">[docs]</a>
+<a class="viewcode-back" href="../../../../pyzui/objects/mediaobjects/mediaobject.html#pyzui.objects.mediaobjects.mediaobject.MediaObject.render">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">painter</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
@@ -166,8 +173,27 @@
         <span class="k">pass</span></div>
 
 
+<div class="viewcode-block" id="MediaObject.is_size_visible">
+<a class="viewcode-back" href="../../../../pyzui/objects/mediaobjects/mediaobject.html#pyzui.objects.mediaobjects.mediaobject.MediaObject.is_size_visible">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_size_visible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if object is visible based on size and render mode.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            mode: RenderMode (Invisible, Draft, or HighQuality)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if object should be rendered, False if too small,</span>
+<span class="sd">            too large, or mode is Invisible.</span>
+
+<span class="sd">        Base implementation returns True unless mode is Invisible.</span>
+<span class="sd">        Subclasses should override to add size-based visibility checks.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">mode</span> <span class="o">!=</span> <span class="n">RenderMode</span><span class="o">.</span><span class="n">Invisible</span></div>
+
+
 <div class="viewcode-block" id="MediaObject.move">
-<a class="viewcode-back" href="../../../../pyzui/mediaobject.html#pyzui.objects.mediaobjects.mediaobject.MediaObject.move">[docs]</a>
+<a class="viewcode-back" href="../../../../pyzui/objects/mediaobjects/mediaobject.html#pyzui.objects.mediaobjects.mediaobject.MediaObject.move">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dx</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">dy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
@@ -182,14 +208,14 @@
 <span class="sd">        an on-screen distance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1">#self._x and self._y correspond to self.pos[0] and self.pos[1], but</span>
-        <span class="c1">#mediaobject.pos dosen&#39;t support += operation</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">+=</span> <span class="n">dx</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">+=</span> <span class="n">dy</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">)</span></div>
+        <span class="c1"># self._x and self._y correspond to self.pos[0] and self.pos[1], but</span>
+        <span class="c1"># mediaobject.pos dosen&#39;t support += operation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">+=</span> <span class="n">dx</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">**-</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">+=</span> <span class="n">dy</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">**-</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="MediaObject.zoom">
-<a class="viewcode-back" href="../../../../pyzui/mediaobject.html#pyzui.objects.mediaobjects.mediaobject.MediaObject.zoom">[docs]</a>
+<a class="viewcode-back" href="../../../../pyzui/objects/mediaobjects/mediaobject.html#pyzui.objects.mediaobjects.mediaobject.MediaObject.zoom">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">zoom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amount</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
@@ -207,34 +233,41 @@
         <span class="c1">## C_i is the image coordinates of the centre</span>
         <span class="c1">## P is the onscreen position of the centre</span>
         <span class="c1">## zoomlevel_i&#39; = zoomlevel_i + amount</span>
-        <span class="c1">##    P = scene.origin + C_s * 2**zoomlevel_s</span>
-        <span class="c1">##      =&gt; C_s = (P - scene.origin) * 2**-zoomlevel_s</span>
-        <span class="c1">## C_s  = self.pos  + C_i * 2**zoomlevel_i</span>
-        <span class="c1">##      =&gt; C_i = (C_s - self.pos) * 2**-zoomlevel_i</span>
-        <span class="c1">## C_s&#39; = self.pos&#39; + C_i * 2**zoomlevel_i&#39;</span>
+        <span class="c1">##    P = scene.origin + C_s * math.exp2(zoomlevel_s)</span>
+        <span class="c1">##      =&gt; C_s = (P - scene.origin) * math.exp2(-zoomlevel_s)</span>
+        <span class="c1">## C_s  = self.pos  + C_i * math.exp2(zoomlevel_i)</span>
+        <span class="c1">##      =&gt; C_i = (C_s - self.pos) * math.exp2(-zoomlevel_i)</span>
+        <span class="c1">## C_s&#39; = self.pos&#39; + C_i * math.exp2(zoomlevel_i&#39;)</span>
         <span class="c1">##      = self.pos&#39; + (C_s - self.pos)</span>
-        <span class="c1">##        * 2**(zoomlevel_i&#39;-zoomlevel_i)</span>
+        <span class="c1">##        * math.exp2(zoomlevel_i&#39;-zoomlevel_i)</span>
         <span class="c1">## solving for C_s = C_s&#39; yields:</span>
-        <span class="c1">##   self.pos&#39; = C_s - (C_s - self.pos) * 2**amount</span>
+        <span class="c1">##   self.pos&#39; = C_s - (C_s - self.pos) * math.exp2(amount)</span>
 
         <span class="c1"># Px, Py = self.centre</span>
-        <span class="c1"># C_sx = (Px - self._scene.origin[0]) * 2**-self._scene.zoomlevel</span>
-        <span class="c1"># C_sy = (Py - self._scene.origin[1]) * 2**-self._scene.zoomlevel</span>
+        <span class="c1"># C_sx = (Px - self._scene.origin[0]) * math.exp2(-self._scene.zoomlevel)</span>
+        <span class="c1"># C_sy = (Py - self._scene.origin[1]) * math.exp2(-self._scene.zoomlevel)</span>
 
         <span class="n">C_ix</span><span class="p">:</span> <span class="nb">float</span>
         <span class="n">C_iy</span><span class="p">:</span> <span class="nb">float</span>
         <span class="n">C_ix</span><span class="p">,</span> <span class="n">C_iy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_centre</span>
-        <span class="n">C_sx</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">+</span> <span class="n">C_ix</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_z</span>
-        <span class="n">C_sy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">+</span> <span class="n">C_iy</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_z</span>
+        <span class="n">C_sx</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">+</span> <span class="n">C_ix</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">exp2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_z</span><span class="p">)</span>
+        <span class="n">C_sy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">+</span> <span class="n">C_iy</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">exp2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_z</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="n">C_sx</span> <span class="o">-</span> <span class="p">(</span><span class="n">C_sx</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="n">amount</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="n">C_sy</span> <span class="o">-</span> <span class="p">(</span><span class="n">C_sy</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="n">amount</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_z</span> <span class="o">+=</span> <span class="n">amount</span></div>
+        <span class="c1"># Calculate new zoomlevel and validate it</span>
+        <span class="n">new_zoomlevel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z</span> <span class="o">+</span> <span class="n">amount</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zoom_manager</span><span class="p">:</span>
+            <span class="n">new_zoomlevel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zoom_manager</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">new_zoomlevel</span><span class="p">)</span>
+            <span class="c1"># Recalculate amount after clamping</span>
+            <span class="n">amount</span> <span class="o">=</span> <span class="n">new_zoomlevel</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="n">C_sx</span> <span class="o">-</span> <span class="p">(</span><span class="n">C_sx</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">exp2</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="n">C_sy</span> <span class="o">-</span> <span class="p">(</span><span class="n">C_sy</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">exp2</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_z</span> <span class="o">=</span> <span class="n">new_zoomlevel</span></div>
 
 
 <div class="viewcode-block" id="MediaObject.hides">
-<a class="viewcode-back" href="../../../../pyzui/mediaobject.html#pyzui.objects.mediaobjects.mediaobject.MediaObject.hides">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">hides</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s1">&#39;MediaObject&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../../pyzui/objects/mediaobjects/mediaobject.html#pyzui.objects.mediaobjects.mediaobject.MediaObject.hides">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">hides</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;MediaObject&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
 <span class="sd">            MediaObject.hides(other)</span>
@@ -250,7 +283,7 @@
             <span class="c1">## nothing can be hidden behind a transparent object</span>
             <span class="k">return</span> <span class="kc">False</span>
 
-        <span class="n">viewport_size</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">viewport_size</span>
+        <span class="n">viewport_size</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">viewport_size</span>
 
         <span class="n">s_left</span><span class="p">:</span> <span class="nb">float</span>
         <span class="n">s_top</span><span class="p">:</span> <span class="nb">float</span>
@@ -259,9 +292,9 @@
         <span class="n">s_bottom</span><span class="p">:</span> <span class="nb">float</span>
         <span class="n">s_right</span><span class="p">,</span> <span class="n">s_bottom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bottomright</span>
         <span class="c1">## clamp values</span>
-        <span class="n">s_left</span> <span class="o">=</span>   <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">s_left</span><span class="p">,</span>   <span class="n">viewport_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-        <span class="n">s_top</span> <span class="o">=</span>    <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">s_top</span><span class="p">,</span>    <span class="n">viewport_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-        <span class="n">s_right</span> <span class="o">=</span>  <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">s_right</span><span class="p">,</span>  <span class="n">viewport_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">s_left</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">s_left</span><span class="p">,</span> <span class="n">viewport_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">s_top</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">s_top</span><span class="p">,</span> <span class="n">viewport_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">s_right</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">s_right</span><span class="p">,</span> <span class="n">viewport_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
         <span class="n">s_bottom</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">s_bottom</span><span class="p">,</span> <span class="n">viewport_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 
         <span class="n">o_left</span><span class="p">:</span> <span class="nb">float</span>
@@ -271,18 +304,17 @@
         <span class="n">o_bottom</span><span class="p">:</span> <span class="nb">float</span>
         <span class="n">o_right</span><span class="p">,</span> <span class="n">o_bottom</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">bottomright</span>
         <span class="c1">## clamp values</span>
-        <span class="n">o_left</span> <span class="o">=</span>   <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">o_left</span><span class="p">,</span>   <span class="n">viewport_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-        <span class="n">o_top</span> <span class="o">=</span>    <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">o_top</span><span class="p">,</span>    <span class="n">viewport_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-        <span class="n">o_right</span> <span class="o">=</span>  <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">o_right</span><span class="p">,</span>  <span class="n">viewport_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">o_left</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">o_left</span><span class="p">,</span> <span class="n">viewport_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">o_top</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">o_top</span><span class="p">,</span> <span class="n">viewport_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">o_right</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">o_right</span><span class="p">,</span> <span class="n">viewport_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
         <span class="n">o_bottom</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">o_bottom</span><span class="p">,</span> <span class="n">viewport_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 
-        <span class="k">return</span> <span class="n">o_left</span>  <span class="o">&gt;=</span> <span class="n">s_left</span>  <span class="ow">and</span> <span class="n">o_top</span>    <span class="o">&gt;=</span> <span class="n">s_top</span> <span class="ow">and</span> \
-               <span class="n">o_right</span> <span class="o">&lt;=</span> <span class="n">s_right</span> <span class="ow">and</span> <span class="n">o_bottom</span> <span class="o">&lt;=</span> <span class="n">s_bottom</span></div>
+        <span class="k">return</span> <span class="n">o_left</span> <span class="o">&gt;=</span> <span class="n">s_left</span> <span class="ow">and</span> <span class="n">o_top</span> <span class="o">&gt;=</span> <span class="n">s_top</span> <span class="ow">and</span> <span class="n">o_right</span> <span class="o">&lt;=</span> <span class="n">s_right</span> <span class="ow">and</span> <span class="n">o_bottom</span> <span class="o">&lt;=</span> <span class="n">s_bottom</span></div>
 
 
 <div class="viewcode-block" id="MediaObject.fit">
-<a class="viewcode-back" href="../../../../pyzui/mediaobject.html#pyzui.objects.mediaobjects.mediaobject.MediaObject.fit">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bbox</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../../pyzui/objects/mediaobjects/mediaobject.html#pyzui.objects.mediaobjects.mediaobject.MediaObject.fit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bbox</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
 <span class="sd">            MediaObject.fit(bbox)</span>
@@ -302,39 +334,45 @@
         <span class="n">box_y2</span><span class="p">:</span> <span class="nb">float</span>
         <span class="n">box_x</span><span class="p">,</span> <span class="n">box_y</span><span class="p">,</span> <span class="n">box_x2</span><span class="p">,</span> <span class="n">box_y2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">bbox</span><span class="p">))</span>
         <span class="n">box_w</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">box_x2</span> <span class="o">-</span> <span class="n">box_x</span>
-        <span class="c1">#print(&#39;box_x, box_x2&#39;,box_x, box_x2)</span>
         <span class="n">box_h</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">box_y2</span> <span class="o">-</span> <span class="n">box_y</span>
-        <span class="c1">#print(&#39;box_y&#39;,box_y)</span>
+        <span class="c1"># print(&#39;box_y&#39;,box_y)</span>
 
         <span class="n">w</span><span class="p">:</span> <span class="nb">float</span>
         <span class="n">h</span><span class="p">:</span> <span class="nb">float</span>
         <span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">onscreen_size</span>
-        <span class="c1">#print(&#39;MEDIA&#39;,w,h)</span>
+
+        <span class="c1"># Apply minimum safe values to prevent division by zero</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>  <span class="c1"># Minimum 1 pixel width</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>  <span class="c1"># Minimum 1 pixel height</span>
+
         <span class="n">scale</span><span class="p">:</span> <span class="nb">float</span>
         <span class="n">target_x</span><span class="p">:</span> <span class="nb">float</span>
         <span class="n">target_y</span><span class="p">:</span> <span class="nb">float</span>
-        <span class="k">if</span> <span class="n">w</span><span class="o">/</span><span class="n">h</span> <span class="o">&gt;</span> <span class="n">box_w</span><span class="o">/</span><span class="n">box_h</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">w</span> <span class="o">/</span> <span class="n">h</span> <span class="o">&gt;</span> <span class="n">box_w</span> <span class="o">/</span> <span class="n">box_h</span><span class="p">:</span>
             <span class="c1">## need to fit width</span>
             <span class="n">scale</span> <span class="o">=</span> <span class="n">box_w</span> <span class="o">/</span> <span class="n">w</span>
             <span class="n">target_x</span> <span class="o">=</span> <span class="n">box_x</span>
-            <span class="n">target_y</span> <span class="o">=</span> <span class="n">box_y</span> <span class="o">+</span> <span class="n">box_h</span><span class="o">/</span><span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">h</span><span class="o">*</span><span class="n">scale</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+            <span class="n">target_y</span> <span class="o">=</span> <span class="n">box_y</span> <span class="o">+</span> <span class="n">box_h</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">h</span> <span class="o">*</span> <span class="n">scale</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1">## need to fit height</span>
             <span class="n">scale</span> <span class="o">=</span> <span class="n">box_h</span> <span class="o">/</span> <span class="n">h</span>
-            <span class="n">target_x</span> <span class="o">=</span> <span class="n">box_x</span> <span class="o">+</span> <span class="n">box_w</span><span class="o">/</span><span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">w</span><span class="o">*</span><span class="n">scale</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+            <span class="n">target_x</span> <span class="o">=</span> <span class="n">box_x</span> <span class="o">+</span> <span class="n">box_w</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="n">scale</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
             <span class="n">target_y</span> <span class="o">=</span> <span class="n">box_y</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">zoomlevel</span> <span class="o">+=</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">scale</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># Safe log calculation with bounds checking</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">scale</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.001</span>  <span class="c1"># Minimum safe scale (0.1%)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">zoomlevel</span> <span class="o">+=</span> <span class="n">math</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">scale</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">ZeroDivisionError</span><span class="p">):</span>
+            <span class="c1"># Fallback: don&#39;t change zoomlevel if scale is invalid</span>
+            <span class="k">pass</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">target_x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">origin</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> \
-            <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">)</span>
-        <span class="c1">#print(&#39;self._x&#39;,self._x)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">target_y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">origin</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> \
-            <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">target_x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">origin</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">**-</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">target_y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">origin</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">**-</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">)</span></div>
 
-        <span class="c1">#print(&#39;self._y&#39;,self._y)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__cmp__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s1">&#39;MediaObject&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__cmp__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;MediaObject&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
 <span class="sd">            MediaObject.__cmp__(other)</span>
@@ -382,10 +420,10 @@
 <span class="sd">        The factor by which each dimension of the image should be scaled</span>
 <span class="sd">        when rendering it to the screen.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">))</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">topleft</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">topleft</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Property :</span>
 <span class="sd">            MediaObject.topleft</span>
@@ -403,12 +441,12 @@
 <span class="sd">        here self.pos() is mediaobject</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">x</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">origin</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">)</span>
-        <span class="n">y</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">origin</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">)</span>
+        <span class="n">x</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">origin</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">)</span>
+        <span class="n">y</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">origin</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">onscreen_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">onscreen_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Property :</span>
 <span class="sd">            MediaObject.onscreen_size</span>
@@ -421,10 +459,10 @@
 <span class="sd">        This gets inherited by higher order classes (StringMediaObject,</span>
 <span class="sd">        TiledMediaObject, etc.)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span>
+        <span class="k">pass</span>  <span class="c1"># type: ignore[empty-body,return]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">bottomright</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bottomright</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Property :</span>
 <span class="sd">            MediaObject.bottomright</span>
@@ -435,8 +473,8 @@
 
 <span class="sd">        The on-screen position of the bottom-right corner of the image.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">o</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">topleft</span>
-        <span class="n">s</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">onscreen_size</span>
+        <span class="n">o</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">topleft</span>
+        <span class="n">s</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">onscreen_size</span>
         <span class="n">x</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">y</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">o</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
@@ -458,7 +496,7 @@
         <span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">onscreen_size</span>
         <span class="k">return</span> <span class="n">w</span> <span class="o">*</span> <span class="n">h</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__get_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__get_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
 <span class="sd">            __get_pos</span>
@@ -471,7 +509,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__set_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__set_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
 <span class="sd">            __set_pos(pos)</span>
@@ -488,7 +526,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Creating MediaObject.pos property with __get_pos as</span>
 <span class="sd">    getter and __set_pos as setter&quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__get_centre</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__get_centre</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
 <span class="sd">            __get_centre</span>
@@ -502,24 +540,28 @@
 <span class="sd">        Converts image-coordinate C_i to screen-coordinate P through</span>
 <span class="sd">        scene-coordinate C_s using the formulas::</span>
 
-<span class="sd">            P = scene.origin + C_s * 2**zoomlevel_s</span>
-<span class="sd">            C_s = self.pos + C_i * 2**zoomlevel_i</span>
+<span class="sd">            P = scene.origin + C_s * math.exp2(zoomlevel_s)</span>
+<span class="sd">            C_s = self.pos + C_i * math.exp2(zoomlevel_i)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1">## we need to convert image-coordinate C_i to</span>
         <span class="c1">## screen-coordinate P (through scene-coordinate C_s):</span>
-        <span class="c1">##   P = scene.origin + C_s * 2**zoomlevel_s</span>
-        <span class="c1">## C_s = self.pos + C_i * 2**zoomlevel_i</span>
+        <span class="c1">##   P = scene.origin + C_s * math.exp2(zoomlevel_s)</span>
+        <span class="c1">## C_s = self.pos + C_i * math.exp2(zoomlevel_i)</span>
 
-        <span class="c1">#This are the image coordinates relative to scene coordinates.</span>
+        <span class="c1"># This are the image coordinates relative to scene coordinates.</span>
 
-        <span class="n">C_s</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_centre</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_z</span><span class="p">,</span>
-               <span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_centre</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_z</span><span class="p">)</span>
+        <span class="n">C_s</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_centre</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">exp2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_z</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_centre</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">exp2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_z</span><span class="p">),</span>
+        <span class="p">)</span>
 
         <span class="c1">#</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">origin</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">C_s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">origin</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">C_s</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">origin</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">C_s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">exp2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">origin</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">C_s</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">exp2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">),</span>
+        <span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__set_centre</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">centre</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__set_centre</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">centre</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
 <span class="sd">            __set_centre(centre)</span>
@@ -533,19 +575,20 @@
 <span class="sd">        Converts screen-coordinate P to image-coordinate C_i through</span>
 <span class="sd">        scene-coordinate C_s using the formulas::</span>
 
-<span class="sd">            P = scene.origin + C_s * 2**zoomlevel_s</span>
-<span class="sd">            C_s = self.pos + C_i * 2**zoomlevel_i</span>
+<span class="sd">            P = scene.origin + C_s * math.exp2(zoomlevel_s)</span>
+<span class="sd">            C_s = self.pos + C_i * math.exp2(zoomlevel_i)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1">## we need to convert screen-coordinate P to</span>
         <span class="c1">## image-coordinate C_i (through scene-coordinate C_s):</span>
-        <span class="c1">##   P = scene.origin + C_s * 2**zoomlevel_s</span>
-        <span class="c1">##     =&gt; C_s = (P - scene.origin) * 2**-zoomlevel_s</span>
-        <span class="c1">## C_s = self.pos  + C_i * 2**zoomlevel_i</span>
-        <span class="c1">##     =&gt; C_i = (C_s - self.pos) * 2**-zoomlevel_i</span>
-        <span class="n">C_s</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="n">centre</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">origin</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**-</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">,</span>
-               <span class="p">(</span><span class="n">centre</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">origin</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**-</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_centre</span> <span class="o">=</span> <span class="p">((</span><span class="n">C_s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**-</span><span class="bp">self</span><span class="o">.</span><span class="n">_z</span><span class="p">,</span>
-                        <span class="p">(</span><span class="n">C_s</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**-</span><span class="bp">self</span><span class="o">.</span><span class="n">_z</span><span class="p">)</span>
+        <span class="c1">##   P = scene.origin + C_s * math.exp2(zoomlevel_s)</span>
+        <span class="c1">##     =&gt; C_s = (P - scene.origin) * math.exp2(-zoomlevel_s)</span>
+        <span class="c1">## C_s = self.pos  + C_i * math.exp2(zoomlevel_i)</span>
+        <span class="c1">##     =&gt; C_i = (C_s - self.pos) * math.exp2(-zoomlevel_i)</span>
+        <span class="n">C_s</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">centre</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">origin</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">exp2</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">centre</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">origin</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">exp2</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_centre</span> <span class="o">=</span> <span class="p">((</span><span class="n">C_s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">exp2</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_z</span><span class="p">),</span> <span class="p">(</span><span class="n">C_s</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">exp2</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_z</span><span class="p">))</span>
 
     <span class="n">centre</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_centre</span><span class="p">,</span> <span class="n">__set_centre</span><span class="p">)</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Creating MediaObject.centre property with __get_centre as</span>
@@ -564,7 +607,7 @@
 
 <span class="sd">        Format: ClassName(media_id)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="si">}</span><span class="s2">)&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -579,11 +622,52 @@
 
 <span class="sd">        Format: ClassName(repr(media_id))</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="si">!r}</span><span class="s2">)&quot;</span>
+
+<div class="viewcode-block" id="MediaObject.to_dict">
+<a class="viewcode-back" href="../../../../pyzui/objects/mediaobjects/mediaobject.html#pyzui.objects.mediaobjects.mediaobject.MediaObject.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            MediaObject.to_dict()</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            None</span>
+
+<span class="sd">        MediaObject.to_dict() --&gt; Dict[str, Any]</span>
+
+<span class="sd">        Serialize object to dictionary for copying.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="s2">&quot;media_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span>
+            <span class="s2">&quot;position&quot;</span><span class="p">:</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z</span><span class="p">),</span>
+            <span class="s2">&quot;velocity&quot;</span><span class="p">:</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vz</span><span class="p">),</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="MediaObject.from_dict">
+<a class="viewcode-back" href="../../../../pyzui/objects/mediaobjects/mediaobject.html#pyzui.objects.mediaobjects.mediaobject.MediaObject.from_dict">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">scene</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MediaObject&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            MediaObject.from_dict(data, scene)</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            data : Dict[str, Any]</span>
+<span class="sd">            scene : Any</span>
+
+<span class="sd">        MediaObject.from_dict(data, scene) --&gt; MediaObject</span>
+
+<span class="sd">        Create MediaObject from serialized data.</span>
+<span class="sd">        Subclasses must override this method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Subclasses must implement from_dict&quot;</span><span class="p">)</span></div>
+</div>
+
 
 
 <div class="viewcode-block" id="LoadError">
-<a class="viewcode-back" href="../../../../pyzui/mediaobject.html#pyzui.objects.mediaobjects.mediaobject.LoadError">[docs]</a>
+<a class="viewcode-back" href="../../../../pyzui/objects/mediaobjects/mediaobject.html#pyzui.objects.mediaobjects.mediaobject.LoadError">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">LoadError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Exception :</span>
@@ -593,11 +677,13 @@
 <span class="sd">    or processing media content. This can occur during file loading,</span>
 <span class="sd">    format conversion, or media initialization.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">pass</span></div>
 
 
+
 <div class="viewcode-block" id="RenderMode">
-<a class="viewcode-back" href="../../../../pyzui/mediaobject.html#pyzui.objects.mediaobjects.mediaobject.RenderMode">[docs]</a>
+<a class="viewcode-back" href="../../../../pyzui/objects/mediaobjects/mediaobject.html#pyzui.objects.mediaobjects.mediaobject.RenderMode">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">RenderMode</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class :</span>
@@ -614,6 +700,7 @@
 <span class="sd">        HighQuality : int = 2</span>
 <span class="sd">            MediaObject should be rendered in high quality mode</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">Invisible</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">Draft</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">HighQuality</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span></div>
@@ -647,17 +734,22 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/userinterface.html">User Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/svgfeatures.html">SVG Features</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/configsystem.html">Configuration System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/objectsystem.html">Object System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/windowsystem.html">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/backup.html">Backup System</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
 <ul>
@@ -672,6 +764,10 @@
 <p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyzui.html">pyzui package</a></li>
 </ul>
 
 <div class="relations">

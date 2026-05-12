@@ -4,11 +4,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>pyzui.tilesystem.tilestore.tilecache &#8212; PyZui 0.11 documentation</title>
+    <title>pyzui.tilesystem.tilestore.tilecache &#8212; PyZui 0.5.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=cc7d0dec" />
-    <script src="../../../../_static/documentation_options.js?v=086c1757"></script>
+    <script src="../../../../_static/documentation_options.js?v=b9afe91b"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -49,19 +49,20 @@
 
 <span class="sd">&quot;&quot;&quot;Thread-safe Least Recently Used (LRU) cache for storing tiles.&quot;&quot;&quot;</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">threading</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLock</span><span class="p">,</span> <span class="n">Thread</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">deque</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">deque</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">threading</span><span class="w"> </span><span class="kn">import</span> <span class="n">Event</span><span class="p">,</span> <span class="n">RLock</span><span class="p">,</span> <span class="n">Thread</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">..tile</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tile</span>
 
-<span class="n">TileID</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+<span class="n">TileID</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+
 
 <div class="viewcode-block" id="TileCache">
-<a class="viewcode-back" href="../../../../pyzui/tilecache.html#pyzui.tilesystem.tilestore.tilecache.TileCache">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">TileCache</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<a class="viewcode-back" href="../../../../pyzui/tilesystem/tilecache.html#pyzui.tilesystem.tilestore.tilecache.TileCache">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TileCache</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Constructor:</span>
 <span class="sd">        TileCache(maxsize, maxage)</span>
@@ -76,6 +77,7 @@
 <span class="sd">    Tiles can be accessed in much the same way as `dict` objects:</span>
 <span class="sd">    `tilecache[tile_id]` holds the tile identified by the given `tile_id`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxsize</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span> <span class="n">maxage</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor:</span>
@@ -100,22 +102,30 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__maxsize</span> <span class="o">=</span> <span class="n">maxsize</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__maxage</span> <span class="o">=</span> <span class="n">maxage</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__d</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__atime</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__anum</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__maxaccesses</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__discard_queue</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__d</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">TileID</span><span class="p">,</span> <span class="n">Tile</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__atime</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">TileID</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__anum</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">TileID</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__maxaccesses</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">TileID</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__discard_queue</span><span class="p">:</span> <span class="n">deque</span><span class="p">[</span><span class="n">TileID</span><span class="p">]</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__num_tiles</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__lock</span> <span class="o">=</span> <span class="n">RLock</span><span class="p">()</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">__shutdown_event</span> <span class="o">=</span> <span class="n">Event</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__periodic_clean_thread</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__periodic_clean</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__periodic_clean_thread</span><span class="o">.</span><span class="n">daemon</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__periodic_clean_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
+<div class="viewcode-block" id="TileCache.shutdown">
+<a class="viewcode-back" href="../../../../pyzui/tilesystem/tilecache.html#pyzui.tilesystem.tilestore.tilecache.TileCache.shutdown">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Signal the periodic clean thread to stop.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__shutdown_event</span><span class="o">.</span><span class="n">set</span><span class="p">()</span></div>
+
+
 <div class="viewcode-block" id="TileCache.insert">
-<a class="viewcode-back" href="../../../../pyzui/tilecache.html#pyzui.tilesystem.tilestore.tilecache.TileCache.insert">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_id</span><span class="p">:</span> <span class="n">TileID</span><span class="p">,</span> <span class="n">tile</span><span class="p">:</span> <span class="s1">&#39;Tile&#39;</span><span class="p">,</span> <span class="n">maxaccesses</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../../pyzui/tilesystem/tilecache.html#pyzui.tilesystem.tilestore.tilecache.TileCache.insert">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_id</span><span class="p">:</span> <span class="n">TileID</span><span class="p">,</span> <span class="n">tile</span><span class="p">:</span> <span class="s2">&quot;Tile&quot;</span><span class="p">,</span> <span class="n">maxaccesses</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
 <span class="sd">            TileCache.insert(tile_id, tile, maxaccesses)</span>
@@ -159,7 +169,7 @@
     <span class="c1">#     &quot;&quot;&quot;</span>
     <span class="c1">#     return tile_id in self.__maxaccesses</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__mortal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_id</span><span class="p">:</span> <span class="n">TileID</span><span class="p">,</span> <span class="n">tile</span><span class="p">:</span> <span class="s1">&#39;Tile&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__mortal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_id</span><span class="p">:</span> <span class="n">TileID</span><span class="p">,</span> <span class="n">tile</span><span class="p">:</span> <span class="s2">&quot;Tile&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
 <span class="sd">            __mortal(tile_id, tile)</span>
@@ -177,7 +187,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">tile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">tile_id</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_id</span><span class="p">:</span> <span class="n">TileID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Tile&#39;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_id</span><span class="p">:</span> <span class="n">TileID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Tile&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
 <span class="sd">            TileCache.__getitem__(tile_id)</span>
@@ -201,8 +211,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">__atime</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">__anum</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__anum</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">tile_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
-                <span class="k">if</span> <span class="n">tile_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__maxaccesses</span> <span class="ow">and</span> \
-                   <span class="bp">self</span><span class="o">.</span><span class="n">__anum</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__maxaccesses</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">tile_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__maxaccesses</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__anum</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__maxaccesses</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]:</span>
                     <span class="c1">## tile has expired</span>
                     <span class="k">del</span> <span class="bp">self</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]</span>
 
@@ -221,14 +230,18 @@
 
 <span class="sd">        Periodically remove old tiles based on maxage.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__shutdown_event</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
             <span class="c1">## make sure the age of tiles never exceeds 4/3 maxage</span>
-            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__maxage</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__shutdown_event</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__maxage</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__shutdown_event</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
+                <span class="k">break</span>
 
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lock</span><span class="p">:</span>
-                <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">__maxage</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__discard_queue</span> <span class="ow">and</span> \
-                      <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__atime</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__discard_queue</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> \
-                        <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">__maxage</span><span class="p">:</span>
+                <span class="k">while</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__maxage</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                    <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__discard_queue</span>
+                    <span class="ow">and</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__atime</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__discard_queue</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">__maxage</span>
+                <span class="p">):</span>
                     <span class="n">tile_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__discard_queue</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                     <span class="k">del</span> <span class="bp">self</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]</span>
 
@@ -248,7 +261,7 @@
                 <span class="n">tile_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__discard_queue</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="k">del</span> <span class="bp">self</span><span class="p">[</span><span class="n">tile_id</span><span class="p">]</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_id</span><span class="p">:</span> <span class="n">TileID</span><span class="p">,</span> <span class="n">tile</span><span class="p">:</span> <span class="s1">&#39;Tile&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_id</span><span class="p">:</span> <span class="n">TileID</span><span class="p">,</span> <span class="n">tile</span><span class="p">:</span> <span class="s2">&quot;Tile&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
 <span class="sd">            TileCache.__setitem__(tile_id, tile)</span>
@@ -322,7 +335,7 @@
             <span class="k">return</span> <span class="n">tile_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__d</span>
 
 <div class="viewcode-block" id="TileCache.purge">
-<a class="viewcode-back" href="../../../../pyzui/tilecache.html#pyzui.tilesystem.tilestore.tilecache.TileCache.purge">[docs]</a>
+<a class="viewcode-back" href="../../../../pyzui/tilesystem/tilecache.html#pyzui.tilesystem.tilestore.tilecache.TileCache.purge">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">purge</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
@@ -371,17 +384,22 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/userinterface.html">User Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/svgfeatures.html">SVG Features</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/configsystem.html">Configuration System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/objectsystem.html">Object System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/windowsystem.html">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/backup.html">Backup System</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
 <ul>
@@ -396,6 +414,10 @@
 <p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyzui.html">pyzui package</a></li>
 </ul>
 
 <div class="relations">

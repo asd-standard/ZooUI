@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>pyzui.windows.dialogwindows.svgpickerinputdialog module &#8212; PyZui 0.5.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=cc7d0dec" />
+    <script src="../../../_static/documentation_options.js?v=b9afe91b"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="pyzui.windows.dialogwindows.zoomsettingsdialog module" href="zoomsettingsdialog.html" />
+    <link rel="prev" title="pyzui.windows.dialogwindows.stringinputdialog module" href="stringinputdialog.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-pyzui.windows.dialogwindows.svgpickerinputdialog">
+<span id="pyzui-windows-dialogwindows-svgpickerinputdialog-module"></span><h1>pyzui.windows.dialogwindows.svgpickerinputdialog module<a class="headerlink" href="#module-pyzui.windows.dialogwindows.svgpickerinputdialog" title="Link to this heading">¶</a></h1>
+<p>SVG picker input dialog with color selection.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyzui.windows.dialogwindows.svgpickerinputdialog.</span></span><span class="sig-name descname"><span class="pre">OpenSVGPickerInputDialog</span></span><a class="reference internal" href="../../../_modules/pyzui/windows/dialogwindows/svgpickerinputdialog.html#OpenSVGPickerInputDialog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="simple">
+<dt>Constructor :</dt><dd><p>OpenSVGPickerInputDialog()</p>
+</dd>
+<dt>Parameters :</dt><dd><p>None</p>
+</dd>
+</dl>
+<p>OpenSVGPickerInputDialog() –&gt; None</p>
+<p>Gather SVG file selection through a dialog with color selection.
+Also gives a selection column of the last 20 used colors.</p>
+<dl class="simple">
+<dt>Constructor :</dt><dd><p>OpenSVGPickerInputDialog()</p>
+</dd>
+<dt>Parameters :</dt><dd><p>None</p>
+</dd>
+</dl>
+<p>OpenSVGPickerInputDialog() –&gt; None</p>
+<p>Create a new OpenSVGPickerInputDialog for gathering SVG file selection with color selection.</p>
+<p>Initializes the dialog with empty color, loads previously used colors
+from the color store file, or creates default colors (red, green, blue) if
+no color history exists. Also scans the SVG directory for available SVG files.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog.SVG_DIR">
+<span class="sig-name descname"><span class="pre">SVG_DIR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'../data/SVG'</span></em><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog.SVG_DIR" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog.DEFAULT_SVG_THICKNESS">
+<span class="sig-name descname"><span class="pre">DEFAULT_SVG_THICKNESS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'50'</span></em><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog.DEFAULT_SVG_THICKNESS" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/windows/dialogwindows/svgpickerinputdialog.html#OpenSVGPickerInputDialog.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog.__init__" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Constructor :</dt><dd><p>OpenSVGPickerInputDialog()</p>
+</dd>
+<dt>Parameters :</dt><dd><p>None</p>
+</dd>
+</dl>
+<p>OpenSVGPickerInputDialog() –&gt; None</p>
+<p>Create a new OpenSVGPickerInputDialog for gathering SVG file selection with color selection.</p>
+<p>Initializes the dialog with empty color, loads previously used colors
+from the color store file, or creates default colors (red, green, blue) if
+no color history exists. Also scans the SVG directory for available SVG files.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog.shape_color">
+<span class="sig-name descname"><span class="pre">shape_color</span></span><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog.shape_color" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog.selected_svg">
+<span class="sig-name descname"><span class="pre">selected_svg</span></span><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog.selected_svg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog.color_codes">
+<span class="sig-name descname"><span class="pre">color_codes</span></span><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog.color_codes" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog.custom_color_input">
+<span class="sig-name descname"><span class="pre">custom_color_input</span></span><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog.custom_color_input" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog.thickness_input">
+<span class="sig-name descname"><span class="pre">thickness_input</span></span><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog.thickness_input" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._svg_buttons">
+<span class="sig-name descname"><span class="pre">_svg_buttons</span></span><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._svg_buttons" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._svg_colors">
+<span class="sig-name descname"><span class="pre">_svg_colors</span></span><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._svg_colors" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._svg_thicknesses">
+<span class="sig-name descname"><span class="pre">_svg_thicknesses</span></span><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._svg_thicknesses" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._svg_contents">
+<span class="sig-name descname"><span class="pre">_svg_contents</span></span><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._svg_contents" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._svg_renderers">
+<span class="sig-name descname"><span class="pre">_svg_renderers</span></span><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._svg_renderers" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._modified_svg_files">
+<span class="sig-name descname"><span class="pre">_modified_svg_files</span></span><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._modified_svg_files" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog.SVG_FILES">
+<span class="sig-name descname"><span class="pre">SVG_FILES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog.SVG_FILES" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog.SVG_NAMES">
+<span class="sig-name descname"><span class="pre">SVG_NAMES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog.SVG_NAMES" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._modify_svg_file">
+<span class="sig-name descname"><span class="pre">_modify_svg_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svg_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thickness</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/windows/dialogwindows/svgpickerinputdialog.html#OpenSVGPickerInputDialog._modify_svg_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._modify_svg_file" title="Link to this definition">¶</a></dt>
+<dd><p>Modify an SVG file with new color and/or thickness using XML parsing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>svg_path</strong> – Path to the original SVG file</p></li>
+<li><p><strong>color</strong> – Hex color code (without #) to apply to stroke and fill</p></li>
+<li><p><strong>thickness</strong> – Stroke width value</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>svg_{8_char_hex})</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Cache hash of modified SVG (format</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._color_square">
+<span class="sig-name descname"><span class="pre">_color_square</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color_code</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/windows/dialogwindows/svgpickerinputdialog.html#OpenSVGPickerInputDialog._color_square"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._color_square" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Method :</dt><dd><p>OpenSVGPickerInputDialog._color_square(color_code)</p>
+</dd>
+<dt>Parameters :</dt><dd><p>color_code : str</p>
+</dd>
+</dl>
+<p>OpenSVGPickerInputDialog._color_square(color_code) –&gt; QWidget</p>
+<p>Creates a colored square widget.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._color_button_click">
+<span class="sig-name descname"><span class="pre">_color_button_click</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/windows/dialogwindows/svgpickerinputdialog.html#OpenSVGPickerInputDialog._color_button_click"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._color_button_click" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Method :</dt><dd><p>OpenSVGPickerInputDialog._color_button_click(color)</p>
+</dd>
+<dt>Parameters :</dt><dd><p>color : str</p>
+</dd>
+</dl>
+<p>OpenSVGPickerInputDialog._color_button_click(color) –&gt; None</p>
+<p>Handles color button click event.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._color_button">
+<span class="sig-name descname"><span class="pre">_color_button</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color_code</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/windows/dialogwindows/svgpickerinputdialog.html#OpenSVGPickerInputDialog._color_button"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._color_button" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Method :</dt><dd><p>OpenSVGPickerInputDialog._color_button(color_code)</p>
+</dd>
+<dt>Parameters :</dt><dd><p>color_code : str</p>
+</dd>
+</dl>
+<p>OpenSVGPickerInputDialog._color_button(color_code) –&gt; QWidget</p>
+<p>Creates a color selection button.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._svg_widget">
+<span class="sig-name descname"><span class="pre">_svg_widget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svg_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/windows/dialogwindows/svgpickerinputdialog.html#OpenSVGPickerInputDialog._svg_widget"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._svg_widget" title="Link to this definition">¶</a></dt>
+<dd><p>Create a widget that displays an SVG preview and acts as a button.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._svg_button_click">
+<span class="sig-name descname"><span class="pre">_svg_button_click</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svg_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/windows/dialogwindows/svgpickerinputdialog.html#OpenSVGPickerInputDialog._svg_button_click"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._svg_button_click" title="Link to this definition">¶</a></dt>
+<dd><p>Handle SVG button click event.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._create_modified_svg_renderer">
+<span class="sig-name descname"><span class="pre">_create_modified_svg_renderer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svg_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_update</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/windows/dialogwindows/svgpickerinputdialog.html#OpenSVGPickerInputDialog._create_modified_svg_renderer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._create_modified_svg_renderer" title="Link to this definition">¶</a></dt>
+<dd><p>Create a modified SVG renderer with color and thickness applied.
+Uses XML parsing instead of regex for more reliable modification.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>svg_path</strong> – Path to the SVG file</p></li>
+<li><p><strong>force_update</strong> – If True, always create new renderer even if cached</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._apply_color_to_svg">
+<span class="sig-name descname"><span class="pre">_apply_color_to_svg</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/windows/dialogwindows/svgpickerinputdialog.html#OpenSVGPickerInputDialog._apply_color_to_svg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._apply_color_to_svg" title="Link to this definition">¶</a></dt>
+<dd><p>Apply the selected color to the selected SVG preview.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._apply_thickness_to_svg">
+<span class="sig-name descname"><span class="pre">_apply_thickness_to_svg</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/windows/dialogwindows/svgpickerinputdialog.html#OpenSVGPickerInputDialog._apply_thickness_to_svg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._apply_thickness_to_svg" title="Link to this definition">¶</a></dt>
+<dd><p>Apply the entered thickness to the selected SVG preview.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._apply_changes_to_svg">
+<span class="sig-name descname"><span class="pre">_apply_changes_to_svg</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/windows/dialogwindows/svgpickerinputdialog.html#OpenSVGPickerInputDialog._apply_changes_to_svg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._apply_changes_to_svg" title="Link to this definition">¶</a></dt>
+<dd><p>Apply both color and thickness changes to the selected SVG preview.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._main_dialog">
+<span class="sig-name descname"><span class="pre">_main_dialog</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/windows/dialogwindows/svgpickerinputdialog.html#OpenSVGPickerInputDialog._main_dialog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._main_dialog" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Method :</dt><dd><p>OpenSVGPickerInputDialog._main_dialog()</p>
+</dd>
+<dt>Parameters :</dt><dd><p>None</p>
+</dd>
+</dl>
+<p>OpenSVGPickerInputDialog._main_dialog() –&gt; QDialog</p>
+<p>Creates and configures the main dialog window.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._run_dialog">
+<span class="sig-name descname"><span class="pre">_run_dialog</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/windows/dialogwindows/svgpickerinputdialog.html#OpenSVGPickerInputDialog._run_dialog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog._run_dialog" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Method :</dt><dd><p>OpenSVGPickerInputDialog._run_dialog()</p>
+</dd>
+<dt>Parameters :</dt><dd><p>None</p>
+</dd>
+</dl>
+<p>OpenSVGPickerInputDialog._run_dialog() –&gt; Tuple[bool, str]</p>
+<p>Runs the dialog and returns the result.
+Returns (ok, filepath) where ok is True if accepted, filepath is the selected SVG file path.</p>
+</dd></dl>
+
+</dd></dl>
+
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><span class="xref std std-doc">pyzui/objects/mediaobjects/svgmediaobject</span> - SVGMediaObject class for rendering SVG objects</p></li>
+<li><p><span class="xref std std-doc">pyzui/windows/dialogwindows/modifysvginputdialog</span> - Dialog for modifying existing SVG objects</p></li>
+<li><p><span class="xref std std-doc">../../usageinstructions/svgfeatures</span> - User guide for SVG features</p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">PyZui</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html">PyZui installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html#running-pyzui">Running PyZUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usageinstructions/userinterface.html">User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usageinstructions/svgfeatures.html">SVG Features</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/configsystem.html">Configuration System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/objectsystem.html">Object System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/windowsystem.html">Window System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/backup.html">Backup System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../testingdocumentation/unittest.html">Unit Testing Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../testingdocumentation/integrationtest.html">Integration Testing Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../benchmarksdocumentation/qzuibenchmark.html">QZUI Benchmark Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../benchmarksdocumentation/converterbenchmark.html">Converter Benchmark Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../pyzui.html">pyzui package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../backup.html">backup package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../converters.html">converters package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../objects.html">objects package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tilesystem.html">tilesystem package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../windows.html">windows package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../config.html">pyzui.config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../logger.html">pyzui.logger module</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../pyzui.html">pyzui package</a><ul>
+  <li><a href="../../windows.html">windows package</a><ul>
+      <li>Previous: <a href="stringinputdialog.html" title="previous chapter">pyzui.windows.dialogwindows.stringinputdialog module</a></li>
+      <li>Next: <a href="zoomsettingsdialog.html" title="next chapter">pyzui.windows.dialogwindows.zoomsettingsdialog module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, David Roberts, Andrea Silvestri.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../../../_sources/pyzui/windows/dialogwindows/svgpickerinputdialog.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

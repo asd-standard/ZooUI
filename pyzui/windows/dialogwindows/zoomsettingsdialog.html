@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>pyzui.windows.dialogwindows.zoomsettingsdialog module &#8212; PyZui 0.5.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=cc7d0dec" />
+    <script src="../../../_static/documentation_options.js?v=b9afe91b"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="pyzui.windows.dialogwindows.zoomsensitivitydialog module" href="zoomsensitivitydialog.html" />
+    <link rel="prev" title="pyzui.windows.dialogwindows.svgpickerinputdialog module" href="svgpickerinputdialog.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-pyzui.windows.dialogwindows.zoomsettingsdialog">
+<span id="pyzui-windows-dialogwindows-zoomsettingsdialog-module"></span><h1>pyzui.windows.dialogwindows.zoomsettingsdialog module<a class="headerlink" href="#module-pyzui.windows.dialogwindows.zoomsettingsdialog" title="Link to this heading">¶</a></h1>
+<p>Zoom Settings Dialog</p>
+<p>Provides a dialog for configuring zoom limits including minimum and maximum
+zoom levels with clamping to prevent crashes at extreme zoom values.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.zoomsettingsdialog.ZoomSettingsDialog">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyzui.windows.dialogwindows.zoomsettingsdialog.</span></span><span class="sig-name descname"><span class="pre">ZoomSettingsDialog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/windows/dialogwindows/zoomsettingsdialog.html#ZoomSettingsDialog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.windows.dialogwindows.zoomsettingsdialog.ZoomSettingsDialog" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QDialog</span></code></p>
+<dl class="simple">
+<dt>Constructor :</dt><dd><p>ZoomSettingsDialog(parent=None, initial_config=None)</p>
+</dd>
+<dt>Parameters :</dt><dd><dl class="simple">
+<dt>parent<span class="classifier">Optional[QtWidgets.QWidget]</span></dt><dd><p>Parent widget</p>
+</dd>
+<dt>initial_config<span class="classifier">Optional[Dict[str, Any]]</span></dt><dd><p>Initial zoom configuration</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>ZoomSettingsDialog(parent=None, initial_config=None) –&gt; None</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.zoomsettingsdialog.ZoomSettingsDialog._setup_ui">
+<span class="sig-name descname"><span class="pre">_setup_ui</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/windows/dialogwindows/zoomsettingsdialog.html#ZoomSettingsDialog._setup_ui"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.windows.dialogwindows.zoomsettingsdialog.ZoomSettingsDialog._setup_ui" title="Link to this definition">¶</a></dt>
+<dd><p>Setup the dialog UI components.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.zoomsettingsdialog.ZoomSettingsDialog._load_initial_config">
+<span class="sig-name descname"><span class="pre">_load_initial_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/windows/dialogwindows/zoomsettingsdialog.html#ZoomSettingsDialog._load_initial_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.windows.dialogwindows.zoomsettingsdialog.ZoomSettingsDialog._load_initial_config" title="Link to this definition">¶</a></dt>
+<dd><p>Load initial configuration into UI.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.zoomsettingsdialog.ZoomSettingsDialog.get_config">
+<span class="sig-name descname"><span class="pre">get_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/windows/dialogwindows/zoomsettingsdialog.html#ZoomSettingsDialog.get_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.windows.dialogwindows.zoomsettingsdialog.ZoomSettingsDialog.get_config" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Method :</dt><dd><p>get_config()</p>
+</dd>
+</dl>
+<p>Get the current configuration from the dialog.</p>
+<dl class="simple">
+<dt>Returns :</dt><dd><dl class="simple">
+<dt>Dict[str, Any]</dt><dd><p>Zoom configuration dictionary</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>get_config() –&gt; Dict[str, Any]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.zoomsettingsdialog.ZoomSettingsDialog.get_zoom_settings">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_zoom_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/windows/dialogwindows/zoomsettingsdialog.html#ZoomSettingsDialog.get_zoom_settings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.windows.dialogwindows.zoomsettingsdialog.ZoomSettingsDialog.get_zoom_settings" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Method :</dt><dd><p>get_zoom_settings(parent=None, initial_config=None)</p>
+</dd>
+</dl>
+<p>Static method to show dialog and get zoom settings.</p>
+<dl class="simple">
+<dt>Parameters :</dt><dd><dl class="simple">
+<dt>parent<span class="classifier">Optional[QtWidgets.QWidget]</span></dt><dd><p>Parent widget</p>
+</dd>
+<dt>initial_config<span class="classifier">Optional[Dict[str, Any]]</span></dt><dd><p>Initial zoom configuration</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns :</dt><dd><dl class="simple">
+<dt>Optional[Dict[str, Any]]</dt><dd><p>Zoom configuration if accepted, None if cancelled</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>get_zoom_settings(parent=None, initial_config=None) –&gt; Optional[Dict[str, Any]]</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.windows.dialogwindows.zoomsettingsdialog.ZoomSettingsDialog.staticMetaObject">
+<span class="sig-name descname"><span class="pre">staticMetaObject</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">PySide6.QtCore.QMetaObject(&quot;ZoomSettingsDialog&quot;</span> <span class="pre">inherits</span> <span class="pre">&quot;QDialog&quot;:</span> <span class="pre">)</span></em><a class="headerlink" href="#pyzui.windows.dialogwindows.zoomsettingsdialog.ZoomSettingsDialog.staticMetaObject" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">PyZui</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html">PyZui installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html#running-pyzui">Running PyZUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usageinstructions/userinterface.html">User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usageinstructions/svgfeatures.html">SVG Features</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/configsystem.html">Configuration System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/objectsystem.html">Object System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/windowsystem.html">Window System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/backup.html">Backup System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../testingdocumentation/unittest.html">Unit Testing Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../testingdocumentation/integrationtest.html">Integration Testing Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../benchmarksdocumentation/qzuibenchmark.html">QZUI Benchmark Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../benchmarksdocumentation/converterbenchmark.html">Converter Benchmark Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../pyzui.html">pyzui package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../backup.html">backup package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../converters.html">converters package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../objects.html">objects package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tilesystem.html">tilesystem package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../windows.html">windows package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../config.html">pyzui.config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../logger.html">pyzui.logger module</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../pyzui.html">pyzui package</a><ul>
+  <li><a href="../../windows.html">windows package</a><ul>
+      <li>Previous: <a href="svgpickerinputdialog.html" title="previous chapter">pyzui.windows.dialogwindows.svgpickerinputdialog module</a></li>
+      <li>Next: <a href="zoomsensitivitydialog.html" title="next chapter">pyzui.windows.dialogwindows.zoomsensitivitydialog module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, David Roberts, Andrea Silvestri.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../../../_sources/pyzui/windows/dialogwindows/zoomsettingsdialog.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

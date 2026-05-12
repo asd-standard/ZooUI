@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>SVG Features &#8212; PyZui 0.5.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cc7d0dec" />
+    <script src="../_static/documentation_options.js?v=b9afe91b"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Reading Documentation" href="../technicaldocumentation/readingdocumentation.html" />
+    <link rel="prev" title="Program Configuration" href="programconfiguration.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="svg-features">
+<h1>SVG Features<a class="headerlink" href="#svg-features" title="Link to this heading">¶</a></h1>
+<p>PyZUI provides comprehensive support for Scalable Vector Graphics (SVG) files,
+allowing users to add, modify, and manipulate vector graphics within the
+zooming user interface. This document covers all SVG-related features available
+in PyZUI.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<p>SVG (Scalable Vector Graphics) is an XML-based vector image format that
+supports interactivity and animation. In PyZUI, SVG files can be:</p>
+<ul class="simple">
+<li><p>Added to scenes as media objects</p></li>
+<li><p>Modified with custom colors and line thickness</p></li>
+<li><p>Embedded in scene files for portability</p></li>
+<li><p>Rendered at any zoom level without quality loss</p></li>
+</ul>
+</section>
+<section id="key-features">
+<h2>Key Features<a class="headerlink" href="#key-features" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p><strong>SVG Picker Dialog</strong>: Browse and select SVG files from the <code class="docutils literal notranslate"><span class="pre">data/SVG/</span></code> directory</p></li>
+<li><p><strong>Color Customization</strong>: Apply any color to SVG strokes and fills</p></li>
+<li><p><strong>Thickness Adjustment</strong>: Modify line/stroke thickness</p></li>
+<li><p><strong>Modification Dialog</strong>: Edit existing SVG objects in the scene</p></li>
+<li><p><strong>SVG Cache</strong>: Efficient storage of modified SVG files</p></li>
+<li><p><strong>Embedding Support</strong>: Modified SVGs embedded in scene files</p></li>
+</ol>
+</section>
+<section id="adding-svg-objects">
+<h2>Adding SVG Objects<a class="headerlink" href="#adding-svg-objects" title="Link to this heading">¶</a></h2>
+<p>There are two main ways to add SVG objects to your PyZUI scene:</p>
+<p><strong>Method 1: Using the SVG Picker Dialog</strong></p>
+<ol class="arabic simple">
+<li><p>Open the SVG picker dialog from the main menu or toolbar</p></li>
+<li><p>Browse available SVG files in the <code class="docutils literal notranslate"><span class="pre">data/SVG/</span></code> directory</p></li>
+<li><p>Select an SVG file to preview it</p></li>
+<li><p>Choose a color from the color history or enter a custom hex color</p></li>
+<li><p>Adjust the stroke thickness if needed</p></li>
+<li><p>Click “Apply Changes” to preview modifications</p></li>
+<li><p>Click “OK” to add the modified SVG to your scene</p></li>
+</ol>
+<p><strong>Method 2: Direct File Import</strong></p>
+<p>SVG files can also be added directly by:
+- Dragging and dropping SVG files into the PyZUI window
+- Using the “Add Media” dialog to select SVG files
+- Loading scene files that contain embedded SVG objects</p>
+</section>
+<section id="svg-picker-dialog">
+<h2>SVG Picker Dialog<a class="headerlink" href="#svg-picker-dialog" title="Link to this heading">¶</a></h2>
+<p>The SVG Picker Dialog (<code class="docutils literal notranslate"><span class="pre">OpenSVGPickerInputDialog</span></code>) provides an intuitive
+interface for selecting and customizing SVG files:</p>
+<a class="reference internal image-reference" href="../_images/svg_picker_dialog.png"><img alt="SVG Picker Dialog Interface" class="align-center" src="../_images/svg_picker_dialog.png" style="width: 80%;" />
+</a>
+<p><strong>Interface Components:</strong></p>
+<ol class="arabic simple">
+<li><p><strong>SVG Preview Grid</strong>: Thumbnail previews of all available SVG files</p></li>
+<li><p><strong>Color History</strong>: Recently used colors for quick selection</p></li>
+<li><p><strong>Custom Color Input</strong>: Enter any hex color (with or without #)</p></li>
+<li><p><strong>Thickness Input</strong>: Adjust stroke width (default: 50)</p></li>
+<li><p><strong>Apply Changes Button</strong>: Preview modifications before adding</p></li>
+<li><p><strong>OK/Cancel Buttons</strong>: Add to scene or cancel operation</p></li>
+</ol>
+<p><strong>Available SVG Files:</strong></p>
+<p>PyZUI includes a collection of basic shapes in the <code class="docutils literal notranslate"><span class="pre">data/SVG/</span></code> directory:</p>
+<ul class="simple">
+<li><p>Arrows (various directions)</p></li>
+<li><p>Geometric shapes (circles, squares, triangles)</p></li>
+<li><p>Basic icons and symbols</p></li>
+<li><p>Custom shapes (add your own SVG files)</p></li>
+</ul>
+</section>
+<section id="modifying-existing-svg-objects">
+<h2>Modifying Existing SVG Objects<a class="headerlink" href="#modifying-existing-svg-objects" title="Link to this heading">¶</a></h2>
+<p>Existing SVG objects in your scene can be modified using the
+Modify SVG Dialog (<code class="docutils literal notranslate"><span class="pre">ModifySVGInputDialog</span></code>):</p>
+<p><strong>To modify an existing SVG object:</strong></p>
+<ol class="arabic simple">
+<li><p>Select the SVG object in your scene</p></li>
+<li><p>Right-click and choose “Modify SVG” from the context menu</p></li>
+<li><p>Or use the “Modify” option from the object properties panel</p></li>
+</ol>
+<p><strong>Modify Dialog Features:</strong></p>
+<a class="reference internal image-reference" href="../_images/svg_modify_dialog.png"><img alt="SVG Modify Dialog Interface" class="align-center" src="../_images/svg_modify_dialog.png" style="width: 60%;" />
+</a>
+<ol class="arabic simple">
+<li><p><strong>SVG Preview</strong>: Live preview of the SVG with current modifications</p></li>
+<li><p><strong>Color Selection</strong>: Choose from color history or enter custom color</p></li>
+<li><p><strong>Thickness Adjustment</strong>: Modify stroke width</p></li>
+<li><p><strong>Apply Preview Button</strong>: See changes before applying</p></li>
+<li><p><strong>Reset Button</strong>: Revert to original SVG appearance</p></li>
+<li><p><strong>OK/Cancel</strong>: Apply changes or cancel</p></li>
+</ol>
+<p><strong>Note</strong>: The modify dialog is designed for simple shapes (arrows, circles,
+squares, triangles) added via the SVG picker dialog. For complex SVG files
+added from other sources, default values (black color, stroke-width=10) will
+be used with a warning message.</p>
+</section>
+<section id="color-management">
+<h2>Color Management<a class="headerlink" href="#color-management" title="Link to this heading">¶</a></h2>
+<p>PyZUI maintains a color history system that persists across sessions:</p>
+<p><strong>Color History Features:</strong></p>
+<ul class="simple">
+<li><p>Stores up to 24 recently used colors</p></li>
+<li><p>Colors saved in <code class="docutils literal notranslate"><span class="pre">~/.pyzui/colorstore/color_list.txt</span></code></p></li>
+<li><p>Colors shared between SVG picker and modify dialogs</p></li>
+<li><p>Default colors: white (ffffff), red (ff0000), green (00ff00), blue (0000ff)</p></li>
+</ul>
+<p><strong>Custom Color Input:</strong></p>
+<ul class="simple">
+<li><p>Enter hex colors with or without # prefix (e.g., <code class="docutils literal notranslate"><span class="pre">ff5733</span></code> or <code class="docutils literal notranslate"><span class="pre">#ff5733</span></code>)</p></li>
+<li><p>Color names are supported (e.g., <code class="docutils literal notranslate"><span class="pre">red</span></code>, <code class="docutils literal notranslate"><span class="pre">blue</span></code>, <code class="docutils literal notranslate"><span class="pre">green</span></code>)</p></li>
+<li><p>Invalid colors default to black (000000)</p></li>
+</ul>
+</section>
+<section id="svg-cache-system">
+<h2>SVG Cache System<a class="headerlink" href="#svg-cache-system" title="Link to this heading">¶</a></h2>
+<p>PyZUI uses an efficient SVG cache system to store modified SVG files:</p>
+<p><strong>Cache Features:</strong></p>
+<ul class="simple">
+<li><p><strong>Location</strong>: <code class="docutils literal notranslate"><span class="pre">/tmp/pyzui_svg_/</span></code> directory (temporary storage)</p></li>
+<li><p><strong>Format</strong>: <code class="docutils literal notranslate"><span class="pre">svg_{8_char_sha1_hash}.svg</span></code> files</p></li>
+<li><p><strong>Deduplication</strong>: Same content = same hash (saves storage)</p></li>
+<li><p><strong>Flat Structure</strong>: All files in single directory (no subfolders)</p></li>
+</ul>
+<p><strong>How it works:</strong></p>
+<ol class="arabic simple">
+<li><p>When you modify an SVG (color/thickness), PyZUI creates a modified version</p></li>
+<li><p>The modified content is hashed (SHA1, first 8 chars)</p></li>
+<li><p>File is saved as <code class="docutils literal notranslate"><span class="pre">svg_{hash}.svg</span></code> in cache directory</p></li>
+<li><p>SVG objects reference the cache hash instead of original file</p></li>
+<li><p>Cache files are automatically cleaned up on system restart</p></li>
+</ol>
+<p><strong>Benefits:</strong></p>
+<ul class="simple">
+<li><p>Fast retrieval of modified SVGs</p></li>
+<li><p>No duplication of identical modified files</p></li>
+<li><p>Efficient storage for frequently used modifications</p></li>
+<li><p>Enables SVG embedding in scene files</p></li>
+</ul>
+</section>
+<section id="svg-embedding-in-scene-files">
+<h2>SVG Embedding in Scene Files<a class="headerlink" href="#svg-embedding-in-scene-files" title="Link to this heading">¶</a></h2>
+<p>Modified SVG objects can be embedded directly in PyZUI scene (<code class="docutils literal notranslate"><span class="pre">.pzs</span></code>) files:</p>
+<p><strong>Embedding Behavior:</strong></p>
+<ul class="simple">
+<li><p><strong>Modified SVGs</strong>: Embedded as XML content with <code class="docutils literal notranslate"><span class="pre">embedded:</span></code> prefix</p></li>
+<li><p><strong>Unmodified SVGs</strong>: Keep file references (not embedded)</p></li>
+<li><p><strong>Large SVGs</strong>: Warning shown for files &gt;1MB (configurable)</p></li>
+</ul>
+<p><strong>Embedding Example:</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;objects&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;SVGMediaObject&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;media_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;embedded:&lt;?xml version=\&quot;1.0\&quot;?&gt;&lt;svg&gt;...&lt;/svg&gt;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;position&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">],</span>
+<span class="w">            </span><span class="nt">&quot;is_modified&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;original_file_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/path/to/original.svg&quot;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Benefits of Embedding:</strong></p>
+<ol class="arabic simple">
+<li><p><strong>Portability</strong>: Scene files can be shared without external SVG files</p></li>
+<li><p><strong>Version Control</strong>: All modifications stored in single file</p></li>
+<li><p><strong>Backup Safety</strong>: No risk of losing modified SVG files</p></li>
+<li><p><strong>Collaboration</strong>: Easy sharing of complete scenes</p></li>
+</ol>
+</section>
+<section id="svg-utilities">
+<h2>SVG Utilities<a class="headerlink" href="#svg-utilities" title="Link to this heading">¶</a></h2>
+<p>PyZUI includes specialized utilities for working with SVG files:</p>
+<p><strong>Arrow Utilities (``svgarrowutils.py``):</strong></p>
+<ul class="simple">
+<li><p>Detect arrow shapes in SVG files</p></li>
+<li><p>Elongate arrows while maintaining proportions</p></li>
+<li><p>Handle arrowhead positioning and scaling</p></li>
+</ul>
+<p><strong>Shape Utilities:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">svgcircleutils.py</span></code>: Circle manipulation utilities</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">svgsquareutils.py</span></code>: Square/rectangle utilities</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">svgtriangleutils.py</span></code>: Triangle manipulation utilities</p></li>
+</ul>
+<p><strong>Common Use Cases:</strong></p>
+<ol class="arabic simple">
+<li><p><strong>Diagram Creation</strong>: Add arrows between objects</p></li>
+<li><p><strong>Annotation</strong>: Use shapes to highlight areas</p></li>
+<li><p><strong>Flow Charts</strong>: Create visual workflows with connected shapes</p></li>
+<li><p><strong>Technical Drawing</strong>: Add precise geometric shapes</p></li>
+</ol>
+</section>
+<section id="best-practices">
+<h2>Best Practices<a class="headerlink" href="#best-practices" title="Link to this heading">¶</a></h2>
+<p><strong>For Optimal SVG Performance:</strong></p>
+<ol class="arabic simple">
+<li><p><strong>Use Simple Shapes</strong>: Complex SVGs with many paths render slower</p></li>
+<li><p><strong>Limit Embedding</strong>: Only embed modified SVGs, keep unmodified as file references</p></li>
+<li><p><strong>Reuse Colors</strong>: Use color history for consistency across objects</p></li>
+<li><p><strong>Batch Modifications</strong>: Make all changes in one dialog session</p></li>
+</ol>
+<p><strong>For Scene Portability:</strong></p>
+<ol class="arabic simple">
+<li><p><strong>Embed Modified SVGs</strong>: Ensures scenes work on other systems</p></li>
+<li><p><strong>Keep Originals</strong>: Maintain original SVG files for future modifications</p></li>
+<li><p><strong>Document Colors</strong>: Note down custom color codes used in complex scenes</p></li>
+<li><p><strong>Test Loading</strong>: Verify scenes load correctly after embedding</p></li>
+</ol>
+<p><strong>Troubleshooting:</strong></p>
+<ul class="simple">
+<li><p><strong>SVG Not Rendering</strong>: Check if file is valid XML, try opening in browser</p></li>
+<li><p><strong>Colors Not Applying</strong>: Some SVGs use CSS classes instead of inline attributes</p></li>
+<li><p><strong>Performance Issues</strong>: Reduce number of SVG objects or simplify complex SVGs</p></li>
+<li><p><strong>Cache Issues</strong>: Clear <code class="docutils literal notranslate"><span class="pre">/tmp/pyzui_svg_/</span></code> directory and restart PyZUI</p></li>
+</ul>
+</section>
+<section id="advanced-usage">
+<h2>Advanced Usage<a class="headerlink" href="#advanced-usage" title="Link to this heading">¶</a></h2>
+<p><strong>Programmatic SVG Addition:</strong></p>
+<p>SVG objects can be added programmatically:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.objects.scene.scene</span><span class="w"> </span><span class="kn">import</span> <span class="n">Scene</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.objects.mediaobjects.svgmediaobject</span><span class="w"> </span><span class="kn">import</span> <span class="n">SVGMediaObject</span>
+
+<span class="c1"># Create scene</span>
+<span class="n">scene</span> <span class="o">=</span> <span class="n">Scene</span><span class="p">()</span>
+
+<span class="c1"># Add SVG from file</span>
+<span class="n">svg_from_file</span> <span class="o">=</span> <span class="n">SVGMediaObject</span><span class="p">(</span><span class="s2">&quot;path/to/shape.svg&quot;</span><span class="p">,</span> <span class="n">scene</span><span class="p">)</span>
+<span class="n">svg_from_file</span><span class="o">.</span><span class="n">pos</span> <span class="o">=</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">svg_from_file</span><span class="p">)</span>
+
+<span class="c1"># Add SVG from cache hash</span>
+<span class="n">svg_from_cache</span> <span class="o">=</span> <span class="n">SVGMediaObject</span><span class="p">(</span><span class="s2">&quot;svg_abc12345&quot;</span><span class="p">,</span> <span class="n">scene</span><span class="p">)</span>
+<span class="n">svg_from_cache</span><span class="o">.</span><span class="n">pos</span> <span class="o">=</span> <span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">svg_from_cache</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Custom SVG Directory:</strong></p>
+<p>To use your own SVG files:</p>
+<ol class="arabic simple">
+<li><p>Create a <code class="docutils literal notranslate"><span class="pre">data/SVG/</span></code> directory in your PyZUI installation</p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">.svg</span></code> files to this directory</p></li>
+<li><p>Restart PyZUI to see new files in the picker dialog</p></li>
+</ol>
+<p><strong>SVG Cache Management:</strong></p>
+<p>Advanced users can manage the SVG cache:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># List cached SVG files</span>
+ls<span class="w"> </span>/tmp/pyzui_svg_/
+
+<span class="c1"># Clear cache (will be recreated as needed)</span>
+rm<span class="w"> </span>-rf<span class="w"> </span>/tmp/pyzui_svg_/
+
+<span class="c1"># Monitor cache size</span>
+du<span class="w"> </span>-sh<span class="w"> </span>/tmp/pyzui_svg_/
+</pre></div>
+</div>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h2>
+<p><strong>Example 1: Creating a Simple Diagram</strong></p>
+<ol class="arabic simple">
+<li><p>Add a circle SVG, color it blue, thickness 10</p></li>
+<li><p>Add a square SVG, color it red, thickness 15</p></li>
+<li><p>Add an arrow SVG between them, color it black, thickness 8</p></li>
+<li><p>Position objects to create a flow diagram</p></li>
+</ol>
+<p><strong>Example 2: Annotation Workflow</strong></p>
+<ol class="arabic simple">
+<li><p>Load an image into PyZUI</p></li>
+<li><p>Add triangle SVGs to highlight important areas</p></li>
+<li><p>Color triangles yellow with transparency</p></li>
+<li><p>Add text labels near triangles</p></li>
+<li><p>Save scene with embedded SVG annotations</p></li>
+</ol>
+<p><strong>Example 3: Technical Drawing</strong></p>
+<ol class="arabic simple">
+<li><p>Create grid background</p></li>
+<li><p>Add precise geometric shapes (circles, squares, triangles)</p></li>
+<li><p>Use consistent colors for different element types</p></li>
+<li><p>Add dimension lines using arrow SVGs</p></li>
+<li><p>Export as high-resolution image</p></li>
+</ol>
+</section>
+<section id="limitations">
+<h2>Limitations<a class="headerlink" href="#limitations" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p><strong>Complex SVGs</strong>: Very complex SVGs with gradients, filters, or animations
+may not render correctly</p></li>
+<li><p><strong>CSS Styling</strong>: External CSS stylesheets in SVG files are not supported</p></li>
+<li><p><strong>JavaScript</strong>: SVG files with embedded JavaScript will not execute</p></li>
+<li><p><strong>External References</strong>: Images or fonts referenced in SVG may not load</p></li>
+<li><p><strong>File Size</strong>: Very large SVG files (&gt;5MB) may cause performance issues</p></li>
+</ol>
+</section>
+<section id="future-enhancements">
+<h2>Future Enhancements<a class="headerlink" href="#future-enhancements" title="Link to this heading">¶</a></h2>
+<p>Planned improvements for SVG support:</p>
+<ol class="arabic simple">
+<li><p><strong>SVG Library</strong>: Expanded collection of pre-made SVG shapes</p></li>
+<li><p><strong>Layer Support</strong>: SVG objects with multiple editable layers</p></li>
+<li><p><strong>Group Operations</strong>: Modify multiple SVG objects simultaneously</p></li>
+<li><p><strong>Export Options</strong>: Export SVG objects as standalone files</p></li>
+<li><p><strong>Template System</strong>: Save and reuse SVG modification templates</p></li>
+</ol>
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><span class="xref std std-doc">../pyzui/svgmediaobject</span> - SVGMediaObject API documentation</p></li>
+<li><p><span class="xref std std-doc">../pyzui/svgpickerinputdialog</span> - SVG Picker Dialog API</p></li>
+<li><p><span class="xref std std-doc">../pyzui/modifysvginputdialog</span> - Modify SVG Dialog API</p></li>
+<li><p><a class="reference internal" href="../technicaldocumentation/objectsystem.html"><span class="doc">Object System</span></a> - Object system overview</p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">PyZui</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html">PyZui installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#running-pyzui">Running PyZUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="userinterface.html">User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">SVG Features</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/configsystem.html">Configuration System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/objectsystem.html">Object System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/windowsystem.html">Window System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/backup.html">Backup System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../testingdocumentation/unittest.html">Unit Testing Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testingdocumentation/integrationtest.html">Integration Testing Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../benchmarksdocumentation/qzuibenchmark.html">QZUI Benchmark Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../benchmarksdocumentation/converterbenchmark.html">Converter Benchmark Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../pyzui.html">pyzui package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="programconfiguration.html" title="previous chapter">Program Configuration</a></li>
+      <li>Next: <a href="../technicaldocumentation/readingdocumentation.html" title="next chapter">Reading Documentation</a></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, David Roberts, Andrea Silvestri.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../_sources/usageinstructions/svgfeatures.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

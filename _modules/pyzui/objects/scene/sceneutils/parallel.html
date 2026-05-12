@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pyzui.objects.scene.sceneutils.parallel &#8212; PyZui 0.5.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=cc7d0dec" />
+    <script src="../../../../../_static/documentation_options.js?v=b9afe91b"></script>
+    <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for pyzui.objects.scene.sceneutils.parallel</h1><div class="highlight"><pre>
+<span></span><span class="c1">## PyZUI - Python Zooming User Interface</span>
+<span class="c1">## Copyright (C) 2009 David Roberts &lt;d@vidr.cc&gt;</span>
+<span class="c1">##</span>
+<span class="c1">## This program is free software; you can redistribute it and/or</span>
+<span class="c1">## modify it under the terms of the GNU General Public License</span>
+<span class="c1">## as published by the Free Software Foundation; either version 3</span>
+<span class="c1">## of the License, or (at your option) any later version.</span>
+<span class="c1">##</span>
+<span class="c1">## This program is distributed in the hope that it will be useful,</span>
+<span class="c1">## but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1">## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1">## GNU General Public License for more details.</span>
+<span class="c1">##</span>
+<span class="c1">## You should have received a copy of the GNU General Public License</span>
+<span class="c1">## along with this program; if not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
+
+<span class="sd">&quot;&quot;&quot;SceneParallelRenderer class for parallel rendering operations.</span>
+
+<span class="sd">This class encapsulates all parallel rendering functionality that was</span>
+<span class="sd">previously part of the Scene class, providing better separation of concerns.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.objects.mediaobjects.stringmediaobject</span><span class="w"> </span><span class="kn">import</span> <span class="n">StringMediaObject</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.objects.scene.scene</span><span class="w"> </span><span class="kn">import</span> <span class="n">Scene</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">PySide6</span><span class="w"> </span><span class="kn">import</span> <span class="n">QtCore</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PySide6.QtGui</span><span class="w"> </span><span class="kn">import</span> <span class="n">QPainter</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParallelLayoutCalculator</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.prioritybatcher</span><span class="w"> </span><span class="kn">import</span> <span class="n">PriorityBatcher</span>
+
+
+<div class="viewcode-block" id="SceneParallelRenderer">
+<a class="viewcode-back" href="../../../../../pyzui/objects/scene/sceneutils/parallel.html#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SceneParallelRenderer</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Manages parallel rendering operations for a Scene.</span>
+
+<span class="sd">    This class encapsulates all parallel rendering functionality that was</span>
+<span class="sd">    previously part of the Scene class, providing better separation of concerns.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        _scene: Reference to parent Scene</span>
+<span class="sd">        _config: Parallel rendering configuration</span>
+<span class="sd">        _enabled: Whether parallel rendering is enabled</span>
+<span class="sd">        _layout_calculator: Parallel layout calculator instance</span>
+<span class="sd">        _priority_batcher: Priority batcher for text objects</span>
+<span class="sd">        _last_viewport_center: Last known viewport center</span>
+<span class="sd">        _last_viewport_rect: Last known viewport rectangle</span>
+<span class="sd">        _stats: Parallel rendering statistics</span>
+<span class="sd">        _logger: Logger instance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scene</span><span class="p">:</span> <span class="s2">&quot;Scene&quot;</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the SceneParallelRenderer.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            scene: Reference to parent Scene</span>
+<span class="sd">            config: Configuration dictionary (may contain &#39;parallel_rendering&#39; key)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="o">=</span> <span class="n">scene</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;parallel_rendering&quot;</span><span class="p">,</span> <span class="p">{})</span> <span class="k">if</span> <span class="n">config</span> <span class="k">else</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;enabled&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layout_calculator</span><span class="p">:</span> <span class="n">ParallelLayoutCalculator</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_priority_batcher</span><span class="p">:</span> <span class="n">PriorityBatcher</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_viewport_center</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_viewport_rect</span><span class="p">:</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QRectF</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;total_text_objects&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;visible_text_objects&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;batches_processed&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;cache_hit_rate&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;average_batch_time_ms&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;total_processing_time_ms&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;SceneParallelRenderer&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SceneParallelRenderer.is_enabled">
+<a class="viewcode-back" href="../../../../../pyzui/objects/scene/sceneutils/parallel.html#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.is_enabled">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_enabled</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if parallel rendering is enabled.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if parallel rendering is enabled, False otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_enabled</span></div>
+
+
+<div class="viewcode-block" id="SceneParallelRenderer.initialize">
+<a class="viewcode-back" href="../../../../../pyzui/objects/scene/sceneutils/parallel.html#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.initialize">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize parallel rendering components if not already initialized.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layout_calculator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Use config values or defaults</span>
+            <span class="n">max_workers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_workers&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+            <span class="n">batch_timeout_ms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;batch_timeout_ms&quot;</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">)</span>
+            <span class="n">enable_profiling</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;enable_profiling&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_layout_calculator</span> <span class="o">=</span> <span class="n">ParallelLayoutCalculator</span><span class="p">(</span>
+                <span class="n">max_workers</span><span class="o">=</span><span class="n">max_workers</span><span class="p">,</span> <span class="n">batch_timeout_ms</span><span class="o">=</span><span class="n">batch_timeout_ms</span><span class="p">,</span> <span class="n">enable_profiling</span><span class="o">=</span><span class="n">enable_profiling</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_priority_batcher</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Use config values or defaults</span>
+            <span class="n">batch_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;batch_size&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+            <span class="n">max_batches</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_batches&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_priority_batcher</span> <span class="o">=</span> <span class="n">PriorityBatcher</span><span class="p">(</span>
+                <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+                <span class="n">max_batches</span><span class="o">=</span><span class="n">max_batches</span><span class="p">,</span>
+                <span class="n">viewport_center</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_last_viewport_center</span><span class="p">,</span>
+                <span class="n">viewport_rect</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_last_viewport_rect</span> <span class="ow">or</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QRectF</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SceneParallelRenderer.update_viewport">
+<a class="viewcode-back" href="../../../../../pyzui/objects/scene/sceneutils/parallel.html#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.update_viewport">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_viewport</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update viewport information for parallel rendering components.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_enabled</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Calculate current viewport center and rectangle</span>
+        <span class="n">viewport_center</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">centre</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">centre</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">viewport_width</span><span class="p">,</span> <span class="n">viewport_height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">viewport_size</span>
+        <span class="n">viewport_rect</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QRectF</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">centre</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">viewport_width</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">centre</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">viewport_height</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="n">viewport_width</span><span class="p">,</span>
+            <span class="n">viewport_height</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Check if viewport has changed significantly</span>
+        <span class="n">viewport_changed</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">abs</span><span class="p">(</span><span class="n">viewport_center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_viewport_center</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mf">10.0</span>
+            <span class="ow">or</span> <span class="nb">abs</span><span class="p">(</span><span class="n">viewport_center</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_viewport_center</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mf">10.0</span>
+            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_viewport_rect</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">viewport_changed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_viewport_center</span> <span class="o">=</span> <span class="n">viewport_center</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_viewport_rect</span> <span class="o">=</span> <span class="n">viewport_rect</span>
+
+            <span class="c1"># Update priority batcher if initialized</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_priority_batcher</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_priority_batcher</span><span class="o">.</span><span class="n">update_viewport</span><span class="p">(</span><span class="n">viewport_center</span><span class="p">,</span> <span class="n">viewport_rect</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SceneParallelRenderer._get_text_objects">
+<a class="viewcode-back" href="../../../../../pyzui/objects/scene/sceneutils/parallel.html#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer._get_text_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_text_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="s2">&quot;StringMediaObject&quot;</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all StringMediaObjects in the scene.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of StringMediaObject instances</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Delegate to Scene&#39;s method</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">_get_text_objects</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SceneParallelRenderer.precalculate_text_layouts">
+<a class="viewcode-back" href="../../../../../pyzui/objects/scene/sceneutils/parallel.html#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.precalculate_text_layouts">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">precalculate_text_layouts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pre-calculate text layouts for parallel rendering.</span>
+
+<span class="sd">        This method should be called before rendering when the scene is moving</span>
+<span class="sd">        to prepare layout data for parallel rendering.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_enabled</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_viewport</span><span class="p">()</span>
+
+        <span class="c1"># Get text objects</span>
+        <span class="n">text_objects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_text_objects</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">text_objects</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Update statistics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">[</span><span class="s2">&quot;total_text_objects&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">text_objects</span><span class="p">)</span>
+
+        <span class="c1"># Add objects to priority batcher</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_priority_batcher</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_priority_batcher</span><span class="o">.</span><span class="n">clear_objects</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_priority_batcher</span><span class="o">.</span><span class="n">add_objects</span><span class="p">(</span><span class="n">text_objects</span><span class="p">)</span>
+
+            <span class="c1"># Create batches</span>
+            <span class="n">batches</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_priority_batcher</span><span class="o">.</span><span class="n">create_batches</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">[</span><span class="s2">&quot;visible_text_objects&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_priority_batcher</span><span class="o">.</span><span class="n">get_visible_object_count</span><span class="p">()</span>
+
+            <span class="c1"># Submit batches for parallel calculation</span>
+            <span class="k">if</span> <span class="n">batches</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layout_calculator</span><span class="p">:</span>
+                <span class="n">viewport_rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_viewport_rect</span> <span class="ow">or</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QRectF</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">batches</span><span class="p">:</span>
+                    <span class="c1"># Submit batch for parallel calculation</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_layout_calculator</span><span class="o">.</span><span class="n">submit_batch</span><span class="p">(</span>
+                        <span class="n">batch</span><span class="p">,</span> <span class="n">viewport_rect</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_layout_calculation_complete</span>
+                    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SceneParallelRenderer._on_layout_calculation_complete">
+<a class="viewcode-back" href="../../../../../pyzui/objects/scene/sceneutils/parallel.html#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer._on_layout_calculation_complete">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_layout_calculation_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Callback for when layout calculation completes.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            index: Object index</span>
+<span class="sd">            result: CalculationResult</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># This callback can be used to update statistics or handle errors</span>
+        <span class="c1"># For now, we just update statistics</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="s2">&quot;status&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">result</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;COMPLETED&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">[</span><span class="s2">&quot;batches_processed&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="SceneParallelRenderer.render_text">
+<a class="viewcode-back" href="../../../../../pyzui/objects/scene/sceneutils/parallel.html#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.render_text">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">render_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">painter</span><span class="p">:</span> <span class="n">QPainter</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Render text objects using parallel rendering.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            painter: QPainter object to render with</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if parallel rendering was used, False otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_enabled</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">vzmoving</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_priority_batcher</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layout_calculator</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Get batches from priority batcher</span>
+        <span class="n">batches</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_priority_batcher</span><span class="o">.</span><span class="n">create_batches</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">batches</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">rendered_count</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Render each batch</span>
+        <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">batches</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">prioritized_obj</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">:</span>
+                <span class="c1"># Get layout data from cache</span>
+                <span class="n">layout_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_priority_batcher</span><span class="o">.</span><span class="n">get_layout_cache</span><span class="p">(</span><span class="n">prioritized_obj</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">layout_data</span> <span class="ow">and</span> <span class="n">layout_data</span><span class="o">.</span><span class="n">is_valid</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">layout_data</span><span class="o">.</span><span class="n">is_stale</span><span class="p">():</span>
+                    <span class="c1"># Render using layout data</span>
+                    <span class="n">obj</span> <span class="o">=</span> <span class="n">prioritized_obj</span><span class="o">.</span><span class="n">object</span>
+                    <span class="c1"># Use string comparison instead of isinstance() for performance and to avoid circular imports</span>
+                    <span class="c1"># This is consistent with patterns in scene.py and 2.8x faster</span>
+                    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;StringMediaObject&quot;</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">render_with_layout</span><span class="p">(</span><span class="n">painter</span><span class="p">,</span> <span class="n">layout_data</span><span class="p">):</span>
+                            <span class="n">rendered_count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># Update statistics</span>
+        <span class="n">processing_time</span> <span class="o">=</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">[</span><span class="s2">&quot;total_processing_time_ms&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">processing_time</span>
+
+        <span class="k">if</span> <span class="n">rendered_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">[</span><span class="s2">&quot;average_batch_time_ms&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">[</span><span class="s2">&quot;total_processing_time_ms&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">[</span><span class="s2">&quot;batches_processed&quot;</span><span class="p">],</span> <span class="mi">1</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">rendered_count</span> <span class="o">&gt;</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="SceneParallelRenderer.enable">
+<a class="viewcode-back" href="../../../../../pyzui/objects/scene/sceneutils/parallel.html#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.enable">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">enable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enable or disable parallel rendering.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            enabled: Whether to enable parallel rendering</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_enabled</span> <span class="o">=</span> <span class="n">enabled</span>
+
+        <span class="k">if</span> <span class="n">enabled</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Clean up resources</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layout_calculator</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_layout_calculator</span><span class="o">.</span><span class="n">shutdown</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_layout_calculator</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_priority_batcher</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="SceneParallelRenderer.shutdown">
+<a class="viewcode-back" href="../../../../../pyzui/objects/scene/sceneutils/parallel.html#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.shutdown">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shut down parallel rendering and release resources.</span>
+
+<span class="sd">        Stops the layout calculator and clears the priority batcher.</span>
+<span class="sd">        Safe to call multiple times.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_enabled</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layout_calculator</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_layout_calculator</span><span class="o">.</span><span class="n">shutdown</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_layout_calculator</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_priority_batcher</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="SceneParallelRenderer.get_stats">
+<a class="viewcode-back" href="../../../../../pyzui/objects/scene/sceneutils/parallel.html#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.get_stats">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get parallel rendering statistics.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dictionary with parallel rendering statistics</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="c1"># Add current state information</span>
+        <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;parallel_enabled&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_enabled</span>
+        <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;scene_moving&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">vzmoving</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_priority_batcher</span><span class="p">:</span>
+            <span class="n">batcher_stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_priority_batcher</span><span class="o">.</span><span class="n">get_statistics</span><span class="p">()</span>
+            <span class="n">stats</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;batcher_total_objects&quot;</span><span class="p">:</span> <span class="n">batcher_stats</span><span class="p">[</span><span class="s2">&quot;total_objects&quot;</span><span class="p">],</span>
+                    <span class="s2">&quot;batcher_visible_objects&quot;</span><span class="p">:</span> <span class="n">batcher_stats</span><span class="p">[</span><span class="s2">&quot;visible_objects&quot;</span><span class="p">],</span>
+                    <span class="s2">&quot;batcher_cache_hit_rate&quot;</span><span class="p">:</span> <span class="n">batcher_stats</span><span class="p">[</span><span class="s2">&quot;cache_hit_rate&quot;</span><span class="p">],</span>
+                    <span class="s2">&quot;batcher_batch_count&quot;</span><span class="p">:</span> <span class="n">batcher_stats</span><span class="p">[</span><span class="s2">&quot;batch_count&quot;</span><span class="p">],</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layout_calculator</span><span class="p">:</span>
+            <span class="n">calculator_stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layout_calculator</span><span class="o">.</span><span class="n">get_statistics</span><span class="p">()</span>
+            <span class="n">stats</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;calculator_queue_size&quot;</span><span class="p">:</span> <span class="n">calculator_stats</span><span class="p">[</span><span class="s2">&quot;queue_size&quot;</span><span class="p">],</span>
+                    <span class="s2">&quot;calculator_active_workers&quot;</span><span class="p">:</span> <span class="n">calculator_stats</span><span class="p">[</span><span class="s2">&quot;active_workers&quot;</span><span class="p">],</span>
+                    <span class="s2">&quot;calculator_cache_size&quot;</span><span class="p">:</span> <span class="n">calculator_stats</span><span class="p">[</span><span class="s2">&quot;cache_size&quot;</span><span class="p">],</span>
+                    <span class="s2">&quot;calculator_cache_hit_rate&quot;</span><span class="p">:</span> <span class="n">calculator_stats</span><span class="p">[</span><span class="s2">&quot;cache_hit_rate&quot;</span><span class="p">],</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">stats</span></div>
+
+
+<div class="viewcode-block" id="SceneParallelRenderer.invalidate_cache">
+<a class="viewcode-back" href="../../../../../pyzui/objects/scene/sceneutils/parallel.html#pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer.invalidate_cache">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">invalidate_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Invalidate parallel rendering cache.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_priority_batcher</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_priority_batcher</span><span class="o">.</span><span class="n">clear_layout_cache</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layout_calculator</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_layout_calculator</span><span class="o">.</span><span class="n">invalidate_cache</span><span class="p">()</span>
+
+        <span class="c1"># Also invalidate cache in all text objects</span>
+        <span class="n">text_objects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_text_objects</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">text_objects</span><span class="p">:</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">enable_parallel_rendering</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># This clears layout cache</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">enable_parallel_rendering</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># Re-enable</span></div>
+</div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../../index.html">PyZui</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../gettingstarted/installation.html">PyZui installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../gettingstarted/installation.html#running-pyzui">Running PyZUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../usageinstructions/userinterface.html">User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../usageinstructions/svgfeatures.html">SVG Features</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/configsystem.html">Configuration System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/objectsystem.html">Object System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/windowsystem.html">Window System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/backup.html">Backup System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../testingdocumentation/unittest.html">Unit Testing Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../testingdocumentation/integrationtest.html">Integration Testing Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../benchmarksdocumentation/qzuibenchmark.html">QZUI Benchmark Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../benchmarksdocumentation/converterbenchmark.html">Converter Benchmark Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../pyzui.html">pyzui package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, David Roberts, Andrea Silvestri.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

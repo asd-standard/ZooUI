@@ -4,11 +4,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>pyzui.objects.mediaobjects.tiledmediaobject &#8212; PyZui 0.11 documentation</title>
+    <title>pyzui.objects.mediaobjects.tiledmediaobject &#8212; PyZui 0.5.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=cc7d0dec" />
-    <script src="../../../../_static/documentation_options.js?v=086c1757"></script>
+    <script src="../../../../_static/documentation_options.js?v=b9afe91b"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -49,29 +49,31 @@
 
 <span class="sd">&quot;&quot;&quot;Tiled media to be displayed in the ZUI.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
+<span class="c1">## Performance optimization note:</span>
+<span class="c1">## Phase 2 optimizations replace 2**x with math.exp2(x) (1.85x faster)</span>
+<span class="c1">## and math.log(x, 2) with math.log2(x) (2x faster) throughout the codebase.</span>
+<span class="c1">## These changes are performance-critical for zoom operations.</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">PySide6</span><span class="w"> </span><span class="kn">import</span> <span class="n">QtCore</span><span class="p">,</span> <span class="n">QtGui</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.objects.mediaobjects.mediaobject</span><span class="w"> </span><span class="kn">import</span> <span class="n">MediaObject</span><span class="p">,</span> <span class="n">LoadError</span><span class="p">,</span> <span class="n">RenderMode</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.tilesystem</span><span class="w"> </span><span class="kn">import</span> <span class="n">tilemanager</span> <span class="k">as</span> <span class="n">TileManager</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
-
-<span class="c1"># Subdivide a ppm image into tiles that fit the mediaobject frame</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.tilesystem.tiler.ppm</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPMTiler</span>
 
 <span class="c1"># Process-based conversion for parallel media conversion</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.converters</span><span class="w"> </span><span class="kn">import</span> <span class="n">converterrunner</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.objects.mediaobjects.mediaobject</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoadError</span><span class="p">,</span> <span class="n">MediaObject</span><span class="p">,</span> <span class="n">RenderMode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.tilesystem</span><span class="w"> </span><span class="kn">import</span> <span class="n">tilemanager</span> <span class="k">as</span> <span class="n">TileManager</span>
 
+<span class="c1"># Subdivide a ppm image into tiles that fit the mediaobject frame</span>
 <span class="c1"># Process-based tiling for parallel image tiling</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.tilesystem.tiler.tilerrunner</span><span class="w"> </span><span class="kn">import</span> <span class="n">submit_tiling</span><span class="p">,</span> <span class="n">TilingHandle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.tilesystem.tiler.tilerrunner</span><span class="w"> </span><span class="kn">import</span> <span class="n">TilingHandle</span><span class="p">,</span> <span class="n">submit_tiling</span>
+
 
 <div class="viewcode-block" id="TiledMediaObject">
-<a class="viewcode-back" href="../../../../pyzui/tiledmediaobject.html#pyzui.objects.mediaobjects.tiledmediaobject.TiledMediaObject">[docs]</a>
+<a class="viewcode-back" href="../../../../pyzui/objects/mediaobjects/tiledmediaobject.html#pyzui.objects.mediaobjects.tiledmediaobject.TiledMediaObject">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">TiledMediaObject</span><span class="p">(</span><span class="n">MediaObject</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Constructor :</span>
@@ -98,6 +100,7 @@
 <span class="sd">    For any acceptable filetype the adequate converter gets called.</span>
 <span class="sd">    The converter returns a ppm image file on which we can run the tiler on.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">media_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">scene</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">autofit</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor :</span>
@@ -132,19 +135,19 @@
 
         <span class="c1"># Path to the temporary PPM file created during conversion</span>
         <span class="c1"># Set to None initially; assigned a tempfile path if conversion is needed</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__tmpfile</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__tmpfile</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># Reference to the active ConversionHandle (wraps a Future from process pool)</span>
         <span class="c1"># None if no conversion is needed (e.g., already tiled or is a .ppm file)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__converter</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">converterrunner</span><span class="o">.</span><span class="n">ConversionHandle</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__converter</span><span class="p">:</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">ConversionHandle</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># Reference to the TilingHandle that manages process-based tiling</span>
         <span class="c1"># None until __run_tiler() is called after conversion completes</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__tiler</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TilingHandle</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__tiler</span><span class="p">:</span> <span class="n">TilingHandle</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># Logger instance for this specific TiledMediaObject, named with the media_id</span>
         <span class="c1"># Used for debug/info/error logging throughout the object&#39;s lifecycle</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;TiledMediaObject.</span><span class="si">{</span><span class="n">media_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;TiledMediaObject.</span><span class="si">{</span><span class="n">media_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># Maximum tile level (zoom depth) for this media</span>
         <span class="c1"># Initialized to 0; updated from TileManager metadata once tiles are loaded</span>
@@ -158,16 +161,16 @@
 
         <span class="c1"># Aspect ratio of the media (width / height)</span>
         <span class="c1"># None until loaded from TileManager metadata; used for efficient size calculations</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__aspect_ratio</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__aspect_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1">## for caching tileblocks</span>
         <span class="c1"># The cached QImage containing the rendered tileblock</span>
         <span class="c1"># Reused across frames if the visible tile region hasn&#39;t changed</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__tileblock</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QImage</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__tileblock</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QImage</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># Tuple identifying the cached tileblock: (tilelevel, row_min, col_min, row_max, col_max)</span>
         <span class="c1"># Used to determine if the cache is still valid for the current view</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__tileblock_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__tileblock_id</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># Whether the cached tileblock contains all final (fully loaded) tiles</span>
         <span class="c1"># If False, the tileblock may need re-rendering when higher quality tiles become available</span>
@@ -191,45 +194,39 @@
             <span class="c1"># Create a temporary file with .ppm extension for the converter output</span>
             <span class="c1"># tempfile.mkstemp() returns (file_descriptor, file_path)</span>
             <span class="n">fd</span><span class="p">:</span> <span class="nb">int</span>
-            <span class="n">fd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tmpfile</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkstemp</span><span class="p">(</span><span class="s1">&#39;.ppm&#39;</span><span class="p">)</span>
+            <span class="n">fd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tmpfile</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkstemp</span><span class="p">(</span><span class="s2">&quot;.ppm&quot;</span><span class="p">)</span>
 
             <span class="c1"># Close the file descriptor immediately; the converter will open the file itself</span>
             <span class="n">os</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
 
             <span class="c1"># Determine which converter to use based on file extension</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.pdf&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.pdf&quot;</span><span class="p">):</span>
                 <span class="c1"># PDF files: submit to process pool for PDF-to-PPM conversion</span>
                 <span class="c1"># submit_pdf_conversion() returns a Future object</span>
-                <span class="n">future</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">submit_pdf_conversion</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tmpfile</span><span class="p">)</span>
+                <span class="n">future</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">submit_pdf_conversion</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tmpfile</span><span class="p">)</span>
 
                 <span class="c1"># Wrap the Future in a ConversionHandle for progress/error tracking</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__converter</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">ConversionHandle</span><span class="p">(</span>
-                    <span class="n">future</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tmpfile</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__converter</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">ConversionHandle</span><span class="p">(</span><span class="n">future</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tmpfile</span><span class="p">)</span>
 
                 <span class="c1"># Store path to the PPM file that the converter will produce</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__ppmfile</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tmpfile</span>
 
-            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.ppm&#39;</span><span class="p">):</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.ppm&quot;</span><span class="p">):</span>
                 <span class="c1">## assume media_id is a local PPM file</span>
                 <span class="c1"># No conversion needed; the media_id itself is the PPM file path</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                    <span class="s2">&quot;assuming media is a local PPM file&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;assuming media is a local PPM file&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__ppmfile</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span>
 
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># All other image formats (JPG, PNG, GIF, TIFF, etc.): use Vips conversion</span>
                 <span class="c1"># submit_vips_conversion() returns a Future object</span>
-                <span class="n">future</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">submit_vips_conversion</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tmpfile</span><span class="p">)</span>
+                <span class="n">future</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">submit_vips_conversion</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tmpfile</span><span class="p">)</span>
 
                 <span class="c1"># Wrap the Future in a ConversionHandle for progress/error tracking</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__converter</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">ConversionHandle</span><span class="p">(</span>
-                    <span class="n">future</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tmpfile</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__converter</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">ConversionHandle</span><span class="p">(</span><span class="n">future</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tmpfile</span><span class="p">)</span>
 
                 <span class="c1"># Store path to the PPM file that the converter will produce</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__ppmfile</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tmpfile</span>
-
 
     <span class="c1"># Class variable: indicates this media object does NOT support transparency</span>
     <span class="c1"># Tiled images are fully opaque, so they can hide objects behind them</span>
@@ -239,7 +236,7 @@
     <span class="c1">## loaded</span>
     <span class="c1"># Class variable: default placeholder dimensions (width, height) in pixels</span>
     <span class="c1"># Used until the actual media dimensions are loaded from TileManager metadata</span>
-    <span class="n">default_size</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>
+    <span class="n">default_size</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>
 
     <span class="c1">## maximum number of cycles to cache temporary tiles for</span>
     <span class="c1"># Class variable: number of render cycles before non-final tileblocks are refreshed</span>
@@ -279,7 +276,7 @@
             <span class="c1"># Average both progresses: converter contributes 50%, tiler contributes 50%</span>
             <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__converter</span><span class="o">.</span><span class="n">progress</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tiler</span><span class="o">.</span><span class="n">progress</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__pixpos2rowcol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pixpos</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">tilescale</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__pixpos2rowcol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pixpos</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">tilescale</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
 <span class="sd">            __pixpos2rowcol(pixpos, tilescale)</span>
@@ -294,7 +291,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Get the top-left corner of this media object on screen</span>
         <span class="c1"># self.topleft returns (x, y) tuple in screen coordinates</span>
-        <span class="n">o</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">topleft</span>
+        <span class="n">o</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">topleft</span>
 
         <span class="c1"># Calculate column index: horizontal offset from object&#39;s left edge, divided by scaled tile size</span>
         <span class="c1"># (pixpos[0] - o[0]) gives the pixel distance from the object&#39;s left edge</span>
@@ -308,7 +305,7 @@
 
         <span class="k">return</span> <span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__rowcol_bound</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tilelevel</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__rowcol_bound</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tilelevel</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
 <span class="sd">            __rowcol_bound(tilelevel)</span>
@@ -329,32 +326,31 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__aspect_ratio</span> <span class="o">&gt;=</span> <span class="mf">1.0</span><span class="p">:</span>
                 <span class="c1">## width &gt;= height (landscape orientation)</span>
                 <span class="c1"># At this tilelevel, there are 2^tilelevel columns</span>
-                <span class="n">col_bound</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="n">tilelevel</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="n">col_bound</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">tilelevel</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
 
                 <span class="c1"># Rows are fewer because height &lt; width; divide by aspect ratio</span>
-                <span class="n">row_bound</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="mi">2</span><span class="o">**</span><span class="n">tilelevel</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">__aspect_ratio</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="n">row_bound</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">tilelevel</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">__aspect_ratio</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1">## height &gt; width (portrait orientation)</span>
                 <span class="c1"># Columns are fewer because width &lt; height; multiply by aspect ratio</span>
-                <span class="n">col_bound</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="mi">2</span><span class="o">**</span><span class="n">tilelevel</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__aspect_ratio</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="n">col_bound</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">tilelevel</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__aspect_ratio</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
 
                 <span class="c1"># At this tilelevel, there are 2^tilelevel rows</span>
-                <span class="n">row_bound</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="n">tilelevel</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="n">row_bound</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">tilelevel</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Fallback: calculate bounds from actual pixel dimensions</span>
             <span class="c1"># tile_pixsize is the pixel size each tile covers at this tilelevel</span>
             <span class="c1"># Higher tilelevels have smaller tiles; maxtilelevel has tilesize pixels per tile</span>
-            <span class="n">tile_pixsize</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tilesize</span> \
-                <span class="o">*</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__maxtilelevel</span> <span class="o">-</span> <span class="n">tilelevel</span><span class="p">)</span>
+            <span class="n">tile_pixsize</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tilesize</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__maxtilelevel</span> <span class="o">-</span> <span class="n">tilelevel</span><span class="p">)</span>
 
             <span class="c1"># Calculate the maximum row/col by dividing total dimensions by tile pixel size</span>
             <span class="c1"># (self.__height - 1) ensures we get the correct last tile index</span>
             <span class="n">row_bound</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">__height</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">tile_pixsize</span><span class="p">)</span>
-            <span class="n">col_bound</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">__width</span>  <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">tile_pixsize</span><span class="p">)</span>
+            <span class="n">col_bound</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">__width</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">tile_pixsize</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">row_bound</span><span class="p">,</span> <span class="n">col_bound</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__render_tileblock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tileblock_id</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QImage</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__render_tileblock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tileblock_id</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QImage</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
 <span class="sd">            __render_tileblock(tileblock_id, mode)</span>
@@ -386,8 +382,7 @@
 
         <span class="c1"># Get the bottom-right tile to determine its actual pixel dimensions</span>
         <span class="c1"># The bottom-right tile may be smaller than tilesize if the image doesn&#39;t divide evenly</span>
-        <span class="n">brtile</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">TileManager</span><span class="o">.</span><span class="n">get_tile_robust</span><span class="p">(</span>
-            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="n">tilelevel</span><span class="p">,</span> <span class="n">row_max</span><span class="p">,</span> <span class="n">col_max</span><span class="p">))</span>
+        <span class="n">brtile</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">TileManager</span><span class="o">.</span><span class="n">get_tile_robust</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="n">tilelevel</span><span class="p">,</span> <span class="n">row_max</span><span class="p">,</span> <span class="n">col_max</span><span class="p">))</span>
 
         <span class="c1"># Calculate total pixel dimensions of the tileblock</span>
         <span class="c1"># Width: number of full tiles * tilesize + actual width of the rightmost tile</span>
@@ -416,7 +411,7 @@
             <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">col_min</span><span class="p">,</span> <span class="n">col_max</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
                 <span class="c1"># Construct the unique tile identifier tuple</span>
                 <span class="c1"># Format: (media_id, tilelevel, row, col)</span>
-                <span class="n">tile_id</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="n">tilelevel</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span>
+                <span class="n">tile_id</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="n">tilelevel</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="c1"># Try to get the fully loaded tile from TileManager&#39;s cache</span>
                     <span class="n">tile</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">TileManager</span><span class="o">.</span><span class="n">get_tile</span><span class="p">(</span><span class="n">tile_id</span><span class="p">)</span>
@@ -440,10 +435,10 @@
                         <span class="n">tile</span><span class="p">,</span> <span class="n">final</span> <span class="o">=</span> <span class="n">TileManager</span><span class="o">.</span><span class="n">cut_tile</span><span class="p">(</span><span class="n">tile_id</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="c1"># In Draft mode: generate tile with tempcache expiry cycles</span>
-                        <span class="n">tile</span><span class="p">,</span> <span class="n">final</span> <span class="o">=</span> <span class="n">TileManager</span><span class="o">.</span><span class="n">cut_tile</span><span class="p">(</span><span class="n">tile_id</span><span class="p">,</span>
-                                                           <span class="bp">self</span><span class="o">.</span><span class="n">tempcache</span><span class="p">)</span>
+                        <span class="n">tile</span><span class="p">,</span> <span class="n">final</span> <span class="o">=</span> <span class="n">TileManager</span><span class="o">.</span><span class="n">cut_tile</span><span class="p">(</span><span class="n">tile_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tempcache</span><span class="p">)</span>
                     <span class="c1"># If the generated tile is not final quality, mark the whole block non-final</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">final</span><span class="p">:</span> <span class="n">tileblock_final</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">final</span><span class="p">:</span>
+                        <span class="n">tileblock_final</span> <span class="o">=</span> <span class="kc">False</span>
 
                 <span class="c1"># Calculate the pixel position of this tile within the tileblock image</span>
                 <span class="c1"># Offset from the top-left tile (col_min, row_min) of the block</span>
@@ -483,25 +478,17 @@
 
 <span class="sd">        Precondition: mode is equal to one of the constants defined in</span>
 <span class="sd">        :class:`RenderMode`</span>
-<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># Skip rendering if the image is too small to be visible on screen</span>
-        <span class="c1"># min(self.onscreen_size) returns the smaller of width/height</span>
-        <span class="c1"># Also skip if mode is Invisible (object should not be drawn)</span>
-        <span class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">onscreen_size</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">mode</span> <span class="o">==</span> <span class="n">RenderMode</span><span class="o">.</span><span class="n">Invisible</span><span class="p">:</span>
-            <span class="c1">## don&#39;t bother rendering if the image is too</span>
-            <span class="c1">## small to be seen, or invisible mode is set</span>
-            <span class="k">return</span>
+<span class="sd">        Note: Size visibility is checked by the scene via is_size_visible().</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># Select the image scaling transformation mode based on render quality</span>
         <span class="c1"># FastTransformation uses nearest-neighbor interpolation (fast but lower quality)</span>
-        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="n">RenderMode</span><span class="o">.</span><span class="n">Draft</span><span class="p">:</span>
-            <span class="n">transform_mode</span><span class="p">:</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">TransformationMode</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">FastTransformation</span>
-        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="n">RenderMode</span><span class="o">.</span><span class="n">HighQuality</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="n">RenderMode</span><span class="o">.</span><span class="n">Draft</span> <span class="ow">or</span> <span class="n">mode</span> <span class="o">==</span> <span class="n">RenderMode</span><span class="o">.</span><span class="n">HighQuality</span><span class="p">:</span>
             <span class="n">transform_mode</span><span class="p">:</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">TransformationMode</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">FastTransformation</span>
 
         <span class="c1"># Get the viewport dimensions (width, height) in pixels</span>
-        <span class="n">viewport_size</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">viewport_size</span>
+        <span class="n">viewport_size</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">viewport_size</span>
 
         <span class="c1"># Calculate the combined zoom level (scene zoom + object zoom)</span>
         <span class="c1"># This determines which tile level to use and the sub-tile scaling</span>
@@ -509,7 +496,7 @@
 
         <span class="c1"># tilelevel is the integer ceiling of zoomlevel</span>
         <span class="c1"># Tiles are stored at integer zoom levels; we pick the next higher level</span>
-        <span class="n">tilelevel</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">zoomlevel</span><span class="p">))</span>
+        <span class="n">tilelevel</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">zoomlevel</span><span class="p">)</span>
 
         <span class="c1"># tilescale is the fractional scaling between the tile&#39;s native resolution and display</span>
         <span class="c1"># When zoomlevel == tilelevel, tilescale = 1.0 (tiles displayed at native size)</span>
@@ -547,13 +534,12 @@
 
         <span class="c1"># Create the tileblock identifier tuple for cache lookup</span>
         <span class="c1"># Uniquely identifies the visible tile region at the current zoom level</span>
-        <span class="n">tileblock_id</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">tilelevel</span><span class="p">,</span> <span class="n">row_min</span><span class="p">,</span> <span class="n">col_min</span><span class="p">,</span> <span class="n">row_max</span><span class="p">,</span> <span class="n">col_max</span><span class="p">)</span>
+        <span class="n">tileblock_id</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">tilelevel</span><span class="p">,</span> <span class="n">row_min</span><span class="p">,</span> <span class="n">col_min</span><span class="p">,</span> <span class="n">row_max</span><span class="p">,</span> <span class="n">col_max</span><span class="p">)</span>
 
         <span class="c1"># Determine whether the cached tileblock needs to be re-rendered</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__tileblock_id</span> <span class="o">!=</span> <span class="n">tileblock_id</span><span class="p">)</span> <span class="ow">or</span> \
-           <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tileblock_final</span> <span class="ow">and</span> \
-            <span class="p">(</span><span class="n">mode</span> <span class="o">==</span> <span class="n">RenderMode</span><span class="o">.</span><span class="n">HighQuality</span> <span class="ow">or</span> \
-             <span class="bp">self</span><span class="o">.</span><span class="n">__tileblock_age</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tempcache</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__tileblock_id</span> <span class="o">!=</span> <span class="n">tileblock_id</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
+            <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tileblock_final</span> <span class="ow">and</span> <span class="p">(</span><span class="n">mode</span> <span class="o">==</span> <span class="n">RenderMode</span><span class="o">.</span><span class="n">HighQuality</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tileblock_age</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tempcache</span><span class="p">)</span>
+        <span class="p">):</span>
             <span class="c1">## the cached tileblock is different to the required</span>
             <span class="c1">## one, so we have draw the new tileblock</span>
             <span class="c1">## we also re-render the tileblock if it is not final</span>
@@ -571,11 +557,12 @@
             <span class="nb">int</span><span class="p">(</span><span class="n">tilescale</span> <span class="o">*</span> <span class="n">tileblock</span><span class="o">.</span><span class="n">width</span><span class="p">()),</span>
             <span class="nb">int</span><span class="p">(</span><span class="n">tilescale</span> <span class="o">*</span> <span class="n">tileblock</span><span class="o">.</span><span class="n">height</span><span class="p">()),</span>
             <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">IgnoreAspectRatio</span><span class="p">,</span>
-            <span class="n">transform_mode</span><span class="p">)</span>
+            <span class="n">transform_mode</span><span class="p">,</span>
+        <span class="p">)</span>
 
         <span class="c1"># Calculate the on-screen position where the tileblock should be drawn</span>
         <span class="c1"># Start from the object&#39;s top-left corner and offset by the tile region&#39;s position</span>
-        <span class="n">o</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">topleft</span>
+        <span class="n">o</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">topleft</span>
 
         <span class="c1"># x position: object left edge + horizontal offset to the first visible tile column</span>
         <span class="n">x</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">tilescale</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tilesize</span> <span class="o">*</span> <span class="n">col_min</span><span class="p">)</span>
@@ -634,8 +621,7 @@
                 <span class="c1"># Draw the progress percentage centered in the placeholder rectangle</span>
                 <span class="c1"># QtCore.Qt.AlignCenter centers text both horizontally and vertically</span>
                 <span class="c1"># int(self.__progress * 100) converts 0.0-1.0 to 0-100 percentage</span>
-                <span class="n">painter</span><span class="o">.</span><span class="n">drawText</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">AlignCenter</span><span class="p">,</span>
-                    <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__progress</span> <span class="o">*</span> <span class="mi">100</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;%&#39;</span><span class="p">)</span>
+                <span class="n">painter</span><span class="o">.</span><span class="n">drawText</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">AlignCenter</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__progress</span> <span class="o">*</span> <span class="mi">100</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;%&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># No progress yet; show &quot;loading...&quot; text</span>
                 <span class="c1"># Set text color to white for visibility</span>
@@ -647,8 +633,7 @@
                 <span class="n">painter</span><span class="o">.</span><span class="n">setFont</span><span class="p">(</span><span class="n">font</span><span class="p">)</span>
 
                 <span class="c1"># Draw &quot;loading...&quot; centered in the placeholder rectangle</span>
-                <span class="n">painter</span><span class="o">.</span><span class="n">drawText</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">AlignCenter</span><span class="p">,</span>
-                    <span class="s2">&quot;loading...&quot;</span><span class="p">)</span>
+                <span class="n">painter</span><span class="o">.</span><span class="n">drawText</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">AlignCenter</span><span class="p">,</span> <span class="s2">&quot;loading...&quot;</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__try_load</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -665,17 +650,15 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># Attempt to retrieve the root tile (level=0, row=0, col=0) from TileManager</span>
             <span class="c1"># If this succeeds, the media has been fully tiled and is ready to render</span>
-            <span class="n">TileManager</span><span class="o">.</span><span class="n">get_tile</span><span class="p">(</span>
-                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+            <span class="n">TileManager</span><span class="o">.</span><span class="n">get_tile</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
         <span class="k">except</span> <span class="n">TileManager</span><span class="o">.</span><span class="n">TileNotLoaded</span><span class="p">:</span>
             <span class="c1"># Tile exists in the store but hasn&#39;t been loaded into memory yet</span>
             <span class="c1"># This is expected during the loading process; we&#39;ll retry on next render cycle</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;(0,0,0) tile not loaded yet&quot;</span><span class="p">)</span>
             <span class="k">pass</span>
-        <span class="k">except</span> <span class="p">(</span><span class="n">TileManager</span><span class="o">.</span><span class="n">MediaNotTiled</span><span class="p">,</span>
-            <span class="n">TileManager</span><span class="o">.</span><span class="n">TileNotAvailable</span><span class="p">):</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">TileManager</span><span class="o">.</span><span class="n">MediaNotTiled</span><span class="p">,</span> <span class="n">TileManager</span><span class="o">.</span><span class="n">TileNotAvailable</span><span class="p">):</span>
             <span class="c1"># The media could not be tiled at all; raise a LoadError to signal failure</span>
-            <span class="k">raise</span> <span class="n">LoadError</span><span class="p">(</span><span class="s2">&quot;unable to correctly tile the image&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">LoadError</span><span class="p">(</span><span class="s2">&quot;unable to correctly tile the image&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Root tile loaded successfully; media is ready for rendering</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;media loaded&quot;</span><span class="p">)</span>
@@ -688,14 +671,13 @@
 
             <span class="c1"># On Windows, clean up the temporary PPM file</span>
             <span class="c1"># On Unix systems, the file can be unlinked even while open</span>
-            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;nt&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;nt&quot;</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="c1"># os.unlink() deletes the file from the filesystem</span>
                     <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__tmpfile</span><span class="p">)</span>
-                <span class="k">except</span><span class="p">:</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                     <span class="c1"># Log but don&#39;t crash if temp file cleanup fails</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;unable to unlink temporary file &quot;</span>
-                        <span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tmpfile</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unable to unlink temporary file &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__tmpfile</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
 
             <span class="c1"># Save the current bounding box before updating dimensions</span>
             <span class="c1"># These are needed for autofit to maintain the placeholder&#39;s screen position</span>
@@ -708,26 +690,21 @@
             <span class="n">old_x2</span><span class="p">,</span> <span class="n">old_y2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bottomright</span>
 
             <span class="c1"># Save the current centre position for restoration after autofit</span>
-            <span class="n">old_centre</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centre</span>
+            <span class="n">old_centre</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centre</span>
 
             <span class="c1"># Load the actual media dimensions from TileManager metadata</span>
             <span class="c1"># These replace the default_size (256, 256) placeholder values</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__width</span> <span class="o">=</span> <span class="n">TileManager</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="s1">&#39;width&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__height</span> <span class="o">=</span> <span class="n">TileManager</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="s1">&#39;height&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__width</span> <span class="o">=</span> <span class="n">TileManager</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="s2">&quot;width&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__height</span> <span class="o">=</span> <span class="n">TileManager</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="s2">&quot;height&quot;</span><span class="p">)</span>
 
             <span class="c1"># Load the maximum tile level (deepest zoom level available)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__maxtilelevel</span> <span class="o">=</span> <span class="n">TileManager</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="s1">&#39;maxtilelevel&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__maxtilelevel</span> <span class="o">=</span> <span class="n">TileManager</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="s2">&quot;maxtilelevel&quot;</span><span class="p">)</span>
 
             <span class="c1"># Load the tile size in pixels (typically 256)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__tilesize</span> <span class="o">=</span> <span class="n">TileManager</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="s1">&#39;tilesize&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__tilesize</span> <span class="o">=</span> <span class="n">TileManager</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="s2">&quot;tilesize&quot;</span><span class="p">)</span>
 
             <span class="c1"># Load the aspect ratio (width / height) for efficient size calculations</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__aspect_ratio</span> <span class="o">=</span> <span class="n">TileManager</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="s1">&#39;aspect_ratio&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__aspect_ratio</span> <span class="o">=</span> <span class="n">TileManager</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="s2">&quot;aspect_ratio&quot;</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__autofit</span><span class="p">:</span>
                 <span class="c1">## fit to area occupied by placeholder</span>
@@ -754,7 +731,6 @@
         <span class="c1"># Check if the PPM file exists on disk before attempting to tile it</span>
         <span class="c1"># os.path.exists() returns True if the file path exists</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__ppmfile</span><span class="p">):</span>
-
             <span class="c1">## there was a problem converting, or the input file</span>
             <span class="c1">## never actually existed</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__converter</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__converter</span><span class="o">.</span><span class="n">error</span><span class="p">:</span>
@@ -762,15 +738,14 @@
                 <span class="k">raise</span> <span class="n">LoadError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__converter</span><span class="o">.</span><span class="n">error</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># No converter error available; raise a generic LoadError</span>
-                <span class="k">raise</span> <span class="n">LoadError</span><span class="p">(</span><span class="s2">&quot;there was a problem &quot;</span>
-                    <span class="s2">&quot;converting and/or loading the input file&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">LoadError</span><span class="p">(</span><span class="s2">&quot;there was a problem converting and/or loading the input file&quot;</span><span class="p">)</span>
 
         <span class="c1"># Determine the output tile format based on the input file extension</span>
         <span class="c1"># JPG files are tiled as JPG to preserve compression; everything else uses PNG</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.jpg&#39;</span><span class="p">):</span>
-            <span class="n">filext</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;jpg&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.jpg&quot;</span><span class="p">):</span>
+            <span class="n">filext</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;jpg&quot;</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">filext</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;png&#39;</span>
+            <span class="n">filext</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;png&quot;</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># Submit tiling job to process pool for parallel tile creation</span>
@@ -778,12 +753,12 @@
             <span class="n">future</span> <span class="o">=</span> <span class="n">submit_tiling</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__ppmfile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="n">filext</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__tiler</span> <span class="o">=</span> <span class="n">TilingHandle</span><span class="p">(</span><span class="n">future</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ppmfile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">)</span>
 
-        <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
             <span class="c1"># IOError during tiler creation indicates a file read problem</span>
-            <span class="k">raise</span> <span class="n">LoadError</span><span class="p">(</span><span class="s2">&quot;there was an error creating the tiler: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">LoadError</span><span class="p">(</span><span class="s2">&quot;there was an error creating the tiler: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
 
 <div class="viewcode-block" id="TiledMediaObject.render">
-<a class="viewcode-back" href="../../../../pyzui/tiledmediaobject.html#pyzui.objects.mediaobjects.tiledmediaobject.TiledMediaObject.render">[docs]</a>
+<a class="viewcode-back" href="../../../../pyzui/objects/mediaobjects/tiledmediaobject.html#pyzui.objects.mediaobjects.tiledmediaobject.TiledMediaObject.render">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">painter</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
@@ -813,13 +788,11 @@
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tiler</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tiler</span><span class="o">.</span><span class="n">error</span><span class="p">:</span>
             <span class="c1"># The tiler encountered an error during the tiling process</span>
             <span class="c1"># Log the error but don&#39;t raise an exception to avoid crashing the render loop</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;an error ocurred during &quot;</span>
-                <span class="s2">&quot;the tiling process: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tiler</span><span class="o">.</span><span class="n">error</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;an error ocurred during the tiling process: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__tiler</span><span class="o">.</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># Check if TileManager now has tiles available for this media</span>
         <span class="c1"># Uses &#39;if&#39; instead of &#39;elif&#39; to allow loading even after the __loaded check above</span>
         <span class="k">if</span> <span class="n">TileManager</span><span class="o">.</span><span class="n">tiled</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">):</span>
-
             <span class="c1"># Attempt to load the root tile and update media dimensions</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__try_load</span><span class="p">()</span>
 
@@ -830,8 +803,7 @@
                 <span class="c1"># Root tile not yet in memory; show placeholder while loading</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__render_placeholder</span><span class="p">(</span><span class="n">painter</span><span class="p">)</span>
 
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tiler</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> \
-             <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__converter</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">__converter</span><span class="o">.</span><span class="n">progress</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tiler</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__converter</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">__converter</span><span class="o">.</span><span class="n">progress</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">):</span>
             <span class="c1">## the tiler has not been run yet and either</span>
             <span class="c1">## it was assumed that media_id is a local PPM</span>
             <span class="c1">## file or the converter has just finished</span>
@@ -847,8 +819,24 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__render_placeholder</span><span class="p">(</span><span class="n">painter</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="TiledMediaObject.is_size_visible">
+<a class="viewcode-back" href="../../../../pyzui/objects/mediaobjects/tiledmediaobject.html#pyzui.objects.mediaobjects.tiledmediaobject.TiledMediaObject.is_size_visible">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_size_visible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Tiled image size visibility check.</span>
+
+<span class="sd">        Returns False if image is too small (&lt;= 1 pixel),</span>
+<span class="sd">        otherwise returns super().is_size_visible(mode).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">is_size_visible</span><span class="p">(</span><span class="n">mode</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># TiledMediaObject specific: minimum size check</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">onscreen_size</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span></div>
+
+
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">onscreen_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">onscreen_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Property :</span>
 <span class="sd">            TiledMediaObject.onscreen_size</span>
@@ -870,14 +858,14 @@
                 <span class="c1">## width &gt;= height (landscape orientation)</span>
                 <span class="c1"># Width is determined by the combined zoom level and tile size</span>
                 <span class="c1"># 2^(scene_zoom + object_zoom) * tilesize gives the full-width at this zoom</span>
-                <span class="n">w</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tilesize</span>
+                <span class="n">w</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tilesize</span>
 
                 <span class="c1"># Height is derived from width using the aspect ratio (width / height)</span>
                 <span class="n">h</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">w</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">__aspect_ratio</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1">## height &gt; width (portrait orientation)</span>
                 <span class="c1"># Height is determined by the combined zoom level and tile size</span>
-                <span class="n">h</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tilesize</span>
+                <span class="n">h</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tilesize</span>
 
                 <span class="c1"># Width is derived from height using the aspect ratio</span>
                 <span class="n">w</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">h</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__aspect_ratio</span>
@@ -889,8 +877,7 @@
             <span class="c1"># Fallback: calculate from actual pixel dimensions and zoom levels</span>
             <span class="c1"># scale converts from tile-level pixels to screen pixels</span>
             <span class="c1"># Subtracting maxtilelevel accounts for the tile hierarchy depth</span>
-            <span class="n">scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">zoomlevel</span> \
-                <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__maxtilelevel</span><span class="p">)</span>
+            <span class="n">scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">zoomlevel</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__maxtilelevel</span><span class="p">)</span>
 
             <span class="c1"># Multiply pixel dimensions by scale to get on-screen size</span>
             <span class="n">w</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__width</span> <span class="o">*</span> <span class="n">scale</span>
@@ -926,17 +913,22 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/userinterface.html">User Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/svgfeatures.html">SVG Features</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/configsystem.html">Configuration System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/objectsystem.html">Object System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/windowsystem.html">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/backup.html">Backup System</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
 <ul>
@@ -951,6 +943,10 @@
 <p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyzui.html">pyzui package</a></li>
 </ul>
 
 <div class="relations">

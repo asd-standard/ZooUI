@@ -5,17 +5,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Unit Testing Guide &#8212; PyZui 0.11 documentation</title>
+    <title>Unit Testing Guide &#8212; PyZui 0.5.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cc7d0dec" />
-    <script src="../_static/documentation_options.js?v=086c1757"></script>
+    <script src="../_static/documentation_options.js?v=b9afe91b"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Integration Testing Guide" href="integrationtest.html" />
-    <link rel="prev" title="Logging System" href="../technicaldocumentation/logging.html" />
+    <link rel="prev" title="Backup System" href="../technicaldocumentation/backup.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -1139,6 +1139,69 @@ pytest<span class="w"> </span>-n<span class="w"> </span>auto
 </pre></div>
 </div>
 </section>
+<section id="preventing-pytest-hangs-on-exit">
+<h3>Preventing Pytest Hangs on Exit<a class="headerlink" href="#preventing-pytest-hangs-on-exit" title="Link to this heading">¶</a></h3>
+<p>After all tests pass and pytest prints the summary line, the process may
+appear to hang — never returning control to the terminal.  This is
+caused by two independent interactions between mocked tests and
+real (unmockable) Python stdlib resources.</p>
+<p><strong>Cause 1 — TileStore atexit cleanup on a large tilestore</strong></p>
+<p>Tests that call <code class="docutils literal notranslate"><span class="pre">tilemanager.init(auto_cleanup=True)</span></code> register a real
+<code class="docutils literal notranslate"><span class="pre">atexit</span></code> handler (<code class="docutils literal notranslate"><span class="pre">atexit.register</span></code> is stdlib and cannot be mocked).
+After all <code class="docutils literal notranslate"><span class="pre">&#64;patch</span></code> decorators are undone, that handler fires on the
+<strong>real</strong> <code class="docutils literal notranslate"><span class="pre">~/.pyzui/tilestore/</span></code> directory, which can contain tens of
+thousands of files (over 80,000 in a heavily-used installation).
+Walking and <code class="docutils literal notranslate"><span class="pre">stat</span></code>-ing every file can take several minutes, which
+masquerades as a hang.</p>
+<p><strong>Cause 2 — Multiprocessing resource tracker thread</strong></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">converterrunner</span></code> and <code class="docutils literal notranslate"><span class="pre">tilerrunner</span></code> modules use
+<code class="docutils literal notranslate"><span class="pre">multiprocessing.get_context('spawn')</span></code>, which creates a resource
+tracker daemon thread.  During Python interpreter shutdown, the
+tracker’s <code class="docutils literal notranslate"><span class="pre">__del__</span></code> method calls <code class="docutils literal notranslate"><span class="pre">_stop_locked()</span></code>, which tries to
+join the tracker thread.  In the <code class="docutils literal notranslate"><span class="pre">'spawn'</span></code> context this thread is
+frequently stuck, causing the process to hang indefinitely.  This is
+the same issue that the old codebase explicitly warned about (the
+commented-out <code class="docutils literal notranslate"><span class="pre">'fork'</span></code> preference note in the source).</p>
+<p><strong>Solution — conftest.py session hooks</strong></p>
+<p>Both causes are handled by hooks in <code class="docutils literal notranslate"><span class="pre">test/unittest/conftest.py</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">pytest_sessionstart</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Disable tilemanager atexit so tests never register real handlers.&quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.tilesystem</span><span class="w"> </span><span class="kn">import</span> <span class="n">tilemanager</span>
+    <span class="n">tilemanager</span><span class="o">.</span><span class="n">__cleanup_enabled</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">pytest_sessionfinish</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">exitstatus</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Prevent expensive cleanup from blocking pytest exit.&quot;&quot;&quot;</span>
+    <span class="c1"># TileManager: mark cleanup as already executed</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.tilesystem</span><span class="w"> </span><span class="kn">import</span> <span class="n">tilemanager</span>
+    <span class="n">tilemanager</span><span class="o">.</span><span class="n">__cleanup_executed</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">tilemanager</span><span class="o">.</span><span class="n">__cleanup_enabled</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># ConverterRunner / TilerRunner: prevent atexit from firing</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.converters</span><span class="w"> </span><span class="kn">import</span> <span class="n">converterrunner</span>
+    <span class="n">converterrunner</span><span class="o">.</span><span class="n">_atexit_registered</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.tilesystem.tiler</span><span class="w"> </span><span class="kn">import</span> <span class="n">tilerrunner</span>
+    <span class="n">tilerrunner</span><span class="o">.</span><span class="n">_atexit_registered</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># Force-clean the multiprocessing resource tracker</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing.resource_tracker</span>
+    <span class="n">tracker</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">resource_tracker</span><span class="o">.</span><span class="n">_resource_tracker</span>
+    <span class="k">if</span> <span class="n">tracker</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">tracker</span><span class="o">.</span><span class="n">_stop</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="kc">None</span>  <span class="c1"># no-op to prevent re-stop</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">tracker</span><span class="p">,</span> <span class="s1">&#39;_thread&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">tracker</span><span class="o">.</span><span class="n">_thread</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">tracker</span><span class="o">.</span><span class="n">_thread</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Verification:</strong></p>
+<p>To confirm the fix is working, run the full suite several times; every
+run should exit cleanly within a few seconds of the summary line:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>test/unittest
+<span class="k">for</span><span class="w"> </span>i<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="k">$(</span>seq<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="m">5</span><span class="k">)</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span>timeout<span class="w"> </span><span class="m">120</span><span class="w"> </span>pytest<span class="w"> </span>-q<span class="w"> </span>--tb<span class="o">=</span>no
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;exit=</span><span class="nv">$?</span><span class="s2">&quot;</span>
+<span class="k">done</span>
+</pre></div>
+</div>
+</section>
 </section>
 <section id="quick-reference">
 <h2>Quick Reference<a class="headerlink" href="#quick-reference" title="Link to this heading">¶</a></h2>
@@ -1286,17 +1349,22 @@ executable documentation of expected behavior.</p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../usageinstructions/userinterface.html">User Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usageinstructions/svgfeatures.html">SVG Features</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/configsystem.html">Configuration System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/objectsystem.html">Object System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/windowsystem.html">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/backup.html">Backup System</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
 <ul class="current">
@@ -1312,12 +1380,16 @@ executable documentation of expected behavior.</p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../pyzui.html">pyzui package</a></li>
+</ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="../technicaldocumentation/logging.html" title="previous chapter">Logging System</a></li>
+      <li>Previous: <a href="../technicaldocumentation/backup.html" title="previous chapter">Backup System</a></li>
       <li>Next: <a href="integrationtest.html" title="next chapter">Integration Testing Guide</a></li>
   </ul></li>
 </ul>

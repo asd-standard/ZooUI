@@ -4,11 +4,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>pyzui.tilesystem.tileproviders.tileprovider &#8212; PyZui 0.11 documentation</title>
+    <title>pyzui.tilesystem.tileproviders.tileprovider &#8212; PyZui 0.5.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=cc7d0dec" />
-    <script src="../../../../_static/documentation_options.js?v=086c1757"></script>
+    <script src="../../../../_static/documentation_options.js?v=b9afe91b"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -49,22 +49,21 @@
 
 <span class="sd">&quot;&quot;&quot;Threaded class for loading tiles into memory (abstract base class).&quot;&quot;&quot;</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">threading</span><span class="w"> </span><span class="kn">import</span> <span class="n">Thread</span><span class="p">,</span> <span class="n">Condition</span><span class="p">,</span> <span class="n">Event</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">deque</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">threading</span><span class="w"> </span><span class="kn">import</span> <span class="n">Condition</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">Thread</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.tilesystem.tile</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tile</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.tilesystem.tile</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tile</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.tilesystem.tilestore.tilecache</span><span class="w"> </span><span class="kn">import</span> <span class="n">TileCache</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.tilesystem.tile</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tile</span> <span class="k">as</span> <span class="n">TileType</span>
 
-<span class="n">TileID</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+<span class="n">TileID</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+
 
 <div class="viewcode-block" id="TileProvider">
-<a class="viewcode-back" href="../../../../pyzui/tileprovider.html#pyzui.tilesystem.tileproviders.tileprovider.TileProvider">[docs]</a>
+<a class="viewcode-back" href="../../../../pyzui/tilesystem/tileproviders/tileprovider.html#pyzui.tilesystem.tileproviders.tileprovider.TileProvider">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">TileProvider</span><span class="p">(</span><span class="n">Thread</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Constructor :</span>
@@ -82,7 +81,8 @@
 
 <span class="sd">    Requests are processed in LIFO (Last In First Out) order.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tilecache</span><span class="p">:</span> <span class="s1">&#39;TileCache&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tilecache</span><span class="p">:</span> <span class="s2">&quot;TileCache&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
 <span class="sd">            TileProvider.__init__(tilecache)</span>
@@ -101,17 +101,33 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__tilecache</span> <span class="o">=</span> <span class="n">tilecache</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__tasks</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__tasks</span><span class="p">:</span> <span class="n">deque</span><span class="p">[</span><span class="n">TileID</span><span class="p">]</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__tasks_available</span> <span class="o">=</span> <span class="n">Condition</span><span class="p">()</span>
 
         <span class="c1"># Pause/resume mechanism</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__pause_event</span> <span class="o">=</span> <span class="n">Event</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__pause_event</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>  <span class="c1"># Start in running (not paused) state</span>
 
+        <span class="c1"># Shutdown event to signal the thread to stop</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__shutdown_event</span> <span class="o">=</span> <span class="n">Event</span><span class="p">()</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
 
+<div class="viewcode-block" id="TileProvider.stop">
+<a class="viewcode-back" href="../../../../pyzui/tilesystem/tileproviders/tileprovider.html#pyzui.tilesystem.tileproviders.tileprovider.TileProvider.stop">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Signal the tile provider thread to stop and wake it if blocked.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__shutdown_event</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__pause_event</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__tasks_available</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__tasks_available</span><span class="o">.</span><span class="n">notify</span><span class="p">()</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__tasks_available</span><span class="o">.</span><span class="n">release</span><span class="p">()</span></div>
+
+
 <div class="viewcode-block" id="TileProvider.request">
-<a class="viewcode-back" href="../../../../pyzui/tileprovider.html#pyzui.tilesystem.tileproviders.tileprovider.TileProvider.request">[docs]</a>
+<a class="viewcode-back" href="../../../../pyzui/tilesystem/tileproviders/tileprovider.html#pyzui.tilesystem.tileproviders.tileprovider.TileProvider.request">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_id</span><span class="p">:</span> <span class="n">TileID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
@@ -136,8 +152,8 @@
 
 
 <div class="viewcode-block" id="TileProvider._load">
-<a class="viewcode-back" href="../../../../pyzui/tileprovider.html#pyzui.tilesystem.tileproviders.tileprovider.TileProvider._load">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_id</span><span class="p">:</span> <span class="n">TileID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<a class="viewcode-back" href="../../../../pyzui/tilesystem/tileproviders/tileprovider.html#pyzui.tilesystem.tileproviders.tileprovider.TileProvider._load">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_id</span><span class="p">:</span> <span class="n">TileID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
 <span class="sd">            TileProvider._load(tile_id)</span>
@@ -154,7 +170,7 @@
 
 
 <div class="viewcode-block" id="TileProvider.run">
-<a class="viewcode-back" href="../../../../pyzui/tileprovider.html#pyzui.tilesystem.tileproviders.tileprovider.TileProvider.run">[docs]</a>
+<a class="viewcode-back" href="../../../../pyzui/tilesystem/tileproviders/tileprovider.html#pyzui.tilesystem.tileproviders.tileprovider.TileProvider.run">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
@@ -166,18 +182,23 @@
 
 <span class="sd">        Run a loop to load requested tiles.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="c1"># Wait if paused</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__shutdown_event</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__pause_event</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__shutdown_event</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
+                <span class="k">break</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">__tasks_available</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
-            <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tasks</span><span class="p">:</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tasks</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__shutdown_event</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__tasks_available</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__shutdown_event</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__tasks_available</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+                <span class="k">break</span>
             <span class="n">tile_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tasks</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__tasks_available</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
 
-            <span class="c1"># Check pause again after acquiring task</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__pause_event</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__shutdown_event</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
+                <span class="k">break</span>
 
             <span class="k">if</span> <span class="n">tile_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tilecache</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
@@ -197,8 +218,8 @@
 
 
 <div class="viewcode-block" id="TileProvider.purge">
-<a class="viewcode-back" href="../../../../pyzui/tileprovider.html#pyzui.tilesystem.tileproviders.tileprovider.TileProvider.purge">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">purge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">media_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../../pyzui/tilesystem/tileproviders/tileprovider.html#pyzui.tilesystem.tileproviders.tileprovider.TileProvider.purge">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">purge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">media_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
 <span class="sd">            TileProvider.purge(media_id)</span>
@@ -213,7 +234,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__tasks_available</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;purging </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">media_id</span> <span class="ow">or</span> <span class="s2">&quot;all&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">media_id</span><span class="p">:</span>
-            <span class="n">new_tasks</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
+            <span class="n">new_tasks</span><span class="p">:</span> <span class="n">deque</span><span class="p">[</span><span class="n">TileID</span><span class="p">]</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tasks</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">task</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">media_id</span><span class="p">:</span>
                     <span class="n">new_tasks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
@@ -224,7 +245,7 @@
 
 
 <div class="viewcode-block" id="TileProvider.pause">
-<a class="viewcode-back" href="../../../../pyzui/tileprovider.html#pyzui.tilesystem.tileproviders.tileprovider.TileProvider.pause">[docs]</a>
+<a class="viewcode-back" href="../../../../pyzui/tilesystem/tileproviders/tileprovider.html#pyzui.tilesystem.tileproviders.tileprovider.TileProvider.pause">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">pause</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
@@ -242,7 +263,7 @@
 
 
 <div class="viewcode-block" id="TileProvider.resume">
-<a class="viewcode-back" href="../../../../pyzui/tileprovider.html#pyzui.tilesystem.tileproviders.tileprovider.TileProvider.resume">[docs]</a>
+<a class="viewcode-back" href="../../../../pyzui/tilesystem/tileproviders/tileprovider.html#pyzui.tilesystem.tileproviders.tileprovider.TileProvider.resume">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">resume</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
@@ -282,8 +303,7 @@
 
 <span class="sd">        Return a formal string representation of the TileProvider.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">()&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span></div>
-
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">()&quot;</span></div>
 
 </pre></div>
 
@@ -314,17 +334,22 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/userinterface.html">User Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/svgfeatures.html">SVG Features</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/configsystem.html">Configuration System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/objectsystem.html">Object System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/windowsystem.html">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/backup.html">Backup System</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
 <ul>
@@ -339,6 +364,10 @@
 <p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyzui.html">pyzui package</a></li>
 </ul>
 
 <div class="relations">

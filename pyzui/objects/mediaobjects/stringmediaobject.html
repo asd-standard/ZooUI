@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>pyzui.objects.mediaobjects.stringmediaobject module &#8212; PyZui 0.5.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=cc7d0dec" />
+    <script src="../../../_static/documentation_options.js?v=b9afe91b"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="pyzui.objects.mediaobjects.svgmediaobject module" href="svgmediaobject.html" />
+    <link rel="prev" title="pyzui.objects.mediaobjects.tiledmediaobject module" href="tiledmediaobject.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-pyzui.objects.mediaobjects.stringmediaobject">
+<span id="pyzui-objects-mediaobjects-stringmediaobject-module"></span><h1>pyzui.objects.mediaobjects.stringmediaobject module<a class="headerlink" href="#module-pyzui.objects.mediaobjects.stringmediaobject" title="Link to this heading">¶</a></h1>
+<p>Strings to be displayed in the ZUI.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyzui.objects.mediaobjects.stringmediaobject.</span></span><span class="sig-name descname"><span class="pre">StringMediaObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">media_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scene</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/objects/mediaobjects/stringmediaobject.html#StringMediaObject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="mediaobject.html#pyzui.objects.mediaobjects.mediaobject.MediaObject" title="pyzui.objects.mediaobjects.mediaobject.MediaObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">MediaObject</span></code></a></p>
+<dl class="simple">
+<dt>Constructor :</dt><dd><p>StringMediaObject(media_id, scene)</p>
+</dd>
+<dt>Parameters :</dt><dd><p>media_id : str
+scene : Scene</p>
+</dd>
+</dl>
+<p>StringMediaObject(media_id, scene) –&gt; None</p>
+<p>StringMediaObject implements a hybrid rendering system for
+text displayin the ZUI.</p>
+<p><cite>StringMediaObject.media_id</cite> should be of the form ‘string:rrggbb:foobar’,
+where ‘rrggbb’ is a string of three two-digit hexadecimal numbers
+representing the colour of the text, and ‘foobar’ is the string to be
+displayed.</p>
+<p>Overview:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>render Dual-mode triggered by scene.vzmoving (zoom velocity)</p></li>
+<li><p>moving mode: Direct QPainter.drawText() rendering for smooth zoom/pan operations</p></li>
+<li><p>static mode: Cached QImage rendering for optimal quality when stationary</p></li>
+<li><p>Automatic cache invalidation when movement starts to ensure fresh rendering</p></li>
+</ul>
+</div></blockquote>
+<p>From “foobar” string QImage gets generated, from form ‘string:rrggbb:foobar’ hash get’s
+generated for cache invalidation in case string color of text content changes.
+Also Qfont, QFontMetrics, text dimension (width, height), and scale are cached.</p>
+<p>QImage cached image gets invalidated if relative_scale_diff &gt; 1% or if
+self__scene_vzmoving returns True</p>
+<dl class="simple">
+<dt>For direct text rendering :</dt><dd><ul class="simple">
+<li><p>longest line index gets Pre-calculated for efficient multi-line rendering</p></li>
+<li><p>Font creation only when point size ≥ 1 (visible text)</p></li>
+<li><p>Visibility culling based on viewport size ratios</p></li>
+<li><p>Automatic cache validation with comprehensive invalidation triggers</p></li>
+</ul>
+</dd>
+</dl>
+<p>Initialize a new StringMediaObject from the media identified by media_id,
+and the parent Scene referenced by scene.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.transparent">
+<span class="sig-name descname"><span class="pre">transparent</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.transparent" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Constructor:</dt><dd><p>MediaObject(media_id, scene)</p>
+</dd>
+<dt>Parameters :</dt><dd><p>media_id[‘string’], scene[‘Scene’]</p>
+</dd>
+</dl>
+<p>Media_object(media_id, scene) –&gt; PhysicalObject</p>
+<p>MediaObject objects are used to represent media that can be rendered in
+the ZUI.</p>
+<p>Screen view it’s fixed unless user change mainwindow size on the screen.
+Both scene and MediaObjects have their own reference systems so that zooms
+can be applied bot to Scene and Mediaobject indipendently trough their
+reference system transformation.</p>
+<p>You can think about it as fixed window looking at a scene that can strecth or
+shrink beneath it, with this stretch or shrink always having it’s origin
+at the Scene center for scene zoom and MediaObject center for the mediobject
+zoom as at the same time individual mediaobject can also strecth
+or shrink. The fixed window can then move on the 2d plane bringing objects
+into view.</p>
+<p>World:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> ---------------------------------------&gt;
+|   Scene
+|  @ ------------------------------+---&gt;
+|  |  ViewPort        MediaObj     |
+|  |  (Screen View)   *-------+--&gt; |
+|  |                  |   &amp;   |    |
+|  |               %  +-------&quot;    |
+|  |                  |            |
+|  |                  ∨            |
+|  |                               |
+|  +-------------------------------#
+|  |
+|  ∨
+∨
+</pre></div>
+</div>
+<p>Legend:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">All</span> <span class="n">attributes</span> <span class="n">are</span> <span class="n">relative</span> <span class="n">to</span> <span class="n">screen</span> <span class="n">view</span><span class="p">)</span>
+<span class="o">*</span> <span class="o">-&gt;</span> <span class="n">MediaObject</span><span class="o">.</span><span class="n">topleft</span><span class="p">()</span>
+<span class="s2">&quot; -&gt; MediaObject.bottomright()</span>
+<span class="o">&amp;</span> <span class="o">-&gt;</span> <span class="n">MediaObject</span><span class="o">.</span><span class="n">center</span><span class="p">()</span>
+<span class="c1"># -&gt; Scene.viewport_size()</span>
+<span class="o">%</span> <span class="o">-&gt;</span> <span class="n">Scene</span><span class="o">.</span><span class="n">center</span><span class="p">()</span>
+<span class="o">@</span> <span class="o">-&gt;</span> <span class="n">Scene</span><span class="o">.</span><span class="n">origin</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>MediaObject topleft coordinates relative to screen view are given by:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MediaObject</span><span class="o">.</span><span class="n">topleft</span><span class="p">[</span><span class="mi">0</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">origin</span><span class="p">[</span><span class="mi">0</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Where <em>self.pos[0-1]</em> it’s MediaObject position relative to Scene reference
+system wich get’s scaled by math.exp2() of scene zoom level</p>
+<p>MediaObject centre coordinates relative to screen view are given firstly by
+calculating image center coordinates relative to Scene reference coordinates:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">C_s</span><span class="p">[</span><span class="mi">0</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_centre</span><span class="p">[</span><span class="mi">0</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">exp2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_z</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Where <em>self._centre[0-1]</em> are center coordinates relative to the mediaobject
+frame of reference and <em>self._z</em> it’s MediaObject reference frame scaling
+(zoom).</p>
+<p>Take note that self.pos[0-1] dosen’t get to be scaled by self._z as that
+position it’s relative to Scene reference frame.</p>
+<p>Then we can calculate MediaObject centre coordinates relative to screen view as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MediaObject</span><span class="o">.</span><span class="n">centre</span><span class="p">[</span><span class="mi">0</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">origin</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">C_s</span><span class="p">[</span><span class="mi">0</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">exp2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">zoomlevel</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.base_pointsize">
+<span class="sig-name descname"><span class="pre">base_pointsize</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">24.0</span></em><a class="headerlink" href="#pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.base_pointsize" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.__compute_text_hash">
+<span class="sig-name descname"><span class="pre">__compute_text_hash</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.__compute_text_hash" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Method :</dt><dd><p>StringMediaObject.__compute_text_hash()</p>
+</dd>
+<dt>Parameters :</dt><dd><p>None</p>
+</dd>
+</dl>
+<p>StringMediaObject.__compute_text_hash() –&gt; int</p>
+<p>Compute hash of text content and color for cache invalidation.
+Returns a combined hash of all text lines and the color RGB value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.__is_image_cache_valid">
+<span class="sig-name descname"><span class="pre">__is_image_cache_valid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.__is_image_cache_valid" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Method :</dt><dd><p>StringMediaObject.__is_image_cache_valid(current_scale, mode)</p>
+</dd>
+<dt>Parameters :</dt><dd><p>current_scale : float
+mode : int</p>
+</dd>
+</dl>
+<p>StringMediaObject.__is_image_cache_valid(current_scale, mode) –&gt; bool</p>
+<p>Check if cached text image is valid for current scale and render mode.
+Returns True if cache is valid, False otherwise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.__render_text_direct">
+<span class="sig-name descname"><span class="pre">__render_text_direct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">painter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.__render_text_direct" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Method :</dt><dd><p>StringMediaObject.__render_text_direct(painter, x, y, mode)</p>
+</dd>
+<dt>Parameters :</dt><dd><p>painter : QPainter
+x : float - x position to render at
+y : float - y position to render at
+mode : int</p>
+</dd>
+</dl>
+<p>StringMediaObject.__render_text_direct(painter, x, y, mode) –&gt; None</p>
+<p>Render text directly using QPainter.drawText().
+This is the original rendering method used before caching was implemented.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.__render_text_to_image">
+<span class="sig-name descname"><span class="pre">__render_text_to_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.__render_text_to_image" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Method :</dt><dd><p>StringMediaObject.__render_text_to_image(mode)</p>
+</dd>
+<dt>Parameters :</dt><dd><p>mode : int</p>
+</dd>
+</dl>
+<p>StringMediaObject.__render_text_to_image(mode) –&gt; QImage</p>
+<p>Render text to QImage for caching.
+Creates a transparent image with the text rendered at current scale.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.invalidate_cache">
+<span class="sig-name descname"><span class="pre">invalidate_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/objects/mediaobjects/stringmediaobject.html#StringMediaObject.invalidate_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.invalidate_cache" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Method :</dt><dd><p>StringMediaObject.invalidate_cache()</p>
+</dd>
+<dt>Parameters :</dt><dd><p>None</p>
+</dd>
+</dl>
+<p>StringMediaObject.invalidate_cache() –&gt; None</p>
+<p>Invalidate text image cache.
+Clears all cached image data to force re-rendering on next render call.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject._get_text">
+<span class="sig-name descname"><span class="pre">_get_text</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/objects/mediaobjects/stringmediaobject.html#StringMediaObject._get_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject._get_text" title="Link to this definition">¶</a></dt>
+<dd><p>Get the text content for parallel rendering.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The text string to render</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject._get_font">
+<span class="sig-name descname"><span class="pre">_get_font</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/objects/mediaobjects/stringmediaobject.html#StringMediaObject._get_font"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject._get_font" title="Link to this definition">¶</a></dt>
+<dd><p>Get the font properties for parallel rendering (thread-safe).</p>
+<p>Returns plain Python data (dict) instead of a QFont object so
+that this method can be safely called from any thread.
+QtGui.QFont construction is deferred to TextLayoutData.to_qfont()
+which runs on the main thread during rendering.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>family, pointsize, weight, italic</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict with keys</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject._get_color">
+<span class="sig-name descname"><span class="pre">_get_color</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/objects/mediaobjects/stringmediaobject.html#StringMediaObject._get_color"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject._get_color" title="Link to this definition">¶</a></dt>
+<dd><p>Get the text color for parallel rendering.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QColor object for text color</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.precalculate_layout">
+<span class="sig-name descname"><span class="pre">precalculate_layout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">viewport_rect</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/objects/mediaobjects/stringmediaobject.html#StringMediaObject.precalculate_layout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.precalculate_layout" title="Link to this definition">¶</a></dt>
+<dd><p>Pre-calculate layout data for parallel rendering.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>viewport_rect</strong> – Current viewport rectangle</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>TextLayoutData if successful, None otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.render_with_layout">
+<span class="sig-name descname"><span class="pre">render_with_layout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">painter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/objects/mediaobjects/stringmediaobject.html#StringMediaObject.render_with_layout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.render_with_layout" title="Link to this definition">¶</a></dt>
+<dd><p>Render text using pre-calculated layout data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>painter</strong> – QPainter object to render with</p></li>
+<li><p><strong>layout_data</strong> – Pre-calculated TextLayoutData</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if rendering successful, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.get_parallel_stats">
+<span class="sig-name descname"><span class="pre">get_parallel_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/objects/mediaobjects/stringmediaobject.html#StringMediaObject.get_parallel_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.get_parallel_stats" title="Link to this definition">¶</a></dt>
+<dd><p>Get parallel rendering statistics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary with parallel rendering statistics</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.enable_parallel_rendering">
+<span class="sig-name descname"><span class="pre">enable_parallel_rendering</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">enabled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/objects/mediaobjects/stringmediaobject.html#StringMediaObject.enable_parallel_rendering"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.enable_parallel_rendering" title="Link to this definition">¶</a></dt>
+<dd><p>Enable or disable parallel rendering for this object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>enabled</strong> – Whether to enable parallel rendering</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.render">
+<span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">painter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/objects/mediaobjects/stringmediaobject.html#StringMediaObject.render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.render" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Method :</dt><dd><p>StringMediaObject.render(painter, mode)</p>
+</dd>
+<dt>Parameters :</dt><dd><p>painter : QPainter
+mode : int</p>
+</dd>
+</dl>
+<p>StringMediaObject.render(painter, mode) –&gt; None</p>
+<p>Given QPainter and Rendering mode renders the string calculating the
+rendering rectangle and using QtPainter.drawText</p>
+<p>Note: Size visibility is checked by the scene via is_size_visible().</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.is_size_visible">
+<span class="sig-name descname"><span class="pre">is_size_visible</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pyzui/objects/mediaobjects/stringmediaobject.html#StringMediaObject.is_size_visible"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.is_size_visible" title="Link to this definition">¶</a></dt>
+<dd><p>String-specific size visibility check.</p>
+<p>Returns False if text is too small or too large to be visible,
+otherwise returns super().is_size_visible(mode).</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.__pointsize">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">__pointsize</span></span><a class="headerlink" href="#pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.__pointsize" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Property:</dt><dd><p>__pointsize</p>
+</dd>
+<dt>Parameters :</dt><dd><p>None</p>
+</dd>
+</dl>
+<p>__pointsize –&gt; float</p>
+<p>Calculate and return the font point size based on the current scale.</p>
+<p>Returns base_pointsize multiplied by the current scale factor.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.__font">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">__font</span></span><a class="headerlink" href="#pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.__font" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Property:</dt><dd><p>__font</p>
+</dd>
+<dt>Parameters :</dt><dd><p>None</p>
+</dd>
+</dl>
+<p>__font –&gt; QFont or None</p>
+<p>Create and return a QFont object with the appropriate point size
+for the current scale.</p>
+<p>Returns minimum font (1.0 point) if the point size is less than 1.
+Otherwise returns a Sans Serif font with the calculated point size.</p>
+<p>Uses caching to avoid recreating font objects on every access.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.onscreen_size">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">onscreen_size</span></span><a class="headerlink" href="#pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.onscreen_size" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Property:</dt><dd><p>StringMediaObject.onscreen_size</p>
+</dd>
+<dt>Parameters :</dt><dd><p>None</p>
+</dd>
+</dl>
+<p>StringMediaObject.onscreen_size –&gt; Tuple[float, float]</p>
+<p>Returns width and height of the MediaObject passed to the StringMediaObject Class.</p>
+<p>Uses caching to avoid recalculating size on every access.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.lines">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lines</span></span><a class="headerlink" href="#pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject.lines" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Property:</dt><dd><p>lines</p>
+</dd>
+<dt>Parameters :</dt><dd><p>None</p>
+</dd>
+</dl>
+<p>lines –&gt; list[str]</p>
+<p>Get the list of text lines.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">PyZui</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html">PyZui installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html#running-pyzui">Running PyZUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usageinstructions/userinterface.html">User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usageinstructions/svgfeatures.html">SVG Features</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/configsystem.html">Configuration System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/objectsystem.html">Object System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/windowsystem.html">Window System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/backup.html">Backup System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../testingdocumentation/unittest.html">Unit Testing Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../testingdocumentation/integrationtest.html">Integration Testing Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../benchmarksdocumentation/qzuibenchmark.html">QZUI Benchmark Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../benchmarksdocumentation/converterbenchmark.html">Converter Benchmark Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../pyzui.html">pyzui package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../backup.html">backup package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../converters.html">converters package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../objects.html">objects package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tilesystem.html">tilesystem package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../windows.html">windows package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../config.html">pyzui.config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../logger.html">pyzui.logger module</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../pyzui.html">pyzui package</a><ul>
+  <li><a href="../../objects.html">objects package</a><ul>
+      <li>Previous: <a href="tiledmediaobject.html" title="previous chapter">pyzui.objects.mediaobjects.tiledmediaobject module</a></li>
+      <li>Next: <a href="svgmediaobject.html" title="next chapter">pyzui.objects.mediaobjects.svgmediaobject module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, David Roberts, Andrea Silvestri.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../../../_sources/pyzui/objects/mediaobjects/stringmediaobject.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>pyzui.objects.scene.sceneutils.autosave module &#8212; PyZui 0.5.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=cc7d0dec" />
+    <script src="../../../../_static/documentation_options.js?v=b9afe91b"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="pyzui.objects.scene.sceneutils.clipboard module" href="clipboard.html" />
+    <link rel="prev" title="pyzui.objects.scene.qzui module" href="../qzui.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-pyzui.objects.scene.sceneutils.autosave">
+<span id="pyzui-objects-scene-sceneutils-autosave-module"></span><h1>pyzui.objects.scene.sceneutils.autosave module<a class="headerlink" href="#module-pyzui.objects.scene.sceneutils.autosave" title="Link to this heading">¶</a></h1>
+<p>SceneAutosaveManager - Autosave functionality for Scene class.</p>
+<p>This class manages automatic backup creation for scene files with configurable
+interval and rotation. It was extracted from the Scene class to improve
+modularity and maintainability.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.autosave.stop_timer_safely">
+<span class="sig-prename descclassname"><span class="pre">pyzui.objects.scene.sceneutils.autosave.</span></span><span class="sig-name descname"><span class="pre">stop_timer_safely</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pyzui/objects/scene/sceneutils/autosave.html#stop_timer_safely"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.scene.sceneutils.autosave.stop_timer_safely" title="Link to this definition">¶</a></dt>
+<dd><p>Safely stop a QTimer, ensuring thread safety.</p>
+<p>This function ensures that QTimer.stop() is called from the same
+thread that created the timer, preventing Qt threading errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>timer</strong> – QTimer instance to stop, or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyzui.objects.scene.sceneutils.autosave.</span></span><span class="sig-name descname"><span class="pre">SceneAutosaveManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scene</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pyzui/objects/scene/sceneutils/autosave.html#SceneAutosaveManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Manager for scene autosave functionality.</p>
+<p>This class handles automatic backup creation for scene files with
+configurable interval and rotation. It manages the backup timer,
+configuration, and integration with the BackupManager.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager._scene">
+<span class="sig-name descname"><span class="pre">_scene</span></span><a class="headerlink" href="#pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager._scene" title="Link to this definition">¶</a></dt>
+<dd><p>Reference to the parent Scene object</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager._logger">
+<span class="sig-name descname"><span class="pre">_logger</span></span><a class="headerlink" href="#pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager._logger" title="Link to this definition">¶</a></dt>
+<dd><p>Logger instance for autosave operations</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager._autosave_enabled">
+<span class="sig-name descname"><span class="pre">_autosave_enabled</span></span><a class="headerlink" href="#pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager._autosave_enabled" title="Link to this definition">¶</a></dt>
+<dd><p>Whether autosave is enabled</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager._autosave_interval">
+<span class="sig-name descname"><span class="pre">_autosave_interval</span></span><a class="headerlink" href="#pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager._autosave_interval" title="Link to this definition">¶</a></dt>
+<dd><p>Autosave interval in seconds</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager._autosave_config">
+<span class="sig-name descname"><span class="pre">_autosave_config</span></span><a class="headerlink" href="#pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager._autosave_config" title="Link to this definition">¶</a></dt>
+<dd><p>Autosave configuration dictionary</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager._autosave_timer">
+<span class="sig-name descname"><span class="pre">_autosave_timer</span></span><a class="headerlink" href="#pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager._autosave_timer" title="Link to this definition">¶</a></dt>
+<dd><p>QTimer for periodic autosave</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager._autosave_active">
+<span class="sig-name descname"><span class="pre">_autosave_active</span></span><a class="headerlink" href="#pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager._autosave_active" title="Link to this definition">¶</a></dt>
+<dd><p>Whether autosave timer is active</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager._backup_manager">
+<span class="sig-name descname"><span class="pre">_backup_manager</span></span><a class="headerlink" href="#pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager._backup_manager" title="Link to this definition">¶</a></dt>
+<dd><p>BackupManager instance for creating backups</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager._last_save_path">
+<span class="sig-name descname"><span class="pre">_last_save_path</span></span><a class="headerlink" href="#pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager._last_save_path" title="Link to this definition">¶</a></dt>
+<dd><p>Path of last saved scene file</p>
+</dd></dl>
+
+<p>Initialize SceneAutosaveManager.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scene</strong> – Parent Scene object</p></li>
+<li><p><strong>config</strong> – Optional configuration dictionary with autosave settings</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager._enable_autosave_if_configured">
+<span class="sig-name descname"><span class="pre">_enable_autosave_if_configured</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pyzui/objects/scene/sceneutils/autosave.html#SceneAutosaveManager._enable_autosave_if_configured"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager._enable_autosave_if_configured" title="Link to this definition">¶</a></dt>
+<dd><p>Enable autosave if configured in settings.</p>
+<p>Creates backup manager, runs expiration cleanup, and starts
+autosave timer.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager._trigger_autosave_backup">
+<span class="sig-name descname"><span class="pre">_trigger_autosave_backup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pyzui/objects/scene/sceneutils/autosave.html#SceneAutosaveManager._trigger_autosave_backup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager._trigger_autosave_backup" title="Link to this definition">¶</a></dt>
+<dd><p>Trigger autosave backup creation via BackupManager.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> – Path to the scene file to backup</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager._autosave_timeout">
+<span class="sig-name descname"><span class="pre">_autosave_timeout</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pyzui/objects/scene/sceneutils/autosave.html#SceneAutosaveManager._autosave_timeout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager._autosave_timeout" title="Link to this definition">¶</a></dt>
+<dd><p>Timer callback for periodic autosave.</p>
+<p>Called when autosave timer expires to create a backup.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager.enable_autosave">
+<span class="sig-name descname"><span class="pre">enable_autosave</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interval_minutes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pyzui/objects/scene/sceneutils/autosave.html#SceneAutosaveManager.enable_autosave"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager.enable_autosave" title="Link to this definition">¶</a></dt>
+<dd><p>Enable autosave with specified interval.</p>
+<p>Starts QTimer for periodic autosave.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>interval_minutes</strong> – Autosave interval in minutes (minimum 1)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager.cleanup_legacy_backups">
+<span class="sig-name descname"><span class="pre">cleanup_legacy_backups</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pyzui/objects/scene/sceneutils/autosave.html#SceneAutosaveManager.cleanup_legacy_backups"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager.cleanup_legacy_backups" title="Link to this definition">¶</a></dt>
+<dd><p>Clean up legacy flat backup files from old backup structure.</p>
+<p>Called during application shutdown to migrate from the old flat
+backup system to the new per-scene directory structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of legacy backup files deleted</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager.disable_autosave">
+<span class="sig-name descname"><span class="pre">disable_autosave</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pyzui/objects/scene/sceneutils/autosave.html#SceneAutosaveManager.disable_autosave"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager.disable_autosave" title="Link to this definition">¶</a></dt>
+<dd><p>Disable autosave and stop timer safely.</p>
+<p>Idempotent: if autosave is already disabled, this is a no-op.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager.is_autosave_enabled">
+<span class="sig-name descname"><span class="pre">is_autosave_enabled</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pyzui/objects/scene/sceneutils/autosave.html#SceneAutosaveManager.is_autosave_enabled"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager.is_autosave_enabled" title="Link to this definition">¶</a></dt>
+<dd><p>Check if autosave is currently enabled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if autosave is enabled, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager.get_autosave_interval">
+<span class="sig-name descname"><span class="pre">get_autosave_interval</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pyzui/objects/scene/sceneutils/autosave.html#SceneAutosaveManager.get_autosave_interval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager.get_autosave_interval" title="Link to this definition">¶</a></dt>
+<dd><p>Get current autosave interval in seconds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Autosave interval in seconds</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager.get_autosave_config">
+<span class="sig-name descname"><span class="pre">get_autosave_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pyzui/objects/scene/sceneutils/autosave.html#SceneAutosaveManager.get_autosave_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager.get_autosave_config" title="Link to this definition">¶</a></dt>
+<dd><p>Get autosave configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary with autosave configuration</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager.set_autosave_config">
+<span class="sig-name descname"><span class="pre">set_autosave_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pyzui/objects/scene/sceneutils/autosave.html#SceneAutosaveManager.set_autosave_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager.set_autosave_config" title="Link to this definition">¶</a></dt>
+<dd><p>Update autosave configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> – Dictionary with autosave configuration updates</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager.update_last_save_path">
+<span class="sig-name descname"><span class="pre">update_last_save_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/pyzui/objects/scene/sceneutils/autosave.html#SceneAutosaveManager.update_last_save_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager.update_last_save_path" title="Link to this definition">¶</a></dt>
+<dd><p>Update the last save path and trigger autosave if enabled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> – Path to the saved scene file</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><span class="xref std std-doc">pyzui/objects/scene/scene</span> - Scene management</p></li>
+<li><p><span class="xref std std-doc">pyzui/backup/backupmanager</span> - Backup creation and rotation</p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">PyZui</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html">PyZui installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#running-pyzui">Running PyZUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/userinterface.html">User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/svgfeatures.html">SVG Features</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/configsystem.html">Configuration System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/objectsystem.html">Object System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/windowsystem.html">Window System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/backup.html">Backup System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testingdocumentation/unittest.html">Unit Testing Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testingdocumentation/integrationtest.html">Integration Testing Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../benchmarksdocumentation/qzuibenchmark.html">QZUI Benchmark Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../benchmarksdocumentation/converterbenchmark.html">Converter Benchmark Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../pyzui.html">pyzui package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../backup.html">backup package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../converters.html">converters package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../objects.html">objects package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tilesystem.html">tilesystem package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../windows.html">windows package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../config.html">pyzui.config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../logger.html">pyzui.logger module</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../pyzui.html">pyzui package</a><ul>
+  <li><a href="../../../objects.html">objects package</a><ul>
+      <li>Previous: <a href="../qzui.html" title="previous chapter">pyzui.objects.scene.qzui module</a></li>
+      <li>Next: <a href="clipboard.html" title="next chapter">pyzui.objects.scene.sceneutils.clipboard module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, David Roberts, Andrea Silvestri.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../../../../_sources/pyzui/objects/scene/sceneutils/autosave.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

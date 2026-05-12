@@ -5,16 +5,16 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Project structure &#8212; PyZui 0.11 documentation</title>
+    <title>Project structure &#8212; PyZui 0.5.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cc7d0dec" />
-    <script src="../_static/documentation_options.js?v=086c1757"></script>
+    <script src="../_static/documentation_options.js?v=b9afe91b"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Object System" href="objectsystem.html" />
+    <link rel="next" title="Configuration System" href="configsystem.html" />
     <link rel="prev" title="Reading Documentation" href="readingdocumentation.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -35,109 +35,108 @@
             
   <section id="project-structure">
 <h1>Project structure<a class="headerlink" href="#project-structure" title="Link to this heading">¶</a></h1>
-<p>For human readability the project have been subdivided in the following folder structure:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                                   ┌─────────┐
-                                   │  pyzui  │
-                                   └────┬────┘
-                ┌────────────┬──────────┼───────────┬────────────┐
-                │            │          │           │            │
-          ┌─────▼─────┐ ┌────▼────┐ ┌───▼──────┐ ┌──▼───────┐    │
-          │converters │ │ objects │ │tilesystem│ │ windows  │ logger.py
-          └─────┬─────┘ └────┬────┘ └─────┬────┘ └──────────┘
-                │            │            │                │
-    ┌───────────┼──────┐     │            │     ┌──────────▼─────────┐
-    │           │      │     │            │     │             ┌──────▼──────┐
-converter   pdfconv vipsconv │            │ mainwindow        │dialogwindows│
-            erter   erter    │            │                   └─────────────┘
-                             │            │                          │
-                  ┌──────────┼─────────┐  │                 stringinputdialog
-                  │                    │  │                 modifystringdialog
-          physicalobject               │   ──────────┐      zoomsesitivitydialog
-                                       │             │      dialogwindows
-                          ┌────────────┼────────┐    │
-                          │            │        │    │
-                  ┌───────▼──────┐ ┌───▼───┐    │    │
-                  │mediaobjects  │ │ scene │    │    │
-                  └───────┬──────┘ └───┬───┘    │    │
-                          │            │        │    │
-              ┌───────────┼            │        │    │
-              │           │            │        │    │
-       mediaobject   strmediaobj     qzui    scene   │
-                     svgmediaobj                     │
-                     tiledmediaobj                   │
-                                                     │
-                    ┌────────────────────────────────┼───────────┐
-                                    │                │           │
-                  tile         ┌────▼─────┐    ┌─────▼─────┐ ┌───▼─────┐
-                  tilemanager  │tileprov  │    │   tiler   │ │tilestore│
-                               └────┬─────┘    └─────┬─────┘ └───┬─────┘
-                                    │                │           │
-                      ┌─────────────┼──────┐         │           │
-                      │             │      │         │           │
-                tileprovider  statictp  dynamictp  tiler         │
-                                           │        ppm          │
-                                           │                     │
-                                    ferndynamictp      ┌─────────┼────────┐
-                                                       │         │        │
-                                                  tilestore tilecache cleanup
+<p>For human readability the project has been subdivided into the following folder structure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>pyzui/
+├── config.py
+├── logger.py
+├── converters/
+│   ├── converter.py
+│   ├── converterrunner.py
+│   ├── pdfconverter.py
+│   └── vipsconverter.py
+├── backup/
+│   └── backupmanager.py
+├── objects/
+│   ├── physicalobject.py
+│   ├── objectsutils/
+│   │   └── zoom/
+│   │       └── zoommanager.py
+│   ├── mediaobjects/
+│   │   ├── mediaobject.py
+│   │   ├── stringmediaobject.py
+│   │   ├── svgmediaobject.py
+│   │   ├── tiledmediaobject.py
+│   │   └── mediaobjectsutils/
+│   │       ├── string/
+│   │       │   ├── parallellayout.py
+│   │       │   └── textlayout.py
+│   │       └── svg/
+│   │           ├── svgcache/
+│   │           │   └── svgcache.py
+│   │           └── utils/
+│   │               ├── svgarrowutils.py
+│   │               ├── svgcircleutils.py
+│   │               ├── svgsquareutils.py
+│   │               ├── svgstickutils.py
+│   │               └── svgtriangleutils.py
+│   └── scene/
+│       ├── qzui.py
+│       ├── scene.py
+│       └── sceneutils/
+│           ├── autosave.py
+│           ├── clipboard.py
+│           ├── parallel.py
+│           └── prioritybatcher.py
+├── tilesystem/
+│   ├── tile.py
+│   ├── tilecache.py
+│   ├── tilemanager.py
+│   ├── tiler/
+│   │   ├── ppm.py
+│   │   ├── tiler.py
+│   │   └── tilerrunner.py
+│   ├── tileproviders/
+│   │   ├── tileprovider.py
+│   │   ├── statictileprovider.py
+│   │   ├── dynamictileprovider.py
+│   │   └── ferndynamictileprovider.py
+│   └── tilestore/
+│       ├── cleanuptilestore.py
+│       ├── tilecache.py
+│       └── tilestore.py
+└── windows/
+    ├── mainwindow.py
+    └── dialogwindows/
+        ├── dialogwindows.py
+        ├── autosavesettingsdialog.py
+        ├── modifystringdialog.py
+        ├── modifysvginputdialog.py
+        ├── modifytiledmediaobjectdialog.py
+        ├── stringinputdialog.py
+        ├── svgpickerinputdialog.py
+        ├── zoomsensitivitydialog.py
+        └── zoomsettingsdialog.py
 </pre></div>
 </div>
 <section id="project-class-hierarchy">
 <h2>Project class hierarchy<a class="headerlink" href="#project-class-hierarchy" title="Link to this heading">¶</a></h2>
+<section id="physicalobject-and-media-types">
+<h3>PhysicalObject and media types<a class="headerlink" href="#physicalobject-and-media-types" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><dl class="simple">
-<dt><a class="reference internal" href="../pyzui/physicalobject.html"><span class="doc">physicalobject</span></a></dt><dd><ul>
+<dt><span class="xref std std-doc">physicalobject</span></dt><dd><ul>
 <li><dl class="simple">
-<dt><a class="reference internal" href="../pyzui/mediaobject.html"><span class="doc">mediaobject</span></a></dt><dd><ul>
-<li><p><a class="reference internal" href="../pyzui/tiledmediaobject.html"><span class="doc">tiledmediaobject</span></a></p></li>
-<li><p><a class="reference internal" href="../pyzui/stringmediaobject.html"><span class="doc">stringmediaobject</span></a></p></li>
-<li><p><a class="reference internal" href="../pyzui/svgmediaobject.html"><span class="doc">svgmediaobject</span></a></p></li>
+<dt><span class="xref std std-doc">mediaobject</span></dt><dd><ul>
+<li><p><span class="xref std std-doc">tiledmediaobject</span></p></li>
+<li><p><span class="xref std std-doc">stringmediaobject</span></p></li>
+<li><p><span class="xref std std-doc">svgmediaobject</span></p></li>
 </ul>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><a class="reference internal" href="../pyzui/scene.html"><span class="doc">scene</span></a></dt><dd><ul>
+<dt><span class="xref std std-doc">scene</span></dt><dd><ul>
 <li><dl class="simple">
-<dt><a class="reference internal" href="../pyzui/qzui.html"><span class="doc">qzui</span></a></dt><dd><ul>
+<dt><span class="xref std std-doc">qzui</span></dt><dd><ul>
 <li><p><a class="reference internal" href="../main.html"><span class="doc">main</span></a></p></li>
 </ul>
 </dd>
 </dl>
 </li>
-</ul>
-</dd>
-</dl>
-</li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><a class="reference internal" href="../pyzui/converter.html"><span class="doc">converter</span></a></dt><dd><ul>
-<li><p><a class="reference internal" href="../pyzui/pdfconverter.html"><span class="doc">pdfconverter</span></a></p></li>
-<li><p><a class="reference internal" href="../pyzui/vipsconverter.html"><span class="doc">vipsconverter</span></a></p></li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><a class="reference internal" href="../pyzui/tiler.html"><span class="doc">tiler</span></a></dt><dd><ul>
-<li><p><a class="reference internal" href="../pyzui/ppm.html"><span class="doc">ppm</span></a></p></li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><p><a class="reference internal" href="../pyzui/tile.html"><span class="doc">tile</span></a></p></li>
-<li><p><a class="reference internal" href="../pyzui/tilemanager.html"><span class="doc">tilemanager</span></a></p></li>
-<li><p><a class="reference internal" href="../pyzui/tilecache.html"><span class="doc">tilecache</span></a></p></li>
-<li><p><a class="reference internal" href="../pyzui/tilestore.html"><span class="doc">tilestore</span></a></p></li>
-<li><dl class="simple">
-<dt><a class="reference internal" href="../pyzui/tileprovider.html"><span class="doc">tileprovider</span></a></dt><dd><ul>
-<li><p><a class="reference internal" href="../pyzui/statictileprovider.html"><span class="doc">statictileprovider</span></a></p></li>
-<li><dl class="simple">
-<dt><a class="reference internal" href="../pyzui/dynamictileprovider.html"><span class="doc">dynamictileprovider</span></a></dt><dd><ul>
-<li><p><a class="reference internal" href="../pyzui/ferntileprovider.html"><span class="doc">ferntileprovider</span></a></p></li>
+<li><p><span class="xref std std-doc">prioritybatcher</span></p></li>
+<li><p><span class="xref std std-doc">autosave</span> — Timer-based autosave orchestration</p></li>
+<li><p><span class="xref std std-doc">clipboard</span> — Copy/paste operations</p></li>
+<li><p><span class="xref std std-doc">parallel</span> — Parallel rendering</p></li>
 </ul>
 </dd>
 </dl>
@@ -148,15 +147,124 @@ converter   pdfconv vipsconv │            │ mainwindow        │dialogwindo
 </li>
 </ul>
 </section>
+<section id="zoom-manager">
+<h3>Zoom manager<a class="headerlink" href="#zoom-manager" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><span class="xref std std-doc">zoommanager</span> — Zoom level tracking and physics</p></li>
+</ul>
+</section>
+<section id="media-object-utilities">
+<h3>Media object utilities<a class="headerlink" href="#media-object-utilities" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>String utilities</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">mediaobjectsutils/string/textlayout.py</span></code> — Text layout engine</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mediaobjectsutils/string/parallellayout.py</span></code> — Parallel text rendering</p></li>
+</ul>
+</dd>
+<dt>SVG utilities</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">mediaobjectsutils/svg/svgcache/svgcache.py</span></code> — SVG rendering cache</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mediaobjectsutils/svg/utils/svgarrowutils.py</span></code> — Arrow shape generator</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mediaobjectsutils/svg/utils/svgcircleutils.py</span></code> — Circle shape generator</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mediaobjectsutils/svg/utils/svgsquareutils.py</span></code> — Square shape generator</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mediaobjectsutils/svg/utils/svgstickutils.py</span></code> — Stick figure generator</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mediaobjectsutils/svg/utils/svgtriangleutils.py</span></code> — Triangle shape generator</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="converters">
+<h3>Converters<a class="headerlink" href="#converters" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><dl class="simple">
+<dt><span class="xref std std-doc">converter</span></dt><dd><ul>
+<li><p><span class="xref std std-doc">pdfconverter</span></p></li>
+<li><p><span class="xref std std-doc">vipsconverter</span></p></li>
+<li><p><span class="xref std std-doc">converterrunner</span> — Process-based parallel conversion</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+<section id="tile-system">
+<h3>Tile system<a class="headerlink" href="#tile-system" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><span class="xref std std-doc">tile</span></p></li>
+<li><p><span class="xref std std-doc">tilecache</span> — In-memory LRU cache</p></li>
+<li><p><span class="xref std std-doc">tilemanager</span> — Central tile coordinator</p></li>
+<li><dl class="simple">
+<dt><span class="xref std std-doc">tiler</span></dt><dd><ul>
+<li><p><span class="xref std std-doc">ppm</span></p></li>
+<li><p><span class="xref std std-doc">tilerrunner</span> — Process-based parallel tiling</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><span class="xref std std-doc">tileprovider</span></dt><dd><ul>
+<li><p><span class="xref std std-doc">statictileprovider</span></p></li>
+<li><dl class="simple">
+<dt><span class="xref std std-doc">dynamictileprovider</span></dt><dd><ul>
+<li><p><span class="xref std std-doc">ferntileprovider</span></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><span class="xref std std-doc">tilestore</span></dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">cleanuptilestore.py</span></code> — Auto-cleanup of stale tiles</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+<section id="windows-and-dialogs">
+<h3>Windows and dialogs<a class="headerlink" href="#windows-and-dialogs" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><span class="xref std std-doc">mainwindow</span></p></li>
+<li><dl class="simple">
+<dt><span class="xref std std-doc">dialogwindows</span></dt><dd><ul>
+<li><p><span class="xref std std-doc">stringinputdialog</span></p></li>
+<li><p><span class="xref std std-doc">modifystringdialog</span></p></li>
+<li><p><span class="xref std std-doc">svgpickerinputdialog</span></p></li>
+<li><p><span class="xref std std-doc">modifysvginputdialog</span></p></li>
+<li><p><span class="xref std std-doc">modifytiledmediaobjectdialog</span></p></li>
+<li><p><span class="xref std std-doc">zoomsensitivitydialog</span></p></li>
+<li><p><span class="xref std std-doc">zoomsettingsdialog</span></p></li>
+<li><p><span class="xref std std-doc">autosavesettingsdialog</span></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+<section id="configuration-and-backup">
+<h3>Configuration and backup<a class="headerlink" href="#configuration-and-backup" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">config.py</span></code> — User configuration management (ConfigManager)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">backup/backupmanager.py</span></code> — Per-scene backup creation and rotation</p></li>
+</ul>
+</section>
+</section>
 <section id="architecture-diagram">
 <h2>Architecture diagram<a class="headerlink" href="#architecture-diagram" title="Link to this heading">¶</a></h2>
-<p>Here’s a schematic of the program architecture, with a simple legend of
-core components:</p>
+<p>Here is a schematic of the program architecture, with a legend of
+core components and design patterns.</p>
 <p>Key Design Patterns:</p>
 <blockquote>
 <div><ul class="simple">
 <li><p><strong>Abstract Base Classes</strong>: Converter, TileProvider, MediaObject, PhysicalObject</p></li>
-<li><p><strong>Threading</strong>: Non-blocking tile loading, rendering, conversion</p></li>
+<li><p><strong>Process Pooling</strong>: Parallel media conversion (<span class="xref std std-doc">converterrunner</span>) and tile generation (<span class="xref std std-doc">tilerrunner</span>)</p></li>
+<li><p><strong>Thread Pooling</strong>: Concurrent tile creation with worker thread pools in TileManager</p></li>
+<li><p><strong>Autosave</strong>: Timer-based per-scene backup orchestration with rotation and cleanup</p></li>
+<li><p><strong>Clipboard</strong>: Copy/paste with grid-aligned positioning via <code class="docutils literal notranslate"><span class="pre">sceneutils/clipboard.py</span></code></p></li>
+<li><p><strong>Parallel Rendering</strong>: Multi-priority render pipeline with render order toggle (Ctrl+R)</p></li>
+<li><p><strong>Hybrid Rendering</strong>: CPU-efficient text caching for StringMediaObject</p></li>
 <li><p><strong>Caching Strategy</strong>: Three-tier (Memory → Disk → Source)</p></li>
 <li><p><strong>Observer Pattern</strong>: Qt signals/slots for event handling</p></li>
 <li><p><strong>Template Method</strong>: Tile provider request processing</p></li>
@@ -164,45 +272,63 @@ core components:</p>
 </ul>
 </div></blockquote>
 <p>Core Components:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span> <span class="n">Component</span>        <span class="o">|</span> <span class="n">Responsibility</span>                    <span class="o">|</span> <span class="n">Key</span> <span class="n">Files</span> <span class="o">|</span>
-<span class="o">|-----------</span>       <span class="o">|-----------------------------------|-----------|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">main</span><span class="o">.</span><span class="n">py</span><span class="o">**</span>      <span class="o">|</span> <span class="n">Application</span> <span class="n">entry</span><span class="p">,</span> <span class="n">initialization</span> <span class="o">|</span> <span class="n">main</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">LoggerConfig</span><span class="o">**</span> <span class="o">|</span> <span class="n">Centralized</span> <span class="n">logging</span> <span class="n">system</span>        <span class="o">|</span> <span class="n">pyzui</span><span class="o">/</span><span class="n">logger</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">TileManager</span><span class="o">**</span>  <span class="o">|</span> <span class="n">Tile</span> <span class="n">coordination</span> <span class="ow">and</span> <span class="n">caching</span>     <span class="o">|</span> <span class="n">pyzui</span><span class="o">/</span><span class="n">tilesystem</span><span class="o">/</span><span class="n">tilemanager</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">MainWindow</span><span class="o">**</span>   <span class="o">|</span> <span class="n">Qt</span> <span class="n">main</span> <span class="n">window</span> <span class="ow">and</span> <span class="n">menus</span>          <span class="o">|</span> <span class="n">pyzui</span><span class="o">/</span><span class="n">windows</span><span class="o">/</span><span class="n">mainwindow</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">QZUI</span><span class="o">**</span>         <span class="o">|</span> <span class="n">Rendering</span> <span class="n">widget</span><span class="p">,</span> <span class="nb">input</span> <span class="n">handling</span>  <span class="o">|</span> <span class="n">pyzui</span><span class="o">/</span><span class="n">objects</span><span class="o">/</span><span class="n">scene</span><span class="o">/</span><span class="n">qzui</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">Scene</span><span class="o">**</span>        <span class="o">|</span> <span class="n">MediaObject</span> <span class="n">container</span>             <span class="o">|</span> <span class="n">pyzui</span><span class="o">/</span><span class="n">objects</span><span class="o">/</span><span class="n">scene</span><span class="o">/</span><span class="n">scene</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">MediaObject</span><span class="o">**</span>  <span class="o">|</span> <span class="n">Displayable</span> <span class="n">media</span> <span class="ow">in</span> <span class="n">ZUI</span>          <span class="o">|</span> <span class="n">pyzui</span><span class="o">/</span><span class="n">objects</span><span class="o">/</span><span class="n">mediaobjects</span><span class="o">/</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">TileProvider</span><span class="o">**</span> <span class="o">|</span> <span class="n">Tile</span> <span class="n">loading</span><span class="o">/</span><span class="n">generation</span>           <span class="o">|</span> <span class="n">pyzui</span><span class="o">/</span><span class="n">tilesystem</span><span class="o">/</span><span class="n">tileproviders</span><span class="o">/</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">TileStore</span><span class="o">**</span>    <span class="o">|</span> <span class="n">Persistent</span> <span class="n">tile</span> <span class="n">storage</span>           <span class="o">|</span> <span class="n">pyzui</span><span class="o">/</span><span class="n">tilesystem</span><span class="o">/</span><span class="n">tilestore</span><span class="o">/</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">Converter</span><span class="o">**</span>    <span class="o">|</span> <span class="n">Media</span> <span class="nb">format</span> <span class="n">conversion</span>           <span class="o">|</span> <span class="n">pyzui</span><span class="o">/</span><span class="n">converters</span><span class="o">/</span> <span class="o">|</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span> <span class="n">Component</span>           <span class="o">|</span> <span class="n">Responsibility</span>                      <span class="o">|</span> <span class="n">Key</span> <span class="n">Files</span> <span class="o">|</span>
+<span class="o">|---------------------|-------------------------------------|-----------|</span>
+<span class="o">|</span> <span class="o">**</span><span class="n">main</span><span class="o">.</span><span class="n">py</span><span class="o">**</span>         <span class="o">|</span> <span class="n">Application</span> <span class="n">entry</span><span class="p">,</span> <span class="n">initialization</span>   <span class="o">|</span> <span class="n">main</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">**</span><span class="n">ConfigManager</span><span class="o">**</span>   <span class="o">|</span> <span class="n">User</span> <span class="n">configuration</span> <span class="n">management</span>       <span class="o">|</span> <span class="n">pyzui</span><span class="o">/</span><span class="n">config</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">**</span><span class="n">LoggerConfig</span><span class="o">**</span>    <span class="o">|</span> <span class="n">Centralized</span> <span class="n">logging</span> <span class="n">system</span>          <span class="o">|</span> <span class="n">pyzui</span><span class="o">/</span><span class="n">logger</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">**</span><span class="n">MainWindow</span><span class="o">**</span>      <span class="o">|</span> <span class="n">Qt</span> <span class="n">main</span> <span class="n">window</span> <span class="ow">and</span> <span class="n">menus</span>            <span class="o">|</span> <span class="n">pyzui</span><span class="o">/</span><span class="n">windows</span><span class="o">/</span><span class="n">mainwindow</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">**</span><span class="n">QZUI</span><span class="o">**</span>            <span class="o">|</span> <span class="n">Rendering</span> <span class="n">widget</span><span class="p">,</span> <span class="nb">input</span> <span class="n">handling</span>    <span class="o">|</span> <span class="n">pyzui</span><span class="o">/</span><span class="n">objects</span><span class="o">/</span><span class="n">scene</span><span class="o">/</span><span class="n">qzui</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">**</span><span class="n">Scene</span><span class="o">**</span>           <span class="o">|</span> <span class="n">MediaObject</span> <span class="n">container</span><span class="p">,</span> <span class="n">autosave</span>     <span class="o">|</span> <span class="n">pyzui</span><span class="o">/</span><span class="n">objects</span><span class="o">/</span><span class="n">scene</span><span class="o">/</span><span class="n">scene</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">**</span><span class="n">Autosave</span><span class="o">**</span>        <span class="o">|</span> <span class="n">Timer</span><span class="o">-</span><span class="n">based</span> <span class="n">per</span><span class="o">-</span><span class="n">scene</span> <span class="n">backups</span>       <span class="o">|</span> <span class="n">pyzui</span><span class="o">/</span><span class="n">objects</span><span class="o">/</span><span class="n">scene</span><span class="o">/</span><span class="n">sceneutils</span><span class="o">/</span><span class="n">autosave</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">**</span><span class="n">Clipboard</span><span class="o">**</span>       <span class="o">|</span> <span class="n">Copy</span><span class="o">/</span><span class="n">paste</span> <span class="k">with</span> <span class="n">grid</span> <span class="n">alignment</span>      <span class="o">|</span> <span class="n">pyzui</span><span class="o">/</span><span class="n">objects</span><span class="o">/</span><span class="n">scene</span><span class="o">/</span><span class="n">sceneutils</span><span class="o">/</span><span class="n">clipboard</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">**</span><span class="n">MediaObject</span><span class="o">**</span>     <span class="o">|</span> <span class="n">Displayable</span> <span class="n">media</span> <span class="ow">in</span> <span class="n">ZUI</span>            <span class="o">|</span> <span class="n">pyzui</span><span class="o">/</span><span class="n">objects</span><span class="o">/</span><span class="n">mediaobjects</span><span class="o">/</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">**</span><span class="n">ZoomManager</span><span class="o">**</span>     <span class="o">|</span> <span class="n">Zoom</span> <span class="n">level</span> <span class="n">tracking</span> <span class="ow">and</span> <span class="n">physics</span>     <span class="o">|</span> <span class="n">pyzui</span><span class="o">/</span><span class="n">objects</span><span class="o">/</span><span class="n">objectsutils</span><span class="o">/</span><span class="n">zoom</span><span class="o">/</span><span class="n">zoommanager</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">**</span><span class="n">PriorityBatcher</span><span class="o">**</span> <span class="o">|</span> <span class="n">Priority</span><span class="o">-</span><span class="n">based</span> <span class="n">tile</span> <span class="n">request</span> <span class="n">batching</span><span class="o">|</span> <span class="n">pyzui</span><span class="o">/</span><span class="n">objects</span><span class="o">/</span><span class="n">scene</span><span class="o">/</span><span class="n">sceneutils</span><span class="o">/</span><span class="n">prioritybatcher</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">**</span><span class="n">TileManager</span><span class="o">**</span>     <span class="o">|</span> <span class="n">Tile</span> <span class="n">coordination</span> <span class="ow">and</span> <span class="n">caching</span>       <span class="o">|</span> <span class="n">pyzui</span><span class="o">/</span><span class="n">tilesystem</span><span class="o">/</span><span class="n">tilemanager</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">**</span><span class="n">TileProvider</span><span class="o">**</span>    <span class="o">|</span> <span class="n">Tile</span> <span class="n">loading</span><span class="o">/</span><span class="n">generation</span>             <span class="o">|</span> <span class="n">pyzui</span><span class="o">/</span><span class="n">tilesystem</span><span class="o">/</span><span class="n">tileproviders</span><span class="o">/</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">**</span><span class="n">TileStore</span><span class="o">**</span>       <span class="o">|</span> <span class="n">Persistent</span> <span class="n">tile</span> <span class="n">storage</span>             <span class="o">|</span> <span class="n">pyzui</span><span class="o">/</span><span class="n">tilesystem</span><span class="o">/</span><span class="n">tilestore</span><span class="o">/</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">**</span><span class="n">Converter</span><span class="o">**</span>       <span class="o">|</span> <span class="n">Media</span> <span class="nb">format</span> <span class="n">conversion</span>             <span class="o">|</span> <span class="n">pyzui</span><span class="o">/</span><span class="n">converters</span><span class="o">/</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">**</span><span class="n">ConverterRunner</span><span class="o">**</span> <span class="o">|</span> <span class="n">Process</span><span class="o">-</span><span class="n">based</span> <span class="n">parallel</span> <span class="n">conversion</span>   <span class="o">|</span> <span class="n">pyzui</span><span class="o">/</span><span class="n">converters</span><span class="o">/</span><span class="n">converterrunner</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">**</span><span class="n">TilerRunner</span><span class="o">**</span>     <span class="o">|</span> <span class="n">Process</span><span class="o">-</span><span class="n">based</span> <span class="n">parallel</span> <span class="n">tiling</span>       <span class="o">|</span> <span class="n">pyzui</span><span class="o">/</span><span class="n">tilesystem</span><span class="o">/</span><span class="n">tiler</span><span class="o">/</span><span class="n">tilerrunner</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
+<span class="o">|</span> <span class="o">**</span><span class="n">BackupManager</span><span class="o">**</span>   <span class="o">|</span> <span class="n">Per</span><span class="o">-</span><span class="n">scene</span> <span class="n">backup</span> <span class="n">creation</span><span class="o">/</span><span class="n">rotation</span>  <span class="o">|</span> <span class="n">pyzui</span><span class="o">/</span><span class="n">backup</span><span class="o">/</span><span class="n">backupmanager</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
 </pre></div>
 </div>
 <p>Complete Application Lifecycle:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>START                                        |    Enter Qt Event Loop ←──────────┐
   ↓                                          |      ↓                            │
 Parse Args → Load Config → Init Logging      |      │  ┌─────────────────────┐   │
-  ↓                                          |      ├─→│ User Input Events   │───┤
-Init TileManager                             |      │  └─────────────────────┘   │
-  ↓                                          |      │                            │
-  ├─→ Create TileCache (80% static,          |      │  ┌─────────────────────┐   │
-  │   20% dynamic)                           |      ├─→│ QZUI Render Loop    │───┤
-  ├─→ Start StaticTileProvider thread        |      │  │ • Update physics    │   │
-  ├─→ Start DynamicTileProvider threads      |      │  │ • Request tiles     │   │
-  └─→ Auto cleanup TileStore (if enabled)    |      │  │ • Render scene      │   │
-  ↓                                          |      │  └─────────────────────┘   │
-Create Qt App                                |      │                            │
+  ↓                        ↑                 |      ├─→│ User Input Events   │───┤
+ConfigManager reads       │                  |      │  └─────────────────────┘   │
+pyzui_config.json ←───────┘                  |      │                            │
   ↓                                          |      │  ┌─────────────────────┐   │
-Create MainWindow                            |      ├─→│ Tile Providers      │───┤
+Init TileManager                             |      ├─→│ QZUI Render Loop    │───┤
+  ↓                                          |      │  │ • Update physics    │   │
+  ├─→ Create TileCache (80% static,          |      │  │ • PriorityBatcher   │   │
+  │   20% dynamic)                           |      │  │ • Request tiles     │   │
+  ├─→ Start StaticTileProvider thread        |      │  │ • Render scene      │   │
+  ├─→ Start DynamicTileProvider threads      |      │  └─────────────────────┘   │
+  └─→ Auto cleanup TileStore (if enabled)    |      │                            │
+  ↓                                          |      │  ┌─────────────────────┐   │
+Create Qt App                                |      ├─→│ Tile Providers      │───┤
   ↓                                          |      │  │ • Process requests  │   │
-  ├─→ Create QZUI widget                     |      │  │ • Load/generate     │   │
-  │   ├─→ Create Scene                       |      │  │ • Cache tiles       │   │
-  │   └─→ Start render thread (10 fps)       |      │  └─────────────────────┘   │
-  ├─→ Setup menus                            |      │                            │
-  └─→ Load default scene                     |      └────────────────────────────┘
-  ↓                                          |      ↓
-Show Window                                  |    User Closes Window
-  ↓                                          |      ↓
+Create MainWindow                            |      │  │ • Load/generate     │   │
+  ↓                                          |      │  │ • Cache tiles       │   │
+  ├─→ Create QZUI widget                     |      │  │ • PriorityBatcher   │   │
+  │   ├─→ Create Scene                       |      │  └─────────────────────┘   │
+  │   ├─→ Start render thread (10 fps)       |      │                            │
+  │   └─→ Init PriorityBatcher               |      │  ┌─────────────────────┐   │
+  ├─→ Setup menus                            |      ├─→│ Autosave Timer      │───┤
+  ├─→ Init ConverterRunner (process pool)    |      │  │ • Per-scene backup  │   │
+  ├─→ Init TilerRunner (process pool)        |      │  │ • Rotation/cleanup  │   │
+  ├─→ Load default scene                     |      │  └─────────────────────┘   │
+  └─→ Start autosave timer                   |      │                            │
+  ↓                                          |      └────────────────────────────┘
+Show Window                                  |      ↓
+  ↓                                          |    User Closes Window
+                                             |      ↓
+                                             |    Stop Autosave → Cleanup Pools
+                                             |      ↓
                                              |    Exit Event Loop → Cleanup &amp; Exit
                                              |      ↓
                                              |    END
@@ -212,78 +338,121 @@ Show Window                                  |    User Closes Window
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────────────────────────────────────────────────────────┐
 │                         main.py                                 │
 │  • Parse CLI arguments                                          │
-│  • Load configuration (JSON)                                    │
+│  • Load configuration via ConfigManager                         │
 │  • Initialize logging system                                    │
 │  • Initialize TileManager                                       │
 │  • Create MainWindow &amp; QZUI                                     │
+│  • Start process pools (Converter / Tiler)                      │
 └─────────────┬───────────────────────────────────────────────────┘
               │
-              ├──────────────────────────────────────────────┐
-              │                                              │
-              ▼                                              ▼
+              ├──────────────────────────────────────────────────────────────┐
+              │                                                              │
+              ▼                                                              ▼
 ┌─────────────────────────────┐              ┌──────────────────────────────┐
-│      LoggerConfig           │              │     TileManager (Module)     │
-│  • Centralized logging      │              │  • init() - Setup caches     │
-│  • File + Console handlers  │              │  • load_tile()               │
-│  • Color-coded output       │              │  • get_tile()                │
-│  • Rotation support         │              │  • get_tile_robust()         │
-└─────────────────────────────┘              └──────────┬───────────────────┘
-                                                        │
-                                                        │
-              ┌─────────────────────────────────────────┴──────────┐
-              │                                                    │
-              ▼                                                    ▼
-┌─────────────────────────────┐              ┌──────────────────────────────┐
-│     MainWindow (Qt)         │              │   TileCache (LRU)            │
-│  • Menu system              │              │  • In-memory cache           │
-│  • File operations          │              │  • 80% static / 20% dynamic  │
-│  • Central widget: QZUI     │              │  • Thread-safe               │
-└─────────────┬───────────────┘              └──────────┬───────────────────┘
-              │                                         │
-              ▼                                         │
-┌─────────────────────────────┐                         │
-│   QZUI (Qt Widget+Thread)   │                         │
-│  • Rendering loop           │                         │
-│  • Input handling           │                         │
-│  • Viewport management      │◄────────────────────────┤
-│  • Requests tiles           │                         │
-└─────────────┬───────────────┘                         │
-              │                                         │
-              ▼                                         │
-┌─────────────────────────────┐                         │
-│        Scene                │                         │
-│  • Container for media      │                         │
-│  • Coordinate transforms    │                         │
-│  • Thread-safe (RLock)      │                         │
-│  • Save/Load .pzs files     │                         │
-└─────────────┬───────────────┘                         │
-              │                                         │
-              ▼                                         │
-┌───────────────────────────────────┐                   │
-│      MediaObject                  │                   │
-│  ┌─────────────────────┐          │                   │
-│  │  PhysicalObject     │          │                   │
-│  │  • x, y, z coords   │          │                   │
-│  │  • vx, vy, vz       │          │                   │
-│  │  • damping          │          │                   │
-│  └─────────────────────┘          │                   │
-│         ▲                         │                   │
-│         │                         │                   │
-│  ┌──────┴──────────────┐          │                   │
-│  │                     │          │                   │
-│  ▼                     ▼          │                   │
-│ TiledMediaObject  StringMediaObj  │                   │
-│ SVGMediaObject                    │                   │
-└───────────────────────────────────┘                   │
-              │                                         │
-              │ requests tiles                          │
-              ▼                                         │
-┌─────────────────────────────┐                         │
-│   TileProvider (Abstract)   │◄────────────────────────┘
-│  • Thread-based             │
-│  • LIFO task queue          │
-│  • Condition variables      │
+│      ConfigManager          │              │     LoggerConfig             │
+│  • JSON config file I/O     │              │  • Centralized logging       │
+│  • CLI override support     │              │  • File + Console handlers   │
+│  • Autosave settings        │              │  • Color-coded output        │
+└─────────────────────────────┘              └──────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                     TileManager (Module)                        │
+│  • init() — Setup caches and thread pools                      │
+│  • load_tile() / get_tile() / get_tile_robust()                │
+│  • Manages Static and Dynamic tile providers                   │
+│  • Coordinates with TilerRunner (process pool)                 │
+└──────────┬──────────────────┬────────────────┬─────────────────┘
+           │                  │                │
+           ▼                  ▼                ▼
+┌──────────────────┐ ┌──────────────┐ ┌──────────────────┐
+│ TileCache (LRU)  │ │ ConverterRunner│ │  TilerRunner     │
+│ • In-memory cache│ │ (Process Pool) │ │  (Process Pool)  │
+│ • 80% static     │ │ • Parallel fmt │ │  • Parallel tile │
+│ • 20% dynamic    │ │   conversion   │ │    generation    │
+│ • Thread-safe    │ │ • libvips/PIL  │ │  • PPM format    │
+└──────────────────┘ └──────────────┘ └──────────────────┘
+
+┌─────────────────────────────┐
+│     MainWindow (Qt)         │
+│  • Menu system              │
+│  • File operations          │
+│  • Central widget: QZUI     │
+│  • Dialog management        │
 └─────────────┬───────────────┘
+              │
+              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    QZUI (Qt Widget + Thread)                     │
+│  • Rendering loop (10 fps)                                      │
+│  • Input handling (mouse, touch, keyboard)                      │
+│  • Viewport management (pan, zoom)                              │
+│  • Requests tiles via PriorityBatcher                           │
+│  • Renders Scene content                                         │
+└─────────────┬───────────────────────────────────────────────────┘
+              │
+              ├──────────────────────────────┬────────────────────┐
+              │                              │                    │
+              ▼                              ▼                    ▼
+┌─────────────────────────────┐ ┌─────────────────────┐ ┌─────────────────┐
+│        Scene                │ │   PriorityBatcher   │ │  ZoomManager   │
+│  • Container for media      │ │  • Priority queue   │ │  • Zoom level  │
+│  • Coordinate transforms    │ │  • Tile request     │ │  • Physics     │
+│  • Thread-safe (RLock)      │ │    batching         │ │  • Sensitivity │
+│  • Save/Load .pzs files     │ └─────────┬───────────┘ └─────────────────┘
+│  • Autosave integration     │           │
+│  • Clipboard integration    │           │ tile requests
+└──────┬──────────────┬───────┘           │
+       │              │                   │
+       ▼              ▼                   │
+┌──────────────┐ ┌────────────────┐       │
+│   Autosave    │ │   Clipboard    │       │
+│  • Per-scene  │ │  • Copy/paste  │       │
+│    backups    │ │  • Grid-align  │       │
+│  • Rotation   │ │  • Selection   │       │
+│  • Expiration │ └────────────────┘       │
+└──────┬───────┘                            │
+       │                                   │
+       ▼                                   │
+┌──────────────┐                           │
+│ BackupManager │                          │
+│  • Dir mgmt  │                           │
+│  • Cleanup   │                           │
+└──────────────┘                           │
+                                           │
+┌──────────────────────────────────────────┘
+│
+▼
+┌───────────────────────────────────┐
+│      MediaObject                  │
+│  ┌─────────────────────┐          │
+│  │  PhysicalObject     │          │
+│  │  • x, y, z coords   │          │
+│  │  • vx, vy, vz       │          │
+│  │  • damping          │          │
+│  └─────────────────────┘          │
+│         ▲                         │
+│         │                         │
+│  ┌──────┴──────────────┐          │
+│  │                     │          │
+│  ▼                     ▼          │
+│ TiledMediaObject  StringMediaObj  │
+│ SVGMediaObject                    │
+│  • SVG cache          • Hybrid   │
+│  • Shape utils          render   │
+│  (5 shape types)      • Text     │
+│                         layout   │
+│                         • Parall │
+└───────────────────────────────────┘
+              │
+              │ requests tiles
+              ▼
+┌──────────────────────────────────────┐
+│   TileProvider (Abstract)            │◄─── PriorityBatcher
+│  • Thread-based (ThreadPool)         │
+│  • LIFO task queue                   │
+│  • Condition variables               │
+│  • Pause/resume support              │
+└─────────────┬────────────────────────┘
               │
     ┌─────────┴──────────┐
     │                    │
@@ -291,9 +460,8 @@ Show Window                                  |    User Closes Window
 ┌────────────┐    ┌──────────────────┐
 │  Static    │    │  DynamicProvider │
 │  Provider  │    │  • FernProvider  │
-│            │    │  • MandelProvider│
-└────┬───────┘    └────────┬─────────┘
-     │                     │
+│            │    └────────┬─────────┘
+└────┬───────┘             │
      │                     │
      └─────────┬───────────┘
                │
@@ -303,6 +471,7 @@ Show Window                                  |    User Closes Window
      │  • Disk storage  │
      │  • SHA-1 hashing │
      │  • Auto cleanup  │
+     │    (cleanuptls)  │
      └──────────────────┘
 </pre></div>
 </div>
@@ -337,17 +506,22 @@ Show Window                                  |    User Closes Window
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../usageinstructions/userinterface.html">User Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usageinstructions/svgfeatures.html">SVG Features</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="readingdocumentation.html">Reading Documentation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configsystem.html">Configuration System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="objectsystem.html">Object System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="svgecosystem.html">SVG Utility Ecosystem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tiledmediaobject.html">Tiled media object</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tilingsystem.html">Tiling System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="windowsystem.html">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backup.html">Backup System</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
 <ul>
@@ -363,13 +537,17 @@ Show Window                                  |    User Closes Window
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../pyzui.html">pyzui package</a></li>
+</ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
       <li>Previous: <a href="readingdocumentation.html" title="previous chapter">Reading Documentation</a></li>
-      <li>Next: <a href="objectsystem.html" title="next chapter">Object System</a></li>
+      <li>Next: <a href="configsystem.html" title="next chapter">Configuration System</a></li>
   </ul></li>
 </ul>
 </div>

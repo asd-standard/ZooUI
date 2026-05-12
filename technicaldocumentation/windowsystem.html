@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Window System &#8212; PyZui 0.11 documentation</title>
+    <title>Window System &#8212; PyZui 0.5.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cc7d0dec" />
-    <script src="../_static/documentation_options.js?v=086c1757"></script>
+    <script src="../_static/documentation_options.js?v=b9afe91b"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -44,9 +44,10 @@ interface.</p>
 <p>The window system is responsible for:</p>
 <ol class="arabic simple">
 <li><p>Creating the main application window with menus and toolbar</p></li>
+<li><p>Managing multiple scene tabs via a <code class="docutils literal notranslate"><span class="pre">QTabWidget</span></code></p></li>
 <li><p>Rendering the zooming user interface in real-time</p></li>
 <li><p>Handling user input (mouse, keyboard, touch)</p></li>
-<li><p>Managing dialogs for user interactions</p></li>
+<li><p>Managing dialogs for user interactions (string, SVG, tiled media, zoom, autosave)</p></li>
 <li><p>Coordinating between UI events and scene updates</p></li>
 <li><p>Providing visual feedback (selection borders, loading indicators)</p></li>
 </ol>
@@ -67,18 +68,24 @@ system provides the interactive view.</p>
     │   • Media import dialogs
     │   • Settings and configuration
     │   • Error message display
+    │   • Tab management (add/close/switch)
     │
-    └── QZUI (QWidget + Thread)
-        │   • Central rendering widget
-        │   • Scene rendering coordination
-        │   • Mouse event handling
-        │   • Keyboard event handling
-        │   • Wheel event handling (zoom)
-        │   • Timer-based animation
-        │   • Draft/high-quality rendering
+    └── QTabWidget (central widget)
+        │   • Contains one or more QZUI tabs
+        │   • Tab bar for switching scenes
+        │   • Close button on each tab
         │
-        └── Scene
-            └── MediaObjects
+        └── QZUI (QWidget + Thread) × N
+            │   • Central rendering widget
+            │   • Scene rendering coordination
+            │   • Mouse event handling
+            │   • Keyboard event handling
+            │   • Wheel event handling (zoom)
+            │   • Timer-based animation
+            │   • Draft/high-quality rendering
+            │
+            └── Scene
+                └── MediaObjects
 
 
 DialogWindows (Static Container)
@@ -98,9 +105,41 @@ DialogWindows (Static Container)
 │       • Change text color
 │       • Preserves original text
 │
-└── ZoomSensitivityDialog
-        • Adjust zoom sensitivity (0-100)
-        • Real-time sensitivity update
+├── OpenSVGPickerInputDialog
+│       • Browse SVG files from data/SVG/
+│       • Scrollable SVG preview panels
+│       • Color selection (24 recent colors)
+│       • Thickness control
+│
+├── ModifySVGInputDialog
+│       • Modify stroke color of SVG shapes
+│       • Change line thickness
+│       • Integrates with SVGCache
+│       • Triggered by right-click on SVG
+│
+├── ModifyTiledMediaObjectDialog
+│       • Rotate left / rotate right
+│       • Invert colors toggle
+│       • Black and white toggle
+│       • Preview then apply pattern
+│       • Triggered by right-click on tiled media
+│
+├── ZoomSensitivityDialog
+│       • Adjust zoom speed (0–100)
+│       • Real-time sensitivity update
+│
+├── ZoomSettingsDialog
+│       • Configure min/max zoom levels
+│       • Clamp zoom to limits toggle
+│       • Default zoom for new scenes
+│       • Accessed via Settings menu
+│
+└── AutosaveSettingsDialog
+        • Enable/disable autosave
+        • Set interval (1–1440 min)
+        • Set max backups (1–1000)
+        • Set expire days (1–365)
+        • Accessed via Settings menu
 </pre></div>
 </div>
 <p><strong>UI Event Flow:</strong></p>
@@ -150,29 +189,43 @@ DialogWindows (Static Container)
 <section id="mainwindow">
 <h3>MainWindow<a class="headerlink" href="#mainwindow" title="Link to this heading">¶</a></h3>
 <p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">MainWindow</span></code> class extends <code class="xref py py-class docutils literal notranslate"><span class="pre">QMainWindow</span></code> and serves as the main
-application window, providing menus, actions, and file operations.</p>
+application window, providing menus, actions, tab management, and file operations.</p>
 <p><strong>Class Definition:</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MainWindow</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QMainWindow</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">framerate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
-                 <span class="n">zoom_sensitivity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">framerate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span>
+                 <span class="n">zoom_sensitivity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+                 <span class="n">icon</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QIcon</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">autosave_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QMainWindow</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s2">&quot;PyZUI&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">zui</span> <span class="o">=</span> <span class="n">QZUI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">framerate</span><span class="p">,</span> <span class="n">zoom_sensitivity</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">zui</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">setCentralWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">zui</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__config</span> <span class="o">=</span> <span class="n">config</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__autosave_config</span> <span class="o">=</span> <span class="n">autosave_config</span> <span class="ow">or</span> <span class="p">{}</span>
+
+        <span class="c1"># Tab widget is the central widget</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__tab_widget</span> <span class="o">=</span> <span class="n">QTabWidget</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__tab_widget</span><span class="o">.</span><span class="n">setTabsClosable</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setCentralWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__tab_widget</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__create_actions</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__create_menus</span><span class="p">()</span>
+
+        <span class="c1"># Create initial tab</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_tab</span><span class="p">()</span>
 </pre></div>
 </div>
 <p><strong>Key Attributes:</strong></p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">zui</span></code>: Central QZUI widget for rendering</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">__tab_widget</span></code>: QTabWidget central widget containing all scene tabs</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">__zui_tabs</span></code>: List of <code class="docutils literal notranslate"><span class="pre">(QZUI,</span> <span class="pre">Scene)</span></code> tuples, one per tab</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">current_zui</span></code>: Property returning the active tab’s QZUI</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zui</span></code>: Backward-compatible property returning current tab’s QZUI</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">__action</span></code>: Dictionary of QAction objects for menu items</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">__menu</span></code>: Dictionary of QMenu objects</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">__prev_dir</span></code>: Last used directory for file dialogs</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">__logger</span></code>: Logger instance for error reporting</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">__config</span></code>: Configuration dictionary loaded at startup</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">__autosave_config</span></code>: Autosave configuration subsection</p></li>
 </ul>
 <p><strong>Window Properties:</strong></p>
 <ul class="simple">
@@ -180,15 +233,61 @@ application window, providing menus, actions, and file operations.</p>
 <li><p><strong>Minimum Size</strong>: 160x120 pixels (minimumSizeHint)</p></li>
 <li><p><strong>Resizable</strong>: Yes, viewport adapts to window size</p></li>
 </ul>
+<p><strong>Tab System:</strong></p>
+<p>MainWindow manages multiple scenes through a <code class="docutils literal notranslate"><span class="pre">QTabWidget</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@property</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">current_zui</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QZUI</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the QZUI of the currently active tab.&quot;&quot;&quot;</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tab_widget</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">idx</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__zui_tabs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__zui_tabs</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+<span class="nd">@property</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">zui</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QZUI</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Backward-compatible accessor for current tab&#39;s QZUI.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_zui</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_add_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scene</span><span class="p">:</span> <span class="n">Scene</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a new tab with a fresh QZUI and Scene.&quot;&quot;&quot;</span>
+    <span class="n">zui</span> <span class="o">=</span> <span class="n">QZUI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;framerate&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">framerate</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;zoom_sensitivity&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">zoom_sensitivity</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">scene</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">zui</span><span class="o">.</span><span class="n">scene</span> <span class="o">=</span> <span class="n">scene</span>
+    <span class="n">zui</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">tab_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tab_widget</span><span class="o">.</span><span class="n">addTab</span><span class="p">(</span><span class="n">zui</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Scene </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__zui_tabs</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">__zui_tabs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">zui</span><span class="p">,</span> <span class="n">zui</span><span class="o">.</span><span class="n">scene</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">__tab_widget</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="n">tab_idx</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_close_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Close a tab, stop autosave, and purge tiles.&quot;&quot;&quot;</span>
+    <span class="n">zui</span><span class="p">,</span> <span class="n">scene</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__zui_tabs</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+    <span class="n">scene</span><span class="o">.</span><span class="n">shutdown_threads</span><span class="p">()</span>
+    <span class="n">tilemanager</span><span class="o">.</span><span class="n">purge</span><span class="p">()</span>  <span class="c1"># Purge tiles from closed scene</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">__tab_widget</span><span class="o">.</span><span class="n">removeTab</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+    <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">__zui_tabs</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_on_tab_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sync render order checkbox and window title on tab switch.&quot;&quot;&quot;</span>
+    <span class="n">zui</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_zui</span>
+    <span class="k">if</span> <span class="n">zui</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PyZUI - </span><span class="si">{</span><span class="n">zui</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">__last_save_path</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;Untitled&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 <p><strong>Menu Structure:</strong></p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>File
+├── New Tab                     (Ctrl+T)
+├── Close Tab                   (Ctrl+W)
+├── ─────────────────────────
 ├── New Scene                   (Ctrl+N)
 ├── Open Scene                  (Ctrl+O)
+├── Import Scene                (Ctrl+I)
 ├── Open Home Scene             (Ctrl+Home)
 ├── Save Scene                  (Ctrl+S)
 ├── Save Screenshot             (Ctrl+H)
 ├── Open Local Media            (Ctrl+L)
 ├── Open new String             (Ctrl+U)
+├── Open new SVG                (Ctrl+G)
 ├── Open Media Directory        (Ctrl+D)
 └── Quit                        (Ctrl+Q)
 
@@ -199,35 +298,63 @@ View
 │   ├── 30 FPS
 │   └── 40 FPS
 ├── Adjust Sensitivity
-└── Fullscreen                  (Ctrl+F)
+├── Fullscreen                  (Ctrl+F)
+└── Render Order: Smaller on Top (Ctrl+R)
+
+Actions
+├── Copy SVG                    (Ctrl+C)
+└── Paste SVG                   (Ctrl+V)
+
+Settings
+├── Autosave Settings
+└── Zoom Settings
 
 Help
 ├── About
 └── About Qt
 </pre></div>
 </div>
+<p><strong>Right-Click Context Menu:</strong></p>
+<p>The Scene handles right-click events and shows a context menu based on
+the selected object type:</p>
+<ul class="simple">
+<li><p><strong>TiledMediaObject</strong>: Opens <a class="reference internal" href="#modify-tiled-media-dialog"><span class="std std-ref">ModifyTiledMediaObjectDialog</span></a> for image
+manipulation (rotate, invert, B&amp;W)</p></li>
+<li><p><strong>SVGMediaObject</strong>: Opens <a class="reference internal" href="#modify-svg-input-dialog"><span class="std std-ref">ModifySVGInputDialog</span></a> for changing
+stroke color and line thickness</p></li>
+<li><p><strong>StringMediaObject</strong>: Opens <a class="reference internal" href="#modify-string-input-dialog"><span class="std std-ref">ModifyStringInputDialog</span></a> for
+editing text content and color</p></li>
+</ul>
 <p><strong>Key Methods:</strong></p>
 <section id="scene-operations">
 <h4>Scene Operations<a class="headerlink" href="#scene-operations" title="Link to this heading">¶</a></h4>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">__action_new_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a new empty scene.&quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">zui</span><span class="o">.</span><span class="n">scene</span> <span class="o">=</span> <span class="n">Scene</span><span class="o">.</span><span class="n">new</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a new empty scene in current tab.&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">current_zui</span><span class="o">.</span><span class="n">scene</span> <span class="o">=</span> <span class="n">Scene</span><span class="o">.</span><span class="n">new</span><span class="p">()</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">__action_open_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Open scene from .pzs file via file dialog.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Open scene from .pzs file via file dialog. Opens in new tab.&quot;&quot;&quot;</span>
     <span class="n">filename</span> <span class="o">=</span> <span class="n">QFileDialog</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Open scene&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__prev_dir</span><span class="p">,</span>
         <span class="s2">&quot;PyZUI Scenes (*.pzs)&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">zui</span><span class="o">.</span><span class="n">scene</span> <span class="o">=</span> <span class="n">Scene</span><span class="o">.</span><span class="n">load_scene</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">scene</span> <span class="o">=</span> <span class="n">Scene</span><span class="o">.</span><span class="n">load_scene</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_tab</span><span class="p">(</span><span class="n">scene</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">__action_save_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Save current scene to .pzs file.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Save current scene to .pzs file.</span>
+<span class="sd">    If objects are selected, saves only the selection.&quot;&quot;&quot;</span>
     <span class="n">filename</span> <span class="o">=</span> <span class="n">QFileDialog</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Save scene&quot;</span><span class="p">,</span> <span class="s2">&quot;scene.pzs&quot;</span><span class="p">,</span>
         <span class="s2">&quot;PyZUI Scenes (*.pzs)&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">zui</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="n">scene</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_zui</span><span class="o">.</span><span class="n">scene</span>
+    <span class="k">if</span> <span class="n">scene</span><span class="o">.</span><span class="n">selection</span><span class="p">:</span>
+        <span class="c1"># Save only selected objects (header: &quot;0 0 0&quot;)</span>
+        <span class="n">scene</span><span class="o">.</span><span class="n">save_selection</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">scene</span><span class="o">.</span><span class="n">selection</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">scene</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">__action_save_screenshot</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Save screenshot to image file.&quot;&quot;&quot;</span>
@@ -235,7 +362,7 @@ Help
         <span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Save screenshot&quot;</span><span class="p">,</span> <span class="s2">&quot;screenshot.png&quot;</span><span class="p">,</span>
         <span class="s2">&quot;Images (*.bmp *.jpg *.png ...)&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
-        <span class="n">pixmap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">zui</span><span class="o">.</span><span class="n">grab</span><span class="p">()</span>
+        <span class="n">pixmap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_zui</span><span class="o">.</span><span class="n">grab</span><span class="p">()</span>
         <span class="n">pixmap</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -246,17 +373,18 @@ Help
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Open media and optionally add to scene.&quot;&quot;&quot;</span>
     <span class="c1"># Detect media type from file extension</span>
     <span class="k">if</span> <span class="n">media_id</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;string:&#39;</span><span class="p">):</span>
-        <span class="n">mediaobject</span> <span class="o">=</span> <span class="n">StringMediaObject</span><span class="p">(</span><span class="n">media_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">zui</span><span class="o">.</span><span class="n">scene</span><span class="p">)</span>
+        <span class="n">mediaobject</span> <span class="o">=</span> <span class="n">StringMediaObject</span><span class="p">(</span><span class="n">media_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_zui</span><span class="o">.</span><span class="n">scene</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">media_id</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.svg&#39;</span><span class="p">):</span>
-        <span class="n">mediaobject</span> <span class="o">=</span> <span class="n">SVGMediaObject</span><span class="p">(</span><span class="n">media_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">zui</span><span class="o">.</span><span class="n">scene</span><span class="p">)</span>
+        <span class="n">mediaobject</span> <span class="o">=</span> <span class="n">SVGMediaObject</span><span class="p">(</span><span class="n">media_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_zui</span><span class="o">.</span><span class="n">scene</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">mediaobject</span> <span class="o">=</span> <span class="n">TiledMediaObject</span><span class="p">(</span><span class="n">media_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">zui</span><span class="o">.</span><span class="n">scene</span><span class="p">)</span>
+        <span class="n">mediaobject</span> <span class="o">=</span> <span class="n">TiledMediaObject</span><span class="p">(</span><span class="n">media_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_zui</span><span class="o">.</span><span class="n">scene</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">add</span><span class="p">:</span>
         <span class="c1"># Fit to center 50% of viewport</span>
-        <span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">zui</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">zui</span><span class="o">.</span><span class="n">height</span><span class="p">()</span>
+        <span class="n">zui</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_zui</span>
+        <span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">zui</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="n">zui</span><span class="o">.</span><span class="n">height</span><span class="p">()</span>
         <span class="n">mediaobject</span><span class="o">.</span><span class="n">fit</span><span class="p">((</span><span class="n">w</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="n">h</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="n">w</span><span class="o">*</span><span class="mi">3</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="n">h</span><span class="o">*</span><span class="mi">3</span><span class="o">/</span><span class="mi">4</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">zui</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mediaobject</span><span class="p">)</span>
+        <span class="n">zui</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mediaobject</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">__action_open_media_local</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Open single media file via file dialog.&quot;&quot;&quot;</span>
@@ -268,6 +396,13 @@ Help
 <span class="k">def</span><span class="w"> </span><span class="nf">__action_open_media_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Open string input dialog to create text object.&quot;&quot;&quot;</span>
     <span class="n">dialog</span> <span class="o">=</span> <span class="n">DialogWindows</span><span class="o">.</span><span class="n">open_new_string_input_dialog</span><span class="p">()</span>
+    <span class="n">ok</span><span class="p">,</span> <span class="n">uri</span> <span class="o">=</span> <span class="n">dialog</span><span class="o">.</span><span class="n">_run_dialog</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">ok</span> <span class="ow">and</span> <span class="n">uri</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__open_media</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__action_open_media_svg</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Open SVG picker dialog to create SVG object.&quot;&quot;&quot;</span>
+    <span class="n">dialog</span> <span class="o">=</span> <span class="n">DialogWindows</span><span class="o">.</span><span class="n">open_svg_picker_input_dialog</span><span class="p">()</span>
     <span class="n">ok</span><span class="p">,</span> <span class="n">uri</span> <span class="o">=</span> <span class="n">dialog</span><span class="o">.</span><span class="n">_run_dialog</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">ok</span> <span class="ow">and</span> <span class="n">uri</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__open_media</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
@@ -331,7 +466,7 @@ Help
                 <span class="n">mediaobject</span><span class="o">.</span><span class="n">aim</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">grid_centre</span><span class="p">)</span> <span class="o">*</span> <span class="n">cellsize</span><span class="p">)</span>
                 <span class="n">mediaobject</span><span class="o">.</span><span class="n">aim</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">grid_centre</span><span class="p">)</span> <span class="o">*</span> <span class="n">cellsize</span><span class="p">)</span>
 
-                <span class="bp">self</span><span class="o">.</span><span class="n">zui</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mediaobject</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_zui</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mediaobject</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -339,24 +474,72 @@ Help
 <h4>View Settings<a class="headerlink" href="#view-settings" title="Link to this heading">¶</a></h4>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">__action_set_fps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">act</span><span class="p">:</span> <span class="n">QAction</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Set framerate from action group.&quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">zui</span><span class="o">.</span><span class="n">framerate</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">act</span><span class="o">.</span><span class="n">fps</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">current_zui</span><span class="o">.</span><span class="n">framerate</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">act</span><span class="o">.</span><span class="n">fps</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">__action_set_zoom_sensitivity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Open dialog to adjust zoom sensitivity.&quot;&quot;&quot;</span>
     <span class="n">ok</span><span class="p">,</span> <span class="n">text</span> <span class="o">=</span> <span class="n">DialogWindows</span><span class="o">.</span><span class="n">_open_zoom_sensitivity_input_dialog</span><span class="p">(</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">zui</span><span class="o">.</span><span class="n">zoom_sensitivity</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_zui</span><span class="o">.</span><span class="n">zoom_sensitivity</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">ok</span> <span class="ow">and</span> <span class="n">text</span><span class="p">:</span>
         <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
         <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="mi">100</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">zui</span><span class="o">.</span><span class="n">zoom_sensitivity</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">1000</span> <span class="o">/</span> <span class="n">value</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_zui</span><span class="o">.</span><span class="n">zoom_sensitivity</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">1000</span> <span class="o">/</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">value</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">zui</span><span class="o">.</span><span class="n">zoom_sensitivity</span> <span class="o">=</span> <span class="mi">1000</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_zui</span><span class="o">.</span><span class="n">zoom_sensitivity</span> <span class="o">=</span> <span class="mi">1000</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">__action_fullscreen</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Toggle fullscreen mode.&quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">setWindowState</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">windowState</span><span class="p">()</span> <span class="o">^</span> <span class="n">Qt</span><span class="o">.</span><span class="n">WindowFullScreen</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__action_toggle_render_order</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Toggle render order between smaller_on_top and larger_on_top.</span>
+<span class="sd">    Persists setting to ~/.pyzui/config.json.&quot;&quot;&quot;</span>
+    <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__action</span><span class="p">[</span><span class="s2">&quot;render_order_smaller_top&quot;</span><span class="p">]</span>
+    <span class="n">new_mode</span> <span class="o">=</span> <span class="s2">&quot;smaller_on_top&quot;</span> <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">isChecked</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;larger_on_top&quot;</span>
+    <span class="n">scene</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_zui</span><span class="o">.</span><span class="n">scene</span>
+    <span class="n">scene</span><span class="o">.</span><span class="n">set_render_order</span><span class="p">(</span><span class="n">new_mode</span><span class="p">)</span>
+
+    <span class="c1"># Persist to config</span>
+    <span class="n">config_manager</span> <span class="o">=</span> <span class="n">ConfigManager</span><span class="p">()</span>
+    <span class="n">full_config</span> <span class="o">=</span> <span class="n">config_manager</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+    <span class="n">full_config</span><span class="p">[</span><span class="s2">&quot;render&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;order&quot;</span><span class="p">:</span> <span class="n">new_mode</span><span class="p">}</span>
+    <span class="n">config_manager</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">full_config</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__action_autosave_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Open autosave settings dialog.&quot;&quot;&quot;</span>
+    <span class="n">dialog</span> <span class="o">=</span> <span class="n">DialogWindows</span><span class="o">.</span><span class="n">autosave_settings_dialog</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__autosave_config</span><span class="p">)</span>
+    <span class="n">ok</span><span class="p">,</span> <span class="n">config</span> <span class="o">=</span> <span class="n">dialog</span><span class="o">.</span><span class="n">_run_dialog</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">ok</span> <span class="ow">and</span> <span class="n">config</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__autosave_config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="c1"># Apply to current scene</span>
+        <span class="n">scene</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_zui</span><span class="o">.</span><span class="n">scene</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="s1">&#39;autosave_manager&#39;</span><span class="p">):</span>
+            <span class="n">scene</span><span class="o">.</span><span class="n">autosave_manager</span><span class="o">.</span><span class="n">set_autosave_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__action_zoom_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Open zoom settings dialog for level limits.&quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.windows.dialogwindows.zoomsettingsdialog</span><span class="w"> </span><span class="kn">import</span> <span class="n">ZoomSettingsDialog</span>
+    <span class="n">dialog</span> <span class="o">=</span> <span class="n">ZoomSettingsDialog</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;zoom&#39;</span><span class="p">,</span> <span class="p">{}))</span>
+    <span class="n">ok</span><span class="p">,</span> <span class="n">zoom_config</span> <span class="o">=</span> <span class="n">dialog</span><span class="o">.</span><span class="n">_run_dialog</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">ok</span> <span class="ow">and</span> <span class="n">zoom_config</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__config</span><span class="p">[</span><span class="s1">&#39;zoom&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">zoom_config</span>
+</pre></div>
+</div>
+</section>
+<section id="clipboard-actions">
+<h4>Clipboard Actions<a class="headerlink" href="#clipboard-actions" title="Link to this heading">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">__action_copy_svg</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Copy selected SVG objects to clipboard.&quot;&quot;&quot;</span>
+    <span class="n">scene</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_zui</span><span class="o">.</span><span class="n">scene</span>
+    <span class="n">scene</span><span class="o">.</span><span class="n">copy_selected</span><span class="p">()</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__action_paste_svg</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Paste SVG objects from clipboard.&quot;&quot;&quot;</span>
+    <span class="n">scene</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_zui</span><span class="o">.</span><span class="n">scene</span>
+    <span class="n">scene</span><span class="o">.</span><span class="n">paste</span><span class="p">()</span>
 </pre></div>
 </div>
 </section>
@@ -410,8 +593,8 @@ the central rendering widget that displays the scene and handles user input.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">__scene</span></code>: The Scene object being rendered</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">__timer</span></code>: QBasicTimer for animation updates</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">framerate</span></code>: Target framerate (default: 10 FPS)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">zoom_sensitivity</span></code>: Zoom speed (default: 20)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">framerate</span></code>: Target framerate (default: 10 FPS, overridden to 20 by MainWindow)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zoom_sensitivity</span></code>: Zoom speed (default: 20, overridden to 50 by MainWindow)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">reduced_framerate</span></code>: Framerate when idle (default: 3 FPS)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">__draft</span></code>: Boolean flag for draft vs high-quality rendering</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">__mouse_left_down</span></code>: Left mouse button state</p></li>
@@ -428,7 +611,7 @@ the central rendering widget that displays the scene and handles user input.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">__active_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the currently active object (selection or scene).&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selection</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selection</span>  <span class="c1"># Selected object</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selection</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># First selected object</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span>  <span class="c1"># Whole scene</span>
 </pre></div>
@@ -631,7 +814,9 @@ the central rendering widget that displays the scene and handles user input.</p>
 
 Selection:
     Left Click      - Select object
-    Right Click     - Right-select (for editing StringMediaObject)
+    Ctrl+Click      - Add to selection (bulk)
+    Left Drag       - Area selection (lasso)
+    Right Click     - Right-select (context menu for editing)
     Escape          - Clear selection
     Shift + Click   - Interact without changing selection
 
@@ -639,6 +824,8 @@ Object Manipulation:
     Left Drag       - Move object/scene
     Wheel           - Zoom object/scene
     Delete          - Remove selected object
+    Ctrl+C          - Copy SVG
+    Ctrl+V          - Paste SVG
 </pre></div>
 </div>
 </section>
@@ -655,9 +842,13 @@ Object Manipulation:
     <span class="c1"># Static methods</span>
     <span class="n">_open_zoom_sensitivity_input_dialog</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 
-    <span class="c1"># Nested classes</span>
+    <span class="c1"># Nested classes / class-level references</span>
     <span class="n">open_new_string_input_dialog</span> <span class="o">=</span> <span class="n">OpenNewStringInputDialog</span>
     <span class="n">modify_string_input_dialog</span> <span class="o">=</span> <span class="n">ModifyStringInputDialog</span>
+    <span class="n">open_svg_picker_input_dialog</span> <span class="o">=</span> <span class="n">OpenSVGPickerInputDialog</span>
+    <span class="n">modify_svg_input_dialog</span> <span class="o">=</span> <span class="n">ModifySVGInputDialog</span>
+    <span class="n">modify_tiled_media_object_dialog</span> <span class="o">=</span> <span class="n">ModifyTiledMediaObjectDialog</span>
+    <span class="n">autosave_settings_dialog</span> <span class="o">=</span> <span class="n">AutosaveSettingsDialog</span>
 </pre></div>
 </div>
 </section>
@@ -712,7 +903,7 @@ Object Manipulation:
 <p>Format: One hex color per line (e.g., <code class="docutils literal notranslate"><span class="pre">ff0000</span></code>)</p>
 </section>
 <section id="modifystringinputdialog">
-<h3>ModifyStringInputDialog<a class="headerlink" href="#modifystringinputdialog" title="Link to this heading">¶</a></h3>
+<span id="modify-string-input-dialog"></span><h3>ModifyStringInputDialog<a class="headerlink" href="#modifystringinputdialog" title="Link to this heading">¶</a></h3>
 <p>Dialog for editing existing text objects.</p>
 <p><strong>Features:</strong></p>
 <ul class="simple">
@@ -742,13 +933,177 @@ Object Manipulation:
     <span class="n">text</span> <span class="o">=</span> <span class="n">media_id</span><span class="p">[</span><span class="mi">14</span><span class="p">:]</span>     <span class="c1"># Extract text content</span>
 </pre></div>
 </div>
+<p id="svg-picker-input-dialog">OpenSVGPickerInputDialog</p>
+<p>Dialog for browsing and selecting SVG files from <code class="docutils literal notranslate"><span class="pre">data/SVG/</span></code>, with color
+and thickness customization. Triggered by <strong>File &gt; Open new SVG</strong> (Ctrl+G).</p>
+<p><strong>Features:</strong></p>
+<ul class="simple">
+<li><p><strong>SVG Browser</strong>: Scrollable grid of SVG file previews loaded from <code class="docutils literal notranslate"><span class="pre">data/SVG/</span></code></p></li>
+<li><p><strong>Preview Panels</strong>: Each SVG is rendered at 64×64 for visual selection</p></li>
+<li><p><strong>Color Selection</strong>: Grid of 24 recently used colors (shared with string dialogs)</p></li>
+<li><p><strong>Custom Colors</strong>: Hex color input field</p></li>
+<li><p><strong>Thickness Control</strong>: Line thickness for the selected SVG shape</p></li>
+<li><p><strong>Color Persistence</strong>: Recent colors saved to <code class="docutils literal notranslate"><span class="pre">~/.pyzui/colorstore/color_list.txt</span></code></p></li>
+</ul>
+<p><strong>Dialog Layout:</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>┌───────────────────────────────────────────────────┐
+│  SVG picker:                              [X]     │
+├───────────────────────────────────────────────────┤
+│                                                   │
+│  ┌──────┬──────┬──────┬──────┬──────┐             │
+│  │ SVG  │ SVG  │ SVG  │ SVG  │ SVG  │             │
+│  │ icon │ icon │ icon │ icon │ icon │   ┌──────┐  │
+│  ├──────┼──────┼──────┼──────┼──────┤   │Color │  │
+│  │ SVG  │ SVG  │ SVG  │ SVG  │ SVG  │   │Grid  │  │
+│  │ icon │ icon │ icon │ icon │ icon │   │24 col│  │
+│  ├──────┼──────┼──────┼──────┼──────┤   │      │  │
+│  │ ...  │ ...  │ ...  │ ...  │ ...  │   │      │  │
+│  └──────┴──────┴──────┴──────┴──────┘   └──────┘  │
+│                                                   │
+│  Thickness: [===slider===]                        │
+│  Custom color: #_____                             │
+│                                                   │
+│              [Cancel]  [OK]                       │
+└───────────────────────────────────────────────────┘
+</pre></div>
+</div>
+<p><strong>Usage:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Triggered by File &gt; Open new SVG (Ctrl+G)</span>
+<span class="n">dialog</span> <span class="o">=</span> <span class="n">DialogWindows</span><span class="o">.</span><span class="n">open_svg_picker_input_dialog</span><span class="p">()</span>
+<span class="n">ok</span><span class="p">,</span> <span class="n">uri</span> <span class="o">=</span> <span class="n">dialog</span><span class="o">.</span><span class="n">_run_dialog</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="n">ok</span> <span class="ow">and</span> <span class="n">uri</span><span class="p">:</span>
+    <span class="c1"># uri format: &quot;svg:&lt;hash&gt;:&lt;color&gt;:&lt;thickness&gt;&quot;</span>
+    <span class="n">mediaobject</span> <span class="o">=</span> <span class="n">SVGMediaObject</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">scene</span><span class="p">)</span>
+    <span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mediaobject</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Output Format:</strong></p>
+<p>The dialog returns a <code class="docutils literal notranslate"><span class="pre">uri</span></code> string encoding the selected SVG, color, and thickness:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>svg:&lt;cache_hash&gt;:&lt;hex_color&gt;:&lt;thickness&gt;
+
+Example:
+    svg:a1b2c3d4:ff0000:3   → Red arrow, thickness 3
+</pre></div>
+</div>
+<p>The SVG file is stored in SVGCache with its content hash, and the created
+object references the cache entry.</p>
+</section>
+<section id="modifysvginputdialog">
+<span id="modify-svg-input-dialog"></span><h3>ModifySVGInputDialog<a class="headerlink" href="#modifysvginputdialog" title="Link to this heading">¶</a></h3>
+<p>Dialog for modifying the stroke color and line thickness of existing SVG
+objects. Triggered by right-clicking an SVG shape in the scene.</p>
+<p><strong>Features:</strong></p>
+<ul class="simple">
+<li><p><strong>Color Change</strong>: Recolor the SVG stroke using the color picker grid</p></li>
+<li><p><strong>Thickness Change</strong>: Adjust line thickness with a slider</p></li>
+<li><p><strong>SVG Cache Integration</strong>: Modified SVG is stored in SVGCache via content hash</p></li>
+<li><p><strong>Shape Detection</strong>: Works with simple shapes (arrows, circles, squares,
+triangles) added via the SVG picker</p></li>
+<li><p><strong>Live Preview</strong>: The dialog shows a preview of the current SVG</p></li>
+</ul>
+<p><strong>Usage:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Triggered by right-click on SVGMediaObject in the scene</span>
+<span class="n">dialog</span> <span class="o">=</span> <span class="n">DialogWindows</span><span class="o">.</span><span class="n">modify_svg_input_dialog</span><span class="p">(</span>
+    <span class="n">media_id</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">media_id</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">current_color</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="n">current_thickness</span><span class="p">)</span>
+<span class="n">ok</span><span class="p">,</span> <span class="n">new_media_id</span> <span class="o">=</span> <span class="n">dialog</span><span class="o">.</span><span class="n">_run_dialog</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="n">ok</span> <span class="ow">and</span> <span class="n">new_media_id</span><span class="p">:</span>
+    <span class="c1"># Update the object&#39;s media reference</span>
+    <span class="n">obj</span><span class="o">.</span><span class="n">_media_id</span> <span class="o">=</span> <span class="n">new_media_id</span>
+    <span class="n">obj</span><span class="o">.</span><span class="n">_SVGMediaObject__is_modified</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">obj</span><span class="o">.</span><span class="n">mark_as_modified</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>SVG Modification Process:</strong></p>
+<ol class="arabic simple">
+<li><p>The dialog loads the SVG content from SVGCache or file</p></li>
+<li><p>User selects new color and/or thickness</p></li>
+<li><p>The SVG XML is parsed and modified (stroke color and stroke-width)</p></li>
+<li><p>Modified SVG is stored in SVGCache with a new content hash</p></li>
+<li><p>The object’s <code class="docutils literal notranslate"><span class="pre">media_id</span></code> is updated to point to the new cache entry</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">is_modified</span></code> is set to True</p></li>
+</ol>
+<p><strong>See Also:</strong></p>
+<ul class="simple">
+<li><p><span class="xref std std-doc">../pyzui/modifysvginputdialog</span> — API reference</p></li>
+<li><p><span class="xref std std-doc">../pyzui/svgcache</span> — SVG cache storage</p></li>
+</ul>
+</section>
+<section id="modifytiledmediaobjectdialog">
+<span id="modify-tiled-media-dialog"></span><h3>ModifyTiledMediaObjectDialog<a class="headerlink" href="#modifytiledmediaobjectdialog" title="Link to this heading">¶</a></h3>
+<p>Dialog for image manipulation of tiled media objects. Triggered by right-clicking
+a <code class="docutils literal notranslate"><span class="pre">TiledMediaObject</span></code> in the scene. Added in v0.1.5.</p>
+<p><strong>Features:</strong></p>
+<ul class="simple">
+<li><p><strong>Rotate Left</strong>: 90° counter-clockwise rotation</p></li>
+<li><p><strong>Rotate Right</strong>: 90° clockwise rotation</p></li>
+<li><p><strong>Invert Colors</strong>: Negative color effect (toggle)</p></li>
+<li><p><strong>Black and White</strong>: Convert to grayscale (toggle)</p></li>
+<li><p><strong>Preview then Apply</strong>: All operations are preview-only until OK is clicked</p></li>
+</ul>
+<p><strong>Dialog Layout:</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>┌────────────────────────────────────────┐
+│  Modify Image                   [X]    │
+├────────────────────────────────────────┤
+│                                        │
+│  ┌──────────────────────────────────┐  │
+│  │                                  │  │
+│  │         Image Preview            │  │
+│  │                                  │  │
+│  └──────────────────────────────────┘  │
+│                                        │
+│  [Rotate Left]  [Rotate Right]         │
+│  [✓] Invert Colors                     │
+│  [✓] Black and White                   │
+│                                        │
+│              [Cancel]  [OK]            │
+└────────────────────────────────────────┘
+</pre></div>
+</div>
+<p><strong>Usage:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Triggered by right-click on TiledMediaObject in the scene</span>
+<span class="n">dialog</span> <span class="o">=</span> <span class="n">DialogWindows</span><span class="o">.</span><span class="n">modify_tiled_media_object_dialog</span><span class="p">(</span>
+    <span class="n">media_id</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">media_id</span><span class="p">,</span> <span class="n">ppmfile</span><span class="o">=</span><span class="n">tmpfile</span><span class="p">)</span>
+<span class="n">ok</span><span class="p">,</span> <span class="n">rotation</span><span class="p">,</span> <span class="n">invert</span><span class="p">,</span> <span class="n">bw</span> <span class="o">=</span> <span class="n">dialog</span><span class="o">.</span><span class="n">_run_dialog</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="n">ok</span><span class="p">:</span>
+    <span class="c1"># Submit to converterrunner with accumulated transformations</span>
+    <span class="n">future</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">submit_vips_conversion</span><span class="p">(</span>
+        <span class="n">ppmfile</span><span class="p">,</span> <span class="n">new_tmpfile</span><span class="p">,</span>
+        <span class="n">rotation</span><span class="o">=</span><span class="n">rotation</span><span class="p">,</span>
+        <span class="n">invert_colors</span><span class="o">=</span><span class="n">invert</span><span class="p">,</span>
+        <span class="n">black_and_white</span><span class="o">=</span><span class="n">bw</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">handle</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">ConversionHandle</span><span class="p">(</span><span class="n">future</span><span class="p">,</span> <span class="n">ppmfile</span><span class="p">,</span> <span class="n">new_tmpfile</span><span class="p">)</span>
+    <span class="n">handle</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+
+    <span class="c1"># Replace object in scene preserving position/zoom</span>
+    <span class="n">scene</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="n">new_obj</span> <span class="o">=</span> <span class="n">TiledMediaObject</span><span class="p">(</span><span class="n">new_tmpfile</span><span class="p">,</span> <span class="n">scene</span><span class="p">)</span>
+    <span class="n">new_obj</span><span class="o">.</span><span class="n">pos</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">pos</span>
+    <span class="n">new_obj</span><span class="o">.</span><span class="n">zoomlevel</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">zoomlevel</span>
+    <span class="n">new_obj</span><span class="o">.</span><span class="n">centre</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">centre</span>
+    <span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">new_obj</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Object Replacement:</strong></p>
+<p>When OK is clicked, all accumulated transformations are applied in a single
+<code class="docutils literal notranslate"><span class="pre">VipsConverter</span></code> pass. The original <code class="docutils literal notranslate"><span class="pre">TiledMediaObject</span></code> is removed from the
+scene and replaced with a new one using the transformed PPM, preserving the
+original position, zoom level, and center point.</p>
+<p><strong>See Also:</strong></p>
+<ul class="simple">
+<li><p><span class="xref std std-doc">../pyzui/modifytiledmediaobjectdialog</span> — API reference</p></li>
+<li><p><span class="xref std std-doc">../pyzui/converterrunner</span> — Process-based parallel conversion</p></li>
+</ul>
 </section>
 <section id="zoomsensitivitydialog">
 <h3>ZoomSensitivityDialog<a class="headerlink" href="#zoomsensitivitydialog" title="Link to this heading">¶</a></h3>
-<p>Simple input dialog for adjusting zoom sensitivity.</p>
+<p>Simple input dialog for adjusting zoom sensitivity (zoom speed).</p>
 <p><strong>Features:</strong></p>
 <ul class="simple">
-<li><p><strong>Range</strong>: 0-100 (higher = more sensitive)</p></li>
+<li><p><strong>Range</strong>: 0–100 (higher = more sensitive)</p></li>
 <li><p><strong>Current Value</strong>: Displays current setting</p></li>
 <li><p><strong>Real-time Update</strong>: Changes take effect immediately</p></li>
 </ul>
@@ -792,6 +1147,118 @@ Object Manipulation:
 </pre></div>
 </div>
 </section>
+<section id="zoomsettingsdialog">
+<h3>ZoomSettingsDialog<a class="headerlink" href="#zoomsettingsdialog" title="Link to this heading">¶</a></h3>
+<p>Dialog for configuring zoom level limits and clamping. Accessed via
+<strong>Settings &gt; Zoom Settings</strong>. This is distinct from <code class="docutils literal notranslate"><span class="pre">ZoomSensitivityDialog</span></code>
+(which controls zoom speed, not limits).</p>
+<p><strong>Features:</strong></p>
+<ul class="simple">
+<li><p><strong>Min Zoom Level</strong>: Minimum allowed zoom (range: -50 to 0, default: -10)</p></li>
+<li><p><strong>Max Zoom Level</strong>: Maximum allowed zoom (range: 0 to 50, default: 12)</p></li>
+<li><p><strong>Clamp Toggle</strong>: Enable or disable zoom clamping (checked by default)</p></li>
+<li><p><strong>Default Zoom Level</strong>: Zoom level for new scenes (range: -10 to 12, default: 0)</p></li>
+<li><p><strong>Info Text</strong>: Explanatory text about why limits exist (font visibility, float overflow, input precision)</p></li>
+</ul>
+<p><strong>Dialog Layout:</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>┌────────────────────────────────────────────┐
+│  Zoom Settings                      [X]    │
+├────────────────────────────────────────────┤
+│                                            │
+│  Configuration for zoom level limits.      │
+│  These settings prevent crashes at         │
+│  extreme zoom values and improve           │
+│  usability.                                │
+│                                            │
+│  Min Zoom Level: [-10]  (range: -50 to 0) │
+│  Max Zoom Level: [12 ]  (range: 0 to 50)  │
+│  [✓] Clamp zoom to limits                 │
+│                                            │
+│  Default Zoom Level: [0] (new scenes)      │
+│                                            │
+│  Performance note:                         │
+│  Extreme zoom levels can cause font        │
+│  rendering issues (too small) and          │
+│  floating-point overflow (too large).      │
+│                                            │
+│              [Cancel]  [OK]                │
+└────────────────────────────────────────────┘
+</pre></div>
+</div>
+<p><strong>Usage:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.windows.dialogwindows.zoomsettingsdialog</span><span class="w"> </span><span class="kn">import</span> <span class="n">ZoomSettingsDialog</span>
+
+<span class="n">dialog</span> <span class="o">=</span> <span class="n">ZoomSettingsDialog</span><span class="p">({</span><span class="s1">&#39;min&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;max&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+<span class="n">ok</span><span class="p">,</span> <span class="n">zoom_config</span> <span class="o">=</span> <span class="n">dialog</span><span class="o">.</span><span class="n">_run_dialog</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="n">ok</span><span class="p">:</span>
+    <span class="c1"># zoom_config = {&#39;min&#39;: -5, &#39;max&#39;: 10, &#39;clamp&#39;: True, &#39;default&#39;: 0}</span>
+    <span class="n">zoom_manager</span><span class="o">.</span><span class="n">set_limits</span><span class="p">(</span><span class="n">zoom_config</span><span class="p">[</span><span class="s1">&#39;min&#39;</span><span class="p">],</span> <span class="n">zoom_config</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">])</span>
+    <span class="n">zoom_manager</span><span class="o">.</span><span class="n">clamp_enabled</span> <span class="o">=</span> <span class="n">zoom_config</span><span class="p">[</span><span class="s1">&#39;clamp&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>Integration with ZoomManager:</strong></p>
+<p>The configured limits are applied to <code class="xref py py-class docutils literal notranslate"><span class="pre">ZoomManager</span></code> which enforces them
+during zoom operations. See <span class="xref std std-doc">../pyzui/zoommanager</span> for details.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">ZoomSettingsDialog</span></code> (zoom level limits) and <code class="docutils literal notranslate"><span class="pre">ZoomSensitivityDialog</span></code>
+(zoom speed) are <strong>different dialogs</strong> accessed from different menus:
+Settings &gt; Zoom Settings vs. View &gt; Adjust Sensitivity.</p>
+</div>
+</section>
+<section id="autosavesettingsdialog">
+<h3>AutosaveSettingsDialog<a class="headerlink" href="#autosavesettingsdialog" title="Link to this heading">¶</a></h3>
+<p>Dialog for configuring the autosave backup system. Accessed via
+<strong>Settings &gt; Autosave Settings</strong>.</p>
+<p><strong>Features:</strong></p>
+<ul class="simple">
+<li><p><strong>Enable/Disable</strong>: Checkbox to toggle autosave on/off</p></li>
+<li><p><strong>Interval</strong>: Spinbox for backup interval in minutes (1–1440, default: 5)</p></li>
+<li><p><strong>Max Backups</strong>: Spinbox for maximum backups per scene (1–1000, default: 20)</p></li>
+<li><p><strong>Expire Days</strong>: Spinbox for days before inactive directories expire (1–365, default: 7)</p></li>
+<li><p><strong>Info Labels</strong>: Explanatory text about backup directory structure and naming conventions</p></li>
+</ul>
+<p><strong>Dialog Layout:</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>┌────────────────────────────────────────────┐
+│  Autosave Settings                  [X]    │
+├────────────────────────────────────────────┤
+│                                            │
+│  [✓] Enable Autosave                       │
+│                                            │
+│  Backup Interval (minutes): [5  ]          │
+│  Max Backups to Keep:        [20 ]         │
+│  Expire After (days):        [7  ]         │
+│                                            │
+│  Backups are stored in:                    │
+│  ~/.pyzui/backups/                         │
+│  Each scene has its own subdirectory.      │
+│  Oldest backups are rotated automatically. │
+│                                            │
+│              [Cancel]  [OK]                │
+└────────────────────────────────────────────┘
+</pre></div>
+</div>
+<p><strong>Usage:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dialog</span> <span class="o">=</span> <span class="n">DialogWindows</span><span class="o">.</span><span class="n">autosave_settings_dialog</span><span class="p">({</span>
+    <span class="s1">&#39;enabled&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s1">&#39;interval&#39;</span><span class="p">:</span> <span class="mi">300</span><span class="p">,</span>
+    <span class="s1">&#39;max_backups&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="s1">&#39;expire_days&#39;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+<span class="p">})</span>
+<span class="n">ok</span><span class="p">,</span> <span class="n">config</span> <span class="o">=</span> <span class="n">dialog</span><span class="o">.</span><span class="n">_run_dialog</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="n">ok</span><span class="p">:</span>
+    <span class="n">scene</span><span class="o">.</span><span class="n">autosave_manager</span><span class="o">.</span><span class="n">set_autosave_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>See Also:</strong></p>
+<ul class="simple">
+<li><p><span class="xref std std-doc">../pyzui/autosavesettingsdialog</span> — API reference</p></li>
+<li><p><span class="xref std std-doc">../pyzui/autosave</span> — SceneAutosaveManager</p></li>
+<li><p><span class="xref std std-doc">../pyzui/backupmanager</span> — BackupManager</p></li>
+</ul>
+</section>
 </section>
 <section id="integration-patterns">
 <h2>Integration Patterns<a class="headerlink" href="#integration-patterns" title="Link to this heading">¶</a></h2>
@@ -799,7 +1266,7 @@ Object Manipulation:
 <h3>Scene and Window Communication<a class="headerlink" href="#scene-and-window-communication" title="Link to this heading">¶</a></h3>
 <p>The window system communicates with the scene through property access and method calls:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># MainWindow → QZUI → Scene</span>
-<span class="n">main_window</span><span class="o">.</span><span class="n">zui</span><span class="o">.</span><span class="n">scene</span> <span class="o">=</span> <span class="n">new_scene</span>
+<span class="n">main_window</span><span class="o">.</span><span class="n">current_zui</span><span class="o">.</span><span class="n">scene</span> <span class="o">=</span> <span class="n">new_scene</span>
 
 <span class="c1"># QZUI → Scene (rendering)</span>
 <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
@@ -819,6 +1286,48 @@ Object Manipulation:
 
 <span class="c1"># When QZUI encounters an error</span>
 <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s2">&quot;Error message&quot;</span><span class="p">,</span> <span class="n">details</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Context Menu Flow:</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>User Right-Clicks Object in Scene
+        │
+        ▼
+Scene identifies object type
+        │
+┌───────┼───────────┬───────────┐
+▼                   ▼           ▼
+StringMediaObject   SVGMedia    TiledMedia
+│                   Object      Object
+▼                   ▼           ▼
+ModifyStringInput   ModifySVG   ModifyTiled
+Dialog              Dialog      MediaDialog
+(edit text/color)   (stroke     (rotate/
+                     color/      invert/
+                     thickness)  B&amp;W)
+</pre></div>
+</div>
+<p>Copy/Paste Flow:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>User presses Ctrl+C
+        │
+        ▼
+MainWindow.__action_copy_svg()
+        │
+        ▼
+Scene.copy_selected() → SceneClipboardManager
+        │
+        ▼
+Selected SVGMediaObjects serialized to clipboard list
+
+User presses Ctrl+V
+        │
+        ▼
+MainWindow.__action_paste_svg()
+        │
+        ▼
+Scene.paste() → SceneClipboardManager
+        │
+        ▼
+New SVGMediaObjects created with offset
 </pre></div>
 </div>
 </section>
@@ -845,11 +1354,12 @@ Object Manipulation:
 <p>Selected objects are highlighted with colored borders:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># In Scene.render()</span>
 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">selection</span><span class="p">:</span>
-    <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selection</span><span class="o">.</span><span class="n">topleft</span>
-    <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selection</span><span class="o">.</span><span class="n">bottomright</span>
+    <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">selection</span><span class="p">:</span>
+        <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">topleft</span>
+        <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">bottomright</span>
 
-    <span class="n">painter</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">green</span><span class="p">)</span>  <span class="c1"># Green for left-click selection</span>
-    <span class="n">painter</span><span class="o">.</span><span class="n">drawRect</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="o">-</span><span class="n">x1</span><span class="p">,</span> <span class="n">y2</span><span class="o">-</span><span class="n">y1</span><span class="p">)</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">green</span><span class="p">)</span>  <span class="c1"># Green for left-click selection</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">drawRect</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="o">-</span><span class="n">x1</span><span class="p">,</span> <span class="n">y2</span><span class="o">-</span><span class="n">y1</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">right_selection</span><span class="p">:</span>
     <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right_selection</span><span class="o">.</span><span class="n">topleft</span>
@@ -868,7 +1378,7 @@ Object Manipulation:
 <p>The window system uses adaptive frame rates to balance responsiveness and quality:</p>
 <p><strong>Normal Operation:</strong></p>
 <ul class="simple">
-<li><p><strong>Target Framerate</strong>: 10 FPS (configurable: 10, 20, 30, 40)</p></li>
+<li><p><strong>Target Framerate</strong>: Configurable (10, 20, 30, 40 FPS — default 20)</p></li>
 <li><p><strong>Rendering Mode</strong>: Draft (fast)</p></li>
 <li><p><strong>Triggered</strong>: When scene.moving is True</p></li>
 </ul>
@@ -880,10 +1390,10 @@ Object Manipulation:
 </ul>
 <p><strong>Frame Dropping Logic:</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">frames_to_skip</span> <span class="o">=</span> <span class="n">framerate</span> <span class="o">/</span> <span class="n">reduced_framerate</span>
-<span class="c1"># Example: 10 / 3 ≈ 3 frames</span>
+<span class="c1"># Example: 20 / 3 ≈ 6 frames</span>
 
-<span class="c1"># Drop 3 frames, then do HQ render on 4th frame</span>
-<span class="c1"># Effective rate: 10 FPS → ~2.5 FPS for HQ rendering</span>
+<span class="c1"># Drop 6 frames, then do HQ render on 7th frame</span>
+<span class="c1"># Effective rate: 20 FPS → ~2.9 FPS for HQ rendering</span>
 </pre></div>
 </div>
 </section>
@@ -910,7 +1420,7 @@ Object Manipulation:
 <p>The window system triggers tile loading through the rendering pipeline:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># TiledMediaObject.render() loads tiles on demand</span>
 <span class="c1"># TileManager caches tiles in memory (LRU)</span>
-<span class="c1"># Old tiles automatically purged when scene objects removed</span>
+<span class="c1"># Old tiles automatically purged when tabs are closed</span>
 </pre></div>
 </div>
 <p><strong>Scene Object Limits:</strong></p>
@@ -918,7 +1428,7 @@ Object Manipulation:
 <ul class="simple">
 <li><p>More than ~100 visible objects</p></li>
 <li><p>Very large viewport sizes</p></li>
-<li><p>High frame rates (30-40 FPS)</p></li>
+<li><p>High frame rates (30–40 FPS)</p></li>
 </ul>
 </section>
 </section>
@@ -931,6 +1441,9 @@ Object Manipulation:
     │
     ▼
 MainWindow
+    │
+    ▼
+QTabWidget
     │
     ▼
 QZUI (central widget)
@@ -1047,7 +1560,7 @@ Instead, Qt’s event loop handles all updates:</p>
 <section id="programmatic-scene-manipulation">
 <h3>Programmatic Scene Manipulation<a class="headerlink" href="#programmatic-scene-manipulation" title="Link to this heading">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Access scene through window</span>
-<span class="n">scene</span> <span class="o">=</span> <span class="n">window</span><span class="o">.</span><span class="n">zui</span><span class="o">.</span><span class="n">scene</span>
+<span class="n">scene</span> <span class="o">=</span> <span class="n">window</span><span class="o">.</span><span class="n">current_zui</span><span class="o">.</span><span class="n">scene</span>
 
 <span class="c1"># Add media programmatically</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.objects.mediaobjects</span><span class="w"> </span><span class="kn">import</span> <span class="n">TiledMediaObject</span>
@@ -1065,15 +1578,29 @@ Instead, Qt’s event loop handles all updates:</p>
 </section>
 <section id="custom-dialogs">
 <h3>Custom Dialogs<a class="headerlink" href="#custom-dialogs" title="Link to this heading">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Custom string input</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># String input</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.windows.dialogwindows</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenNewStringInputDialog</span>
 
 <span class="n">dialog</span> <span class="o">=</span> <span class="n">OpenNewStringInputDialog</span><span class="p">()</span>
 <span class="n">ok</span><span class="p">,</span> <span class="n">uri</span> <span class="o">=</span> <span class="n">dialog</span><span class="o">.</span><span class="n">_run_dialog</span><span class="p">()</span>
-
 <span class="k">if</span> <span class="n">ok</span> <span class="ow">and</span> <span class="n">uri</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created string: </span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="c1"># uri format: &quot;string:RRGGBB:text&quot;</span>
+
+<span class="c1"># SVG picker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.windows.dialogwindows</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenSVGPickerInputDialog</span>
+
+<span class="n">dialog</span> <span class="o">=</span> <span class="n">OpenSVGPickerInputDialog</span><span class="p">()</span>
+<span class="n">ok</span><span class="p">,</span> <span class="n">uri</span> <span class="o">=</span> <span class="n">dialog</span><span class="o">.</span><span class="n">_run_dialog</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">ok</span> <span class="ow">and</span> <span class="n">uri</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created SVG: </span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Autosave settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.windows.dialogwindows</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutosaveSettingsDialog</span>
+
+<span class="n">dialog</span> <span class="o">=</span> <span class="n">AutosaveSettingsDialog</span><span class="p">({</span><span class="s1">&#39;enabled&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;interval&#39;</span><span class="p">:</span> <span class="mi">300</span><span class="p">})</span>
+<span class="n">ok</span><span class="p">,</span> <span class="n">config</span> <span class="o">=</span> <span class="n">dialog</span><span class="o">.</span><span class="n">_run_dialog</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">ok</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;New autosave config: </span><span class="si">{</span><span class="n">config</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -1089,7 +1616,7 @@ Instead, Qt’s event loop handles all updates:</p>
         <span class="k">return</span> <span class="kc">False</span>  <span class="c1"># Continue propagation</span>
 
 <span class="n">event_filter</span> <span class="o">=</span> <span class="n">EventFilter</span><span class="p">()</span>
-<span class="n">window</span><span class="o">.</span><span class="n">zui</span><span class="o">.</span><span class="n">installEventFilter</span><span class="p">(</span><span class="n">event_filter</span><span class="p">)</span>
+<span class="n">window</span><span class="o">.</span><span class="n">current_zui</span><span class="o">.</span><span class="n">installEventFilter</span><span class="p">(</span><span class="n">event_filter</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -1103,14 +1630,23 @@ Instead, Qt’s event loop handles all updates:</p>
     <span class="n">SUPPORTED_EXTENSIONS</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>  <span class="c1"># Supported file extensions</span>
     <span class="n">MAX_PDF_SIZE_BYTES</span><span class="p">:</span> <span class="nb">int</span>         <span class="c1"># Maximum PDF file size (2 MB)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">framerate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
-                 <span class="n">zoom_sensitivity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">framerate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span>
+                 <span class="n">zoom_sensitivity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+                 <span class="n">icon</span><span class="p">:</span> <span class="n">QIcon</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">autosave_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">sizeHint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QSize</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">minimumSizeHint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QSize</span>
 
-    <span class="c1"># Public attributes</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">zui</span><span class="p">:</span> <span class="n">QZUI</span>
+    <span class="c1"># Public attributes and properties</span>
+    <span class="n">current_zui</span><span class="p">:</span> <span class="n">QZUI</span>  <span class="c1"># Active tab&#39;s QZUI</span>
+    <span class="n">zui</span><span class="p">:</span> <span class="n">QZUI</span>          <span class="c1"># Backward-compatible alias for current_zui</span>
+
+    <span class="c1"># Tab management</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_add_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scene</span><span class="p">:</span> <span class="n">Scene</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_close_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_tab_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </pre></div>
 </div>
 <p><strong>Class Constants:</strong></p>
@@ -1165,18 +1701,40 @@ Instead, Qt’s event loop handles all updates:</p>
     <span class="k">class</span><span class="w"> </span><span class="nc">modify_string_input_dialog</span><span class="p">:</span>
         <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">media_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">_run_dialog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">open_svg_picker_input_dialog</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_run_dialog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">modify_svg_input_dialog</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">media_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">color</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                     <span class="n">thickness</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_run_dialog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">modify_tiled_media_object_dialog</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">media_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ppmfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_run_dialog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">autosave_settings_dialog</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_run_dialog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span>
 </pre></div>
 </div>
 </section>
 <section id="key-classes">
 <h3>Key Classes<a class="headerlink" href="#key-classes" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">pyzui.windows.mainwindow.MainWindow</span></code> - Main application window</p></li>
-<li><p><a class="reference internal" href="../pyzui/qzui.html#pyzui.objects.scene.qzui.QZUI" title="pyzui.objects.scene.qzui.QZUI"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyzui.objects.scene.qzui.QZUI</span></code></a> - Central rendering widget</p></li>
-<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">pyzui.windows.dialogwindows.dialogwindows.DialogWindows</span></code> - Dialog container</p></li>
-<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">pyzui.windows.dialogwindows.stringinputdialog.OpenNewStringInputDialog</span></code> - New string dialog</p></li>
-<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">pyzui.windows.dialogwindows.modifystringdialog.ModifyStringInputDialog</span></code> - Edit string dialog</p></li>
-<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">pyzui.windows.dialogwindows.zoomsensitivitydialog.open_zoom_sensitivity_input_dialog</span></code> - Zoom settings</p></li>
+<li><p><a class="reference internal" href="../pyzui/windows/mainwindow.html#pyzui.windows.mainwindow.MainWindow" title="pyzui.windows.mainwindow.MainWindow"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyzui.windows.mainwindow.MainWindow</span></code></a> - Main application window with tab management</p></li>
+<li><p><a class="reference internal" href="../pyzui/objects/scene/qzui.html#pyzui.objects.scene.qzui.QZUI" title="pyzui.objects.scene.qzui.QZUI"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyzui.objects.scene.qzui.QZUI</span></code></a> - Central rendering widget (per tab)</p></li>
+<li><p><a class="reference internal" href="../pyzui/windows/dialogwindows/dialogwindows.html#pyzui.windows.dialogwindows.dialogwindows.DialogWindows" title="pyzui.windows.dialogwindows.dialogwindows.DialogWindows"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyzui.windows.dialogwindows.dialogwindows.DialogWindows</span></code></a> - Dialog container</p></li>
+<li><p><a class="reference internal" href="../pyzui/windows/dialogwindows/stringinputdialog.html#pyzui.windows.dialogwindows.stringinputdialog.OpenNewStringInputDialog" title="pyzui.windows.dialogwindows.stringinputdialog.OpenNewStringInputDialog"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyzui.windows.dialogwindows.stringinputdialog.OpenNewStringInputDialog</span></code></a> - New string dialog</p></li>
+<li><p><a class="reference internal" href="../pyzui/windows/dialogwindows/modifystringdialog.html#pyzui.windows.dialogwindows.modifystringdialog.ModifyStringInputDialog" title="pyzui.windows.dialogwindows.modifystringdialog.ModifyStringInputDialog"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyzui.windows.dialogwindows.modifystringdialog.ModifyStringInputDialog</span></code></a> - Edit string dialog</p></li>
+<li><p><a class="reference internal" href="../pyzui/windows/dialogwindows/svgpickerinputdialog.html#pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog" title="pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog</span></code></a> - SVG file browser</p></li>
+<li><p><a class="reference internal" href="../pyzui/windows/dialogwindows/modifysvginputdialog.html#pyzui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog" title="pyzui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyzui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog</span></code></a> - SVG color/thickness editor</p></li>
+<li><p><a class="reference internal" href="../pyzui/windows/dialogwindows/modifytiledmediaobjectdialog.html#pyzui.windows.dialogwindows.modifytiledmediaobjectdialog.ModifyTiledMediaObjectDialog" title="pyzui.windows.dialogwindows.modifytiledmediaobjectdialog.ModifyTiledMediaObjectDialog"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyzui.windows.dialogwindows.modifytiledmediaobjectdialog.ModifyTiledMediaObjectDialog</span></code></a> - Image manipulation</p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">pyzui.windows.dialogwindows.zoomsensitivitydialog.open_zoom_sensitivity_input_dialog</span></code> - Zoom speed settings</p></li>
+<li><p><a class="reference internal" href="../pyzui/windows/dialogwindows/zoomsettingsdialog.html#pyzui.windows.dialogwindows.zoomsettingsdialog.ZoomSettingsDialog" title="pyzui.windows.dialogwindows.zoomsettingsdialog.ZoomSettingsDialog"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyzui.windows.dialogwindows.zoomsettingsdialog.ZoomSettingsDialog</span></code></a> - Zoom level limits</p></li>
+<li><p><a class="reference internal" href="../pyzui/windows/dialogwindows/autosavesettingsdialog.html#pyzui.windows.dialogwindows.autosavesettingsdialog.AutosaveSettingsDialog" title="pyzui.windows.dialogwindows.autosavesettingsdialog.AutosaveSettingsDialog"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyzui.windows.dialogwindows.autosavesettingsdialog.AutosaveSettingsDialog</span></code></a> - Autosave configuration</p></li>
 </ul>
 </section>
 </section>
@@ -1187,6 +1745,13 @@ Instead, Qt’s event loop handles all updates:</p>
 <li><p><a class="reference internal" href="tilingsystem.html"><span class="doc">Tiling System</span></a> - Tile rendering system</p></li>
 <li><p><a class="reference internal" href="../usageinstructions/userinterface.html"><span class="doc">User Interface</span></a> - User interaction guide</p></li>
 <li><p><a class="reference internal" href="projectstructure.html"><span class="doc">Project structure</span></a> - Overall project organization</p></li>
+<li><p><span class="xref std std-doc">../pyzui/svgpickerinputdialog</span> - SVG picker dialog API</p></li>
+<li><p><span class="xref std std-doc">../pyzui/modifysvginputdialog</span> - SVG modifier dialog API</p></li>
+<li><p><span class="xref std std-doc">../pyzui/modifytiledmediaobjectdialog</span> - Tiled media modifier dialog API</p></li>
+<li><p><span class="xref std std-doc">../pyzui/autosavesettingsdialog</span> - Autosave settings dialog API</p></li>
+<li><p><span class="xref std std-doc">../pyzui/zoommanager</span> - Zoom level clamping</p></li>
+<li><p><span class="xref std std-doc">../pyzui/zoomsettingsdialog</span> - Zoom settings dialog API</p></li>
+<li><p><span class="xref std std-doc">../pyzui/autosave</span> - SceneAutosaveManager</p></li>
 </ul>
 </section>
 </section>
@@ -1219,17 +1784,22 @@ Instead, Qt’s event loop handles all updates:</p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../usageinstructions/userinterface.html">User Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usageinstructions/svgfeatures.html">SVG Features</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="readingdocumentation.html">Reading Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configsystem.html">Configuration System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="objectsystem.html">Object System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="svgecosystem.html">SVG Utility Ecosystem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tiledmediaobject.html">Tiled media object</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tilingsystem.html">Tiling System</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backup.html">Backup System</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
 <ul>
@@ -1244,6 +1814,10 @@ Instead, Qt’s event loop handles all updates:</p>
 <p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../pyzui.html">pyzui package</a></li>
 </ul>
 
 <div class="relations">

@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Integration Testing Guide &#8212; PyZui 0.11 documentation</title>
+    <title>Integration Testing Guide &#8212; PyZui 0.5.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cc7d0dec" />
-    <script src="../_static/documentation_options.js?v=086c1757"></script>
+    <script src="../_static/documentation_options.js?v=b9afe91b"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -70,8 +70,20 @@ rather than mocks, validating the complete system behavior.</p>
 ├── test_concurrent_access.py        # Thread safety tests
 ├── test_cache_provider_integration.py  # Cache-provider interaction
 ├── test_tilemanager_integration.py  # TileManager coordination
-├── gui_integration.py               # Visual GUI testing (manual)
-├── GUI_INTEGRATION.md               # GUI test documentation
+├── guiintegration/                  # Visual GUI testing (manual)
+│   ├── main.py                      #   Test orchestrator + CLI
+│   ├── conf.py                      #   Timing constants
+│   ├── logger.py                    #   Test logger
+│   ├── utilities/                   #   Shared utilities
+│   │   ├── qt_simulation.py
+│   │   ├── scene_helpers.py
+│   │   ├── image_creation.py
+│   │   └── temp_dirs.py
+│   ├── test/                        #   43 test modules (1 per step)
+│   │   ├── load_test_scene.py
+│   │   ├── new_scene.py
+│   │   └── ... (43 modules total)
+│   └── GUI_INTEGRATION.md           #   GUI test documentation
 └── logs/                            # Test execution logs
     └── pyzui.log
 </pre></div>
@@ -121,13 +133,14 @@ rather than mocks, validating the complete system behavior.</p>
 <li><p>Negative tile level handling</p></li>
 <li><p>Dual-cache management</p></li>
 </ul>
-<p><strong>6. GUI Integration</strong> (<code class="docutils literal notranslate"><span class="pre">gui_integration.py</span></code>)</p>
+<p><strong>6. GUI Integration</strong> (<code class="docutils literal notranslate"><span class="pre">guiintegration/</span></code>)</p>
 <ul class="simple">
 <li><p>Full application workflow</p></li>
-<li><p>All user interactions</p></li>
+<li><p>All user interactions (43 test steps)</p></li>
 <li><p>Visual verification by human</p></li>
-<li><p>Menu operations</p></li>
-<li><p>Mouse and keyboard input</p></li>
+<li><p>Individual step execution (<code class="docutils literal notranslate"><span class="pre">--only</span></code>, <code class="docutils literal notranslate"><span class="pre">--only-step</span></code>)</p></li>
+<li><p>Menu operations, dialogs, mouse and keyboard input</p></li>
+<li><p>Verbose/debug logging control (<code class="docutils literal notranslate"><span class="pre">-v</span></code>, <code class="docutils literal notranslate"><span class="pre">-d</span></code>)</p></li>
 </ul>
 </section>
 </section>
@@ -192,17 +205,50 @@ pytest<span class="w"> </span>-n<span class="w"> </span>auto
 <h3>GUI Integration Tests<a class="headerlink" href="#gui-integration-tests" title="Link to this heading">¶</a></h3>
 <p>GUI tests run separately and require visual verification:</p>
 <p><strong>Run all GUI tests:</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>gui_integration.py
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>test/integrationtest/guiintegration/main.py
+</pre></div>
+</div>
+<p><strong>Run with verbose logging (-v) or debug logging (-d):</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>test/integrationtest/guiintegration/main.py<span class="w"> </span>-v
+python<span class="w"> </span>test/integrationtest/guiintegration/main.py<span class="w"> </span>-d
+</pre></div>
+</div>
+<p><strong>Run a single test step:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>test/integrationtest/guiintegration/main.py<span class="w"> </span>--only<span class="w"> </span>new_tab
+python<span class="w"> </span>test/integrationtest/guiintegration/main.py<span class="w"> </span>--only-step<span class="w"> </span><span class="m">16</span>
 </pre></div>
 </div>
 <p><strong>Start from specific step:</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>gui_integration.py<span class="w"> </span>--start-step<span class="w"> </span><span class="m">30</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>test/integrationtest/guiintegration/main.py<span class="w"> </span>--start-step<span class="w"> </span><span class="m">30</span>
 </pre></div>
 </div>
 <p><strong>List available test steps:</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>gui_integration.py<span class="w"> </span>--list-steps
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>test/integrationtest/guiintegration/main.py<span class="w"> </span>--list-steps
 </pre></div>
 </div>
+<p><strong>Logging flags:</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Flag</p></th>
+<th class="head"><p>Console output</p></th>
+<th class="head"><p>File output</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><em>(none)</em></p></td>
+<td><p>WARNING+</p></td>
+<td><p>INFO+</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-v</span></code></p></td>
+<td><p><strong>INFO</strong>+</p></td>
+<td><p>DEBUG+</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-d</span></code></p></td>
+<td><p><strong>DEBUG</strong>+</p></td>
+<td><p>DEBUG+</p></td>
+</tr>
+</tbody>
+</table>
 </section>
 </section>
 <section id="common-fixtures">
@@ -1137,16 +1183,28 @@ can occur. By running conversions in separate processes:</p>
 <h2>GUI Integration Testing<a class="headerlink" href="#gui-integration-testing" title="Link to this heading">¶</a></h2>
 <section id="visual-verification-testing">
 <h3>Visual Verification Testing<a class="headerlink" href="#visual-verification-testing" title="Link to this heading">¶</a></h3>
-<p>GUI tests validate the complete application through visual verification:</p>
-<p><strong>Running GUI Tests:</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run all tests (with visual observation)</span>
-python<span class="w"> </span>test/integrationtest/gui_integration.py
+<p>GUI tests validate the complete application through visual verification.
+Run from the project root directory:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run all 43 tests (quiet — WARNING+ on console)</span>
+python<span class="w"> </span>test/integrationtest/guiintegration/main.py
+
+<span class="c1"># Run with verbose logging (INFO+ on console)</span>
+python<span class="w"> </span>test/integrationtest/guiintegration/main.py<span class="w"> </span>-v
+
+<span class="c1"># Run with debug logging (DEBUG+ on console)</span>
+python<span class="w"> </span>test/integrationtest/guiintegration/main.py<span class="w"> </span>-d
+
+<span class="c1"># Run a single test by module name</span>
+python<span class="w"> </span>test/integrationtest/guiintegration/main.py<span class="w"> </span>--only<span class="w"> </span>new_tab
+
+<span class="c1"># Run a single test by step number</span>
+python<span class="w"> </span>test/integrationtest/guiintegration/main.py<span class="w"> </span>--only-step<span class="w"> </span><span class="m">16</span>
 
 <span class="c1"># Start from specific step</span>
-python<span class="w"> </span>gui_integration.py<span class="w"> </span>--start-step<span class="w"> </span><span class="m">30</span>
+python<span class="w"> </span>test/integrationtest/guiintegration/main.py<span class="w"> </span>--start-step<span class="w"> </span><span class="m">30</span>
 
-<span class="c1"># List available steps</span>
-python<span class="w"> </span>gui_integration.py<span class="w"> </span>--list-steps
+<span class="c1"># List all available steps</span>
+python<span class="w"> </span>test/integrationtest/guiintegration/main.py<span class="w"> </span>--list-steps
 </pre></div>
 </div>
 <p><strong>Test Steps Covered:</strong></p>
@@ -1160,25 +1218,51 @@ File Menu:
   5. Save Screenshot
   6. Save Scene
   7. Open Saved Scene
+  8. Open New String Dialog
+  9. Open Local Media
+  14. Open new SVG
+  15. Import Scene
+  16. New Tab
+  17. Close Tab
 
 View Menu:
   10. Set Framerate
   11. Adjust Sensitivity
   12. Fullscreen Toggle
+  13. Adjust Sensitivity Dialog
+  18. Render Order Toggle
+
+Settings Menu:
+  19. Autosave Settings
+  22. Zoom Settings
+
+Actions Menu:
+  23. Copy SVG
+  24. Paste SVG
 
 Help Menu:
   20. About Dialog
   21. About Qt Dialog
 
+SVG:
+  25. Full Elongation Test
+  26. SVG - Reload Test Scene
+
 Mouse Interactions:
-   30. Left Click Select
-   31. Click and Drag
-   32. Scroll Wheel Zoom
-   35. Control+Click Rectangle Drawing Selection
-   36. Shift+Click No Selection Change
+  30. Left Click Select
+  31. Click and Drag
+  32. Scroll Wheel Zoom
+  33. Multi-Selection Persistence
+  35. Control+Click Rectangle Drawing and Move
+  36. Shift+Click No Selection Change
+  45. Right-Click String Modification Dialog
+  46. Right-Click Image Modification Dialog
+  47. Right-Click SVG Modification Dialog
 
 Keyboard Interactions:
-   40. Escape Deselect
+  34. Alt Fine Zoom Control
+  37. Ctrl+C/V Copy Paste
+  40. Escape Deselect
   41. Page Up/Down Zoom
   42. Arrow Keys Move
   43. Space Center
@@ -1186,6 +1270,7 @@ Keyboard Interactions:
 
 Complete Workflow:
   90. Full Application Workflow
+  99. File Menu - Quit
 </pre></div>
 </div>
 <p><strong>Test Resources:</strong></p>
@@ -1205,11 +1290,30 @@ Complete Workflow:
 </pre></div>
 </div>
 <p><strong>Timing Configuration:</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Configurable timing constants (milliseconds)</span>
-<span class="n">SHORT_DELAY_MS</span> <span class="o">=</span> <span class="mi">2000</span>      <span class="c1"># 2 seconds</span>
-<span class="n">DEFAULT_DELAY_MS</span> <span class="o">=</span> <span class="mi">3500</span>    <span class="c1"># 3.5 seconds</span>
-<span class="n">LONG_DELAY_MS</span> <span class="o">=</span> <span class="mi">5000</span>       <span class="c1"># 5 seconds</span>
-<span class="n">IMAGE_LOAD_DELAY_MS</span> <span class="o">=</span> <span class="mi">10000</span>  <span class="c1"># 10 seconds</span>
+<p>Timing constants are in <code class="docutils literal notranslate"><span class="pre">guiintegration/conf.py</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">SHORT_DELAY_MS</span> <span class="o">=</span> <span class="mi">2000</span>       <span class="c1"># Short pauses (2 seconds)</span>
+<span class="n">DEFAULT_DELAY_MS</span> <span class="o">=</span> <span class="mi">150</span>      <span class="c1"># Standard delay between actions (0.15s)</span>
+<span class="n">LONG_DELAY_MS</span> <span class="o">=</span> <span class="mi">200</span>         <span class="c1"># Long delay for loading/rendering (0.2s)</span>
+<span class="n">IMAGE_LOAD_DELAY_MS</span> <span class="o">=</span> <span class="mi">500</span>   <span class="c1"># Extra time for images to fully load (0.5s)</span>
+<span class="n">ZOOM_STEP_DELAY_MS</span> <span class="o">=</span> <span class="mi">50</span>     <span class="c1"># Delay between zoom steps (0.05s)</span>
+<span class="n">MOVE_STEP_DELAY_MS</span> <span class="o">=</span> <span class="mi">30</span>     <span class="c1"># Delay between movement steps (0.03s)</span>
+</pre></div>
+</div>
+<p><strong>Package Structure:</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>test/integrationtest/guiintegration/
+├── main.py                 # Orchestrator: GUITestContext, GUIIntegrationTest
+├── conf.py                 # Timing constants
+├── logger.py               # GUITestLogger
+├── utilities/
+│   ├── qt_simulation.py    # wait, trigger_action, simulate_*
+│   ├── scene_helpers.py    # load_media_dir, add_test_string, add_svg
+│   ├── image_creation.py   # create_ppm_image, create_png_image
+│   └── temp_dirs.py        # get_pytest_style_temp_dir
+└── test/                   # 43 modules (one per test step)
+    ├── load_test_scene.py
+    ├── new_scene.py
+    ├── ... (43 modules total)
+    └── quit.py
 </pre></div>
 </div>
 </section>
@@ -1577,7 +1681,7 @@ pytest<span class="w"> </span>-v<span class="w"> </span>-s
 pytest<span class="w"> </span>--cov<span class="o">=</span>pyzui
 
 <span class="c1"># GUI tests (manual)</span>
-python<span class="w"> </span>gui_integration.py
+python<span class="w"> </span>test/integrationtest/guiintegration/main.py
 </pre></div>
 </div>
 </section>
@@ -1630,7 +1734,7 @@ python<span class="w"> </span>gui_integration.py
 <li><p><code class="docutils literal notranslate"><span class="pre">test/integrationtest/test_concurrent_access.py</span></code> - Thread safety patterns</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">test/integrationtest/test_cache_provider_integration.py</span></code> - Component interaction</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">test/integrationtest/test_tilemanager_integration.py</span></code> - Coordination testing</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">test/integrationtest/gui_integration.py</span></code> - Visual verification</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">test/integrationtest/guiintegration/</span></code> - Visual verification</p></li>
 </ul>
 </section>
 </section>
@@ -1681,17 +1785,22 @@ and ensure components interact correctly.</p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../usageinstructions/userinterface.html">User Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usageinstructions/svgfeatures.html">SVG Features</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/configsystem.html">Configuration System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/objectsystem.html">Object System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/windowsystem.html">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/backup.html">Backup System</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
 <ul class="current">
@@ -1706,6 +1815,10 @@ and ensure components interact correctly.</p>
 <p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../pyzui.html">pyzui package</a></li>
 </ul>
 
 <div class="relations">
