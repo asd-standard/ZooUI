@@ -35,8 +35,12 @@ import sys
 from pathlib import Path
 
 INIT_PATH = Path(__file__).resolve().parent.parent / "pyzui" / "__init__.py"
+PYPROJECT_PATH = Path(__file__).resolve().parent.parent / "pyproject.toml"
 HOME_PZS_PATH = Path(__file__).resolve().parent.parent / "data" / "home.pzs"
 HOME_PNG_PATH = Path(__file__).resolve().parent.parent / "data" / "home.png"
+PYPROJECT_VERSION_RE = re.compile(
+    r'^(version\s*=\s*)"(\d+\.\d+\.\d+)"', re.MULTILINE
+)
 VERSION_RE = re.compile(r'^(\s*__version__\s*=\s*)"(\d+\.\d+\.\d+)"')
 PZS_VERSION_RE = re.compile(r"(string:[A-Fa-f0-9]+:)\d+\.\d+\.\d+")
 
@@ -90,6 +94,22 @@ def _update_home_pzs(old_version: str, new_version: str) -> None:
 
     HOME_PZS_PATH.write_text(new_content, encoding="utf-8")
     print(f"Version bumped in home.pzs: {old_version} -> {new_version}")
+
+
+def _write_pyproject_version(new_version: str) -> None:
+    """Update the version string in pyproject.toml."""
+    if not PYPROJECT_PATH.exists():
+        print(f"Warning: {PYPROJECT_PATH} not found, skipping.")
+        return
+
+    content = PYPROJECT_PATH.read_text(encoding="utf-8")
+    new_content = PYPROJECT_VERSION_RE.sub(r'\1"' + new_version + '"', content)
+    if new_content == content:
+        print(f"Warning: no version pattern matched in {PYPROJECT_PATH}, skipping.")
+        return
+
+    PYPROJECT_PATH.write_text(new_content, encoding="utf-8")
+    print(f"Version bumped in pyproject.toml: -> {new_version}")
 
 
 def _validate_semver(version: str) -> None:
@@ -249,6 +269,7 @@ def bump(part: str, tag: bool = False, backwards: bool = False) -> None:
     new_version = f"{major}.{minor}.{patch}"
     _validate_semver(new_version)
     _write_new_version(line_num, old_line, new_version)
+    _write_pyproject_version(new_version)
     _update_home_pzs(current, new_version)
 
     try:
