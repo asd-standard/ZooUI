@@ -126,6 +126,22 @@ def _reject_visible_dialog(ctx: GUITestContext) -> None:
             break
 
 
+def accept_open_dialog_via_ctrl_enter(ctx: GUITestContext) -> None:
+    """Schedule accepting any open modal dialog via Ctrl+Return shortcut after a delay."""
+    QtCore.QTimer.singleShot(SHORT_DELAY_MS // 2, lambda: _accept_visible_dialog_via_ctrl_enter(ctx))
+
+
+def _accept_visible_dialog_via_ctrl_enter(ctx: GUITestContext) -> None:
+    """Find visible QDialog and send Ctrl+Return to accept it via the shortcut."""
+    from PySide6.QtTest import QTest
+
+    for widget in QApplication.topLevelWidgets():
+        if isinstance(widget, QDialog) and widget.isVisible():
+            ctx.log.detail(f"Accepting dialog via Ctrl+Enter: {widget.windowTitle()}")
+            QTest.keyClick(widget, QtCore.Qt.Key_Return, QtCore.Qt.ControlModifier)
+            break
+
+
 def ensure_test_scene_loaded(ctx: GUITestContext) -> None:
     """Ensure the test scene with images and string is loaded."""
     if not ctx.scene_loaded:

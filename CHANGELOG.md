@@ -5,6 +5,50 @@ All notable changes to PyZUI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Added
+- Ctrl+Enter keyboard shortcut in all 4 input dialogs (new string, modify string,
+  SVG picker, modify SVG) via QShortcut — accepts the dialog, equivalent to
+  clicking OK
+- GUI integration test helper `accept_open_dialog_via_ctrl_enter()` in
+  `scene_helpers.py` for scheduling dialog acceptance via Ctrl+Enter key simulation
+- GUI integration test steps for Ctrl+Enter dialog acceptance:
+  - Step 38: New string dialog — types "test string" into QTextEdit, then accepts
+  - Step 39: SVG picker dialog — selects first SVG shape, then accepts
+  - Step 48: String modification dialog (right-click) — accepts via Ctrl+Enter
+  - Step 49: SVG modification dialog (right-click) — accepts via Ctrl+Enter
+- Documented Ctrl+Enter shortcut in `userinterface.rst` and `svgfeatures.rst`
+- `data/pyzui.desktop` file for freedesktop desktop integration, enabling proper
+  application icon display on Linux desktop environments (KDE, GNOME, etc.)
+
+### Fixed
+- TileProvider `_load` result check (`if tile:` → `if tile is not None:`) to avoid
+  PIL Image truthiness issues with Pillow >= 10.0 where `bool(Image)` raises
+  TypeError, which silently killed the daemon provider thread and prevented tiles
+  from entering the cache
+- Hardcoded `../../data` relative paths in `test_vipsconverter.py` and
+  `test_ppm.py` replaced with `os.path.dirname(__file__)`-based paths,
+  fixing `FileNotFoundError` when running `pytest ./test -v` from project root
+- Unit test `test_init_needs_tiling` now mocks `converterrunner.submit_vips_conversion`
+  to prevent real `ProcessPoolExecutor` usage and `BrokenProcessPool` cascading
+- Added `test/conftest.py` with autouse fixture that resets the converter process
+  pool after each test, preventing `BrokenProcessPool` from leaking across tests
+- `TestProviderRequestQueue` integration tests now use `cache_ready()` helper to
+  properly synchronize with the provider thread's cache insertion, fixing race
+  condition in `test_provider_processes_all_queued_requests` and
+  `test_duplicate_requests_consolidated_by_cache_check`
+- Application icon not persisting on KDE panel: added `setDesktopFileName`,
+  `setApplicationName`, and `setApplicationDisplayName` calls after QApplication
+  creation in `main.py` so the desktop environment can match the running app to
+  its `.desktop` file and display the correct icon
+
+### Changed
+- Split contribution guidelines into two focused documents:
+  `contributionguidelines/codestyle.rst` (code style, naming, formatting,
+  quality checks, docstring conventions) and `contributionguidelines/
+  contributionguidelines.rst` (workflow, testing requirements, versioning,
+  contributing to documentation), with cross-references between them
+
 ## [0.5.1] - 2026-05-12
 ### Changed
 - GUI integration test restructured from single `gui_integration.py` (1196 lines) to

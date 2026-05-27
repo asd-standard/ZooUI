@@ -152,6 +152,9 @@ Mouse/Keyboard actions:
 - **Ctrl+V** Paste the clipboard content as an SVG object at the current
   mouse position (or center of the viewport)
 
+- **Ctrl+Enter** When inside an input dialog (new string, modify string, SVG picker,
+  or modify SVG), accepts the dialog — equivalent to clicking the OK button.
+
 - **Scrollwheel + modifiers on an SVG shape** Elongate (resize) the selected
   SVG object. Only works when a single SVG object is selected:
 

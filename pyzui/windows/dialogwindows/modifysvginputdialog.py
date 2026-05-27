@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING
 
 from PySide6 import QtCore, QtSvg, QtWidgets
 from PySide6.QtCore import QRectF, Qt
-from PySide6.QtGui import QBrush, QColor, QPainter, QPen
+from PySide6.QtGui import QBrush, QColor, QKeySequence, QPainter, QPen, QShortcut
 from PySide6.QtWidgets import (
     QDialog,
     QDialogButtonBox,
@@ -652,6 +652,9 @@ class ModifySVGInputDialog:
         # Add layouts to main layout
         main_layout.addLayout(left_layout, 2)  # 2 parts for preview
         main_layout.addLayout(right_layout, 1)  # 1 part for controls
+
+        QShortcut(QKeySequence("Ctrl+Return"), dialog, dialog.accept)
+        QShortcut(QKeySequence("Ctrl+Enter"), dialog, dialog.accept)
 
         return dialog
 

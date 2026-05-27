@@ -21,7 +21,7 @@ from collections import deque
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QColor, QFont, QPainter
+from PySide6.QtGui import QColor, QFont, QKeySequence, QPainter, QShortcut
 from PySide6.QtWidgets import (
     QDialog,
     QDialogButtonBox,
@@ -261,6 +261,9 @@ class ModifyStringInputDialog:
 
         main_layout.addLayout(text_layout)
         main_layout.addLayout(color_layout)
+
+        QShortcut(QKeySequence("Ctrl+Return"), dialog, dialog.accept)
+        QShortcut(QKeySequence("Ctrl+Enter"), dialog, dialog.accept)
 
         return dialog
 

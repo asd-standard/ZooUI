@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, Any
 
 from PySide6 import QtSvg
 from PySide6.QtCore import QRectF, Qt
-from PySide6.QtGui import QBrush, QColor, QPainter, QPen
+from PySide6.QtGui import QBrush, QColor, QKeySequence, QPainter, QPen, QShortcut
 from PySide6.QtWidgets import (
     QDialog,
     QDialogButtonBox,
@@ -40,6 +40,7 @@ from PySide6.QtWidgets import (
 
 from pyzui.logger import get_logger
 from pyzui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
+from pyzui.utils._packaging import data_dir
 
 if TYPE_CHECKING:
     from PySide6.QtGui import QPaintEvent
@@ -105,8 +106,7 @@ class OpenSVGPickerInputDialog:
         # Scan SVG directory
         self.SVG_FILES = []
         self.SVG_NAMES = {}
-        svg_dir = os.path.join(os.path.dirname(__file__), "..", "..", "..", "data", "SVG")
-        svg_dir = os.path.abspath(svg_dir)
+        svg_dir = os.path.join(data_dir(), "data", "SVG")
         if os.path.isdir(svg_dir):
             for filename in os.listdir(svg_dir):
                 if filename.lower().endswith(".svg"):
@@ -655,6 +655,9 @@ class OpenSVGPickerInputDialog:
         # Add layouts to main layout
         main_layout.addLayout(left_layout, 3)  # 3 parts for SVG
         main_layout.addLayout(color_layout, 1)  # 1 part for colors
+
+        QShortcut(QKeySequence("Ctrl+Return"), dialog, dialog.accept)
+        QShortcut(QKeySequence("Ctrl+Enter"), dialog, dialog.accept)
 
         return dialog
 

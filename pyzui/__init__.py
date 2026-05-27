@@ -37,7 +37,7 @@ along with this program; if not, see <https://www.gnu.org/licenses/>.
 """
 __credits__ = ["David Roberts, Andrea Silvestri"]
 __license__ = "GPLv3"
-__version__ = "0.5.1"
+__version__ = "0.5.2"
 __maintainer__ = "Andrea Silvestri"
 __email__ = "asd.standard@gmail.com"
 
