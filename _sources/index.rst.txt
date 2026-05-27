@@ -103,6 +103,7 @@ be under COPYING.txt on project root, otherwise visit `gnu.org <https://www.gnu.
    :hidden:
 
    contributionguidelines/contributionguidelines
+   contributionguidelines/codestyle
 
 .. toctree::
    :maxdepth: 2

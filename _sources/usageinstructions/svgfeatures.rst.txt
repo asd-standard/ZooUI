@@ -70,6 +70,7 @@ interface for selecting and customizing SVG files:
 4. **Thickness Input**: Adjust stroke width (default: 50)
 5. **Apply Changes Button**: Preview modifications before adding
 6. **OK/Cancel Buttons**: Add to scene or cancel operation
+7. **Keyboard Shortcut**: Press Ctrl+Enter to accept the dialog (equivalent to clicking OK)
 
 **Available SVG Files:**
 
@@ -105,6 +106,7 @@ Modify SVG Dialog (``ModifySVGInputDialog``):
 4. **Apply Preview Button**: See changes before applying
 5. **Reset Button**: Revert to original SVG appearance
 6. **OK/Cancel**: Apply changes or cancel
+7. **Keyboard Shortcut**: Press Shift+Enter to accept changes (equivalent to clicking OK)
 
 **Note**: The modify dialog is designed for simple shapes (arrows, circles,
 squares, triangles) added via the SVG picker dialog. For complex SVG files
