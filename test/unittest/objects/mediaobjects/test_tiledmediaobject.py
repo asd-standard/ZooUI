@@ -43,10 +43,11 @@ class TestTiledMediaObject:
         obj = TiledMediaObject("test.jpg", scene)
         assert obj is not None
 
+    @patch("pyzui.objects.mediaobjects.tiledmediaobject.converterrunner.submit_vips_conversion")
     @patch("pyzui.objects.mediaobjects.tiledmediaobject.TileManager.tiled")
     @patch("tempfile.mkstemp")
     @patch("os.close")
-    def test_init_needs_tiling(self, mock_close, mock_mkstemp, mock_tiled):
+    def test_init_needs_tiling(self, mock_close, mock_mkstemp, mock_tiled, mock_submit):
         """
         Scenario: Initialize media that requires tiling
 

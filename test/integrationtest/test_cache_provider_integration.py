@@ -597,8 +597,7 @@ class TestProviderRequestQueue:
         assert provider.load_call_count == 5
 
         # All tiles should be in cache
-        for tile_id in tile_ids:
-            assert tile_id in cache
+        assert cache_ready(cache, tile_ids, timeout=5.0), "Tiles not found in cache"
 
     def test_duplicate_requests_consolidated_by_cache_check(self, cache):
         """
@@ -621,7 +620,7 @@ class TestProviderRequestQueue:
 
         # Then: Tile should be loaded only once
         # (First request loads, subsequent find it in cache)
-        assert tile_id in cache
+        assert cache_ready(cache, [tile_id], timeout=5.0), "Tile not found in cache"
         # Load count should be 1 (subsequent requests find tile in cache)
         assert provider.load_call_count == 1
 

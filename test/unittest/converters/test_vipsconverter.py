@@ -21,6 +21,8 @@ import pytest
 
 from pyzui.converters.vipsconverter import VipsConverter
 
+_DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "data"))
+
 
 class TestVipsConverter:
     """
@@ -247,7 +249,7 @@ class TestVipsConverter:
         And progress should be 1.0
         And output file should exist with valid PPM format
         """
-        infile = "../../data/07_climb.png"
+        infile = os.path.join(_DATA_DIR, "07_climb.png")
 
         # Skip test if file doesn't exist
         if not os.path.exists(infile):
@@ -290,12 +292,13 @@ class TestVipsConverter:
         And output file should exist with valid PPM format
         """
 
-        for name in os.listdir("../../data"):
-            fullpath = os.path.join("../../data", name)
+        for name in os.listdir(_DATA_DIR):
+            fullpath = os.path.join(_DATA_DIR, name)
 
             if (os.path.isfile(fullpath) and name.lower().endswith(".tiff")) or (
                 os.path.isfile(fullpath) and name.lower().endswith(".tif")
             ):
+
                 infile = fullpath
             else:
                 infile = ""
@@ -340,12 +343,13 @@ class TestVipsConverter:
         And progress should be 1.0
         And output file should exist with valid PPM format
         """
-        for name in os.listdir("../../data"):
-            fullpath = os.path.join("../../data", name)
+        for name in os.listdir(_DATA_DIR):
+            fullpath = os.path.join(_DATA_DIR, name)
 
             if (os.path.isfile(fullpath) and name.lower().endswith(".jpg")) or (
                 os.path.isfile(fullpath) and name.lower().endswith(".jpeg")
             ):
+
                 infile = fullpath
             else:
                 infile = ""

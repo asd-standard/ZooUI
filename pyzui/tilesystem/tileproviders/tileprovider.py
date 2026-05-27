@@ -161,7 +161,7 @@ class TileProvider(Thread):
                     self._logger.exception("error loading tile")
                     tile = None
 
-                if tile:
+                if tile is not None:
                     self._logger.debug("loaded %s", str(tile_id))
                     self.__tilecache[tile_id] = Tile(tile)
 

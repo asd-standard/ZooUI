@@ -13,6 +13,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program; if not, see <https://www.gnu.org/licenses/>.
 
+import os
 from io import BytesIO
 from unittest.mock import mock_open, patch
 
@@ -20,6 +21,8 @@ import pytest
 
 from pyzui.tilesystem.tiler import ppm
 from pyzui.tilesystem.tiler.ppm import PPMTiler, read_ppm_header
+
+_DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "data"))
 
 
 class TestReadPPMHeader:
@@ -275,8 +278,8 @@ class TestPPMTiler:
         from pyzui.converters.vipsconverter import VipsConverter
         from pyzui.tilesystem import tilestore as TileStore
 
-        for name in os.listdir("../../data"):
-            fullpath = os.path.join("../../data", name)
+        for name in os.listdir(_DATA_DIR):
+            fullpath = os.path.join(_DATA_DIR, name)
 
             if (os.path.isfile(fullpath) and name.lower().endswith(".jpg")) or (
                 os.path.isfile(fullpath) and name.lower().endswith(".jpeg")
