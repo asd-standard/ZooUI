@@ -261,6 +261,9 @@ def main():
 
     # Create Qt application
     app = QtWidgets.QApplication(sys.argv)
+    app.setApplicationName("pyzui")
+    app.setApplicationDisplayName("PyZUI")
+    app.setDesktopFileName("pyzui")
 
     # Unified shutdown of all background threads — runs before cleanup handlers,
     # so threads are joined before Qt begins destroying internals
