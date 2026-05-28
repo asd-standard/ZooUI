@@ -5,6 +5,12 @@ All notable changes to PyZUI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Added
+- Usage Instructions dialog under Help menu, automatically displaying content
+  from `docs/source/usageinstructions/userinterface.rst` converted to HTML via
+  docutils
+
 ## [0.5.2] - 2026-05-27
 ### Added
 - Ctrl+Enter keyboard shortcut in all 4 input dialogs (new string, modify string,
