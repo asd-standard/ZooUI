@@ -25,6 +25,7 @@ from .dialogwindows import (
     OpenSVGPickerInputDialog,
     OpenZoomSensitivityInputDialog,
 )
+from .usagedialog import UsageDialog
 from .zoomsettingsdialog import ZoomSettingsDialog
 
 __all__ = [
@@ -36,5 +37,6 @@ __all__ = [
     "OpenNewStringInputDialog",
     "OpenSVGPickerInputDialog",
     "OpenZoomSensitivityInputDialog",
+    "UsageDialog",
     "ZoomSettingsDialog",
 ]

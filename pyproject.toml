@@ -78,6 +78,10 @@ module = "pyvips"
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
+module = "docutils.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
 module = "pyzui.objects.mediaobjects.mediaobjectsutils.svg.*"
 disable_error_code = ["union-attr", "return-value", "arg-type"]
 

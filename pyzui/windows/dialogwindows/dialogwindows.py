@@ -23,6 +23,7 @@ from .modifysvginputdialog import ModifySVGInputDialog
 from .modifytiledmediaobjectdialog import ModifyTiledMediaObjectDialog
 from .stringinputdialog import OpenNewStringInputDialog
 from .svgpickerinputdialog import OpenSVGPickerInputDialog
+from .usagedialog import UsageDialog
 from .zoomsensitivitydialog import OpenZoomSensitivityInputDialog
 
 
@@ -49,6 +50,7 @@ class DialogWindows:
     open_svg_picker_input_dialog = OpenSVGPickerInputDialog
     modify_svg_input_dialog = ModifySVGInputDialog
     autosave_settings_dialog = AutosaveSettingsDialog
+    usage_dialog = UsageDialog
 
 
 # Also expose at module level for direct imports
@@ -61,4 +63,5 @@ __all__ = [
     "OpenNewStringInputDialog",
     "OpenSVGPickerInputDialog",
     "OpenZoomSensitivityInputDialog",
+    "UsageDialog",
 ]

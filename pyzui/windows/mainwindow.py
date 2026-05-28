@@ -781,6 +781,19 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         QtWidgets.QMessageBox.aboutQt(self)
 
+    def __action_usage(self) -> None:
+        """
+        Method :
+            MainWindow.__action_usage()
+        Parameters :
+            None
+
+        MainWindow.__action_usage() --> None
+
+        Display the Usage Instructions dialog from the RST documentation.
+        """
+        DialogWindows.usage_dialog(self).exec()
+
     def __action_save_and_quit(self) -> None:
         """
         Method :
@@ -1051,6 +1064,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.__create_action("autosave_settings", "&Autosave Settings", self.__action_autosave_settings)
         self.__create_action("zoom_settings", "&Zoom Settings", self.__action_zoom_settings)
 
+        self.__create_action("usage", "&Usage", self.__action_usage)
         self.__create_action("about", "&About", self.__action_about)
         self.__create_action("about_qt", "About &Qt", self.__action_about_qt)
 
@@ -1100,6 +1114,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.__menu["settings"].addAction(self.__action["zoom_settings"])
 
         self.__menu["help"] = self.menuBar().addMenu("&Help")
+        self.__menu["help"].addAction(self.__action["usage"])
         self.__menu["help"].addAction(self.__action["about"])
         self.__menu["help"].addAction(self.__action["about_qt"])
 

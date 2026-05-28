@@ -127,6 +127,7 @@ from guiintegration.test import (  # noqa: E402
     set_framerate,
     shift_click_selection,
     svg_elongation,
+    usage,
     workflow,
     zoom_settings,
 )
@@ -196,6 +197,7 @@ class GUIIntegrationTest:
             (19, "Settings Menu - Autosave Settings", autosave_settings.run),
             (20, "Help Menu - About", about.run),
             (21, "Help Menu - About Qt", about_qt.run),
+            (27, "Help Menu - Usage Instructions", usage.run),
             (22, "Settings Menu - Zoom Settings", zoom_settings.run),
             (25, "SVG - Full Elongation Test", svg_elongation.run),
             (23, "Actions Menu - Copy SVG", copy_svg.run),
