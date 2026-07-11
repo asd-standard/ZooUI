@@ -8,7 +8,7 @@ pan and zoom through the collection.
 
 ---
 
-Full documentation available at [asd-standard.github.io/zoomy](https://asd-standard.github.io/zoomy/)
+Full documentation available at [asd-standard.github.io/ZooUI](https://asd-standard.github.io/ZooUI/)
 
 ---
 
