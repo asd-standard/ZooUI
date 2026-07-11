@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -21,7 +21,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-from pyzui.backup.backupmanager import BackupManager
+from zooui.backup.backupmanager import BackupManager
 
 
 class TestBackupManager:
@@ -29,7 +29,7 @@ class TestBackupManager:
     Feature: Per-Scene Backup Management System
 
     The BackupManager handles automatic backup creation with per-scene
-    directories. Each scene gets its own directory under ~/.pyzui/backups/
+    directories. Each scene gets its own directory under ~/.zooui/backups/
     named {scene_filename}_{4char_path_hash}/. Backups within each dir are
     named yy_mm_dd_hh_mm_filename_hash.pzs. Rotation is per-scene (keeps
     last N per directory). Scene directories expire after expire_days of
@@ -754,13 +754,13 @@ class TestBackupManager:
         monkeypatch.setattr(Path, 'expanduser', mock_expanduser)
 
         config = {
-            'backup_dir': '~/.pyzui/test_backups',
+            'backup_dir': '~/.zooui/test_backups',
             'max_backups': 10
         }
 
         manager = BackupManager(config)
 
-        assert str(manager._backup_dir).endswith('.pyzui/test_backups')
+        assert str(manager._backup_dir).endswith('.zooui/test_backups')
         assert '~' not in str(manager._backup_dir)
         assert manager._backup_dir.exists()
 
@@ -801,13 +801,13 @@ class TestBackupManager:
 
         monkeypatch.setattr('os.path.expanduser', mock_expanduser)
 
-        tilde_path = Path('~/.pyzui/backups')
+        tilde_path = Path('~/.zooui/backups')
         expanded = tilde_path.expanduser()
 
         assert '~' not in str(expanded)
         assert str(expanded).startswith(str(test_dir))
 
-        already_expanded = Path(str(test_dir / '.pyzui' / 'backups'))
+        already_expanded = Path(str(test_dir / '.zooui' / 'backups'))
         same_expanded = already_expanded.expanduser()
 
         assert str(same_expanded) == str(already_expanded)

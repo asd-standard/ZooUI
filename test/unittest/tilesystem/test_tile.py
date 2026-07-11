@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -18,8 +18,8 @@ from unittest.mock import Mock, patch
 from PIL import Image
 from PySide6 import QtGui
 
-from pyzui.tilesystem import tile
-from pyzui.tilesystem.tile import Tile
+from zooui.tilesystem import tile
+from zooui.tilesystem.tile import Tile
 
 
 class TestTile:
@@ -109,7 +109,7 @@ class TestTile:
         resized = t.resize(50, 50)
         assert resized.size == (50, 50)
 
-    @patch("pyzui.tilesystem.tile.QtGui.QImage.save")
+    @patch("zooui.tilesystem.tile.QtGui.QImage.save")
     def test_save(self, mock_save):
         """
         Scenario: Save tile to disk

@@ -1,0 +1,641 @@
+## ZooUI - Zooming User Interface
+## Copyright (C) 2009 David Roberts <d@vidr.cc>
+##
+## This program is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License
+## as published by the Free Software Foundation; either version 3
+## of the License, or (at your option) any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program; if not, see <https://www.gnu.org/licenses/>.
+
+"""Media to be displayed in the ZUI (abstract base class)."""
+
+import math
+from typing import Any
+
+## Performance optimization note:
+## Phase 2 optimizations replace 2**x with math.exp2(x) (1.85x faster)
+## and math.log(x, 2) with math.log2(x) (2x faster) throughout the codebase.
+## These changes are performance-critical for zoom operations.
+from zooui.objects.physicalobject import PhysicalObject
+
+
+class MediaObject(PhysicalObject):
+    transparent: bool = False  # Set True by subclasses that support transparency
+    """
+    Constructor :
+        MediaObject(media_id, scene)
+    Parameters :
+        media_id['string'], scene['Scene']
+
+    Media_object(media_id, scene) --> PhysicalObject
+
+    MediaObject objects are used to represent media that can be rendered in
+    the ZUI.
+
+    Screen view it's fixed unless user change mainwindow size on the screen.
+    Both scene and MediaObjects have their own reference systems so that zooms
+    can be applied bot to Scene and Mediaobject indipendently trough their
+    reference system transformation.
+
+    You can think about it as fixed window looking at a scene that can strecth or
+    shrink beneath it, with this stretch or shrink always having it's origin
+    at the Scene center for scene zoom and MediaObject center for the mediobject
+    zoom as at the same time individual mediaobject can also strecth
+    or shrink. The fixed window can then move on the 2d plane bringing objects
+    into view.
+
+    World::
+
+         --------------------------------------->
+        |   Scene
+        |  @ ------------------------------+--->
+        |  |  ViewPort        MediaObj     |
+        |  |  (Screen View)   *-------+--> |
+        |  |                  |   &   |    |
+        |  |               %  +-------"    |
+        |  |                  |            |
+        |  |                  ∨            |
+        |  |                               |
+        |  +-------------------------------#
+        |  |
+        |  ∨
+        ∨
+
+    Legend::
+
+        (All attributes are relative to screen view)
+        * -> MediaObject.topleft()
+        " -> MediaObject.bottomright()
+        & -> MediaObject.center()
+        # -> Scene.viewport_size()
+        % -> Scene.center()
+        @ -> Scene.origin()
+
+    MediaObject topleft coordinates relative to screen view are given by::
+
+        MediaObject.topleft[0-1] = self._scene.origin[0-1] + self.pos[0-1] * (2 ** self._scene.zoomlevel)
+
+    Where *self.pos[0-1]* it's MediaObject position relative to Scene reference
+    system wich get's scaled by math.exp2() of scene zoom level
+
+    MediaObject centre coordinates relative to screen view are given firstly by
+    calculating image center coordinates relative to Scene reference coordinates::
+
+        C_s[0-1] = self.pos[0-1] + self._centre[0-1] * math.exp2(self._z)
+
+    Where *self._centre[0-1]* are center coordinates relative to the mediaobject
+    frame of reference and *self._z* it's MediaObject reference frame scaling
+    (zoom).
+
+    Take note that self.pos[0-1] dosen't get to be scaled by self._z as that
+    position it's relative to Scene reference frame.
+
+    Then we can calculate MediaObject centre coordinates relative to screen view as::
+
+        MediaObject.centre[0-1] = self._scene.origin[0] + C_s[0-1] * math.exp2(self._scene.zoomlevel)
+
+
+    """
+
+    def __init__(self, media_id: str, scene: Any) -> None:
+        """
+        Create a new MediaObject from the media identified by media_id,
+        and the parent Scene referenced by scene.
+
+        Initializes PhysicalObject center, position and velocity attributes,
+        then sets the _media_id and _scene instance variables.
+        """
+        # initialize mediobject centre, position and velocity
+        PhysicalObject.__init__(self)
+
+        self._media_id: str = media_id
+        self._scene: Any = scene
+
+    def render(self, painter: Any, mode: int) -> None:
+        """
+        Method :
+            MediaObject.render(painter, mode)
+        Parameters :
+            painter : QPainter
+            mode : int
+
+        MediaObject.render(painter, mode) --> None
+
+        Render the media using the given `painter` and rendering `mode`.
+
+        Precondition: `mode` is equal to one of the constants defined in
+        :class:`RenderMode`
+        """
+        pass
+
+    def is_size_visible(self, mode: int) -> bool:
+        """
+        Check if object is visible based on size and render mode.
+
+        Args:
+            mode: RenderMode (Invisible, Draft, or HighQuality)
+
+        Returns:
+            True if object should be rendered, False if too small,
+            too large, or mode is Invisible.
+
+        Base implementation returns True unless mode is Invisible.
+        Subclasses should override to add size-based visibility checks.
+        """
+        return mode != RenderMode.Invisible
+
+    def move(self, dx: float, dy: float) -> None:
+        """
+        Method :
+            MediaObject.move(dx, dy)
+        Parameters :
+            dx : float
+            dy : float
+
+        MediaObject.move(dx, dy) --> None
+
+        Move the image relative to the scene, where (`dx`,`dy`) is given as
+        an on-screen distance.
+        """
+
+        # self._x and self._y correspond to self.pos[0] and self.pos[1], but
+        # mediaobject.pos dosen't support += operation
+        self._x += dx * (2**-self._scene.zoomlevel)
+        self._y += dy * (2**-self._scene.zoomlevel)
+
+    def zoom(self, amount: float) -> None:
+        """
+        Method :
+            MediaObject.zoom(amount)
+        Parameters :
+            amount : float
+
+        MediaObject.zoom(amount) --> None
+
+        Zoom by the given `amount` with the centre maintaining its position
+        on the screen.
+        """
+
+        ## C_s is the scene coordinates of the centre
+        ## C_i is the image coordinates of the centre
+        ## P is the onscreen position of the centre
+        ## zoomlevel_i' = zoomlevel_i + amount
+        ##    P = scene.origin + C_s * math.exp2(zoomlevel_s)
+        ##      => C_s = (P - scene.origin) * math.exp2(-zoomlevel_s)
+        ## C_s  = self.pos  + C_i * math.exp2(zoomlevel_i)
+        ##      => C_i = (C_s - self.pos) * math.exp2(-zoomlevel_i)
+        ## C_s' = self.pos' + C_i * math.exp2(zoomlevel_i')
+        ##      = self.pos' + (C_s - self.pos)
+        ##        * math.exp2(zoomlevel_i'-zoomlevel_i)
+        ## solving for C_s = C_s' yields:
+        ##   self.pos' = C_s - (C_s - self.pos) * math.exp2(amount)
+
+        # Px, Py = self.centre
+        # C_sx = (Px - self._scene.origin[0]) * math.exp2(-self._scene.zoomlevel)
+        # C_sy = (Py - self._scene.origin[1]) * math.exp2(-self._scene.zoomlevel)
+
+        C_ix: float
+        C_iy: float
+        C_ix, C_iy = self._centre
+        C_sx: float = self._x + C_ix * math.exp2(self._z)
+        C_sy: float = self._y + C_iy * math.exp2(self._z)
+
+        # Calculate new zoomlevel and validate it
+        new_zoomlevel = self._z + amount
+        if self._zoom_manager:
+            new_zoomlevel = self._zoom_manager.validate(new_zoomlevel)
+            # Recalculate amount after clamping
+            amount = new_zoomlevel - self._z
+
+        self._x = C_sx - (C_sx - self._x) * math.exp2(amount)
+        self._y = C_sy - (C_sy - self._y) * math.exp2(amount)
+        self._z = new_zoomlevel
+
+    def hides(self, other: "MediaObject") -> bool:
+        """
+        Method :
+            MediaObject.hides(other)
+        Parameters :
+            other : MediaObject
+
+        MediaObject.hides(other) --> bool
+
+        Returns True iff `other` is completely hidden behind `self` on the
+        screen.
+        """
+        if self.transparent:
+            ## nothing can be hidden behind a transparent object
+            return False
+
+        viewport_size: tuple[float, float] = self._scene.viewport_size
+
+        s_left: float
+        s_top: float
+        s_left, s_top = self.topleft
+        s_right: float
+        s_bottom: float
+        s_right, s_bottom = self.bottomright
+        ## clamp values
+        s_left = max(0, min(s_left, viewport_size[0]))
+        s_top = max(0, min(s_top, viewport_size[1]))
+        s_right = max(0, min(s_right, viewport_size[0]))
+        s_bottom = max(0, min(s_bottom, viewport_size[1]))
+
+        o_left: float
+        o_top: float
+        o_left, o_top = other.topleft
+        o_right: float
+        o_bottom: float
+        o_right, o_bottom = other.bottomright
+        ## clamp values
+        o_left = max(0, min(o_left, viewport_size[0]))
+        o_top = max(0, min(o_top, viewport_size[1]))
+        o_right = max(0, min(o_right, viewport_size[0]))
+        o_bottom = max(0, min(o_bottom, viewport_size[1]))
+
+        return o_left >= s_left and o_top >= s_top and o_right <= s_right and o_bottom <= s_bottom
+
+    def fit(self, bbox: tuple[float, float, float, float]) -> None:
+        """
+        Method :
+            MediaObject.fit(bbox)
+        Parameters :
+            bbox : Tuple[float, float, float, float]
+
+        MediaObject.fit(bbox) --> None
+
+        Move and resize the image such that it is the greatest size possible
+        whilst fitting inside and centred in the onscreen bounding box `bbox`
+        (x1,y1,x2,y2).
+        """
+
+        box_x: float
+        box_y: float
+        box_x2: float
+        box_y2: float
+        box_x, box_y, box_x2, box_y2 = list(map(float, bbox))
+        box_w: float = box_x2 - box_x
+        box_h: float = box_y2 - box_y
+        # print('box_y',box_y)
+
+        w: float
+        h: float
+        w, h = self.onscreen_size
+
+        # Apply minimum safe values to prevent division by zero
+        w = max(w, 1.0)  # Minimum 1 pixel width
+        h = max(h, 1.0)  # Minimum 1 pixel height
+
+        scale: float
+        target_x: float
+        target_y: float
+        if w / h > box_w / box_h:
+            ## need to fit width
+            scale = box_w / w
+            target_x = box_x
+            target_y = box_y + box_h / 2 - (h * scale) / 2
+        else:
+            ## need to fit height
+            scale = box_h / h
+            target_x = box_x + box_w / 2 - (w * scale) / 2
+            target_y = box_y
+
+        # Safe log calculation with bounds checking
+        try:
+            if scale <= 0:
+                scale = 0.001  # Minimum safe scale (0.1%)
+            self.zoomlevel += math.log2(scale)
+        except (ValueError, ZeroDivisionError):
+            # Fallback: don't change zoomlevel if scale is invalid
+            pass
+
+        self._x = (target_x - self._scene.origin[0]) * (2**-self._scene.zoomlevel)
+        self._y = (target_y - self._scene.origin[1]) * (2**-self._scene.zoomlevel)
+
+    def __cmp__(self, other: "MediaObject") -> int:
+        """
+        Method :
+            MediaObject.__cmp__(other)
+        Parameters :
+            other : MediaObject
+
+        MediaObject.__cmp__(other) --> int
+
+        Compare two MediaObject instances based on their onscreen area.
+
+        Returns 0 if self is other, -1 if self has smaller onscreen area,
+        and 1 if self has larger onscreen area.
+        """
+        if self is other:
+            return 0
+        elif self.onscreen_area < other.onscreen_area:
+            return -1
+        else:
+            return 1
+
+    @property
+    def media_id(self) -> str:
+        """
+        Property :
+            MediaObject.media_id
+        Parameters :
+            None
+
+        MediaObject.media_id --> str
+
+        The object's media_id.
+        """
+        return self._media_id
+
+    @property
+    def scale(self) -> float:
+        """
+        Property :
+            MediaObject.scale
+        Parameters :
+            None
+
+        MediaObject.scale --> float
+
+        The factor by which each dimension of the image should be scaled
+        when rendering it to the screen.
+        """
+        return float(2 ** (self._scene.zoomlevel + self.zoomlevel))
+
+    @property
+    def topleft(self) -> tuple[float, float]:
+        """
+        Property :
+            MediaObject.topleft
+        Parameters :
+            None
+
+        MediaObject.topleft --> Tuple[float, float]
+
+        The on-screen position of the top-left corner of the image.
+        self._scene.origin -> the world-space X coordinate of the top-left of the
+        screen view (the camera/view origin)
+        self.pos -> the object's position inside the view before applying zoom
+        (a coordinate in the camera's internal coordinate system)
+
+        here self.pos() is mediaobject
+        """
+
+        x: float = self._scene.origin[0] + self.pos[0] * (2**self._scene.zoomlevel)
+        y: float = self._scene.origin[1] + self.pos[1] * (2**self._scene.zoomlevel)
+        return (x, y)
+
+    @property
+    def onscreen_size(self) -> tuple[float, float]:
+        """
+        Property :
+            MediaObject.onscreen_size
+        Parameters :
+            None
+
+        MediaObject.onscreen_size --> Tuple[float, float]
+
+        The on-screen size of the image.
+        This gets inherited by higher order classes (StringMediaObject,
+        TiledMediaObject, etc.)
+        """
+        pass  # type: ignore[empty-body,return]
+
+    @property
+    def bottomright(self) -> tuple[float, float]:
+        """
+        Property :
+            MediaObject.bottomright
+        Parameters :
+            None
+
+        MediaObject.bottomright --> Tuple[float, float]
+
+        The on-screen position of the bottom-right corner of the image.
+        """
+        o: tuple[float, float] = self.topleft
+        s: tuple[float, float] = self.onscreen_size
+        x: float = o[0] + s[0]
+        y: float = o[1] + s[1]
+        return (x, y)
+
+    @property
+    def onscreen_area(self) -> float:
+        """
+        Property :
+            MediaObject.onscreen_area
+        Parameters :
+            None
+
+        MediaObject.onscreen_area --> float
+
+        The number of pixels the image occupies on the screen.
+        """
+        w: float
+        h: float
+        w, h = self.onscreen_size
+        return w * h
+
+    def __get_pos(self) -> tuple[float, float]:
+        """
+        Method :
+            __get_pos
+        Parameters :
+            None
+
+        __get_pos --> Tuple[float, float]
+
+        Return MediaObject position (_x, _y).
+        """
+        return (self._x, self._y)
+
+    def __set_pos(self, pos: tuple[float, float]) -> None:
+        """
+        Method :
+            __set_pos(pos)
+        Parameters :
+            pos : Tuple[float, float]
+
+        __set_pos --> None
+
+        Set self._x, self._y variables to MediaObject position.
+        """
+        self._x, self._y = pos
+
+    pos = property(__get_pos, __set_pos)
+    """Creating MediaObject.pos property with __get_pos as
+    getter and __set_pos as setter"""
+
+    def __get_centre(self) -> tuple[float, float]:
+        """
+        Method :
+            __get_centre
+        Parameters :
+            None
+
+        __get_centre --> Tuple[float, float]
+
+        Get the on-screen position of the MediaObject center.
+
+        Converts image-coordinate C_i to screen-coordinate P through
+        scene-coordinate C_s using the formulas::
+
+            P = scene.origin + C_s * math.exp2(zoomlevel_s)
+            C_s = self.pos + C_i * math.exp2(zoomlevel_i)
+        """
+        ## we need to convert image-coordinate C_i to
+        ## screen-coordinate P (through scene-coordinate C_s):
+        ##   P = scene.origin + C_s * math.exp2(zoomlevel_s)
+        ## C_s = self.pos + C_i * math.exp2(zoomlevel_i)
+
+        # This are the image coordinates relative to scene coordinates.
+
+        C_s: tuple[float, float] = (
+            self.pos[0] + self._centre[0] * math.exp2(self._z),
+            self.pos[1] + self._centre[1] * math.exp2(self._z),
+        )
+
+        #
+        return (
+            self._scene.origin[0] + C_s[0] * math.exp2(self._scene.zoomlevel),
+            self._scene.origin[1] + C_s[1] * math.exp2(self._scene.zoomlevel),
+        )
+
+    def __set_centre(self, centre: tuple[float, float]) -> None:
+        """
+        Method :
+            __set_centre(centre)
+        Parameters :
+            centre : Tuple[float, float]
+
+        __set_centre --> None
+
+        Set the on-screen position of the MediaObject center.
+
+        Converts screen-coordinate P to image-coordinate C_i through
+        scene-coordinate C_s using the formulas::
+
+            P = scene.origin + C_s * math.exp2(zoomlevel_s)
+            C_s = self.pos + C_i * math.exp2(zoomlevel_i)
+        """
+        ## we need to convert screen-coordinate P to
+        ## image-coordinate C_i (through scene-coordinate C_s):
+        ##   P = scene.origin + C_s * math.exp2(zoomlevel_s)
+        ##     => C_s = (P - scene.origin) * math.exp2(-zoomlevel_s)
+        ## C_s = self.pos  + C_i * math.exp2(zoomlevel_i)
+        ##     => C_i = (C_s - self.pos) * math.exp2(-zoomlevel_i)
+        C_s: tuple[float, float] = (
+            (centre[0] - self._scene.origin[0]) * math.exp2(-self._scene.zoomlevel),
+            (centre[1] - self._scene.origin[1]) * math.exp2(-self._scene.zoomlevel),
+        )
+        self._centre = ((C_s[0] - self._x) * math.exp2(-self._z), (C_s[1] - self._y) * math.exp2(-self._z))
+
+    centre = property(__get_centre, __set_centre)
+    """Creating MediaObject.centre property with __get_centre as
+    getter and __set_centre as setter"""
+
+    def __str__(self) -> str:
+        """
+        Method :
+            MediaObject.__str__()
+        Parameters :
+            None
+
+        MediaObject.__str__() --> str
+
+        Return a string representation of the MediaObject.
+
+        Format: ClassName(media_id)
+        """
+        return f"{type(self).__name__}({self._media_id})"
+
+    def __repr__(self) -> str:
+        """
+        Method :
+            MediaObject.__repr__()
+        Parameters :
+            None
+
+        MediaObject.__repr__() --> str
+
+        Return a detailed string representation of the MediaObject.
+
+        Format: ClassName(repr(media_id))
+        """
+        return f"{type(self).__name__}({self._media_id!r})"
+
+    def to_dict(self) -> dict[str, Any]:
+        """
+        Method :
+            MediaObject.to_dict()
+        Parameters :
+            None
+
+        MediaObject.to_dict() --> Dict[str, Any]
+
+        Serialize object to dictionary for copying.
+        """
+        return {
+            "type": self.__class__.__name__,
+            "media_id": self._media_id,
+            "position": (self._x, self._y, self._z),
+            "velocity": (self.vx, self.vy, self.vz),
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any], scene: Any) -> "MediaObject":
+        """
+        Method :
+            MediaObject.from_dict(data, scene)
+        Parameters :
+            data : Dict[str, Any]
+            scene : Any
+
+        MediaObject.from_dict(data, scene) --> MediaObject
+
+        Create MediaObject from serialized data.
+        Subclasses must override this method.
+        """
+        raise NotImplementedError("Subclasses must implement from_dict")
+
+
+class LoadError(Exception):
+    """
+    Exception :
+        LoadError
+
+    LoadError exception is raised when there is an error loading
+    or processing media content. This can occur during file loading,
+    format conversion, or media initialization.
+    """
+
+    pass
+
+
+class RenderMode:
+    """
+    Class :
+        RenderMode
+
+    RenderMode is a namespace class that defines constants used to
+    indicate the rendering mode for MediaObjects.
+
+    Constants:
+        Invisible : int = 0
+            MediaObject should not be rendered at all
+        Draft : int = 1
+            MediaObject should be rendered in draft/fast mode
+        HighQuality : int = 2
+            MediaObject should be rendered in high quality mode
+    """
+
+    Invisible: int = 0
+    Draft: int = 1
+    HighQuality: int = 2

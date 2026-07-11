@@ -5,12 +5,12 @@ Logging System
 Overview
 ========
 
-PyZUI implements a centralized logging system that provides consistent, configurable logging across all modules. The system is designed to facilitate debugging, track application behavior, and diagnose issues effectively.
+ZooUI implements a centralized logging system that provides consistent, configurable logging across all modules. The system is designed to facilitate debugging, track application behavior, and diagnose issues effectively.
 
 Architecture
 ============
 
-The logging system is built around the ``LoggerConfig`` class in ``pyzui/logger.py``, which provides:
+The logging system is built around the ``LoggerConfig`` class in ``zooui/logger.py``, which provides:
 
 * **Centralized configuration** - Single initialization point for all logging behavior
 * **Multiple output targets** - Console and/or file logging with independent level control
@@ -72,7 +72,7 @@ The primary way to configure logging is through command-line arguments:
    python main.py --verbose
 
    # Specify custom log directory
-   python main.py --log-dir /tmp/pyzui-logs
+   python main.py --log-dir /tmp/zooui-logs
 
    # Disable console output (file logging only)
    python main.py --no-console
@@ -105,7 +105,7 @@ Load the configuration with:
 
 .. code-block:: bash
 
-   python main.py --config pyzui_config.json
+   python main.py --config zooui_config.json
 
 Programmatic Configuration
 ---------------------------
@@ -114,7 +114,7 @@ Initialize logging programmatically using the ``LoggerConfig`` class:
 
 .. code-block:: python
 
-   from pyzui.logger import LoggerConfig
+   from zooui.logger import LoggerConfig
 
    LoggerConfig.initialize(
        debug=True,              # Enable debug mode
@@ -135,7 +135,7 @@ To use logging in your code, import the ``get_logger`` function:
 
 .. code-block:: python
 
-    from pyzui.logger import get_logger
+    from zooui.logger import get_logger
 
     class MyClass:
         def __init__(self):
@@ -152,7 +152,7 @@ To use logging in your code, import the ``get_logger`` function:
                 self.logger.error(f'Processing failed: {e}')
                 raise
 
-Loggers are named with a ``pyzui.`` prefix internally (e.g., ``pyzui.MyClass``)
+Loggers are named with a ``zooui.`` prefix internally (e.g., ``zooui.MyClass``)
 and are cached — repeated calls to ``get_logger('MyClass')`` return the same
 instance. If logging hasn't been initialized yet, the first call to
 ``get_logger()`` auto-initializes the system with default settings
@@ -180,7 +180,7 @@ Adjust logging behavior during execution:
 
 .. code-block:: python
 
-   from pyzui.logger import LoggerConfig
+   from zooui.logger import LoggerConfig
    import logging
 
    # Enable debug mode at runtime
@@ -226,7 +226,7 @@ Example workflow:
    python main.py --debug
 
    # Step 4: Review detailed logs in file
-   tail -f logs/pyzui.log | grep TileManager
+   tail -f logs/zooui.log | grep TileManager
 
 Debugging Specific Components
 ------------------------------
@@ -235,7 +235,7 @@ For targeted debugging, enable debug logging only for specific modules:
 
 .. code-block:: python
 
-   from pyzui.logger import LoggerConfig
+   from zooui.logger import LoggerConfig
    import logging
 
    # Initialize with normal logging
@@ -357,7 +357,7 @@ Example output:
 
 .. code-block:: text
 
-   [INFO    ] main                      | Starting PyZUI application
+   [INFO    ] main                      | Starting ZooUI application
    [DEBUG   ] TileManager               | Initializing tile cache with 100 MB
    [WARNING ] Scene                     | Object 'text1' outside visible bounds
    [ERROR   ] PDFConverter              | Failed to convert document.pdf: File not found
@@ -383,7 +383,7 @@ Example output:
 
 .. code-block:: text
 
-   2025-12-09 14:23:45 | [INFO    ] | main                      | main                 | Starting PyZUI application
+   2025-12-09 14:23:45 | [INFO    ] | main                      | main                 | Starting ZooUI application
    2025-12-09 14:23:45 | [DEBUG   ] | TileManager               | __init__             | Initializing tile cache with 100 MB
    2025-12-09 14:23:46 | [WARNING ] | Scene                     | add_object           | Object 'text1' outside visible bounds
    2025-12-09 14:23:47 | [ERROR   ] | PDFConverter              | convert              | Failed to convert document.pdf: File not found
@@ -398,34 +398,34 @@ By default, logs are written to:
 
 .. code-block:: text
 
-   ./logs/pyzui.log
+   ./logs/zooui.log
 
 Specify a custom location with:
 
 .. code-block:: bash
 
-   python main.py --log-dir /var/log/pyzui
+   python main.py --log-dir /var/log/zooui
 
 Rotation Strategy
 -----------------
 
 Log files automatically rotate when they reach 10 MB. The system maintains:
 
-* ``pyzui.log`` - Current log file
-* ``pyzui.log.1`` - Previous log file
-* ``pyzui.log.2`` - Second previous log file
-* ``pyzui.log.3`` - Third previous log file
-* ``pyzui.log.4`` - Fourth previous log file
-* ``pyzui.log.5`` - Fifth previous log file (oldest retained)
+* ``zooui.log`` - Current log file
+* ``zooui.log.1`` - Previous log file
+* ``zooui.log.2`` - Second previous log file
+* ``zooui.log.3`` - Third previous log file
+* ``zooui.log.4`` - Fourth previous log file
+* ``zooui.log.5`` - Fifth previous log file (oldest retained)
 
-When ``pyzui.log`` reaches 10 MB:
-1. ``pyzui.log.5`` is deleted
-2. ``pyzui.log.4`` → ``pyzui.log.5``
-3. ``pyzui.log.3`` → ``pyzui.log.4``
-4. ``pyzui.log.2`` → ``pyzui.log.3``
-5. ``pyzui.log.1`` → ``pyzui.log.2``
-6. ``pyzui.log`` → ``pyzui.log.1``
-7. New ``pyzui.log`` is created
+When ``zooui.log`` reaches 10 MB:
+1. ``zooui.log.5`` is deleted
+2. ``zooui.log.4`` → ``zooui.log.5``
+3. ``zooui.log.3`` → ``zooui.log.4``
+4. ``zooui.log.2`` → ``zooui.log.3``
+5. ``zooui.log.1`` → ``zooui.log.2``
+6. ``zooui.log`` → ``zooui.log.1``
+7. New ``zooui.log`` is created
 
 Viewing Logs
 ------------
@@ -435,22 +435,22 @@ Common commands for log analysis:
 .. code-block:: bash
 
    # View real-time logs
-   tail -f logs/pyzui.log
+   tail -f logs/zooui.log
 
    # Search for errors
-   grep ERROR logs/pyzui.log
+   grep ERROR logs/zooui.log
 
    # View recent errors
-   grep ERROR logs/pyzui.log | tail -20
+   grep ERROR logs/zooui.log | tail -20
 
    # Find logs for specific module
-   grep TileManager logs/pyzui.log
+   grep TileManager logs/zooui.log
 
    # View logs with context (5 lines before/after)
-   grep -C 5 "Exception" logs/pyzui.log
+   grep -C 5 "Exception" logs/zooui.log
 
    # Count errors by type
-   grep ERROR logs/pyzui.log | cut -d'|' -f4 | sort | uniq -c
+   grep ERROR logs/zooui.log | cut -d'|' -f4 | sort | uniq -c
 
 API Reference
 =============
@@ -460,7 +460,7 @@ LoggerConfig Class
 
 .. py:class:: LoggerConfig
 
-   Centralized logger configuration for PyZUI.
+   Centralized logger configuration for ZooUI.
 
    .. py:method:: initialize(debug=False, log_to_file=True, log_to_console=True, log_dir=None, colored_output=True, verbose=False)
 
@@ -519,7 +519,7 @@ Convenience Functions
 
    .. code-block:: python
 
-      from pyzui.logger import get_logger
+      from zooui.logger import get_logger
 
       logger = get_logger('MyModule')
       logger.info('Module initialized')
@@ -658,7 +658,7 @@ Common Issues
 
     .. code-block:: python
 
-       from pyzui.logger import LoggerConfig
+       from zooui.logger import LoggerConfig
        LoggerConfig.initialize(debug=True)
 
 **Too much console output**
@@ -671,7 +671,7 @@ Common Issues
 
     .. code-block:: python
 
-       from pyzui.logger import LoggerConfig
+       from zooui.logger import LoggerConfig
        print(LoggerConfig.get_log_file_path())
 
     - Verify log directory exists and is writable
@@ -709,7 +709,7 @@ If you have old code using the standard logging module directly:
 
 .. code-block:: python
 
-   from pyzui.logger import get_logger
+   from zooui.logger import get_logger
 
    class MyClass:
        def __init__(self):
@@ -762,7 +762,7 @@ Here's a complete example of debugging a tile loading issue:
 
 .. code-block:: bash
 
-   $ grep "tile 12345" logs/pyzui.log
+   $ grep "tile 12345" logs/zooui.log
    2025-12-09 14:23:45 | [DEBUG   ] | TileManager  | load_tile     | Loading tile 12345
    2025-12-09 14:23:45 | [ERROR   ] | TileManager  | load_tile     | Failed to load tile 12345
 
@@ -775,7 +775,7 @@ Enable debugging conditionally based on runtime conditions:
 
 .. code-block:: python
 
-   from pyzui.logger import LoggerConfig, get_logger
+   from zooui.logger import LoggerConfig, get_logger
    import logging
 
    class TileManager:
@@ -790,7 +790,7 @@ Enable debugging conditionally based on runtime conditions:
        def load_tile(self, tile_id):
            # Temporarily enable debug for this tile if marked
            if tile_id in self.debug_tile_ids:
-               old_level = logging.getLogger(f'pyzui.{self.logger.name}').level
+               old_level = logging.getLogger(f'zooui.{self.logger.name}').level
                LoggerConfig.set_level(logging.DEBUG, module='TileManager')
 
            self.logger.debug(f'Loading tile {tile_id}')
@@ -808,7 +808,7 @@ Use logging to identify performance bottlenecks:
 .. code-block:: python
 
    import time
-   from pyzui.logger import get_logger
+   from zooui.logger import get_logger
 
    class Converter:
        def __init__(self):
@@ -842,6 +842,6 @@ Use logging to identify performance bottlenecks:
 See Also
 ========
 
-* :doc:`../contributionguidelines/contributionguidelines` - Guidelines for contributing to PyZUI
+* :doc:`../contributionguidelines/contributionguidelines` - Guidelines for contributing to ZooUI
 * :doc:`../gettingstarted/installation` - Installation instructions
 * :doc:`../main` - Main documentation

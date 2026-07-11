@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -30,8 +30,8 @@ from unittest.mock import Mock, patch
 import pytest
 from PySide6 import QtCore, QtGui
 
-from pyzui.objects.mediaobjects.stringmediaobject import StringMediaObject
-from pyzui.objects.mediaobjects.mediaobjectsutils.string.textlayout import TextLayoutData
+from zooui.objects.mediaobjects.stringmediaobject import StringMediaObject
+from zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout import TextLayoutData
 
 
 class TestFontThreadSafety:
@@ -205,10 +205,10 @@ class TestFontThreadSafety:
         Then no QFont or QFontMetrics should be constructed on the
              worker thread
         """
-        from pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout import (
+        from zooui.objects.mediaobjects.mediaobjectsutils.string.parallellayout import (
             ParallelLayoutCalculator,
         )
-        from pyzui.objects.scene.sceneutils.prioritybatcher import (
+        from zooui.objects.scene.sceneutils.prioritybatcher import (
             BatchPriority,
             PrioritizedObject,
         )

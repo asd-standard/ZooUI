@@ -3,7 +3,7 @@
 Object System
 =============
 
-This document provides a comprehensive overview of the object system architecture in PyZUI,
+This document provides a comprehensive overview of the object system architecture in ZooUI,
 explaining how objects are positioned, rendered, and animated within the Zooming User Interface.
 The object system is responsible for managing the spatial relationships, physics simulation,
 autosave backups, clipboard operations, parallel rendering, and rendering of all elements
@@ -361,7 +361,7 @@ SceneParallelRenderer
 
 :class:`SceneParallelRenderer` handles parallel rendering of StringMediaObject
 text layouts in background threads, improving performance for scenes with many
-text objects. Located at :doc:`../pyzui/parallel`.
+text objects. Located at :doc:`../zooui/parallel`.
 
 **Key Features:**
 
@@ -385,12 +385,12 @@ SceneAutosaveManager
 ^^^^^^^^^^^^^^^^^^^^
 
 :class:`SceneAutosaveManager` provides timer-based automatic backup creation for
-scene files. Located at :doc:`../pyzui/autosave`.
+scene files. Located at :doc:`../zooui/autosave`.
 
 **Key Features:**
 
 - **Timer-based**: Configurable interval (default: 5 minutes)
-- **Per-scene directories**: ``~/.pyzui/backups/{filename}_{4char_hash}/``
+- **Per-scene directories**: ``~/.zooui/backups/{filename}_{4char_hash}/``
 - **Rotation**: Keeps last N backups, deletes oldest automatically (default: 20)
 - **Expiration**: Inactive scene directories expire after N days (default: 7)
 - **Enabled by default**: Autosave starts automatically after scene load
@@ -401,7 +401,7 @@ SceneClipboardManager
 ^^^^^^^^^^^^^^^^^^^^^
 
 :class:`SceneClipboardManager` provides copy/paste operations for scene objects.
-Located at :doc:`../pyzui/clipboard`.
+Located at :doc:`../zooui/clipboard`.
 
 **Key Features:**
 
@@ -423,7 +423,7 @@ TiledMediaObject
 
 - **Format Support**: PDF, PPM, and standard images (JPG, PNG, GIF, TIFF)
 - **Converters**: Automatic conversion via PDFConverter or VipsConverter,
-  with process-based parallel conversion via :doc:`../pyzui/converterrunner`
+  with process-based parallel conversion via :doc:`../zooui/converterrunner`
 - **Tile Pyramid**: Multi-resolution tile structure for efficient zooming
 - **Progressive Loading**: Shows placeholder with progress percentage
 - **Caching**: Intelligent tile block caching with age-based invalidation
@@ -531,7 +531,7 @@ StringMediaObject uses two rendering modes to balance quality and performance:
 
 For scenes with many StringMediaObjects, :class:`ParallelLayoutCalculator`
 computes text layouts in a thread pool. Located at
-:doc:`../pyzui/parallellayout`. Key features:
+:doc:`../zooui/parallellayout`. Key features:
 
 - Thread-safe design — no Qt objects constructed on worker threads
 - Uses ``TextLayoutData`` dataclass for pre-calculated layout results
@@ -557,7 +557,7 @@ caching, modification tracking, and utility support.
 **SVG Cache Integration:**
 
 SVGs can be loaded from a file path or from the disk-backed SVGCache
-(:doc:`../pyzui/svgcache`) using a content-hash based ``media_id`` with
+(:doc:`../zooui/svgcache`) using a content-hash based ``media_id`` with
 an ``svg_`` prefix:
 
 .. code-block:: text
@@ -667,17 +667,17 @@ XML element inspection. When a shape is detected, the utility can:
 
 **See Also:**
 
-- :doc:`../pyzui/svgarrowutils`
-- :doc:`../pyzui/svgcircleutils`
-- :doc:`../pyzui/svgsquareutils`
-- :doc:`../pyzui/svgtriangleutils`
-- :doc:`../pyzui/svgcache`
+- :doc:`../zooui/svgarrowutils`
+- :doc:`../zooui/svgcircleutils`
+- :doc:`../zooui/svgsquareutils`
+- :doc:`../zooui/svgtriangleutils`
+- :doc:`../zooui/svgcache`
 
 SVGCache
 ~~~~~~~~
 
 :class:`SVGCache` provides a disk-backed content-addressable cache for SVG data.
-Located at :doc:`../pyzui/svgcache`.
+Located at :doc:`../zooui/svgcache`.
 
 **Key Features:**
 
@@ -691,7 +691,7 @@ Located at :doc:`../pyzui/svgcache`.
 
 .. code-block:: python
 
-    from pyzui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
+    from zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
 
     cache = get_svg_cache(base_dir)
 
@@ -709,7 +709,7 @@ TextLayoutData
 
 :class:`TextLayoutData` is a dataclass storing pre-calculated text layout
 information for StringMediaObject rendering. Located at
-:doc:`../pyzui/textlayout`.
+:doc:`../zooui/textlayout`.
 
 **Key Fields:**
 
@@ -728,7 +728,7 @@ ParallelLayoutCalculator
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 :class:`ParallelLayoutCalculator` manages parallel text layout calculation
-using thread pools. Located at :doc:`../pyzui/parallellayout`.
+using thread pools. Located at :doc:`../zooui/parallellayout`.
 
 **Key Features:**
 
@@ -741,7 +741,7 @@ using thread pools. Located at :doc:`../pyzui/parallellayout`.
 Coordinate Systems and Reference Frames
 ----------------------------------------
 
-Understanding the coordinate transformations is crucial for working with PyZUI.
+Understanding the coordinate transformations is crucial for working with ZooUI.
 
 Reference Frame Hierarchy
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -813,7 +813,7 @@ This ensures the centre point ``C`` maintains its screen position during zoom.
 **ZoomManager:**
 
 :class:`ZoomManager` enforces zoom level limits to prevent crashes at extreme
-zoom levels. Located at :doc:`../pyzui/zoommanager`.
+zoom levels. Located at :doc:`../zooui/zoommanager`.
 
 .. code-block:: python
 
@@ -972,7 +972,7 @@ PriorityBatcher
 ~~~~~~~~~~~~~~~
 
 :class:`PriorityBatcher` provides viewport-aware priority batching for text
-objects in parallel rendering. Located at :doc:`../pyzui/prioritybatcher`.
+objects in parallel rendering. Located at :doc:`../zooui/prioritybatcher`.
 
 **Priority Levels:**
 
@@ -1092,7 +1092,7 @@ Autosave Subsystem
 ~~~~~~~~~~~~~~~~~~
 
 The autosave subsystem provides automatic backup creation for scene files to
-prevent data loss. See :doc:`../pyzui/autosave` and :doc:`../pyzui/backupmanager`.
+prevent data loss. See :doc:`../zooui/autosave` and :doc:`../zooui/backupmanager`.
 
 **Configuration:**
 
@@ -1111,7 +1111,7 @@ prevent data loss. See :doc:`../pyzui/autosave` and :doc:`../pyzui/backupmanager
 
 .. code-block:: text
 
-    ~/.pyzui/backups/
+    ~/.zooui/backups/
     ├── scene1_a1b2/           ← Per-scene directory (filename + 4-char hash)
     │   ├── 26_05_09_14_30_c3d4.pzs
     │   ├── 26_05_09_14_35_e5f6.pzs
@@ -1132,7 +1132,7 @@ prevent data loss. See :doc:`../pyzui/autosave` and :doc:`../pyzui/backupmanager
 **BackupManager:**
 
 :class:`BackupManager` handles the filesystem operations for the autosave
-system. Located at :doc:`../pyzui/backupmanager`. Key methods:
+system. Located at :doc:`../zooui/backupmanager`. Key methods:
 
 - ``create_backup(scene, filepath)``: Creates timestamped backup
 - ``rotate_backups(scene_dir, max_backups)``: Deletes oldest backups
@@ -1158,10 +1158,10 @@ Creating and Populating a Scene
 
 .. code-block:: python
 
-    from pyzui.objects.scene.scene import Scene, load_scene
-    from pyzui.objects.mediaobjects.tiledmediaobject import TiledMediaObject
-    from pyzui.objects.mediaobjects.stringmediaobject import StringMediaObject
-    from pyzui.objects.mediaobjects.svgmediaobject import SVGMediaObject
+    from zooui.objects.scene.scene import Scene, load_scene
+    from zooui.objects.mediaobjects.tiledmediaobject import TiledMediaObject
+    from zooui.objects.mediaobjects.stringmediaobject import StringMediaObject
+    from zooui.objects.mediaobjects.svgmediaobject import SVGMediaObject
 
     # Create new scene with configuration
     config = {
@@ -1179,7 +1179,7 @@ Creating and Populating a Scene
     scene.add(image)
 
     # Add text
-    text = StringMediaObject('string:ff0000:Welcome to PyZUI!', scene)
+    text = StringMediaObject('string:ff0000:Welcome to ZooUI!', scene)
     text.pos = (100, 100)
     text.zoomlevel = 0
     scene.add(text)
@@ -1263,7 +1263,7 @@ Working with SVGCache
 
 .. code-block:: python
 
-    from pyzui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import (
+    from zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import (
         get_svg_cache,
     )
 
@@ -1329,7 +1329,7 @@ Configuring Autosave
 .. code-block:: python
 
     # Enable autosave with custom settings
-    from pyzui.objects.scene.sceneutils.autosave import SceneAutosaveManager
+    from zooui.objects.scene.sceneutils.autosave import SceneAutosaveManager
 
     autosave_config = {
         "enabled": True,
@@ -1357,33 +1357,33 @@ API Reference
 Key Classes
 ~~~~~~~~~~~
 
-- :class:`pyzui.objects.physicalobject.PhysicalObject` - Base physics simulation
-- :class:`pyzui.objects.mediaobjects.mediaobject.MediaObject` - Abstract media object
-- :class:`pyzui.objects.mediaobjects.tiledmediaobject.TiledMediaObject` - Tiled images
-- :class:`pyzui.objects.mediaobjects.stringmediaobject.StringMediaObject` - Text objects
-- :class:`pyzui.objects.mediaobjects.svgmediaobject.SVGMediaObject` - Vector graphics
-- :class:`pyzui.objects.scene.scene.Scene` - Scene container and coordinator
+- :class:`zooui.objects.physicalobject.PhysicalObject` - Base physics simulation
+- :class:`zooui.objects.mediaobjects.mediaobject.MediaObject` - Abstract media object
+- :class:`zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject` - Tiled images
+- :class:`zooui.objects.mediaobjects.stringmediaobject.StringMediaObject` - Text objects
+- :class:`zooui.objects.mediaobjects.svgmediaobject.SVGMediaObject` - Vector graphics
+- :class:`zooui.objects.scene.scene.Scene` - Scene container and coordinator
 
 Scene Sub-Managers
 ~~~~~~~~~~~~~~~~~~
 
-- :class:`pyzui.objects.scene.sceneutils.parallel.SceneParallelRenderer` - Parallel rendering
-- :class:`pyzui.objects.scene.sceneutils.autosave.SceneAutosaveManager` - Autosave orchestration
-- :class:`pyzui.objects.scene.sceneutils.clipboard.SceneClipboardManager` - Copy/paste operations
+- :class:`zooui.objects.scene.sceneutils.parallel.SceneParallelRenderer` - Parallel rendering
+- :class:`zooui.objects.scene.sceneutils.autosave.SceneAutosaveManager` - Autosave orchestration
+- :class:`zooui.objects.scene.sceneutils.clipboard.SceneClipboardManager` - Copy/paste operations
 
 Rendering Utilities
 ~~~~~~~~~~~~~~~~~~~
 
-- :class:`pyzui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher` - Priority-based batching
-- :class:`pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator` - Thread-pool text layout
-- :class:`pyzui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData` - Pre-calculated layouts
+- :class:`zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher` - Priority-based batching
+- :class:`zooui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator` - Thread-pool text layout
+- :class:`zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData` - Pre-calculated layouts
 
 Zoom and Backup
 ~~~~~~~~~~~~~~~
 
-- :class:`pyzui.objects.objectsutils.zoom.zoommanager.ZoomManager` - Zoom level clamping
-- :class:`pyzui.backup.backupmanager.BackupManager` - Backup storage management
-- :class:`pyzui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache.SVGCache` - SVG disk cache
+- :class:`zooui.objects.objectsutils.zoom.zoommanager.ZoomManager` - Zoom level clamping
+- :class:`zooui.backup.backupmanager.BackupManager` - Backup storage management
+- :class:`zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache.SVGCache` - SVG disk cache
 
 For detailed API documentation, see the individual class documentation pages.
 
@@ -1391,19 +1391,19 @@ See Also
 --------
 
 - :doc:`tilingsystem` - Details on tile pyramid and caching
-- :doc:`pyzui/objects/mediaobjects/tiledmediaobject` - TiledMediaObject implementation details
+- :doc:`zooui/objects/mediaobjects/tiledmediaobject` - TiledMediaObject implementation details
 - :doc:`projectstructure` - Overall project architecture
-- :doc:`../pyzui/autosave` - SceneAutosaveManager API
-- :doc:`../pyzui/clipboard` - SceneClipboardManager API
-- :doc:`../pyzui/parallel` - SceneParallelRenderer API
-- :doc:`../pyzui/prioritybatcher` - PriorityBatcher API
-- :doc:`../pyzui/parallellayout` - ParallelLayoutCalculator API
-- :doc:`../pyzui/textlayout` - TextLayoutData API
-- :doc:`../pyzui/zoommanager` - ZoomManager API
-- :doc:`../pyzui/backupmanager` - BackupManager API
-- :doc:`../pyzui/svgcache` - SVGCache API
-- :doc:`../pyzui/svgarrowutils` - Arrow shape utility
-- :doc:`../pyzui/svgcircleutils` - Circle shape utility
-- :doc:`../pyzui/svgsquareutils` - Square shape utility
-- :doc:`../pyzui/svgtriangleutils` - Triangle shape utility
-- :doc:`../pyzui/converterrunner` - Process-based parallel conversion
+- :doc:`../zooui/autosave` - SceneAutosaveManager API
+- :doc:`../zooui/clipboard` - SceneClipboardManager API
+- :doc:`../zooui/parallel` - SceneParallelRenderer API
+- :doc:`../zooui/prioritybatcher` - PriorityBatcher API
+- :doc:`../zooui/parallellayout` - ParallelLayoutCalculator API
+- :doc:`../zooui/textlayout` - TextLayoutData API
+- :doc:`../zooui/zoommanager` - ZoomManager API
+- :doc:`../zooui/backupmanager` - BackupManager API
+- :doc:`../zooui/svgcache` - SVGCache API
+- :doc:`../zooui/svgarrowutils` - Arrow shape utility
+- :doc:`../zooui/svgcircleutils` - Circle shape utility
+- :doc:`../zooui/svgsquareutils` - Square shape utility
+- :doc:`../zooui/svgtriangleutils` - Triangle shape utility
+- :doc:`../zooui/converterrunner` - Process-based parallel conversion

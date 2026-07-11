@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -27,8 +27,8 @@ import os
 import tempfile
 import urllib.parse
 
-from pyzui.objects.mediaobjects.svgmediaobject import SVGMediaObject
-from pyzui.objects.scene.scene import Scene
+from zooui.objects.mediaobjects.svgmediaobject import SVGMediaObject
+from zooui.objects.scene.scene import Scene
 
 
 def test_svg_embedding_basic():
@@ -147,7 +147,7 @@ def test_large_svg_warning():
             import io
             import logging
 
-            from pyzui.logger import get_logger
+            from zooui.logger import get_logger
 
             # Create string stream to capture logs
             log_capture_string = io.StringIO()

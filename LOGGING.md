@@ -1,6 +1,6 @@
-# PyZUI Logging System
+# ZooUI Logging System
 
-This document describes the new centralized logging system for PyZUI.
+This document describes the new centralized logging system for ZooUI.
 
 ## Overview
 
@@ -47,7 +47,7 @@ Options:
 
 ```bash
 # Debug mode with custom log directory
-python main.py --debug --log-dir /tmp/pyzui-logs
+python main.py --debug --log-dir /tmp/zooui-logs
 
 # Verbose mode with file logging only (no console output)
 python main.py --verbose --no-console
@@ -56,7 +56,7 @@ python main.py --verbose --no-console
 python main.py --no-color
 
 # Load settings from config file
-python main.py --config pyzui_config.json
+python main.py --config zooui_config.json
 ```
 
 ## Configuration File
@@ -76,9 +76,9 @@ You can configure logging via a JSON configuration file:
 }
 ```
 
-Save this as `pyzui_config.json` and run:
+Save this as `zooui_config.json` and run:
 ```bash
-python main.py --config pyzui_config.json
+python main.py --config zooui_config.json
 ```
 
 ## Log Levels
@@ -102,8 +102,8 @@ By default:
 ## Log File Location
 
 Log files are stored in the `logs/` directory by default:
-- Main log: `logs/pyzui.log`
-- Rotated logs: `logs/pyzui.log.1`, `logs/pyzui.log.2`, etc.
+- Main log: `logs/zooui.log`
+- Rotated logs: `logs/zooui.log.1`, `logs/zooui.log.2`, etc.
 
 Each log file has a maximum size of 10 MB, and up to 5 backup files are kept.
 
@@ -112,7 +112,7 @@ Each log file has a maximum size of 10 MB, and up to 5 backup files are kept.
 ### For New Modules
 
 ```python
-from pyzui.logger import get_logger
+from zooui.logger import get_logger
 
 class MyClass:
     def __init__(self):
@@ -131,7 +131,7 @@ class MyClass:
 You can enable/disable debug mode at runtime:
 
 ```python
-from pyzui.logger import LoggerConfig
+from zooui.logger import LoggerConfig
 
 # Enable debug mode during execution
 LoggerConfig.enable_debug()
@@ -153,7 +153,7 @@ LoggerConfig.set_level(logging.INFO)
 
 Example:
 ```
-[INFO    ] main                      | Starting PyZUI application
+[INFO    ] main                      | Starting ZooUI application
 [DEBUG   ] TileManager               | Initializing tile cache
 [WARNING ] Scene                     | Object out of bounds
 [ERROR   ] Converter.myimage.jpg     | Conversion failed
@@ -166,7 +166,7 @@ YYYY-MM-DD HH:MM:SS | [LEVEL   ] | ModuleName               | FunctionName      
 
 Example:
 ```
-2025-11-30 14:23:45 | [INFO    ] | main                      | main                 | Starting PyZUI application
+2025-11-30 14:23:45 | [INFO    ] | main                      | main                 | Starting ZooUI application
 2025-11-30 14:23:45 | [DEBUG   ] | TileManager               | init                 | Initializing tile cache
 ```
 
@@ -183,10 +183,10 @@ When colored output is enabled:
 
 ### Problem: No logs appearing
 
-**Solution**: Check that logging is initialized. The main.py should automatically initialize logging, but if using PyZUI as a library:
+**Solution**: Check that logging is initialized. The main.py should automatically initialize logging, but if using ZooUI as a library:
 
 ```python
-from pyzui.logger import LoggerConfig
+from zooui.logger import LoggerConfig
 
 LoggerConfig.initialize(debug=True)
 ```
@@ -205,7 +205,7 @@ python main.py --no-console  # No console output, file only
 **Solution**: Check the log directory:
 
 ```python
-from pyzui.logger import LoggerConfig
+from zooui.logger import LoggerConfig
 
 print(f"Log file: {LoggerConfig.get_log_file_path()}")
 ```
@@ -220,7 +220,7 @@ python main.py --log-dir /path/to/logs
 ### Per-Module Log Levels
 
 ```python
-from pyzui.logger import LoggerConfig
+from zooui.logger import LoggerConfig
 import logging
 
 # Set debug level only for TileManager
@@ -245,7 +245,7 @@ self.__logger = logging.getLogger("ModuleName")
 
 The new system uses:
 ```python
-from pyzui.logger import get_logger
+from zooui.logger import get_logger
 self.__logger = get_logger("ModuleName")
 ```
 
@@ -295,8 +295,8 @@ All existing logger calls (`.debug()`, `.info()`, `.warning()`, `.error()`, `.cr
 For issues or questions about the logging system, please check the logs first:
 ```bash
 # View recent logs
-tail -f logs/pyzui.log
+tail -f logs/zooui.log
 
 # Search for errors
-grep ERROR logs/pyzui.log
+grep ERROR logs/zooui.log
 ```

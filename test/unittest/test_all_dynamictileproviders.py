@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -17,7 +17,7 @@
 Automated test suite for all DynamicTileProvider implementations.
 
 This test file automatically discovers all *dynamictileprovider.py files
-in pyzui/tilesystem/tileproviders/ and runs a standard test suite on each.
+in zooui/tilesystem/tileproviders/ and runs a standard test suite on each.
 
 Tests ensure that all dynamic tile providers:
 1. Initialize correctly
@@ -38,7 +38,7 @@ from unittest.mock import Mock, patch
 import pytest
 
 # Import base classes
-from pyzui.tilesystem.tileproviders import DynamicTileProvider
+from zooui.tilesystem.tileproviders import DynamicTileProvider
 
 # =============================================================================
 # PROVIDER DISCOVERY
@@ -52,13 +52,13 @@ def discover_dynamic_providers() -> list[tuple[str, type]]:
     Returns:
         List of tuples: [(provider_name, ProviderClass), ...]
 
-    Scans pyzui/tilesystem/tileproviders/ for files matching *dynamictileprovider.py
+    Scans zooui/tilesystem/tileproviders/ for files matching *dynamictileprovider.py
     and extracts classes that inherit from DynamicTileProvider.
     """
     providers = []
 
     # Get the tileproviders directory path
-    tileproviders_dir = Path(__file__).parent.parent.parent / "pyzui" / "tilesystem" / "tileproviders"
+    tileproviders_dir = Path(__file__).parent.parent.parent / "zooui" / "tilesystem" / "tileproviders"
 
     # Find all *dynamictileprovider.py files
     for filepath in tileproviders_dir.glob("*dynamictileprovider.py"):
@@ -70,7 +70,7 @@ def discover_dynamic_providers() -> list[tuple[str, type]]:
 
         try:
             # Import the module dynamically
-            module = importlib.import_module(f"pyzui.tilesystem.tileproviders.{module_name}")
+            module = importlib.import_module(f"zooui.tilesystem.tileproviders.{module_name}")
 
             # Find all classes in the module that inherit from DynamicTileProvider
             for name, obj in inspect.getmembers(module, inspect.isclass):
@@ -104,7 +104,7 @@ class TestAllDynamicTileProviders:
     Feature: Automated DynamicTileProvider Discovery and Testing
 
     This class automatically discovers all DynamicTileProvider implementations and runs a comprehensive
-    test suite on each to ensure they follow the required contract and will work correctly with PyZUI's tile system.
+    test suite on each to ensure they follow the required contract and will work correctly with ZooUI's tile system.
     """
 
     # -------------------------------------------------------------------------
@@ -354,7 +354,7 @@ class TestProviderDiscovery:
         """
         assert len(DISCOVERED_PROVIDERS) > 0, (
             "No dynamic tile providers were discovered. "
-            "Ensure *dynamictileprovider.py files exist in pyzui/tilesystem/tileproviders/"
+            "Ensure *dynamictileprovider.py files exist in zooui/tilesystem/tileproviders/"
         )
 
     def test_discovery_finds_known_providers(self):
@@ -407,7 +407,7 @@ RUNNING THESE TESTS:
 ADDING A NEW PROVIDER:
 ---------------------
 
-1. Create your provider file in pyzui/tilesystem/tileproviders/
+1. Create your provider file in zooui/tilesystem/tileproviders/
    Name it: yourproviderdynamictileprovider.py
 
 2. Implement your provider class inheriting from DynamicTileProvider:
@@ -449,5 +449,5 @@ For EACH discovered provider, this test suite automatically verifies:
 ✓ Generates and saves tiles for valid coordinates
 
 This ensures all providers follow the same contract and will work
-correctly with PyZUI's tile system.
+correctly with ZooUI's tile system.
 """

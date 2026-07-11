@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -17,8 +17,8 @@ import time
 from threading import Event, Thread
 from unittest.mock import Mock, patch
 
-from pyzui.tilesystem.tile import Tile
-from pyzui.tilesystem.tileproviders import TileProvider
+from zooui.tilesystem.tile import Tile
+from zooui.tilesystem.tileproviders import TileProvider
 
 
 def wait_for_cache(cache, tile_ids, timeout=5.0):
@@ -242,7 +242,7 @@ class TestTileProvider:
             return mock_image
 
         with patch.object(provider, "_load", side_effect=mock_load):
-            with patch("pyzui.tilesystem.tileproviders.tileprovider.Tile", return_value=mock_tile):
+            with patch("zooui.tilesystem.tileproviders.tileprovider.Tile", return_value=mock_tile):
                 provider.start()
 
                 tile_id = ("test_media", 0, 0, 0)
@@ -279,7 +279,7 @@ class TestTileProvider:
             return Mock()
 
         with patch.object(provider, "_load", side_effect=mock_load):
-            with patch("pyzui.tilesystem.tileproviders.tileprovider.Tile", return_value=Mock(spec=Tile)):
+            with patch("zooui.tilesystem.tileproviders.tileprovider.Tile", return_value=Mock(spec=Tile)):
                 provider.start()
 
                 # Request tiles in order: A, B, C
@@ -390,7 +390,7 @@ class TestTileProvider:
             return Mock()
 
         with patch.object(provider, "_load", side_effect=mock_load):
-            with patch("pyzui.tilesystem.tileproviders.tileprovider.Tile", return_value=Mock(spec=Tile)):
+            with patch("zooui.tilesystem.tileproviders.tileprovider.Tile", return_value=Mock(spec=Tile)):
                 provider.start()
 
                 # Request a different tile first to ensure thread is running
@@ -427,7 +427,7 @@ class TestTileProvider:
             return Mock()
 
         with patch.object(provider, "_load", side_effect=mock_load):
-            with patch("pyzui.tilesystem.tileproviders.tileprovider.Tile", return_value=Mock(spec=Tile)):
+            with patch("zooui.tilesystem.tileproviders.tileprovider.Tile", return_value=Mock(spec=Tile)):
                 provider.start()
 
                 # Request multiple tiles
@@ -470,7 +470,7 @@ class TestTileProvider:
             return Mock()
 
         with patch.object(provider, "_load", side_effect=mock_load):
-            with patch("pyzui.tilesystem.tileproviders.tileprovider.Tile", return_value=Mock(spec=Tile)):
+            with patch("zooui.tilesystem.tileproviders.tileprovider.Tile", return_value=Mock(spec=Tile)):
                 provider.start()
 
                 # Request first tile
@@ -504,7 +504,7 @@ class TestTileProvider:
             return Mock()
 
         with patch.object(provider, "_load", side_effect=mock_load):
-            with patch("pyzui.tilesystem.tileproviders.tileprovider.Tile", return_value=Mock(spec=Tile)):
+            with patch("zooui.tilesystem.tileproviders.tileprovider.Tile", return_value=Mock(spec=Tile)):
                 provider.start()
 
                 # Queue several tasks

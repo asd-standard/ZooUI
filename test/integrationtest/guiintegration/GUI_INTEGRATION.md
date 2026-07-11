@@ -1,10 +1,10 @@
 # GUI Integration Test Documentation
 
-This document describes the GUI integration test suite for PyZUI, located at `test/integrationtest/guiintegration/`.
+This document describes the GUI integration test suite for ZooUI, located at `test/integrationtest/guiintegration/`.
 
 ## Overview
 
-The GUI integration test is a comprehensive end-to-end test that launches the full PyZUI application and performs all possible user interactions as documented in `userinterface.rst`. The test is designed for **human visual verification** - each action is logged at DEBUG level and executed with appropriate time delays so a human observer can verify the behavior visually.
+The GUI integration test is a comprehensive end-to-end test that launches the full ZooUI application and performs all possible user interactions as documented in `userinterface.rst`. The test is designed for **human visual verification** - each action is logged at DEBUG level and executed with appropriate time delays so a human observer can verify the behavior visually.
 
 ## Important Notes
 
@@ -113,7 +113,7 @@ The test suite is organized into numbered steps grouped by functionality:
 The test creates a pytest-style temporary directory structure:
 
 ```
-/tmp/pytest-of-{username}/pytest-{n}/pyzui_gui_test0/
+/tmp/pytest-of-{username}/pytest-{n}/zooui_gui_test0/
 ├── media_directory/
 │   ├── 01_red_stripes.png
 │   ├── 02_green_gradient.png
@@ -177,7 +177,7 @@ Log files are written to the `logs/` directory in the project root.
 
 ### File Menu Operations
 - Creating new blank scenes
-- Opening the home scene (PyZUI logo)
+- Opening the home scene (ZooUI logo)
 - Loading images from a directory (`open_media_dir` action)
 - Saving and loading scenes (`.pzs` format)
 - Saving screenshots
@@ -286,9 +286,9 @@ Some window managers may intercept certain key combinations. Try running in full
 ============================================================
 [Test Resources Created]
 ============================================================
-  Temp directory:   /tmp/pytest-of-user/pytest-5/pyzui_gui_test0
-  Media directory:  /tmp/pytest-of-user/pytest-5/pyzui_gui_test0/media_directory
-  Save directory:   /tmp/pytest-of-user/pytest-5/pyzui_gui_test0/save_output
+  Temp directory:   /tmp/pytest-of-user/pytest-5/zooui_gui_test0
+  Media directory:  /tmp/pytest-of-user/pytest-5/zooui_gui_test0/media_directory
+  Save directory:   /tmp/pytest-of-user/pytest-5/zooui_gui_test0/save_output
   Images created:   6
 ============================================================
 
@@ -299,7 +299,7 @@ Some window managers may intercept certain key combinations. Try running in full
 ######################################################################
 
 ============================================================
-STEP 1: Loading media directory: /tmp/pytest-of-user/pytest-5/pyzui_gui_test0/media_directory
+STEP 1: Loading media directory: /tmp/pytest-of-user/pytest-5/zooui_gui_test0/media_directory
 ============================================================
   -> Loading media directory via action: /tmp/pytest-of-user/pytest-5/...
   -> Waiting for image to load: All images from media directory loading
@@ -315,7 +315,7 @@ STEP 1: Loading media directory: /tmp/pytest-of-user/pytest-5/pyzui_gui_test0/me
 ## Related Files
 
 - `doc/userinterface.rst` - User interface documentation that defines all tested interactions
-- `pyzui/windows/mainwindow.py` - Main window implementation
-- `pyzui/objects/scene/scene.py` - Scene management
-- `pyzui/tilesystem/tilemanager.py` - Image tiling system
+- `zooui/windows/mainwindow.py` - Main window implementation
+- `zooui/objects/scene/scene.py` - Scene management
+- `zooui/tilesystem/tilemanager.py` - Image tiling system
 - `test/integrationtest/guiintegration/` - This test suite directory

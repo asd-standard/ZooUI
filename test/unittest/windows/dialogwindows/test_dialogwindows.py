@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -19,20 +19,20 @@ class TestDialogWindows:
     Feature: DialogWindows Module
 
     This class tests the dialogwindows module to ensure it exists and is properly structured
-    within the PyZUI windows system.
+    within the ZooUI windows system.
     """
 
     def test_module_exists(self):
         """
         Scenario: Verify dialogwindows module exists
 
-        Given the PyZUI windows system
+        Given the ZooUI windows system
         When importing the dialogwindows module
         Then the module should be successfully imported
         """
-        import pyzui.windows.dialogwindows.dialogwindows
+        import zooui.windows.dialogwindows.dialogwindows
 
-        assert pyzui.windows.dialogwindows.dialogwindows is not None
+        assert zooui.windows.dialogwindows.dialogwindows is not None
 
     def test_placeholder(self):
         """

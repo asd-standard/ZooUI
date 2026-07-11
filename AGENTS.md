@@ -1,6 +1,6 @@
-# PyZUI Agent Guidelines
+# ZooUI Agent Guidelines
 
-This document provides essential information for AI agents working on the PyZUI codebase. PyZUI is a Python Zooming User Interface (ZUI) application built with PySide6/Qt.
+This document provides essential information for AI agents working on the ZooUI codebase. ZooUI is a Python Zooming User Interface (ZUI) application built with PySide6/Qt.
 
 ## Table of Contents
 1. [Build and Run Commands](#build-and-run-commands)
@@ -16,13 +16,13 @@ This document provides essential information for AI agents working on the PyZUI 
 ### Running the Application
 ```bash
 # Using the launcher script (recommended)
-./pyzui.sh
+./zooui.sh
 
 # Or directly (with an active conda environment)
 python main.py
 
 # With configuration file
-python main.py --config pyzui_config_example.json
+python main.py --config zooui_config_example.json
 ```
 
 ### Environment Setup
@@ -32,8 +32,8 @@ with Python 3.12+, PySide6, and other dependencies (see `pyproject.toml`).
 **Setup Commands:**
 ```bash
 # Create and activate an environment
-conda create -n pyzui python=3.12
-conda activate pyzui
+conda create -n zooui python=3.12
+conda activate zooui
 
 # Install runtime dependencies
 pip install PySide6 Pillow pyvips
@@ -48,7 +48,7 @@ pre-commit install
 **Note for Wayland users:** Install `qt6-wayland` (via conda or your system package
 manager) for native Wayland support and hardware acceleration.
 
-The `pyzui.sh` launcher uses `conda run -n pyzui` by default. Set the
+The `zooui.sh` launcher uses `conda run -n zooui` by default. Set the
 `CONDA_ENV` environment variable to override the environment name.
 
 ### Documentation Generation
@@ -124,14 +124,14 @@ python test/integrationtest/guiintegration/main.py --list-steps
 ### Coverage Reports
 ```bash
 # Generate HTML coverage report (from project root)
-pytest --cov=pyzui --cov-report=html
+pytest --cov=zooui --cov-report=html
 # Open htmlcov/index.html in browser
 
 # Terminal coverage report
-pytest --cov=pyzui --cov-report=term-missing
+pytest --cov=zooui --cov-report=term-missing
 
 # Coverage for specific module
-pytest --cov=pyzui.tilesystem --cov-report=term
+pytest --cov=zooui.tilesystem --cov-report=term
 
 # Parallel test execution
 pytest -n auto
@@ -152,28 +152,28 @@ pytest test/unittest/ test/integrationtest/
 ### Ruff (linter + formatter)
 ```bash
 # Run linter on source code only
-conda run -n pyzui ruff check
+conda run -n zooui ruff check
 
 # Run linter + autofix (safe fixes)
-conda run -n pyzui ruff check --fix
+conda run -n zooui ruff check --fix
 
 # Run linter + autofix (all fixes, including unsafe)
-conda run -n pyzui ruff check --fix --unsafe-fixes
+conda run -n zooui ruff check --fix --unsafe-fixes
 
 # Format code (like Black)
-conda run -n pyzui ruff format
+conda run -n zooui ruff format
 
 # Check formatting without applying
-conda run -n pyzui ruff format --check
+conda run -n zooui ruff format --check
 ```
 
 ### mypy (type checker)
 ```bash
 # Run type checker on source code
-conda run -n pyzui mypy --explicit-package-bases --follow-imports=skip pyzui/
+conda run -n zooui mypy --explicit-package-bases --follow-imports=skip zooui/
 
 # Run on a single file
-conda run -n pyzui mypy pyzui/path/to/file.py
+conda run -n zooui mypy zooui/path/to/file.py
 ```
 
 **Note:** mypy is run manually, not in pre-commit. There are ~176 type issues to fix
@@ -182,10 +182,10 @@ incrementally before it can be added to CI.
 ### pre-commit (runs automatically before every commit)
 ```bash
 # Run all hooks manually on all files
-conda run -n pyzui pre-commit run --all-files
+conda run -n zooui pre-commit run --all-files
 
 # Install hooks (one-time setup)
-conda run -n pyzui pre-commit install
+conda run -n zooui pre-commit install
 ```
 
 **Current hooks:** ruff (checks + autofix imports/style) and ruff-format (code formatting).
@@ -196,7 +196,7 @@ Test files (`test/`) and scripts (`scripts/`) are excluded from linting.
 ### File Headers
 Every Python file must start with the GPL license header:
 ```python
-## PyZUI - Python Zooming User Interface
+## ZooUI - Python Zooming User Interface
 ## Copyright (C) 2009 David Roberts <d@vidr.cc>
 ##
 ## This program is free software; you can redistribute it and/or
@@ -226,8 +226,8 @@ from PySide6 import QtCore, QtGui, QtWidgets
 from PIL import Image
 
 # Local imports
-from pyzui.objects.scene import scene as Scene
-from pyzui.tilesystem import tilemanager as TileManager
+from zooui.objects.scene import scene as Scene
+from zooui.tilesystem import tilemanager as TileManager
 ```
 
 ### Type Hints
@@ -300,7 +300,7 @@ def load_config(config_file=None):
 ## Project Structure
 
 ```
-pyzui/
+zooui/
 ├── __init__.py              # Package exports and metadata
 ├── logger.py               # Centralized logging configuration
 ├── objects/                # Object system
@@ -339,23 +339,23 @@ logs/                     # Log files (gitignored)
 
 ### Key Configuration Files
 - `pyproject.toml` - Project metadata, ruff, and mypy configuration
-- `pyzui_config_example.json` - Example configuration
+- `zooui_config_example.json` - Example configuration
 - `.gitignore` - Git ignore patterns
-- `pyzui.sh` - Application launcher script
+- `zooui.sh` - Application launcher script
 
 ## Development Workflow
 
 ### Setting Up Development Environment
-1. Create conda environment: `conda create -n pyzui python=3.12`
-2. Activate environment: `conda activate pyzui`
+1. Create conda environment: `conda create -n zooui python=3.12`
+2. Activate environment: `conda activate zooui`
 3. Install runtime deps: `pip install PySide6 Pillow pyvips`
 4. Install dev dependencies: `pip install pytest pytest-cov pytest-xdist ruff mypy pre-commit`
 5. Install pre-commit hooks: `pre-commit install`
 
 ### Adding New Features
 1. **New DynamicTileProvider**: Use template `test/unittest/test_new_dynamictileprovider_TEMPLATE.py`
-2. **New Converter**: Follow patterns in `pyzui/converters/`
-3. **New UI Component**: Follow patterns in `pyzui/windows/`
+2. **New Converter**: Follow patterns in `zooui/converters/`
+3. **New UI Component**: Follow patterns in `zooui/windows/`
 
 ### Writing Tests
 1. Create test file matching source structure
@@ -367,7 +367,7 @@ logs/                     # Log files (gitignored)
 ### Before Committing
 1. Run unit tests: `cd test/unittest && pytest`
 2. Run integration tests: `cd test/integrationtest && pytest`
-3. Check coverage: `pytest --cov=pyzui --cov-report=term-missing`
+3. Check coverage: `pytest --cov=zooui --cov-report=term-missing`
 4. Ensure all tests pass
 5. Update `CHANGELOG.md` under `[Unreleased]` with your changes
 6. Update documentation if needed
@@ -376,7 +376,7 @@ logs/                     # Log files (gitignored)
 
 ### Navigating the Codebase
 - **Start with `main.py`** to understand application entry point
-- **Check `pyzui/__init__.py`** for package structure and exports
+- **Check `zooui/__init__.py`** for package structure and exports
 - **Review test files** to understand component behavior
 - **Consult documentation** in `docs/` for detailed explanations
 
@@ -421,7 +421,7 @@ logs/                     # Log files (gitignored)
 ### Essential Commands
 ```bash
 # Run application
-./pyzui.sh
+./zooui.sh
 
 # Run all unit tests
 cd test/unittest && pytest
@@ -433,7 +433,7 @@ cd test/integrationtest && pytest
 pytest test/unittest/tilesystem/test_tile.py::TestTile::test_init_with_pil_image
 
 # Generate coverage report
-pytest --cov=pyzui --cov-report=html
+pytest --cov=zooui --cov-report=html
 
 # Generate documentation
 cd docs && make html
@@ -443,7 +443,7 @@ cd docs && make html
 ```python
 import pytest
 from unittest.mock import Mock, patch, MagicMock
-from pyzui.module import ClassToTest
+from zooui.module import ClassToTest
 
 # Common pytest features
 pytest.approx()      # Floating point comparison
@@ -470,8 +470,8 @@ with pytest.raises(ValueError):
 
 ## Versioning
 
-PyZUI uses [Semantic Versioning](https://semver.org/) (MAJOR.MINOR.PATCH).
-The single source of truth is `pyzui/__init__.py` → `__version__`.
+ZooUI uses [Semantic Versioning](https://semver.org/) (MAJOR.MINOR.PATCH).
+The single source of truth is `zooui/__init__.py` → `__version__`.
 
 ### Version Bump Criteria
 
@@ -489,11 +489,14 @@ or public API.
 ### Release Workflow
 
 1. **Update CHANGELOG.md**: Move entries from `[Unreleased]` to a new version heading
-2. **Bump version** (updates `pyzui/__init__.py`, `pyproject.toml`, and `data/home.pzs` automatically):
+2. **Bump version** (updates `zooui/__init__.py`, `pyproject.toml`, and `data/home.pzs` automatically):
    ```bash
    python scripts/bump_version.py patch    # bug fixes, refactors, docs, minor UI
    python scripts/bump_version.py minor    # major features, new capabilities, new architectures
    python scripts/bump_version.py major    # breaking changes
+   python scripts/bump_version.py patch -b # decrement patch backwards
+   python scripts/bump_version.py minor -b # decrement minor backwards
+   python scripts/bump_version.py current  # re-capture home screenshot without bumping
    ```
 3. **Tag the release**:
    ```bash
@@ -505,12 +508,12 @@ or public API.
    ```
 
 ### Key Files
-- `pyzui/__init__.py` — canonical version string (`__version__`)
+- `zooui/__init__.py` — canonical version string (`__version__`)
 - `pyproject.toml` — project version metadata
 - `CHANGELOG.md` — per-version change log (Keep a Changelog format)
 - `data/home.pzs` — default scene file (version text updated automatically by bump script)
 - `scripts/bump_version.py` — version bump utility
-- `docs/source/conf.py` — reads version from `pyzui.__version__`
+- `docs/source/conf.py` — reads version from `zooui.__version__`
 
 ## Autosave Feature Reference
 
@@ -518,7 +521,7 @@ or public API.
 The autosave feature provides automatic backup creation for scene files with per-scene directories, configurable interval, rotation, and expiration. Enabled by default.
 
 ### Configuration
-- **Root location**: `~/.pyzui/backups/`
+- **Root location**: `~/.zooui/backups/`
 - **Per-scene directories**: `{scene_filename}_{4char_path_hash}/` under backup root
 - **File naming**: `yy_mm_dd_hh_mm_filename_hash.pzs` (timestamp first for chronological sorting)
 - **Rotation**: Keep last N backups per scene (configurable), delete oldest automatically
@@ -546,11 +549,11 @@ The autosave feature provides automatic backup creation for scene files with per
 ```
 
 ### Key Components
-1. **`pyzui/config.py`**: User configuration management
-2. **`pyzui/backup/backupmanager.py`**: Per-scene backup creation and rotation
-3. **`pyzui/objects/scene/sceneutils/autosave.py`**: Timer-based autosave orchestration
-4. **`pyzui/windows/dialogwindows/autosavesettingsdialog.py`**: Settings UI (enabled by default)
-5. **`pyzui/objects/scene/scene.py`**: Scene integration (enabled at startup)
+1. **`zooui/config.py`**: User configuration management
+2. **`zooui/backup/backupmanager.py`**: Per-scene backup creation and rotation
+3. **`zooui/objects/scene/sceneutils/autosave.py`**: Timer-based autosave orchestration
+4. **`zooui/windows/dialogwindows/autosavesettingsdialog.py`**: Settings UI (enabled by default)
+5. **`zooui/objects/scene/scene.py`**: Scene integration (enabled at startup)
 
 ### Testing
 - **Config tests**: `test/unittest/test_config.py`

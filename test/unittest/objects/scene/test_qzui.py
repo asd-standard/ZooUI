@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -19,20 +19,20 @@ class TestQZUI:
     Feature: QZUI Module
 
     This class tests the QZUI module to ensure it exists and the QZUI class is properly
-    defined within the PyZUI scene system.
+    defined within the ZooUI scene system.
     """
 
     def test_module_exists(self):
         """
         Scenario: Verify qzui module exists
 
-        Given the PyZUI scene system
+        Given the ZooUI scene system
         When importing the qzui module
         Then the module should be successfully imported
         """
-        import pyzui.objects.scene.qzui
+        import zooui.objects.scene.qzui
 
-        assert pyzui.objects.scene.qzui is not None
+        assert zooui.objects.scene.qzui is not None
 
     def test_qzui_class_exists(self):
         """
@@ -42,7 +42,7 @@ class TestQZUI:
         When checking for the QZUI class
         Then the class should be defined
         """
-        from pyzui.objects.scene.qzui import QZUI
+        from zooui.objects.scene.qzui import QZUI
 
         assert QZUI is not None
 

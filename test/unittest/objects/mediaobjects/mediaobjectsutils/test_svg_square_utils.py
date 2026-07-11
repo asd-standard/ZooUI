@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ## Copyright (C) 2009 David Roberts <d@vidr.cc>
 ##
 ## This program is free software; you can redistribute it and/or
@@ -28,7 +28,7 @@ import tempfile
 
 import pytest
 
-from pyzui.objects.mediaobjects.mediaobjectsutils import elongate_square, get_rectangle_bounds, is_square_svg
+from zooui.objects.mediaobjects.mediaobjectsutils import elongate_square, get_rectangle_bounds, is_square_svg
 
 
 class TestSVGSquareUtils:
@@ -41,7 +41,7 @@ class TestSVGSquareUtils:
 
     def setup_method(self):
         """Create test directory and sample SVG files."""
-        self.test_dir = tempfile.mkdtemp(prefix="pyzui_test_")
+        self.test_dir = tempfile.mkdtemp(prefix="zooui_test_")
         self.square_svg = os.path.join(self.test_dir, "square.svg")
         self.non_square_svg = os.path.join(self.test_dir, "not_square.svg")
 
@@ -135,7 +135,7 @@ class TestSVGSquareUtils:
         assert len(cache_hash) == 12  # "svg_" + 8 chars
 
         # Verify the cache hash can be retrieved
-        from pyzui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
+        from zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
         cache = get_svg_cache()
         elongated_content = cache.get_svg_content(cache_hash)
         assert elongated_content is not None
@@ -175,7 +175,7 @@ class TestSVGSquareUtils:
 
         assert cache_hash.startswith("svg_")
 
-        from pyzui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
+        from zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
         cache = get_svg_cache()
         elongated_content = cache.get_svg_content(cache_hash)
         assert elongated_content is not None
@@ -214,7 +214,7 @@ class TestSVGSquareUtils:
 
         assert cache_hash.startswith("svg_")
 
-        from pyzui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
+        from zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
         cache = get_svg_cache()
         elongated_content = cache.get_svg_content(cache_hash)
         assert elongated_content is not None
@@ -266,7 +266,7 @@ class TestSVGSquareUtils:
         cache_hash = elongate_square(self.square_svg, 0.2, 0.2)
         assert cache_hash.startswith("svg_")
 
-        from pyzui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
+        from zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
         cache = get_svg_cache()
         elongated_content = cache.get_svg_content(cache_hash)
         assert elongated_content is not None
@@ -303,7 +303,7 @@ class TestSVGSquareUtils:
         """
         cache_hash = elongate_square(self.square_svg, 2.0, 2.0)
 
-        from pyzui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
+        from zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
         cache = get_svg_cache()
         elongated_content = cache.get_svg_content(cache_hash)
 
@@ -365,7 +365,7 @@ class TestSVGSquareUtils:
 
         cache_hash = elongate_square(complex_svg, 2.0, 1.0)
 
-        from pyzui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
+        from zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
         cache = get_svg_cache()
         elongated_content = cache.get_svg_content(cache_hash)
 

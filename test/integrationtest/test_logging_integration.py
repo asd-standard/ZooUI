@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -17,7 +17,7 @@
 Integration Tests: Logging System
 =================================
 
-This module contains integration tests validating the PyZUI logging system
+This module contains integration tests validating the ZooUI logging system
 as described in the technical documentation. The tests verify:
 
 - Command-line argument parsing and configuration
@@ -26,7 +26,7 @@ as described in the technical documentation. The tests verify:
 - Console vs file logging behavior
 - Runtime log level control
 - Configuration file support
-- Integration with actual PyZUI components
+- Integration with actual ZooUI components
 """
 
 import json
@@ -40,7 +40,7 @@ import pytest
 # Add project root to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from pyzui.logger import LoggerConfig, get_logger
+from zooui.logger import LoggerConfig, get_logger
 
 
 class TestLoggingCommandLine:
@@ -56,7 +56,7 @@ class TestLoggingCommandLine:
         Scenario: Run with default settings
 
         Given no command-line arguments
-        When PyZUI is started
+        When ZooUI is started
         Then it should log WARNING+ to console
         And it should log INFO+ to file
         And console output should be colored
@@ -98,7 +98,7 @@ class TestLoggingCommandLine:
             assert "ERROR message" in console_output
 
             # Check that log file was created
-            log_file = Path(temp_dir) / "test_logs" / "pyzui.log"
+            log_file = Path(temp_dir) / "test_logs" / "zooui.log"
             assert log_file.exists()
 
             # Check log file contents
@@ -112,7 +112,7 @@ class TestLoggingCommandLine:
         Scenario: Run with --debug flag
 
         Given the --debug command-line argument
-        When PyZUI is started
+        When ZooUI is started
         Then it should log DEBUG+ to both console and file
         """
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -153,7 +153,7 @@ class TestLoggingCommandLine:
         Scenario: Run with --verbose flag
 
         Given the --verbose command-line argument
-        When PyZUI is started
+        When ZooUI is started
         Then it should log INFO+ to console
         And DEBUG+ to file
         """
@@ -191,7 +191,7 @@ class TestLoggingCommandLine:
             assert "WARNING message" in console_output
 
             # DEBUG should be in file
-            log_file = Path(temp_dir) / "test_logs" / "pyzui.log"
+            log_file = Path(temp_dir) / "test_logs" / "zooui.log"
             log_content = log_file.read_text()
             assert "DEBUG message" in log_content
 
@@ -200,7 +200,7 @@ class TestLoggingCommandLine:
         Scenario: Run with --no-console flag
 
         Given the --no-console command-line argument
-        When PyZUI is started
+        When ZooUI is started
         Then it should not log to console
         But should still log to file
         """
@@ -240,7 +240,7 @@ class TestLoggingCommandLine:
             assert "Test completed - console output should only show this" in console_output
 
             # But messages should be in file
-            log_file = Path(temp_dir) / "test_logs" / "pyzui.log"
+            log_file = Path(temp_dir) / "test_logs" / "zooui.log"
             log_content = log_file.read_text()
             assert "WARNING message" in log_content
             assert "ERROR message" in log_content
@@ -250,7 +250,7 @@ class TestLoggingCommandLine:
         Scenario: Run with --no-file flag
 
         Given the --no-file command-line argument
-        When PyZUI is started
+        When ZooUI is started
         Then it should not create log files
         But should still log to console
         """
@@ -295,7 +295,7 @@ class TestLoggingCommandLine:
         Scenario: Run with --log-dir flag
 
         Given the --log-dir command-line argument
-        When PyZUI is started
+        When ZooUI is started
         Then it should create logs in the specified directory
         """
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -327,7 +327,7 @@ class TestLoggingCommandLine:
                 print("Test completed")
 
             # Log file should be in custom directory
-            log_file = custom_log_dir / "pyzui.log"
+            log_file = custom_log_dir / "zooui.log"
             assert log_file.exists()
 
             log_content = log_file.read_text()
@@ -375,7 +375,7 @@ class TestLogFileRotation:
             assert log_dir.exists()
 
             # Check that log file was created
-            log_file = log_dir / "pyzui.log"
+            log_file = log_dir / "zooui.log"
             assert log_file.exists()
 
             # Write some test data (not 10MB for performance)
@@ -396,7 +396,7 @@ class TestLogFileRotation:
 
         Given multiple log rotations have occurred
         When checking the log directory
-        Then it should contain pyzui.log and up to 5 backups
+        Then it should contain zooui.log and up to 5 backups
 
         Note: This test verifies the rotation configuration is set correctly.
         """
@@ -454,13 +454,13 @@ class TestConfigurationFile:
         Scenario: Load logging settings from config file
 
         Given a JSON configuration file with logging settings
-        When PyZUI is started with --config flag
+        When ZooUI is started with --config flag
         Then it should use the settings from the config file
         """
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create config file with absolute path for log_dir
             config_logs_dir = Path(temp_dir) / "config_logs"
-            config_file = Path(temp_dir) / "pyzui_config.json"
+            config_file = Path(temp_dir) / "zooui_config.json"
             config_data = {
                 "logging": {
                     "debug": False,
@@ -484,7 +484,7 @@ class TestConfigurationFile:
             f = io.StringIO()
             with redirect_stdout(f):
                 # Simulate config loading like main.py using ConfigManager
-                from pyzui.config import ConfigManager
+                from zooui.config import ConfigManager
 
                 # Create ConfigManager with the config file
                 config_manager = ConfigManager(config_file=str(config_file))
@@ -516,7 +516,7 @@ class TestConfigurationFile:
             # Verify custom log directory from config
             # The config specifies "config_logs" as relative path
             # so it should be created in temp_dir
-            Path(temp_dir) / "config_logs" / "pyzui.log"
+            Path(temp_dir) / "config_logs" / "zooui.log"
             # Note: The log file might not exist if no messages were logged
             # at INFO level or above (file level is INFO in normal mode)
             # But the directory should exist
@@ -641,10 +641,10 @@ class TestRuntimeLogControl:
 
 class TestIntegrationWithComponents:
     """
-    Feature: Logging Integration with PyZUI Components
+    Feature: Logging Integration with ZooUI Components
 
     This test suite validates that the logging system
-    works correctly with actual PyZUI components.
+    works correctly with actual ZooUI components.
     """
 
     def test_tilemanager_logging(self):
@@ -677,7 +677,7 @@ class TestIntegrationWithComponents:
                 )
 
                 # Initialize TileManager (should log initialization)
-                import pyzui.tilesystem.tilemanager as TileManager
+                import zooui.tilesystem.tilemanager as TileManager
 
                 TileManager.init(auto_cleanup=False, cleanup_max_age_days=1, collect_cleanup_stats=False)
 
@@ -689,7 +689,7 @@ class TestIntegrationWithComponents:
             assert "TileManager logging test completed" in console_output
 
             # Check log file for TileManager messages
-            log_file = Path(temp_dir) / "test_logs" / "pyzui.log"
+            log_file = Path(temp_dir) / "test_logs" / "zooui.log"
             if log_file.exists():
                 log_content = log_file.read_text()
                 # TileManager should log something during init

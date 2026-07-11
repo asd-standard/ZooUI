@@ -8,7 +8,7 @@ Overview
 --------
 
 The backup system creates timestamped backups of scene files in per-scene
-directories under ``~/.pyzui/backups/``. Each scene file gets its own
+directories under ``~/.zooui/backups/``. Each scene file gets its own
 backup directory named ``{scene_filename}_{4char_path_hash}/``, containing
 backups named ``yy_mm_dd_hh_mm_filename_hash.pzs`` with chronological sorting.
 
@@ -38,7 +38,7 @@ Backups are stored with per-scene subdirectories:
 
 .. code-block:: text
 
-    ~/.pyzui/backups/
+    ~/.zooui/backups/
     ├── myscene_a1b2/
     │   ├── 26_05_03_14_30_myscene_c3d4.pzs    # Backup file (timestamp_filename_hash.pzs)
     │   ├── 26_05_03_14_35_myscene_e5f6.pzs
@@ -104,7 +104,7 @@ Autosave behavior can be configured through:
                "enabled": true,
                "interval": 300,
                "max_backups": 20,
-               "backup_dir": "~/.pyzui/backups",
+               "backup_dir": "~/.zooui/backups",
                "expire_days": 7
            }
        }
@@ -118,7 +118,7 @@ Default Settings
 - **Interval**: 300 seconds (5 minutes)
 - **Max backups**: 20 backups per scene
 - **Expire days**: 7 days (inactive scene directories are deleted)
-- **Backup location**: ``~/.pyzui/backups/``
+- **Backup location**: ``~/.zooui/backups/``
 
 Usage Flow
 ----------
@@ -154,7 +154,7 @@ API Reference
 BackupManager
 ~~~~~~~~~~~~~~~~~~~
 
-.. automodule:: pyzui.backup.backupmanager
+.. automodule:: zooui.backup.backupmanager
    :members:
    :undoc-members:
    :show-inheritance:
@@ -177,7 +177,7 @@ Main Methods
 SceneAutosaveManager
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. automodule:: pyzui.objects.scene.sceneutils.autosave
+.. automodule:: zooui.objects.scene.sceneutils.autosave
    :members:
    :undoc-members:
    :show-inheritance:
@@ -189,7 +189,7 @@ UI Integration
 The backup system is accessible through:
 
 - **Settings menu**: Settings → Autosave Settings dialog
-- **Configuration**: User preferences stored in ``~/.pyzui/config.json``
+- **Configuration**: User preferences stored in ``~/.zooui/config.json``
 
 Testing
 -------
@@ -206,7 +206,7 @@ Example Usage
 
 .. code-block:: python
 
-    from pyzui.backup.backupmanager import BackupManager
+    from zooui.backup.backupmanager import BackupManager
 
     # Create backup manager with custom configuration
     config = {
@@ -254,7 +254,7 @@ Command-Line Examples
     python main.py --no-autosave
 
     # Configure via settings file
-    python main.py --config pyzui_config_example.json
+    python main.py --config zooui_config_example.json
 
     # 10-minute interval only (uses defaults for other settings)
     python main.py --autosave-interval 10

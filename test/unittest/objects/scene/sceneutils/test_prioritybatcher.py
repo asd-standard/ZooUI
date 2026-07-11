@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -18,8 +18,8 @@ from unittest.mock import Mock
 import pytest
 from PySide6 import QtCore
 
-from pyzui.objects.mediaobjects.mediaobjectsutils.string.textlayout import TextLayoutData
-from pyzui.objects.scene.sceneutils.prioritybatcher import BatchPriority, PrioritizedObject, PriorityBatcher
+from zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout import TextLayoutData
+from zooui.objects.scene.sceneutils.prioritybatcher import BatchPriority, PrioritizedObject, PriorityBatcher
 
 
 class TestPriorityBatcher:

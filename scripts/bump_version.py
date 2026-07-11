@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ## Copyright (C) 2009 David Roberts <d@vidr.cc>
 ##
 ## This program is free software; you can redistribute it and/or
@@ -16,7 +16,7 @@
 ## along with this program; if not, see <https://www.gnu.org/licenses/>.
 
 """
-SemVer version bump utility for PyZUI.
+SemVer version bump utility for ZooUI.
 
 Usage:
     python scripts/bump_version.py patch            # 0.4.0 -> 0.4.1
@@ -34,7 +34,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-INIT_PATH = Path(__file__).resolve().parent.parent / "pyzui" / "__init__.py"
+INIT_PATH = Path(__file__).resolve().parent.parent / "zooui" / "__init__.py"
 PYPROJECT_PATH = Path(__file__).resolve().parent.parent / "pyproject.toml"
 HOME_PZS_PATH = Path(__file__).resolve().parent.parent / "data" / "home.pzs"
 HOME_PNG_PATH = Path(__file__).resolve().parent.parent / "data" / "home.png"
@@ -59,7 +59,7 @@ def _read_current_version() -> tuple[str, int, str]:
         m = VERSION_RE.match(line)
         if m:
             return m.group(2), i, line
-    sys.exit("ERROR: __version__ not found in pyzui/__init__.py")
+    sys.exit("ERROR: __version__ not found in zooui/__init__.py")
 
 
 def _write_new_version(line_num: int, old_line: str, new_version: str) -> None:
@@ -156,24 +156,27 @@ def _capture_home_screenshot() -> None:
     if app is None:
         app = QtWidgets.QApplication(sys.argv)
 
-    import pyzui.tilesystem.tilemanager as TileManager
+    import zooui.tilesystem.tilemanager as TileManager
 
     TileManager.init(auto_cleanup=False)
 
-    from pyzui.objects.objectsutils import ZoomManager
-    from pyzui.objects.physicalobject import PhysicalObject
+    from zooui.objects.objectsutils import ZoomManager
+    from zooui.objects.physicalobject import PhysicalObject
 
     PhysicalObject.set_zoom_manager(ZoomManager({}))
 
-    from pyzui.objects.scene.qzui import QZUI
+    from zooui.objects.scene.qzui import QZUI
 
     zui = QZUI(framerate=20, config={})
 
-    from pyzui.objects.scene import scene as Scene
+    from zooui.objects.scene import scene as Scene
 
     zui.resize(1280, 720)
     zui.show()
     zui.scene = Scene.load_scene(str(HOME_PZS_PATH))
+
+    # Disable autosave to prevent corrupting home.pzs during screenshot capture
+    zui.scene.disable_autosave()
 
     # Ensure viewport size is set (resizeEvent may not fire offscreen)
     zui.scene.viewport_size = (1280, 720)
@@ -282,7 +285,7 @@ def bump(part: str, tag: bool = False, backwards: bool = False) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Bump the PyZUI SemVer version in pyzui/__init__.py")
+    parser = argparse.ArgumentParser(description="Bump the ZooUI SemVer version in zooui/__init__.py")
     parser.add_argument(
         "part",
         choices=["major", "minor", "patch", "current"],

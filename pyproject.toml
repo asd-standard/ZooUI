@@ -1,5 +1,5 @@
 [project]
-name = "pyzui"
+name = "zooui"
 version = "0.5.2"
 requires-python = ">=3.12"
 
@@ -44,7 +44,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["pyzui"]
+known-first-party = ["zooui"]
 
 [tool.ruff.format]
 quote-style = "double"
@@ -82,61 +82,61 @@ module = "docutils.*"
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
-module = "pyzui.objects.mediaobjects.mediaobjectsutils.svg.*"
+module = "zooui.objects.mediaobjects.mediaobjectsutils.svg.*"
 disable_error_code = ["union-attr", "return-value", "arg-type"]
 
 [[tool.mypy.overrides]]
-module = "pyzui.objects.mediaobjects.tiledmediaobject"
+module = "zooui.objects.mediaobjects.tiledmediaobject"
 disable_error_code = ["no-redef", "has-type", "union-attr", "no-any-return", "operator", "assignment", "arg-type"]
 
 [[tool.mypy.overrides]]
-module = "pyzui.config"
+module = "zooui.config"
 disable_error_code = ["assignment", "attr-defined", "index", "operator"]
 
 [[tool.mypy.overrides]]
-module = "pyzui.backup.backupmanager"
+module = "zooui.backup.backupmanager"
 disable_error_code = ["arg-type", "operator", "call-overload"]
 
 [[tool.mypy.overrides]]
-module = "pyzui.tilesystem.tiler.tiler"
+module = "zooui.tilesystem.tiler.tiler"
 disable_error_code = ["call-overload", "return-value", "list-item", "arg-type"]
 
 [[tool.mypy.overrides]]
-module = "pyzui.tilesystem.tilestore.tilecache"
+module = "zooui.tilesystem.tilestore.tilecache"
 disable_error_code = ["arg-type", "return-value", "assignment"]
 
 [[tool.mypy.overrides]]
-module = "pyzui.objects.mediaobjects.mediaobject"
+module = "zooui.objects.mediaobjects.mediaobject"
 disable_error_code = ["empty-body", "unused-ignore"]
 
 [[tool.mypy.overrides]]
-module = "pyzui.converters"
+module = "zooui.converters"
 disable_error_code = ["misc", "assignment"]
 
 [[tool.mypy.overrides]]
-module = "pyzui.tilesystem.tileproviders.tileprovider"
+module = "zooui.tilesystem.tileproviders.tileprovider"
 disable_error_code = ["assignment", "unused-ignore"]
 
 [[tool.mypy.overrides]]
-module = "pyzui.tilesystem.tileproviders.statictileprovider"
+module = "zooui.tilesystem.tileproviders.statictileprovider"
 disable_error_code = ["unused-ignore"]
 
 [[tool.mypy.overrides]]
-module = "pyzui.tilesystem.tileproviders.dynamictileprovider"
+module = "zooui.tilesystem.tileproviders.dynamictileprovider"
 disable_error_code = ["unused-ignore"]
 
 [[tool.mypy.overrides]]
-module = "pyzui.tilesystem.tileproviders.ferndynamictileprovider"
+module = "zooui.tilesystem.tileproviders.ferndynamictileprovider"
 disable_error_code = ["unused-ignore"]
 
 [[tool.mypy.overrides]]
-module = "pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout"
+module = "zooui.objects.mediaobjects.mediaobjectsutils.string.parallellayout"
 disable_error_code = ["arg-type"]
 
 [[tool.mypy.overrides]]
-module = "pyzui.tilesystem.tilestore.cleanuptilestore"
+module = "zooui.tilesystem.tilestore.cleanuptilestore"
 ignore_errors = true
 
 [[tool.mypy.overrides]]
-module = "pyzui.tilesystem.tilestore.tilestore"
+module = "zooui.tilesystem.tilestore.tilestore"
 ignore_errors = true

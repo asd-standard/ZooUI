@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ## Copyright (C) 2009 David Roberts <d@vidr.cc>
 ##
 ## This program is free software; you can redistribute it and/or
@@ -23,10 +23,10 @@ from typing import Any
 
 from PySide6 import QtGui, QtWidgets
 
-import pyzui.tilesystem.tilemanager as TileManager
-from pyzui.config import ConfigManager, ValidationError
-from pyzui.logger import LoggerConfig, get_logger
-from pyzui.windows.mainwindow import MainWindow
+import zooui.tilesystem.tilemanager as TileManager
+from zooui.config import ConfigManager, ValidationError
+from zooui.logger import LoggerConfig, get_logger
+from zooui.windows.mainwindow import MainWindow
 
 
 def load_config_file(config_path: str) -> dict[str, Any]:
@@ -113,7 +113,7 @@ def parse_arguments():
         argparse.Namespace: Parsed arguments
     """
     parser = argparse.ArgumentParser(
-        description="PyZUI - Python Zooming User Interface",
+        description="ZooUI - Python Zooming User Interface",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -121,7 +121,7 @@ Examples:
   %(prog)s --no-console         # Disable console output (file only)
   %(prog)s --debug              # Run in debug mode with console output
   %(prog)s --verbose            # Run with verbose logging to console
-  %(prog)s --config pyzui.json  # Load settings from config file
+  %(prog)s --config zooui.json  # Load settings from config file
   %(prog)s --no-file            # Log to console only (disable file logging)
   %(prog)s --log-dir /tmp/logs  # Use custom log directory
   %(prog)s --autosave-interval 2  # Set autosave interval to 2 minutes
@@ -181,7 +181,7 @@ Examples:
 
 
 def main():
-    """Start the PyZUI application."""
+    """Start the ZooUI application."""
 
     # Parse command-line arguments
     args = parse_arguments()
@@ -228,7 +228,7 @@ def main():
     )
 
     logger = get_logger("main")
-    logger.info("Starting PyZUI application")
+    logger.info("Starting ZooUI application")
     logger.debug(f"Working directory: {os.getcwd()}")
     logger.debug(f"Python version: {sys.version}")
 
@@ -240,8 +240,8 @@ def main():
     )
 
     # Initialize ZoomManager for enforcing zoom limits
-    from pyzui.objects.objectsutils import ZoomManager
-    from pyzui.objects.physicalobject import PhysicalObject
+    from zooui.objects.objectsutils import ZoomManager
+    from zooui.objects.physicalobject import PhysicalObject
 
     zoom_config = config.get("zoom", {})
     zoom_manager = ZoomManager(zoom_config)
@@ -249,7 +249,7 @@ def main():
     logger.info(f"Zoom limits initialized: {zoom_manager.get_limits()}")
 
     # Initialize SVG cache (cleanup registered for shutdown execution)
-    from pyzui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
+    from zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
 
     svg_cache = get_svg_cache()
     logger.debug(f"SVG cache initialized at {svg_cache.cache_root}")
@@ -261,9 +261,9 @@ def main():
 
     # Create Qt application
     app = QtWidgets.QApplication(sys.argv)
-    app.setApplicationName("pyzui")
-    app.setApplicationDisplayName("PyZUI")
-    app.setDesktopFileName("pyzui")
+    app.setApplicationName("zooui")
+    app.setApplicationDisplayName("ZooUI")
+    app.setDesktopFileName("zooui")
 
     # Unified shutdown of all background threads — runs before cleanup handlers,
     # so threads are joined before Qt begins destroying internals
@@ -319,7 +319,7 @@ def main():
 
     # Migrate legacy flat backup files on shutdown
     try:
-        from pyzui.backup.backupmanager import BackupManager
+        from zooui.backup.backupmanager import BackupManager
 
         bm = BackupManager(config.get("autosave", {}))
         deleted = bm.cleanup_flat_backups()

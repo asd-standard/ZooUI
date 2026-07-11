@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -21,7 +21,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from pyzui.windows.dialogwindows.svgpickerinputdialog import OpenSVGPickerInputDialog
+from zooui.windows.dialogwindows.svgpickerinputdialog import OpenSVGPickerInputDialog
 
 
 class TestOpenSVGPickerInputDialogSimple:
@@ -287,7 +287,7 @@ class TestOpenSVGPickerInputDialogSimple:
         dialog._svg_renderers = {}
 
         # Mock QtSvg.QSvgRenderer
-        with patch('pyzui.windows.dialogwindows.svgpickerinputdialog.QtSvg.QSvgRenderer') as mock_renderer_class:
+        with patch('zooui.windows.dialogwindows.svgpickerinputdialog.QtSvg.QSvgRenderer') as mock_renderer_class:
             mock_renderer = Mock()
             mock_renderer_class.return_value = mock_renderer
 
@@ -305,7 +305,7 @@ class TestOpenSVGPickerInputDialogSimple:
         When OpenSVGPickerInputDialog loads colors
         Then it should load color codes from the file
         """
-        color_dir = tmp_path / ".pyzui" / "colorstore"
+        color_dir = tmp_path / ".zooui" / "colorstore"
         color_dir.mkdir(parents=True, exist_ok=True)
         color_file = color_dir / "color_list.txt"
 
@@ -313,13 +313,13 @@ class TestOpenSVGPickerInputDialogSimple:
             f.write("ff0000\n00ff00\n0000ff\n")
 
         # Mock the environment to use our temp directory
-        with patch('pyzui.windows.dialogwindows.svgpickerinputdialog.os.path.isfile', return_value=True), \
-             patch('pyzui.windows.dialogwindows.svgpickerinputdialog.os.path.isdir', return_value=True), \
-             patch('pyzui.windows.dialogwindows.svgpickerinputdialog.os.environ', {}), \
-             patch('pyzui.windows.dialogwindows.svgpickerinputdialog.os.path.expanduser', return_value=str(tmp_path)):
+        with patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.isfile', return_value=True), \
+             patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.isdir', return_value=True), \
+             patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.environ', {}), \
+             patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.expanduser', return_value=str(tmp_path)):
 
             # Mock the SVG directory scan to avoid file system issues
-            with patch('pyzui.windows.dialogwindows.svgpickerinputdialog.os.path.isdir', return_value=False):
+            with patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.isdir', return_value=False):
                 dialog = OpenSVGPickerInputDialog()
 
                 assert len(dialog.color_codes) == 3
@@ -335,17 +335,17 @@ class TestOpenSVGPickerInputDialogSimple:
         When OpenSVGPickerInputDialog is initialized
         Then it should create default colors
         """
-        tmp_path / ".pyzui" / "colorstore"
+        tmp_path / ".zooui" / "colorstore"
 
-        with patch('pyzui.windows.dialogwindows.svgpickerinputdialog.os.path.isfile', return_value=False), \
-             patch('pyzui.windows.dialogwindows.svgpickerinputdialog.os.path.isdir', return_value=True), \
-             patch('pyzui.windows.dialogwindows.svgpickerinputdialog.os.environ', {}), \
-             patch('pyzui.windows.dialogwindows.svgpickerinputdialog.os.path.expanduser', return_value=str(tmp_path)):
+        with patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.isfile', return_value=False), \
+             patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.isdir', return_value=True), \
+             patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.environ', {}), \
+             patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.expanduser', return_value=str(tmp_path)):
 
             # Mock the SVG directory scan to avoid file system issues
-            with patch('pyzui.windows.dialogwindows.svgpickerinputdialog.os.path.isdir', return_value=False), \
-                 patch('pyzui.windows.dialogwindows.svgpickerinputdialog.os.mkdir') as mock_mkdir, \
-                 patch('pyzui.windows.dialogwindows.svgpickerinputdialog.open') as mock_open:
+            with patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.isdir', return_value=False), \
+                 patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.mkdir') as mock_mkdir, \
+                 patch('zooui.windows.dialogwindows.svgpickerinputdialog.open') as mock_open:
 
                 dialog = OpenSVGPickerInputDialog()
 
@@ -369,7 +369,7 @@ class TestOpenSVGPickerInputDialogSimple:
         When OpenSVGPickerInputDialog is initialized
         Then it should handle missing directory gracefully
         """
-        with patch('pyzui.windows.dialogwindows.svgpickerinputdialog.os.path.isdir', return_value=False):
+        with patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.isdir', return_value=False):
             dialog = OpenSVGPickerInputDialog()
 
             assert len(dialog.SVG_FILES) == 0

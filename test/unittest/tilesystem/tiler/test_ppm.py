@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -19,8 +19,8 @@ from unittest.mock import mock_open, patch
 
 import pytest
 
-from pyzui.tilesystem.tiler import ppm
-from pyzui.tilesystem.tiler.ppm import PPMTiler, read_ppm_header
+from zooui.tilesystem.tiler import ppm
+from zooui.tilesystem.tiler.ppm import PPMTiler, read_ppm_header
 
 _DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "data"))
 
@@ -275,8 +275,8 @@ class TestPPMTiler:
         import os
         import tempfile
 
-        from pyzui.converters.vipsconverter import VipsConverter
-        from pyzui.tilesystem import tilestore as TileStore
+        from zooui.converters.vipsconverter import VipsConverter
+        from zooui.tilesystem import tilestore as TileStore
 
         for name in os.listdir(_DATA_DIR):
             fullpath = os.path.join(_DATA_DIR, name)

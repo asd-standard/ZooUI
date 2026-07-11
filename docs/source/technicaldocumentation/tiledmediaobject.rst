@@ -5,7 +5,7 @@ Tiled media objects handle large images by breaking them into a pyramid of tiles
 for efficient zooming. Source media is first converted to PPM format using the
 :doc:`../technicaldocumentation/convertersystem`, then passed to the
 :doc:`../technicaldocumentation/tilingsystem` which creates a multi-resolution
-tile pyramid stored on disk via :doc:`../pyzui/tilestore`.
+tile pyramid stored on disk via :doc:`../zooui/tilestore`.
 
 Application Flow
 ----------------
@@ -73,7 +73,7 @@ Here is the complete lifecycle of a TiledMediaObject, from creation to rendering
         │    • Reads PPM header: read_ppm_header(f)                       │
         │    • Gets image dimensions (width, height)                      │
         │    • Sets __outpath = TileStore.get_media_path(media_id)        │
-        │      → ~/.pyzui/tilestore/<media_id_hash>/                      │
+        │      → ~/.zooui/tilestore/<media_id_hash>/                      │
         └────────────────────┬────────────────────────────────────────────┘
                              │
         ┌────────────────────▼────────────────────────────────────────────┐
@@ -126,7 +126,7 @@ Here is the complete lifecycle of a TiledMediaObject, from creation to rendering
         │ 9. TILE STORAGE: TileStore.get_tile_path()                      │ 
         │                                                                 │
         │    Directory structure created:                                 │
-        │    ~/.pyzui/tilestore/                                          │
+        │    ~/.zooui/tilestore/                                          │
         │    └── <media_id_hash>/                                         │
         │        ├── metadata.json  (width, height, tilesize, etc.)       │
         │        ├── 0/             (Level 0: full resolution)            │
@@ -149,7 +149,7 @@ Here is the complete lifecycle of a TiledMediaObject, from creation to rendering
         │ 10. METADATA STORAGE                                            │
         │     TileStore.write_metadata(media_id, ...)                     │
         │                                                                 │
-        │     Saves to: ~/.pyzui/tilestore/<hash>/metadata.json           │
+        │     Saves to: ~/.zooui/tilestore/<hash>/metadata.json           │
         │     Content:                                                    │
         │     {                                                           │
         │       "filext": "jpg",                                          │
@@ -450,7 +450,7 @@ from the saved values.
 Unlike ``SVGMediaObject``, which stores editable content in memory and
 requires ``from_dict`` for clipboard copy/paste operations,
 ``TiledMediaObject`` references an external file whose tile data is
-persisted in the ``~/.pyzui/tilestore/`` directory. The ``media_id``
+persisted in the ``~/.zooui/tilestore/`` directory. The ``media_id``
 reference is the only state that needs to be preserved.
 
 TileStore Persistence
@@ -459,7 +459,7 @@ TileStore Persistence
 Tile data survives across scene saves because:
 
 1. Converted and tiled data is stored persistently in
-   ``~/.pyzui/tilestore/<media_id_hash>/``
+   ``~/.zooui/tilestore/<media_id_hash>/``
 2. The scene ``.pzs`` file stores only the ``media_id`` reference, not the
    tile data itself
 3. On reload, ``TileManager.tiled(media_id)`` at init time detects
@@ -485,9 +485,9 @@ See Also
 - :doc:`../technicaldocumentation/convertersystem` — Media format conversion
 - :doc:`../technicaldocumentation/tilingsystem` — Tile pyramid generation
 - :doc:`../technicaldocumentation/objectsystem` — Object system architecture
-- :doc:`../pyzui/converterrunner` — Process-based parallel conversion
-- :doc:`../pyzui/tilerrunner` — Process-based parallel tiling
-- :doc:`../pyzui/tilestore` — Persistent tile storage
-- :doc:`../pyzui/tilecache` — In-memory LRU tile cache
-- :doc:`../pyzui/tilemanager` — Tile coordination and caching
-- :doc:`../pyzui/modifytiledmediaobjectdialog` — Image manipulation dialog
+- :doc:`../zooui/converterrunner` — Process-based parallel conversion
+- :doc:`../zooui/tilerrunner` — Process-based parallel tiling
+- :doc:`../zooui/tilestore` — Persistent tile storage
+- :doc:`../zooui/tilecache` — In-memory LRU tile cache
+- :doc:`../zooui/tilemanager` — Tile coordination and caching
+- :doc:`../zooui/modifytiledmediaobjectdialog` — Image manipulation dialog

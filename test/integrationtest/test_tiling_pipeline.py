@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -36,12 +36,12 @@ import shutil
 import pytest
 from PIL import Image
 
-from pyzui.tilesystem import tilestore
-from pyzui.tilesystem.tile import Tile
+from zooui.tilesystem import tilestore
+from zooui.tilesystem.tile import Tile
 
 # Import tiling system components
-from pyzui.tilesystem.tiler import Tiler
-from pyzui.tilesystem.tilestore import TileCache
+from zooui.tilesystem.tiler import Tiler
+from zooui.tilesystem.tilestore import TileCache
 
 
 class ConcreteTiler(Tiler):
@@ -93,7 +93,7 @@ def temp_tilestore(tmp_path):
         str: Path to the temporary tilestore directory.
     """
     # Import the actual tilestore module (not the package)
-    from pyzui.tilesystem.tilestore import tilestore as ts_module
+    from zooui.tilesystem.tilestore import tilestore as ts_module
 
     original_tile_dir = ts_module.tile_dir
     temp_dir = str(tmp_path / "tilestore")

@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ## Copyright (C) 2009 David Roberts <d@vidr.cc>
 ##
 ## This program is free software; you can redistribute it and/or
@@ -15,9 +15,9 @@
 ## along with this program; if not, see <https://www.gnu.org/licenses/>.
 
 """
-Stress Benchmark for PyZUI Performance Testing.
+Stress Benchmark for ZooUI Performance Testing.
 
-This module provides a comprehensive stress benchmark that launches the PyZUI
+This module provides a comprehensive stress benchmark that launches the ZooUI
 application, continuously populates the scene with images and StringMediaObjects,
 and monitors frame rate performance (including dropped frames) and memory
 consumption over time.
@@ -72,12 +72,12 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.
 
 from PySide6 import QtWidgets
 
-import pyzui.objects.scene.scene as Scene
-import pyzui.tilesystem.tilemanager as TileManager
-import pyzui.tilesystem.tilestore as TileStore
-from pyzui.objects.mediaobjects.stringmediaobject import StringMediaObject
-from pyzui.objects.mediaobjects.tiledmediaobject import TiledMediaObject
-from pyzui.objects.scene.qzui import QZUI
+import zooui.objects.scene.scene as Scene
+import zooui.tilesystem.tilemanager as TileManager
+import zooui.tilesystem.tilestore as TileStore
+from zooui.objects.mediaobjects.stringmediaobject import StringMediaObject
+from zooui.objects.mediaobjects.tiledmediaobject import TiledMediaObject
+from zooui.objects.scene.qzui import QZUI
 
 ## ============================================================================
 ## Data Classes for Metrics
@@ -299,7 +299,7 @@ class StressBenchmark:
 
     StressBenchmark(config) --> None
 
-    Benchmark class that continuously populates a PyZUI scene while measuring
+    Benchmark class that continuously populates a ZooUI scene while measuring
     rendering performance and memory consumption.
 
     The benchmark works by:
@@ -927,7 +927,7 @@ def parse_arguments() -> BenchmarkConfig:
     - --no-movement: Disable zoom and pan (static benchmark)
     """
     parser = argparse.ArgumentParser(
-        description="PyZUI Stress Benchmark - Performance testing tool",
+        description="ZooUI Stress Benchmark - Performance testing tool",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -1012,7 +1012,7 @@ def main() -> None:
     """
     config = parse_arguments()
 
-    print("PyZUI Stress Benchmark")
+    print("ZooUI Stress Benchmark")
     print("=" * 60)
     print("Configuration:")
     print(f"  Target FPS:        {config.target_framerate}")

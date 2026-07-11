@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=ZooUI
+Comment=Python Zooming User Interface
+Exec=/home/asd/Projects/zooui/zooui.sh %F
+Icon=/home/asd/Projects/zooui/data/icon.png
+Categories=Graphics;Viewer;
+StartupWMClass=zooui
+Terminal=false

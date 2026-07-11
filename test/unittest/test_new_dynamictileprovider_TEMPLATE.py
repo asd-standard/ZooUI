@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -32,7 +32,7 @@ and replace all instances of YourProvider with MandelbrotTileProvider.
 from unittest.mock import Mock, patch
 
 # TODO: Update this import to match your provider
-# from pyzui.tilesystem.tileproviders import YourProvider
+# from zooui.tilesystem.tileproviders import YourProvider
 
 
 class TestYourProviderName:
@@ -450,7 +450,7 @@ DEBUGGING TIPS:
 - See print output: pytest -v -s
 - Stop on first failure: pytest -x
 - Show local variables on failure: pytest -l
-- Generate coverage report: pytest --cov=pyzui.tilesystem.tileproviders
+- Generate coverage report: pytest --cov=zooui.tilesystem.tileproviders
 
 EXAMPLE PROVIDERS TO REFERENCE:
 --------------------------------

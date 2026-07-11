@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -17,8 +17,8 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from pyzui.objects.mediaobjects.mediaobject import LoadError
-from pyzui.objects.mediaobjects.svgmediaobject import SVGMediaObject
+from zooui.objects.mediaobjects.mediaobject import LoadError
+from zooui.objects.mediaobjects.svgmediaobject import SVGMediaObject
 
 
 class TestSVGMediaObject:
@@ -30,7 +30,7 @@ class TestSVGMediaObject:
     vector graphics with proper scaling and transparency support.
     """
 
-    @patch("pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer")
+    @patch("zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer")
     def test_init_success(self, mock_renderer_class):
         """
         Scenario: Initialize with valid SVG file
@@ -51,7 +51,7 @@ class TestSVGMediaObject:
         assert obj is not None
         mock_renderer.load.assert_called_once_with("test.svg")
 
-    @patch("pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer")
+    @patch("zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer")
     def test_init_load_failure(self, mock_renderer_class):
         """
         Scenario: Reject invalid SVG file
@@ -69,7 +69,7 @@ class TestSVGMediaObject:
         with pytest.raises(LoadError, match="unable to parse SVG file"):
             SVGMediaObject("invalid.svg", scene)
 
-    @patch("pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer")
+    @patch("zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer")
     def test_inherits_from_mediaobject(self, mock_renderer_class):
         """
         Scenario: Verify inheritance from MediaObject
@@ -78,7 +78,7 @@ class TestSVGMediaObject:
         When checking its type
         Then it should be an instance of MediaObject
         """
-        from pyzui.objects.mediaobjects.mediaobject import MediaObject
+        from zooui.objects.mediaobjects.mediaobject import MediaObject
 
         mock_renderer = Mock()
         mock_renderer.load.return_value = True
@@ -100,7 +100,7 @@ class TestSVGMediaObject:
         """
         assert SVGMediaObject.transparent is True
 
-    @patch("pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer")
+    @patch("zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer")
     def test_onscreen_size_property_exists(self, mock_renderer_class):
         """
         Scenario: Verify onscreen_size property availability
@@ -123,7 +123,7 @@ class TestSVGMediaObject:
         # Just verify the property exists (avoids Qt segfault)
         assert hasattr(SVGMediaObject, "onscreen_size")
 
-    @patch("pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer")
+    @patch("zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer")
     def test_render_method_exists(self, mock_renderer_class):
         """
         Scenario: Verify render method availability
@@ -148,7 +148,7 @@ class TestSVGMediaObject:
         assert hasattr(obj, "render")
         assert callable(obj.render)
 
-    @patch("pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer")
+    @patch("zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer")
     def test_to_dict_method(self, mock_renderer_class):
         """
         Scenario: Serialize SVGMediaObject to dictionary
@@ -189,7 +189,7 @@ class TestSVGMediaObject:
             assert result["height"] == 200
             assert result["transparent"] is True
 
-    @patch("pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer")
+    @patch("zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer")
     def test_from_dict_method(self, mock_renderer_class):
         """
         Scenario: Create SVGMediaObject from dictionary
@@ -226,7 +226,7 @@ class TestSVGMediaObject:
         # Note: We can't directly check private attributes due to type checking
         # but the method should execute without errors
 
-    @patch("pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer")
+    @patch("zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer")
     def test_copy_preserves_svg_properties(self, mock_renderer_class):
         """
         Scenario: Copy preserves SVG-specific properties

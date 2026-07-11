@@ -1,31 +1,31 @@
-.. PyZui user instruction file,
+.. ZooUI user instruction file,
 
 Program Configuration
 =====================
 
-PyZUI uses a single source of truth configuration system with `~/.pyzui/config.json`
+ZooUI uses a single source of truth configuration system with `~/.zooui/config.json`
 as the primary configuration file. Configuration options can be overridden via:
 
 Configuration Hierarchy::
 
-    1. User Configuration File (~/.pyzui/config.json) - Primary source
+    1. User Configuration File (~/.zooui/config.json) - Primary source
               ↓
-    2. Temporary Configuration File (--config pyzui.json) - Session override
+    2. Temporary Configuration File (--config zooui.json) - Session override
               ↓
     3. Command-Line Arguments - Highest priority (temporary)
 
 This design provides a consistent configuration experience where user preferences
-are stored in `~/.pyzui/config.json` and can be temporarily overridden for testing
+are stored in `~/.zooui/config.json` and can be temporarily overridden for testing
 or debugging via command-line arguments.
 
 Configuration Categories
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 **Logging Configuration**
-    Controls how PyZUI logs information during execution.
+    Controls how ZooUI logs information during execution.
 
     .. note::
-        By default, PyZUI logs only to file (not to console) for silent operation.
+        By default, ZooUI logs only to file (not to console) for silent operation.
         Use ``--console`` to enable console output.
 
     - ``debug`` (bool): Enable debug mode with maximum logging detail
@@ -64,7 +64,7 @@ Configuration Categories
     - ``enabled`` (bool): Enable autosave functionality (default: ``True``)
     - ``interval`` (int): Autosave interval in seconds (default: 300 = 5 minutes)
     - ``max_backups`` (int): Maximum number of backups to keep per scene (default: 20)
-    - ``backup_dir`` (str): Root directory for per-scene backup directories (default: ``~/.pyzui/backups``)
+    - ``backup_dir`` (str): Root directory for per-scene backup directories (default: ``~/.zooui/backups``)
     - ``expire_days`` (int): Days of inactivity before a scene's backup directory is deleted (default: 7)
 
 **Zoom Limits Configuration**
@@ -100,10 +100,10 @@ Configuration Categories
 Using Configuration Files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-PyZUI uses `~/.pyzui/config.json` as its primary configuration file. This file is
+ZooUI uses `~/.zooui/config.json` as its primary configuration file. This file is
 automatically created with default values if it doesn't exist.
 
-You can also create a temporary configuration file (e.g., ``pyzui_config.json``) with
+You can also create a temporary configuration file (e.g., ``zooui_config.json``) with
 your preferred settings for testing or specific sessions:
 
 .. code-block:: json
@@ -142,7 +142,7 @@ your preferred settings for testing or specific sessions:
             "enabled": true,
             "interval": 300,
             "max_backups": 20,
-            "backup_dir": "~/.pyzui/backups",
+            "backup_dir": "~/.zooui/backups",
             "expire_days": 7
         },
         "zoom_limits": {
@@ -154,16 +154,16 @@ your preferred settings for testing or specific sessions:
         }
     }
 
-Then launch PyZUI with the temporary configuration file:
+Then launch ZooUI with the temporary configuration file:
 
 .. code-block:: bash
 
-    python main.py --config pyzui_config.json
+    python main.py --config zooui_config.json
 
 .. note::
     The ``--config`` file provides temporary overrides for the current session only.
-    Settings from this file are not saved to `~/.pyzui/config.json`. To make permanent
-    changes, edit `~/.pyzui/config.json` directly.
+    Settings from this file are not saved to `~/.zooui/config.json`. To make permanent
+    changes, edit `~/.zooui/config.json` directly.
 
 Command-Line Arguments
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -219,18 +219,18 @@ Configuration Examples
     # - DEBUG level console output
     # - DEBUG level file logging
     # - Colored console output
-    # - File logging to ./logs/pyzui.log
+    # - File logging to ./logs/zooui.log
 
 **Example 2: Production Mode with Custom Log Directory**
 
 .. code-block:: bash
 
     # Run with default settings (file only) to custom directory
-    python main.py --log-dir /var/log/pyzui
+    python main.py --log-dir /var/log/zooui
 
     # This enables:
     # - No console output (default)
-    # - Full logging to /var/log/pyzui/pyzui.log
+    # - Full logging to /var/log/zooui/zooui.log
     # - Default tilestore cleanup
 
 **Example 3: Quick Testing Without Logging**
@@ -257,7 +257,7 @@ Create ``production.json``:
         "logging": {
             "verbose": false,
             "log_to_console": false,
-            "log_dir": "/var/log/pyzui"
+            "log_dir": "/var/log/zooui"
         },
         "tilestore": {
             "max_age_days": 30
@@ -286,7 +286,7 @@ Run with temporary debug override and console output:
 .. code-block:: bash
 
     # Organize logs by date in a custom location
-    python main.py --log-dir ~/pyzui-logs/$(date +%Y-%m-%d)
+    python main.py --log-dir ~/zooui-logs/$(date +%Y-%m-%d)
 
 **Example 8: Configure Autosave Behavior**
 
@@ -299,7 +299,7 @@ Run with temporary debug override and console output:
     python main.py --no-autosave
 
     # Configure via JSON file
-    python main.py --config pyzui_config_example.json
+    python main.py --config zooui_config_example.json
 
     # Set backup expiration to 30 days
     python main.py --backup-expire-days 30
@@ -318,7 +318,7 @@ Run with temporary debug override and console output:
     python main.py
 
     # Configure via JSON file
-    python main.py --config pyzui_config_example.json
+    python main.py --config zooui_config_example.json
 
     # Default: zoom limits -10 to +12 for StringMediaObject compatibility
     python main.py
@@ -326,7 +326,7 @@ Run with temporary debug override and console output:
 Default Configuration
 ~~~~~~~~~~~~~~~~~~~~~
 
-When PyZUI starts for the first time (or when `~/.pyzui/config.json` doesn't exist),
+When ZooUI starts for the first time (or when `~/.zooui/config.json` doesn't exist),
 it creates the configuration file with these default values:
 
 .. code-block:: python
@@ -365,14 +365,14 @@ it creates the configuration file with these default values:
             'enabled': True,
             'interval': 300,
             'max_backups': 20,
-            'backup_dir': '~/.pyzui/backups',
+            'backup_dir': '~/.zooui/backups',
             'expire_days': 7
         }
     }
 
 This results in:
     - No console logging (silent operation)
-    - File logging at INFO level to ./logs/pyzui.log
+    - File logging at INFO level to ./logs/zooui.log
     - Automatic tilestore cleanup on startup
     - Tiles older than 3 days are removed
     - Parallel rendering enabled for performance
@@ -382,7 +382,7 @@ This results in:
 Configuration Validation
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-PyZUI validates all configuration values when loading configuration files. Invalid
+ZooUI validates all configuration values when loading configuration files. Invalid
 values are rejected with clear error messages. The validation rules include:
 
 - **Type checking**: All configuration values must be of the correct type (boolean,
@@ -396,13 +396,13 @@ values are rejected with clear error messages. The validation rules include:
   the values are automatically swapped to maintain logical consistency.
 - **Unknown keys**: Unknown configuration sections or keys are rejected.
 
-If PyZUI fails to start with a configuration error, check your configuration file
+If ZooUI fails to start with a configuration error, check your configuration file
 for invalid values or syntax errors.
 
 Viewing Current Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-PyZUI logs its active configuration when starting. To view this information, either enable
+ZooUI logs its active configuration when starting. To view this information, either enable
 console output with ``--console`` or check the log file:
 
 .. code-block:: bash
@@ -411,40 +411,40 @@ console output with ``--console`` or check the log file:
     python main.py --console
 
     # Or check the log file
-    tail -f logs/pyzui.log
+    tail -f logs/zooui.log
 
 Look for output like:
 
 .. code-block:: text
 
-    [INFO    ] pyzui.LoggerConfig       | ============================================================
-    [INFO    ] pyzui.LoggerConfig       | PyZUI Logging System Initialized
-    [INFO    ] pyzui.LoggerConfig       | Debug Mode: False
-    [INFO    ] pyzui.LoggerConfig       | Console Level: OFF
-    [INFO    ] pyzui.LoggerConfig       | File Level: INFO
-    [INFO    ] pyzui.LoggerConfig       | Log File: /path/to/logs/pyzui.log
-    [INFO    ] pyzui.LoggerConfig       | ============================================================
+    [INFO    ] zooui.LoggerConfig       | ============================================================
+    [INFO    ] zooui.LoggerConfig       | ZooUI Logging System Initialized
+    [INFO    ] zooui.LoggerConfig       | Debug Mode: False
+    [INFO    ] zooui.LoggerConfig       | Console Level: OFF
+    [INFO    ] zooui.LoggerConfig       | File Level: INFO
+    [INFO    ] zooui.LoggerConfig       | Log File: /path/to/logs/zooui.log
+    [INFO    ] zooui.LoggerConfig       | ============================================================
 
 Log File Management
 ~~~~~~~~~~~~~~~~~~~
 
-PyZUI uses rotating log files to prevent unlimited disk usage:
+ZooUI uses rotating log files to prevent unlimited disk usage:
 
 - **Maximum file size**: 10 MB per log file
 - **Backup count**: 5 rotated files kept
 - **Total maximum size**: ~50 MB (current + 5 backups)
 - **File naming**:
-    - Current log: ``pyzui.log``
-    - Rotated logs: ``pyzui.log.1``, ``pyzui.log.2``, etc.
+    - Current log: ``zooui.log``
+    - Rotated logs: ``zooui.log.1``, ``zooui.log.2``, etc.
 
 When the current log reaches 10 MB, it's rotated automatically:
 
 .. code-block:: text
 
     logs/
-    ├── pyzui.log       # Current log (newest)
-    ├── pyzui.log.1     # Previous rotation
-    ├── pyzui.log.2     # Older rotation
-    ├── pyzui.log.3     # Even older
-    ├── pyzui.log.4     # Getting old
-    └── pyzui.log.5     # Oldest (will be deleted on next rotation)
+    ├── zooui.log       # Current log (newest)
+    ├── zooui.log.1     # Previous rotation
+    ├── zooui.log.2     # Older rotation
+    ├── zooui.log.3     # Even older
+    ├── zooui.log.4     # Getting old
+    └── zooui.log.5     # Oldest (will be deleted on next rotation)

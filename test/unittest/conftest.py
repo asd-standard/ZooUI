@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -15,17 +15,17 @@
 
 """
 Pytest configuration file for unittest directory.
-This file sets up the Python path so that tests can import from the pyzui package.
+This file sets up the Python path so that tests can import from the zooui package.
 """
 
 import os
 import sys
 
-# Add the parent directory (pyzui root) to the Python path
-# This allows imports like "from pyzui.tile import Tile" to work
-pyzui_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-if pyzui_root not in sys.path:
-    sys.path.insert(0, pyzui_root)
+# Add the parent directory (zooui root) to the Python path
+# This allows imports like "from zooui.tile import Tile" to work
+zooui_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+if zooui_root not in sys.path:
+    sys.path.insert(0, zooui_root)
 
 
 def pytest_sessionstart(session):
@@ -37,7 +37,7 @@ def pytest_sessionstart(session):
     pytest to appear hung for minutes.
     """
     try:
-        from pyzui.tilesystem import tilemanager
+        from zooui.tilesystem import tilemanager
 
         tilemanager.__cleanup_enabled = False
     except Exception:
@@ -54,7 +54,7 @@ def pytest_sessionfinish(session, exitstatus):
       to prevent this hang.
     """
     try:
-        from pyzui.tilesystem import tilemanager
+        from zooui.tilesystem import tilemanager
 
         tilemanager.__cleanup_executed = True
         tilemanager.__cleanup_enabled = False
@@ -62,14 +62,14 @@ def pytest_sessionfinish(session, exitstatus):
         pass
 
     try:
-        from pyzui.converters import converterrunner
+        from zooui.converters import converterrunner
 
         converterrunner._atexit_registered = False
     except (ImportError, AttributeError):
         pass
 
     try:
-        from pyzui.tilesystem.tiler import tilerrunner
+        from zooui.tilesystem.tiler import tilerrunner
 
         tilerrunner._atexit_registered = False
     except (ImportError, AttributeError):

@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ## Copyright (C) 2009 David Roberts <d@vidr.cc>
 ##
 ## This program is free software; you can redistribute it and/or
@@ -33,7 +33,7 @@ def _reset_converter_pool() -> None:
     """
     yield
     try:
-        from pyzui.converters import converterrunner
+        from zooui.converters import converterrunner
 
         if converterrunner._executor is not None:
             converterrunner.shutdown()

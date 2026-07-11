@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -24,7 +24,7 @@ import os
 import tempfile
 from unittest.mock import patch
 
-from pyzui.objects.scene.scene import Scene
+from zooui.objects.scene.scene import Scene
 
 
 class TestSceneSelectionSaveIntegration:

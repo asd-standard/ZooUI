@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -19,7 +19,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from pyzui.converters.vipsconverter import VipsConverter
+from zooui.converters.vipsconverter import VipsConverter
 
 _DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "data"))
 
@@ -54,7 +54,7 @@ class TestVipsConverter:
         When checking its type
         Then it should be an instance of Converter
         """
-        from pyzui.converters.converter import Converter
+        from zooui.converters.converter import Converter
 
         converter = VipsConverter("input.jpg", "output.ppm")
         assert isinstance(converter, Converter)

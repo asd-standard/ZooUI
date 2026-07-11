@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -20,7 +20,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from pyzui.converters import converterrunner
+from zooui.converters import converterrunner
 
 
 @pytest.fixture(autouse=True)
@@ -74,8 +74,8 @@ class TestConverterRunnerContextSelection:
     process creation.
     """
 
-    @patch("pyzui.converters.converterrunner.threading.active_count")
-    @patch("pyzui.converters.converterrunner.multiprocessing.get_context")
+    @patch("zooui.converters.converterrunner.threading.active_count")
+    @patch("zooui.converters.converterrunner.multiprocessing.get_context")
     def test_get_safe_context_returns_spawn_by_default(self, mock_get_context, mock_active_count):
         """
         Scenario: Default context is spawn (single-threaded or not)
@@ -97,8 +97,8 @@ class TestConverterRunnerContextSelection:
         mock_get_context.assert_called_once_with("spawn")
         assert result == mock_context
 
-    @patch("pyzui.converters.converterrunner.threading.active_count")
-    @patch("pyzui.converters.converterrunner.multiprocessing.get_context")
+    @patch("zooui.converters.converterrunner.threading.active_count")
+    @patch("zooui.converters.converterrunner.multiprocessing.get_context")
     def test_get_safe_context_spawn_with_threads(self, mock_get_context, mock_active_count):
         """
         Scenario: Spawn context when multiple threads are running
@@ -119,13 +119,13 @@ class TestConverterRunnerContextSelection:
         mock_get_context.assert_called_once_with("spawn")
         assert result == mock_context
 
-    @patch("pyzui.converters.converterrunner.threading.active_count")
-    @patch("pyzui.converters.converterrunner.multiprocessing.get_context")
+    @patch("zooui.converters.converterrunner.threading.active_count")
+    @patch("zooui.converters.converterrunner.multiprocessing.get_context")
     def test_get_safe_context_env_override(self, mock_get_context, mock_active_count):
         """
         Scenario: Environment variable overrides context selection
 
-        Given PYZUI_MP_CONTEXT environment variable is set to 'forkserver'
+        Given ZOOUI_MP_CONTEXT environment variable is set to 'forkserver'
         When _get_safe_context is called
         Then it should return the context specified by environment variable
         And thread count should not be checked
@@ -134,7 +134,7 @@ class TestConverterRunnerContextSelection:
         mock_get_context.return_value = mock_context
         mock_context.get_start_method.return_value = "forkserver"
 
-        with patch.dict(os.environ, {"PYZUI_MP_CONTEXT": "forkserver"}):
+        with patch.dict(os.environ, {"ZOOUI_MP_CONTEXT": "forkserver"}):
             result = converterrunner._get_safe_context()
 
         mock_get_context.assert_called_once_with("forkserver")
@@ -150,9 +150,9 @@ class TestConverterRunnerLifecycle:
     including initialization, shutdown, and context-aware reinitialization.
     """
 
-    @patch("pyzui.converters.converterrunner.ProcessPoolExecutor")
-    @patch("pyzui.converters.converterrunner._get_safe_context")
-    @patch("pyzui.converters.converterrunner.atexit.register")
+    @patch("zooui.converters.converterrunner.ProcessPoolExecutor")
+    @patch("zooui.converters.converterrunner._get_safe_context")
+    @patch("zooui.converters.converterrunner.atexit.register")
     def test_init_creates_executor(self, mock_atexit, mock_get_context, mock_executor_class):
         """
         Scenario: Initialize creates process pool executor
@@ -177,8 +177,8 @@ class TestConverterRunnerLifecycle:
         mock_executor_class.assert_called_once_with(max_workers=3, mp_context=mock_context)
         mock_atexit.assert_called_once_with(converterrunner.shutdown)
 
-    @patch("pyzui.converters.converterrunner.ProcessPoolExecutor")
-    @patch("pyzui.converters.converterrunner._get_safe_context")
+    @patch("zooui.converters.converterrunner.ProcessPoolExecutor")
+    @patch("zooui.converters.converterrunner._get_safe_context")
     def test_shutdown_cleans_up(self, mock_get_context, mock_executor_class):
         """
         Scenario: Shutdown terminates executor and child processes
@@ -195,13 +195,13 @@ class TestConverterRunnerLifecycle:
         mock_executor_class.return_value = mock_executor
 
         # Initialize first - need to mock atexit.register to avoid side effects
-        with patch("pyzui.converters.converterrunner.atexit.register"):
+        with patch("zooui.converters.converterrunner.atexit.register"):
             converterrunner.init(max_workers=2)
 
         # Mock active_children
         mock_child1 = Mock()
         mock_child2 = Mock()
-        with patch("pyzui.converters.converterrunner.multiprocessing.active_children") as mock_active:
+        with patch("zooui.converters.converterrunner.multiprocessing.active_children") as mock_active:
             mock_active.return_value = [mock_child1, mock_child2]
             converterrunner.shutdown()
 
@@ -214,8 +214,8 @@ class TestConverterRunnerLifecycle:
         mock_child2.terminate.assert_called_once()
         mock_child2.join.assert_called_once_with(timeout=1)
 
-    @patch("pyzui.converters.converterrunner.ProcessPoolExecutor")
-    @patch("pyzui.converters.converterrunner._get_safe_context")
+    @patch("zooui.converters.converterrunner.ProcessPoolExecutor")
+    @patch("zooui.converters.converterrunner._get_safe_context")
     def test_get_executor_lazy_initialization(self, mock_get_context, mock_executor_class):
         """
         Scenario: Executor is lazily initialized on first use
@@ -245,14 +245,14 @@ class TestConverterRunnerLifecycle:
         mock_init.assert_called_once()
         assert result == mock_executor
 
-    @patch("pyzui.converters.converterrunner.ProcessPoolExecutor")
-    @patch("pyzui.converters.converterrunner._get_safe_context")
+    @patch("zooui.converters.converterrunner.ProcessPoolExecutor")
+    @patch("zooui.converters.converterrunner._get_safe_context")
     def test_context_change_recreates_executor(self, mock_get_context, mock_executor_class):
         """
         Scenario: Executor is recreated when context changes
 
         Given an initialized executor with 'spawn' context
-        When context changes to 'fork' (e.g., via PYZUI_MP_CONTEXT override)
+        When context changes to 'fork' (e.g., via ZOOUI_MP_CONTEXT override)
         Then shutdown should be called
         And new executor should be created with new context
         """
@@ -290,8 +290,8 @@ class TestConverterRunnerThreadSafety:
     initialization and submission operations.
     """
 
-    @patch("pyzui.converters.converterrunner.ProcessPoolExecutor")
-    @patch("pyzui.converters.converterrunner._get_safe_context")
+    @patch("zooui.converters.converterrunner.ProcessPoolExecutor")
+    @patch("zooui.converters.converterrunner._get_safe_context")
     def test_concurrent_submit_operations(self, mock_get_context, mock_executor_class):
         """
         Scenario: Multiple threads can submit conversions concurrently
@@ -314,7 +314,7 @@ class TestConverterRunnerThreadSafety:
         mock_executor.submit.side_effect = [mock_future1, mock_future2, mock_future3]
 
         # Initialize executor - mock atexit to avoid side effects
-        with patch("pyzui.converters.converterrunner.atexit.register"):
+        with patch("zooui.converters.converterrunner.atexit.register"):
             converterrunner.init(max_workers=2)
 
         results = []
@@ -346,8 +346,8 @@ class TestConverterRunnerThreadSafety:
         assert len(results) == 3
         assert mock_executor.submit.call_count == 3
 
-    @patch("pyzui.converters.converterrunner.ProcessPoolExecutor")
-    @patch("pyzui.converters.converterrunner._get_safe_context")
+    @patch("zooui.converters.converterrunner.ProcessPoolExecutor")
+    @patch("zooui.converters.converterrunner._get_safe_context")
     def test_init_shutdown_race_condition(self, mock_get_context, mock_executor_class):
         """
         Scenario: Concurrent init and shutdown operations are thread-safe
@@ -394,8 +394,8 @@ class TestConverterRunnerThreadSafety:
         # Verify operations completed (exact counts may vary due to timing)
         assert init_called > 0 or shutdown_called > 0, "No operations completed"
 
-    @patch("pyzui.converters.converterrunner.ProcessPoolExecutor")
-    @patch("pyzui.converters.converterrunner._get_safe_context")
+    @patch("zooui.converters.converterrunner.ProcessPoolExecutor")
+    @patch("zooui.converters.converterrunner._get_safe_context")
     def test_multiple_threads_get_executor(self, mock_get_context, mock_executor_class):
         """
         Scenario: Multiple threads can safely get executor instance

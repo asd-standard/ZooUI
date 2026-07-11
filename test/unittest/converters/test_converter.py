@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -15,7 +15,7 @@
 
 from threading import Thread
 
-from pyzui.converters.converter import Converter
+from zooui.converters.converter import Converter
 
 
 class TestConverter:

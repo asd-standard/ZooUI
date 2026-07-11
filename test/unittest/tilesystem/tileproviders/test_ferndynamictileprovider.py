@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -15,7 +15,7 @@
 
 from unittest.mock import Mock, patch
 
-from pyzui.tilesystem.tileproviders import FernTileProvider
+from zooui.tilesystem.tileproviders import FernTileProvider
 
 
 class TestFernTileProvider:
@@ -46,7 +46,7 @@ class TestFernTileProvider:
         When a FernTileProvider is instantiated
         Then it should be an instance of DynamicTileProvider
         """
-        from pyzui.tilesystem.tileproviders import DynamicTileProvider
+        from zooui.tilesystem.tileproviders import DynamicTileProvider
 
         tilecache = Mock()
         provider = FernTileProvider(tilecache)
@@ -175,7 +175,7 @@ class TestFernTileProvider:
         result = provider._load_dynamic(tile_id, outfile)
         assert result is None
 
-    @patch("pyzui.tilesystem.tileproviders.ferndynamictileprovider.Image.new")
+    @patch("zooui.tilesystem.tileproviders.ferndynamictileprovider.Image.new")
     def test_load_dynamic_valid_tile(self, mock_image_new):
         """
         Scenario: Generate valid fern fractal tile

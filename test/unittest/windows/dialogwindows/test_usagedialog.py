@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ## Copyright (C) 2009 David Roberts <d@vidr.cc>
 ##
 ## This program is free software; you can redistribute it and/or
@@ -24,7 +24,7 @@ instructions from the reStructuredText documentation file.
 from pathlib import Path
 from unittest.mock import patch
 
-from pyzui.windows.dialogwindows.usagedialog import UsageDialog
+from zooui.windows.dialogwindows.usagedialog import UsageDialog
 
 
 class TestUsageDialog:

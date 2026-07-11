@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -16,7 +16,7 @@
 from threading import Thread
 from unittest.mock import Mock, patch
 
-from pyzui.tilesystem.tiler.tiler import Tiler
+from zooui.tilesystem.tiler.tiler import Tiler
 
 
 class TestTiler:
@@ -398,7 +398,7 @@ class TestTilerMergeRows:
     rows of tiles for pyramid level generation.
     """
 
-    @patch("pyzui.tilesystem.tile.merged")
+    @patch("zooui.tilesystem.tile.merged")
     def test_mergerows_returns_none_for_none_row_a(self, mock_merged):
         """
         Scenario: Merge rows with None row_a
@@ -412,7 +412,7 @@ class TestTilerMergeRows:
         assert result is None
         mock_merged.assert_not_called()
 
-    @patch("pyzui.tilesystem.tile.merged")
+    @patch("zooui.tilesystem.tile.merged")
     def test_mergerows_with_none_row_b(self, mock_merged):
         """
         Scenario: Merge rows with None row_b
@@ -433,7 +433,7 @@ class TestTilerMergeRows:
         # Should call merged with pairs from row_a and None from fake row_b
         assert mock_merged.call_count == 1
 
-    @patch("pyzui.tilesystem.tile.merged")
+    @patch("zooui.tilesystem.tile.merged")
     def test_mergerows_with_two_tiles_each(self, mock_merged):
         """
         Scenario: Merge two rows with two tiles each
@@ -455,7 +455,7 @@ class TestTilerMergeRows:
         assert len(result) == 1
         mock_merged.assert_called_once_with(mock_tile_a1, mock_tile_a2, mock_tile_b1, mock_tile_b2)
 
-    @patch("pyzui.tilesystem.tile.merged")
+    @patch("zooui.tilesystem.tile.merged")
     def test_mergerows_with_odd_tiles(self, mock_merged):
         """
         Scenario: Merge rows with odd number of tiles
@@ -484,8 +484,8 @@ class TestTilerRun:
     This test suite validates the main tiling execution method.
     """
 
-    @patch("pyzui.tilesystem.tilestore.disk_lock")
-    @patch("pyzui.tilesystem.tilestore.write_metadata")
+    @patch("zooui.tilesystem.tilestore.disk_lock")
+    @patch("zooui.tilesystem.tilestore.write_metadata")
     def test_run_sets_progress_to_one_on_completion(self, mock_write_metadata, mock_disk_lock):
         """
         Scenario: Progress is set to 1.0 after completion
@@ -507,8 +507,8 @@ class TestTilerRun:
 
         assert tiler.progress == 1.0
 
-    @patch("pyzui.tilesystem.tilestore.disk_lock")
-    @patch("pyzui.tilesystem.tilestore.write_metadata")
+    @patch("zooui.tilesystem.tilestore.disk_lock")
+    @patch("zooui.tilesystem.tilestore.write_metadata")
     @patch.object(Tiler, "_Tiler__tiles")
     def test_run_calculates_tile_dimensions(self, mock_tiles, mock_write_metadata, mock_disk_lock):
         """
@@ -537,8 +537,8 @@ class TestTilerRun:
         # bottom_tiles_height = (300 - 1) % 256 + 1 = 44
         assert tiler._Tiler__bottom_tiles_height == 44
 
-    @patch("pyzui.tilesystem.tilestore.disk_lock")
-    @patch("pyzui.tilesystem.tilestore.write_metadata")
+    @patch("zooui.tilesystem.tilestore.disk_lock")
+    @patch("zooui.tilesystem.tilestore.write_metadata")
     @patch.object(Tiler, "_Tiler__tiles")
     def test_run_writes_metadata_on_success(self, mock_tiles, mock_write_metadata, mock_disk_lock):
         """
@@ -566,8 +566,8 @@ class TestTilerRun:
         assert call_kwargs["height"] == 512
 
     @patch("shutil.rmtree")
-    @patch("pyzui.tilesystem.tilestore.disk_lock")
-    @patch("pyzui.tilesystem.tilestore.get_media_path", return_value="/test/path")
+    @patch("zooui.tilesystem.tilestore.disk_lock")
+    @patch("zooui.tilesystem.tilestore.get_media_path", return_value="/test/path")
     def test_run_cleans_up_on_error(self, mock_get_path, mock_disk_lock, mock_rmtree):
         """
         Scenario: Run cleans up tiles on error
@@ -588,8 +588,8 @@ class TestTilerRun:
 
         assert tiler.error is not None
 
-    @patch("pyzui.tilesystem.tilestore.disk_lock")
-    @patch("pyzui.tilesystem.tilestore.write_metadata")
+    @patch("zooui.tilesystem.tilestore.disk_lock")
+    @patch("zooui.tilesystem.tilestore.write_metadata")
     @patch.object(Tiler, "_Tiler__tiles")
     def test_run_calculates_numtiles(self, mock_tiles, mock_write_metadata, mock_disk_lock):
         """
@@ -668,8 +668,8 @@ class TestTilerThreadPool:
     multiple tiles are processed per row, optimizing performance for wide images.
     """
 
-    @patch("pyzui.tilesystem.tiler.tiler.ThreadPoolExecutor")
-    @patch("pyzui.tilesystem.tiler.tiler.os.cpu_count")
+    @patch("zooui.tilesystem.tiler.tiler.ThreadPoolExecutor")
+    @patch("zooui.tilesystem.tiler.tiler.os.cpu_count")
     def test_executor_creation_when_multiple_tiles_per_row(self, mock_cpu_count, mock_executor_class):
         """
         Scenario: ThreadPoolExecutor created when multiple tiles per row
@@ -694,12 +694,12 @@ class TestTilerThreadPool:
         tiler._Tiler__numtiles = 4
 
         # Mock disk_lock and other dependencies
-        with patch("pyzui.tilesystem.tilestore.disk_lock") as mock_disk_lock:
+        with patch("zooui.tilesystem.tilestore.disk_lock") as mock_disk_lock:
             mock_disk_lock.__enter__ = Mock()
             mock_disk_lock.__exit__ = Mock()
             with patch.object(tiler, "_Tiler__tiles") as mock_tiles:
                 mock_tiles.return_value = None
-                with patch("pyzui.tilesystem.tilestore.write_metadata"):
+                with patch("zooui.tilesystem.tilestore.write_metadata"):
                     tiler.run()
 
         # ThreadPoolExecutor should be created with max_workers = min(4, 8) = 4
@@ -707,7 +707,7 @@ class TestTilerThreadPool:
         # The executor was created (verified by the call above)
         # Even though it's set to None in finally block, we know it was created
 
-    @patch("pyzui.tilesystem.tiler.tiler.ThreadPoolExecutor")
+    @patch("zooui.tilesystem.tiler.tiler.ThreadPoolExecutor")
     def test_no_executor_when_single_tile_per_row(self, mock_executor_class):
         """
         Scenario: No ThreadPoolExecutor when single tile per row
@@ -728,20 +728,20 @@ class TestTilerThreadPool:
         tiler._Tiler__numtiles = 1
 
         # Mock disk_lock and other dependencies
-        with patch("pyzui.tilesystem.tilestore.disk_lock") as mock_disk_lock:
+        with patch("zooui.tilesystem.tilestore.disk_lock") as mock_disk_lock:
             mock_disk_lock.__enter__ = Mock()
             mock_disk_lock.__exit__ = Mock()
             with patch.object(tiler, "_Tiler__tiles") as mock_tiles:
                 mock_tiles.return_value = None
-                with patch("pyzui.tilesystem.tilestore.write_metadata"):
+                with patch("zooui.tilesystem.tilestore.write_metadata"):
                     tiler.run()
 
         # ThreadPoolExecutor should NOT be created
         mock_executor_class.assert_not_called()
         assert tiler._Tiler__executor is None
 
-    @patch("pyzui.tilesystem.tiler.tiler.ThreadPoolExecutor")
-    @patch("pyzui.tilesystem.tiler.tiler.os.cpu_count")
+    @patch("zooui.tilesystem.tiler.tiler.ThreadPoolExecutor")
+    @patch("zooui.tilesystem.tiler.tiler.os.cpu_count")
     def test_max_workers_calculation(self, mock_cpu_count, mock_executor_class):
         """
         Scenario: Max workers calculation respects CPU count limit
@@ -766,19 +766,19 @@ class TestTilerThreadPool:
         tiler._Tiler__numtiles = 8
 
         # Mock disk_lock and other dependencies
-        with patch("pyzui.tilesystem.tilestore.disk_lock") as mock_disk_lock:
+        with patch("zooui.tilesystem.tilestore.disk_lock") as mock_disk_lock:
             mock_disk_lock.__enter__ = Mock()
             mock_disk_lock.__exit__ = Mock()
             with patch.object(tiler, "_Tiler__tiles") as mock_tiles:
                 mock_tiles.return_value = None
-                with patch("pyzui.tilesystem.tilestore.write_metadata"):
+                with patch("zooui.tilesystem.tilestore.write_metadata"):
                     tiler.run()
 
         # max_workers should be min(8, 2) = 2
         mock_executor_class.assert_called_once_with(max_workers=2)
 
-    @patch("pyzui.tilesystem.tiler.tiler.ThreadPoolExecutor")
-    @patch("pyzui.tilesystem.tiler.tiler.os.cpu_count")
+    @patch("zooui.tilesystem.tiler.tiler.ThreadPoolExecutor")
+    @patch("zooui.tilesystem.tiler.tiler.os.cpu_count")
     def test_executor_shutdown_in_finally_block(self, mock_cpu_count, mock_executor_class):
         """
         Scenario: Executor shutdown in finally block ensures cleanup
@@ -802,20 +802,20 @@ class TestTilerThreadPool:
         tiler._Tiler__numtiles = 4
 
         # Mock disk_lock and other dependencies
-        with patch("pyzui.tilesystem.tilestore.disk_lock") as mock_disk_lock:
+        with patch("zooui.tilesystem.tilestore.disk_lock") as mock_disk_lock:
             mock_disk_lock.__enter__ = Mock()
             mock_disk_lock.__exit__ = Mock()
             with patch.object(tiler, "_Tiler__tiles") as mock_tiles:
                 mock_tiles.return_value = None
-                with patch("pyzui.tilesystem.tilestore.write_metadata"):
+                with patch("zooui.tilesystem.tilestore.write_metadata"):
                     tiler.run()
 
         # executor.shutdown should be called
         mock_executor.shutdown.assert_called_once_with(wait=True)
         assert tiler._Tiler__executor is None  # Should be set to None after shutdown
 
-    @patch("pyzui.tilesystem.tiler.tiler.ThreadPoolExecutor")
-    @patch("pyzui.tilesystem.tiler.tiler.os.cpu_count")
+    @patch("zooui.tilesystem.tiler.tiler.ThreadPoolExecutor")
+    @patch("zooui.tilesystem.tiler.tiler.os.cpu_count")
     def test_executor_shutdown_on_exception(self, mock_cpu_count, mock_executor_class):
         """
         Scenario: Executor shutdown even when exception occurs
@@ -839,7 +839,7 @@ class TestTilerThreadPool:
         tiler._Tiler__numtiles = 4
 
         # Mock disk_lock to raise exception
-        with patch("pyzui.tilesystem.tilestore.disk_lock") as mock_disk_lock:
+        with patch("zooui.tilesystem.tilestore.disk_lock") as mock_disk_lock:
             mock_disk_lock.__enter__ = Mock(side_effect=RuntimeError("Test error"))
             mock_disk_lock.__exit__ = Mock(return_value=False)
 
@@ -858,13 +858,13 @@ class TestTilerThreadPool:
         When _make_tile is called
         Then it should call Tile.fromstring with unpacked arguments
         """
-        from pyzui.tilesystem.tiler.tiler import _make_tile
+        from zooui.tilesystem.tiler.tiler import _make_tile
 
         mock_string = "test_data"
         mock_width = 256
         mock_height = 256
 
-        with patch("pyzui.tilesystem.tiler.tiler.Tile") as mock_tile_class:
+        with patch("zooui.tilesystem.tiler.tiler.Tile") as mock_tile_class:
             mock_tile_instance = Mock()
             mock_tile_class.fromstring.return_value = mock_tile_instance
 

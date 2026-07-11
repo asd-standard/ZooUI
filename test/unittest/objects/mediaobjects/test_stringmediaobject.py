@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -17,8 +17,8 @@ from unittest.mock import Mock
 
 import pytest
 
-from pyzui.objects.mediaobjects.mediaobject import LoadError
-from pyzui.objects.mediaobjects.stringmediaobject import StringMediaObject
+from zooui.objects.mediaobjects.mediaobject import LoadError
+from zooui.objects.mediaobjects.stringmediaobject import StringMediaObject
 
 
 class TestStringMediaObject:
@@ -84,7 +84,7 @@ class TestStringMediaObject:
         When checking its type
         Then it should be an instance of MediaObject
         """
-        from pyzui.objects.mediaobjects.mediaobject import MediaObject
+        from zooui.objects.mediaobjects.mediaobject import MediaObject
 
         scene = Mock()
         obj = StringMediaObject("string:000000:Test", scene)

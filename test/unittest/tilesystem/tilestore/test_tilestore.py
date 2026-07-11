@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -16,7 +16,7 @@
 import hashlib
 from unittest.mock import Mock, mock_open, patch
 
-from pyzui.tilesystem import tilestore
+from zooui.tilesystem import tilestore
 
 
 class TestTilestoreModule:
@@ -108,7 +108,7 @@ class TestTilestoreModule:
         Then it should return a valid path with the correct file extension
         """
         tile_id = ("media_id", 0, 0, 0)
-        with patch("pyzui.tilesystem.tilestore.tilestore.get_metadata", return_value="jpg"):
+        with patch("zooui.tilesystem.tilestore.tilestore.get_metadata", return_value="jpg"):
             path = tilestore.get_tile_path(tile_id)
             assert isinstance(path, str)
             assert ".jpg" in path
@@ -535,8 +535,8 @@ class TestTilestoreCleanup:
         # Should not crash, errors should be collected
         assert "errors" in result
 
-    @patch("pyzui.tilesystem.tilestore.tilestore.get_tilestore_stats")
-    @patch("pyzui.tilesystem.tilestore.tilestore.cleanup_old_tiles")
+    @patch("zooui.tilesystem.tilestore.tilestore.get_tilestore_stats")
+    @patch("zooui.tilesystem.tilestore.tilestore.cleanup_old_tiles")
     def test_auto_cleanup_disabled(self, mock_cleanup, mock_stats):
         """
         Scenario: Auto cleanup when disabled
@@ -550,8 +550,8 @@ class TestTilestoreCleanup:
         assert result is None
         mock_cleanup.assert_not_called()
 
-    @patch("pyzui.tilesystem.tilestore.tilestore.get_tilestore_stats")
-    @patch("pyzui.tilesystem.tilestore.tilestore.cleanup_old_tiles")
+    @patch("zooui.tilesystem.tilestore.tilestore.get_tilestore_stats")
+    @patch("zooui.tilesystem.tilestore.tilestore.cleanup_old_tiles")
     def test_auto_cleanup_enabled(self, mock_cleanup, mock_stats):
         """
         Scenario: Auto cleanup when enabled
@@ -580,8 +580,8 @@ class TestTilestoreCleanup:
         # get_tilestore_stats called twice (before and after cleanup)
         assert mock_stats.call_count == 2
 
-    @patch("pyzui.tilesystem.tilestore.tilestore.get_tilestore_stats")
-    @patch("pyzui.tilesystem.tilestore.tilestore.cleanup_old_tiles")
+    @patch("zooui.tilesystem.tilestore.tilestore.get_tilestore_stats")
+    @patch("zooui.tilesystem.tilestore.tilestore.cleanup_old_tiles")
     def test_auto_cleanup_custom_age(self, mock_cleanup, mock_stats):
         """
         Scenario: Auto cleanup with custom max age
@@ -611,7 +611,7 @@ class TestTilestoreMetadataTypes:
     """
 
     @patch("builtins.open", new_callable=mock_open, read_data="count\t42\tint\n")
-    @patch("pyzui.tilesystem.tilestore.tilestore.get_media_path", return_value="/path/to/media")
+    @patch("zooui.tilesystem.tilestore.tilestore.get_media_path", return_value="/path/to/media")
     def test_load_metadata_parses_int(self, mock_media_path, mock_file):
         """
         Scenario: Parse integer metadata value
@@ -621,7 +621,7 @@ class TestTilestoreMetadataTypes:
         Then the value should be parsed as int and get_metadata should return it
         """
         # Import the actual tilestore module to reset its internal variable
-        from pyzui.tilesystem.tilestore import tilestore as ts_module
+        from zooui.tilesystem.tilestore import tilestore as ts_module
 
         # Reset metadata cache
         ts_module._TestTilestoreMetadataTypes__metadata = {}
@@ -638,7 +638,7 @@ class TestTilestoreMetadataTypes:
         assert isinstance(value, int)
 
     @patch("builtins.open", new_callable=mock_open, read_data="ratio\t3.14\tfloat\n")
-    @patch("pyzui.tilesystem.tilestore.tilestore.get_media_path", return_value="/path/to/media")
+    @patch("zooui.tilesystem.tilestore.tilestore.get_media_path", return_value="/path/to/media")
     def test_load_metadata_parses_float(self, mock_media_path, mock_file):
         """
         Scenario: Parse float metadata value
@@ -655,7 +655,7 @@ class TestTilestoreMetadataTypes:
         assert isinstance(value, float)
 
     @patch("builtins.open", new_callable=mock_open, read_data="large\t9999999999\tlong\n")
-    @patch("pyzui.tilesystem.tilestore.tilestore.get_media_path", return_value="/path/to/media")
+    @patch("zooui.tilesystem.tilestore.tilestore.get_media_path", return_value="/path/to/media")
     def test_load_metadata_parses_long(self, mock_media_path, mock_file):
         """
         Scenario: Parse long metadata value
@@ -672,7 +672,7 @@ class TestTilestoreMetadataTypes:
         assert isinstance(value, int)
 
     @patch("builtins.open", new_callable=mock_open, read_data="name\ttest\tstr\n")
-    @patch("pyzui.tilesystem.tilestore.tilestore.get_media_path", return_value="/path/to/media")
+    @patch("zooui.tilesystem.tilestore.tilestore.get_media_path", return_value="/path/to/media")
     def test_load_metadata_keeps_string(self, mock_media_path, mock_file):
         """
         Scenario: Keep string metadata value

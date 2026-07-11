@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -15,7 +15,7 @@
 
 from unittest.mock import Mock, patch
 
-from pyzui.tilesystem.tileproviders import DynamicTileProvider
+from zooui.tilesystem.tileproviders import DynamicTileProvider
 
 
 class TestDynamicTileProvider:
@@ -46,7 +46,7 @@ class TestDynamicTileProvider:
         When checking its type
         Then it should be an instance of TileProvider
         """
-        from pyzui.tilesystem.tileproviders import TileProvider
+        from zooui.tilesystem.tileproviders import TileProvider
 
         tilecache = Mock()
         provider = DynamicTileProvider(tilecache)
@@ -96,9 +96,9 @@ class TestDynamicTileProvider:
         result = provider._load_dynamic(tile_id, "/path/to/file")
         assert result is None
 
-    @patch("pyzui.tilesystem.tileproviders.dynamictileprovider.TileStore.get_tile_path")
+    @patch("zooui.tilesystem.tileproviders.dynamictileprovider.TileStore.get_tile_path")
     @patch("os.path.exists")
-    @patch("pyzui.tilesystem.tileproviders.dynamictileprovider.QtGui.QImage")
+    @patch("zooui.tilesystem.tileproviders.dynamictileprovider.QtGui.QImage")
     def test_load_existing_tile(self, mock_qimage_class, mock_exists, mock_path):
         """
         Scenario: Load an existing tile from disk
@@ -123,10 +123,10 @@ class TestDynamicTileProvider:
         assert result == mock_image
         mock_qimage_class.assert_called_once_with("/path/to/tile.png")
 
-    @patch("pyzui.tilesystem.tileproviders.dynamictileprovider.TileStore.get_tile_path")
+    @patch("zooui.tilesystem.tileproviders.dynamictileprovider.TileStore.get_tile_path")
     @patch("os.path.exists")
     @patch.object(DynamicTileProvider, "_load_dynamic")
-    @patch("pyzui.tilesystem.tileproviders.dynamictileprovider.QtGui.QImage")
+    @patch("zooui.tilesystem.tileproviders.dynamictileprovider.QtGui.QImage")
     def test_load_nonexistent_tile(self, mock_qimage_class, mock_load_dynamic, mock_exists, mock_path):
         """
         Scenario: Load a tile that doesn't exist on disk
@@ -149,9 +149,9 @@ class TestDynamicTileProvider:
 
         mock_load_dynamic.assert_called_once_with(tile_id, "/path/to/tile.png")
 
-    @patch("pyzui.tilesystem.tileproviders.dynamictileprovider.TileStore.get_tile_path")
+    @patch("zooui.tilesystem.tileproviders.dynamictileprovider.TileStore.get_tile_path")
     @patch("os.path.exists")
-    @patch("pyzui.tilesystem.tileproviders.dynamictileprovider.QtGui.QImage", side_effect=Exception("Load error"))
+    @patch("zooui.tilesystem.tileproviders.dynamictileprovider.QtGui.QImage", side_effect=Exception("Load error"))
     def test_load_handles_exception(self, mock_qimage, mock_exists, mock_path):
         """
         Scenario: Handle exceptions during tile loading
@@ -172,7 +172,7 @@ class TestDynamicTileProvider:
 
         assert result is None
 
-    @patch("pyzui.tilesystem.tileproviders.dynamictileprovider.TileStore.get_tile_path")
+    @patch("zooui.tilesystem.tileproviders.dynamictileprovider.TileStore.get_tile_path")
     def test_load_creates_path_with_mkdirp(self, mock_path):
         """
         Scenario: Create directory structure during tile loading
@@ -190,7 +190,7 @@ class TestDynamicTileProvider:
         tile_id = ("media_id", 0, 0, 0)
 
         with patch("os.path.exists", return_value=True):
-            with patch("pyzui.tilesystem.tileproviders.dynamictileprovider.QtGui.QImage"):
+            with patch("zooui.tilesystem.tileproviders.dynamictileprovider.QtGui.QImage"):
                 provider._load(tile_id)
 
         mock_path.assert_called_once_with(tile_id, True, filext="png")

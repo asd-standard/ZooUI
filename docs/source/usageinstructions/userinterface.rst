@@ -1,12 +1,12 @@
 User Interface
 ==============
 
-Upon startup of PyZUI, the user is presented with the home scene:
+Upon startup of ZooUI, the user is presented with the home scene:
 
 .. image:: ../../../data/home.png
    :align: center
    :width: 800px
-   :alt: PyZUI logo
+   :alt: ZooUI logo
 
 The menus provide the following actions:
 ----------------------------------------
@@ -50,7 +50,7 @@ Settings menu:
   - Set autosave interval (1-1440 minutes)
   - Set maximum backups to keep per scene (1-1000)
   - Set backup directory expiration after inactivity (1-365 days)
-  - Each scene gets its own backup directory: ``~/.pyzui/backups/<scene>_<hash>/``
+  - Each scene gets its own backup directory: ``~/.zooui/backups/<scene>_<hash>/``
   - Backup naming: ``yy_mm_dd_hh_mm_filename_hash.pzs``
   - Oldest backups are automatically deleted when limit is reached
   - Inactive scene directories are deleted after expiration period
@@ -74,7 +74,7 @@ Actions menu:
 Help menu:
 ~~~~~~~~~~
 
-- **About** Show PyZUI copyright information
+- **About** Show ZooUI copyright information
 - **About Qt** Show Qt about dialog
 
 Mouse/Keyboard actions:

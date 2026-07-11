@@ -6,5 +6,5 @@ repos:
         args: [--fix]
       - id: ruff-format
 
-  # mypy is run manually: mypy pyzui/
+  # mypy is run manually: mypy zooui/
   # - 176 type issues to fix incrementally before enabling in pre-commit

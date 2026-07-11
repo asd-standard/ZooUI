@@ -3,7 +3,7 @@ Project structure
 
 For human readability the project has been subdivided into the following folder structure::
 
-  pyzui/
+  zooui/
   ├── config.py
   ├── logger.py
   ├── converters/
@@ -81,23 +81,23 @@ Project class hierarchy
 PhysicalObject and media types
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- :doc:`physicalobject <../pyzui/physicalobject>`
-    - :doc:`mediaobject <../pyzui/mediaobject>`
-        - :doc:`tiledmediaobject <../pyzui/tiledmediaobject>`
-        - :doc:`stringmediaobject <../pyzui/stringmediaobject>`
-        - :doc:`svgmediaobject <../pyzui/svgmediaobject>`
-    - :doc:`scene <../pyzui/scene>`
-        - :doc:`qzui <../pyzui/qzui>`
+- :doc:`physicalobject <../zooui/physicalobject>`
+    - :doc:`mediaobject <../zooui/mediaobject>`
+        - :doc:`tiledmediaobject <../zooui/tiledmediaobject>`
+        - :doc:`stringmediaobject <../zooui/stringmediaobject>`
+        - :doc:`svgmediaobject <../zooui/svgmediaobject>`
+    - :doc:`scene <../zooui/scene>`
+        - :doc:`qzui <../zooui/qzui>`
             - :doc:`main <../main>`
-        - :doc:`prioritybatcher <../pyzui/prioritybatcher>`
-        - :doc:`autosave <../pyzui/autosave>` — Timer-based autosave orchestration
-        - :doc:`clipboard <../pyzui/clipboard>` — Copy/paste operations
-        - :doc:`parallel <../pyzui/parallel>` — Parallel rendering
+        - :doc:`prioritybatcher <../zooui/prioritybatcher>`
+        - :doc:`autosave <../zooui/autosave>` — Timer-based autosave orchestration
+        - :doc:`clipboard <../zooui/clipboard>` — Copy/paste operations
+        - :doc:`parallel <../zooui/parallel>` — Parallel rendering
 
 Zoom manager
 ~~~~~~~~~~~~
 
-- :doc:`zoommanager <../pyzui/zoommanager>` — Zoom level tracking and physics
+- :doc:`zoommanager <../zooui/zoommanager>` — Zoom level tracking and physics
 
 Media object utilities
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -117,40 +117,40 @@ SVG utilities
 Converters
 ~~~~~~~~~~
 
-- :doc:`converter <../pyzui/converter>`
-    - :doc:`pdfconverter <../pyzui/pdfconverter>`
-    - :doc:`vipsconverter <../pyzui/vipsconverter>`
-    - :doc:`converterrunner <../pyzui/converterrunner>` — Process-based parallel conversion
+- :doc:`converter <../zooui/converter>`
+    - :doc:`pdfconverter <../zooui/pdfconverter>`
+    - :doc:`vipsconverter <../zooui/vipsconverter>`
+    - :doc:`converterrunner <../zooui/converterrunner>` — Process-based parallel conversion
 
 Tile system
 ~~~~~~~~~~~
 
-- :doc:`tile <../pyzui/tile>`
-- :doc:`tilecache <../pyzui/tilecache>` — In-memory LRU cache
-- :doc:`tilemanager <../pyzui/tilemanager>` — Central tile coordinator
-- :doc:`tiler <../pyzui/tiler>`
-    - :doc:`ppm <../pyzui/ppm>`
-    - :doc:`tilerrunner <../pyzui/tilerrunner>` — Process-based parallel tiling
-- :doc:`tileprovider <../pyzui/tileprovider>`
-    - :doc:`statictileprovider <../pyzui/statictileprovider>`
-    - :doc:`dynamictileprovider <../pyzui/dynamictileprovider>`
-        - :doc:`ferntileprovider <../pyzui/ferntileprovider>`
-- :doc:`tilestore <../pyzui/tilestore>`
+- :doc:`tile <../zooui/tile>`
+- :doc:`tilecache <../zooui/tilecache>` — In-memory LRU cache
+- :doc:`tilemanager <../zooui/tilemanager>` — Central tile coordinator
+- :doc:`tiler <../zooui/tiler>`
+    - :doc:`ppm <../zooui/ppm>`
+    - :doc:`tilerrunner <../zooui/tilerrunner>` — Process-based parallel tiling
+- :doc:`tileprovider <../zooui/tileprovider>`
+    - :doc:`statictileprovider <../zooui/statictileprovider>`
+    - :doc:`dynamictileprovider <../zooui/dynamictileprovider>`
+        - :doc:`ferntileprovider <../zooui/ferntileprovider>`
+- :doc:`tilestore <../zooui/tilestore>`
     - ``cleanuptilestore.py`` — Auto-cleanup of stale tiles
 
 Windows and dialogs
 ~~~~~~~~~~~~~~~~~~~
 
-- :doc:`mainwindow <../pyzui/mainwindow>`
-- :doc:`dialogwindows <../pyzui/dialogwindows>`
-    - :doc:`stringinputdialog <../pyzui/stringinputdialog>`
-    - :doc:`modifystringdialog <../pyzui/modifystringdialog>`
-    - :doc:`svgpickerinputdialog <../pyzui/svgpickerinputdialog>`
-    - :doc:`modifysvginputdialog <../pyzui/modifysvginputdialog>`
-    - :doc:`modifytiledmediaobjectdialog <../pyzui/modifytiledmediaobjectdialog>`
-    - :doc:`zoomsensitivitydialog <../pyzui/zoomsensitivitydialog>`
-    - :doc:`zoomsettingsdialog <../pyzui/zoomsettingsdialog>`
-    - :doc:`autosavesettingsdialog <../pyzui/autosavesettingsdialog>`
+- :doc:`mainwindow <../zooui/mainwindow>`
+- :doc:`dialogwindows <../zooui/dialogwindows>`
+    - :doc:`stringinputdialog <../zooui/stringinputdialog>`
+    - :doc:`modifystringdialog <../zooui/modifystringdialog>`
+    - :doc:`svgpickerinputdialog <../zooui/svgpickerinputdialog>`
+    - :doc:`modifysvginputdialog <../zooui/modifysvginputdialog>`
+    - :doc:`modifytiledmediaobjectdialog <../zooui/modifytiledmediaobjectdialog>`
+    - :doc:`zoomsensitivitydialog <../zooui/zoomsensitivitydialog>`
+    - :doc:`zoomsettingsdialog <../zooui/zoomsettingsdialog>`
+    - :doc:`autosavesettingsdialog <../zooui/autosavesettingsdialog>`
 
 Configuration and backup
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -168,7 +168,7 @@ core components and design patterns.
 Key Design Patterns:
 
     - **Abstract Base Classes**: Converter, TileProvider, MediaObject, PhysicalObject
-    - **Process Pooling**: Parallel media conversion (:doc:`converterrunner <../pyzui/converterrunner>`) and tile generation (:doc:`tilerrunner <../pyzui/tilerrunner>`)
+    - **Process Pooling**: Parallel media conversion (:doc:`converterrunner <../zooui/converterrunner>`) and tile generation (:doc:`tilerrunner <../zooui/tilerrunner>`)
     - **Thread Pooling**: Concurrent tile creation with worker thread pools in TileManager
     - **Autosave**: Timer-based per-scene backup orchestration with rotation and cleanup
     - **Clipboard**: Copy/paste with grid-aligned positioning via ``sceneutils/clipboard.py``
@@ -185,23 +185,23 @@ Core Components::
   | Component           | Responsibility                      | Key Files |
   |---------------------|-------------------------------------|-----------|
   | **main.py**         | Application entry, initialization   | main.py |
-  | **ConfigManager**   | User configuration management       | pyzui/config.py |
-  | **LoggerConfig**    | Centralized logging system          | pyzui/logger.py |
-  | **MainWindow**      | Qt main window and menus            | pyzui/windows/mainwindow.py |
-  | **QZUI**            | Rendering widget, input handling    | pyzui/objects/scene/qzui.py |
-  | **Scene**           | MediaObject container, autosave     | pyzui/objects/scene/scene.py |
-  | **Autosave**        | Timer-based per-scene backups       | pyzui/objects/scene/sceneutils/autosave.py |
-  | **Clipboard**       | Copy/paste with grid alignment      | pyzui/objects/scene/sceneutils/clipboard.py |
-  | **MediaObject**     | Displayable media in ZUI            | pyzui/objects/mediaobjects/ |
-  | **ZoomManager**     | Zoom level tracking and physics     | pyzui/objects/objectsutils/zoom/zoommanager.py |
-  | **PriorityBatcher** | Priority-based tile request batching| pyzui/objects/scene/sceneutils/prioritybatcher.py |
-  | **TileManager**     | Tile coordination and caching       | pyzui/tilesystem/tilemanager.py |
-  | **TileProvider**    | Tile loading/generation             | pyzui/tilesystem/tileproviders/ |
-  | **TileStore**       | Persistent tile storage             | pyzui/tilesystem/tilestore/ |
-  | **Converter**       | Media format conversion             | pyzui/converters/ |
-  | **ConverterRunner** | Process-based parallel conversion   | pyzui/converters/converterrunner.py |
-  | **TilerRunner**     | Process-based parallel tiling       | pyzui/tilesystem/tiler/tilerrunner.py |
-  | **BackupManager**   | Per-scene backup creation/rotation  | pyzui/backup/backupmanager.py |
+  | **ConfigManager**   | User configuration management       | zooui/config.py |
+  | **LoggerConfig**    | Centralized logging system          | zooui/logger.py |
+  | **MainWindow**      | Qt main window and menus            | zooui/windows/mainwindow.py |
+  | **QZUI**            | Rendering widget, input handling    | zooui/objects/scene/qzui.py |
+  | **Scene**           | MediaObject container, autosave     | zooui/objects/scene/scene.py |
+  | **Autosave**        | Timer-based per-scene backups       | zooui/objects/scene/sceneutils/autosave.py |
+  | **Clipboard**       | Copy/paste with grid alignment      | zooui/objects/scene/sceneutils/clipboard.py |
+  | **MediaObject**     | Displayable media in ZUI            | zooui/objects/mediaobjects/ |
+  | **ZoomManager**     | Zoom level tracking and physics     | zooui/objects/objectsutils/zoom/zoommanager.py |
+  | **PriorityBatcher** | Priority-based tile request batching| zooui/objects/scene/sceneutils/prioritybatcher.py |
+  | **TileManager**     | Tile coordination and caching       | zooui/tilesystem/tilemanager.py |
+  | **TileProvider**    | Tile loading/generation             | zooui/tilesystem/tileproviders/ |
+  | **TileStore**       | Persistent tile storage             | zooui/tilesystem/tilestore/ |
+  | **Converter**       | Media format conversion             | zooui/converters/ |
+  | **ConverterRunner** | Process-based parallel conversion   | zooui/converters/converterrunner.py |
+  | **TilerRunner**     | Process-based parallel tiling       | zooui/tilesystem/tiler/tilerrunner.py |
+  | **BackupManager**   | Per-scene backup creation/rotation  | zooui/backup/backupmanager.py |
 
 
 Complete Application Lifecycle::
@@ -211,7 +211,7 @@ Complete Application Lifecycle::
      Parse Args → Load Config → Init Logging      |      │  ┌─────────────────────┐   │
        ↓                        ↑                 |      ├─→│ User Input Events   │───┤
      ConfigManager reads       │                  |      │  └─────────────────────┘   │
-     pyzui_config.json ←───────┘                  |      │                            │
+     zooui_config.json ←───────┘                  |      │                            │
        ↓                                          |      │  ┌─────────────────────┐   │
      Init TileManager                             |      ├─→│ QZUI Render Loop    │───┤
        ↓                                          |      │  │ • Update physics    │   │

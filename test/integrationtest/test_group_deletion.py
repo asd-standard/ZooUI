@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -23,9 +23,9 @@ Tests the complete workflow:
 
 from unittest.mock import Mock, patch
 
-from pyzui.objects.mediaobjects.tiledmediaobject import TiledMediaObject
-from pyzui.objects.scene.scene import Scene
-from pyzui.tilesystem import tilemanager as TileManager
+from zooui.objects.mediaobjects.tiledmediaobject import TiledMediaObject
+from zooui.objects.scene.scene import Scene
+from zooui.tilesystem import tilemanager as TileManager
 
 
 class TestGroupDeletion:

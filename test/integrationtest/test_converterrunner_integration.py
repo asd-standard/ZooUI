@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -26,7 +26,7 @@ import threading
 import pytest
 from PIL import Image
 
-from pyzui.converters import converterrunner
+from zooui.converters import converterrunner
 
 
 def is_pyvips_available():
@@ -166,7 +166,7 @@ class TestConverterRunnerIntegration:
         """
         Scenario: Default multiprocessing context is spawn
 
-        Given no PYZUI_MP_CONTEXT environment variable
+        Given no ZOOUI_MP_CONTEXT environment variable
         When converter runner initializes
         Then it should use 'spawn' context regardless of thread count
         """
@@ -201,14 +201,14 @@ class TestConverterRunnerIntegration:
     @pytest.mark.skipif(not is_pyvips_available(), reason="pyvips not available")
     def test_converterrunner_environment_variable_override(self, monkeypatch):
         """
-        Scenario: PYZUI_MP_CONTEXT environment variable overrides context selection
+        Scenario: ZOOUI_MP_CONTEXT environment variable overrides context selection
 
-        Given PYZUI_MP_CONTEXT environment variable is set
+        Given ZOOUI_MP_CONTEXT environment variable is set
         When converter runner initializes
         Then it should use the specified context regardless of thread count
         """
         # Set environment variable
-        monkeypatch.setenv("PYZUI_MP_CONTEXT", "spawn")
+        monkeypatch.setenv("ZOOUI_MP_CONTEXT", "spawn")
 
         # Initialize - should use 'spawn' even with single thread
         converterrunner.init(max_workers=2)
@@ -217,7 +217,7 @@ class TestConverterRunnerIntegration:
         converterrunner.shutdown()
 
         # Test with different value
-        monkeypatch.setenv("PYZUI_MP_CONTEXT", "forkserver")
+        monkeypatch.setenv("ZOOUI_MP_CONTEXT", "forkserver")
 
         # Re-initialize
         converterrunner.init(max_workers=2)

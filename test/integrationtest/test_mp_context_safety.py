@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -23,8 +23,8 @@ no DeprecationWarning is emitted when submitting jobs with threads active.
 import threading
 import warnings
 
-from pyzui.converters import converterrunner
-from pyzui.tilesystem.tiler import tilerrunner
+from zooui.converters import converterrunner
+from zooui.tilesystem.tiler import tilerrunner
 
 
 class TestMPContextSafety:
@@ -41,7 +41,7 @@ class TestMPContextSafety:
         """
         Scenario: Both runners initialize with spawn context by default
 
-        Given no PYZUI_MP_CONTEXT environment variable
+        Given no ZOOUI_MP_CONTEXT environment variable
         When tilerrunner and converterrunner initialize
         Then both should use 'spawn' context
         """
@@ -156,13 +156,13 @@ class TestMPContextSafety:
 
     def test_env_override_to_fork_still_works(self, monkeypatch):
         """
-        Scenario: PYZUI_MP_CONTEXT=fork override still works
+        Scenario: ZOOUI_MP_CONTEXT=fork override still works
 
-        Given PYZUI_MP_CONTEXT=fork
+        Given ZOOUI_MP_CONTEXT=fork
         When runner initializes
         Then it should use 'fork' context (opt-in to old behavior)
         """
-        monkeypatch.setenv('PYZUI_MP_CONTEXT', 'fork')
+        monkeypatch.setenv('ZOOUI_MP_CONTEXT', 'fork')
 
         tilerrunner.init(max_workers=1)
         assert tilerrunner._executor_context_name == 'fork'

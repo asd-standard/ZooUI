@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -28,9 +28,9 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from pyzui.objects.mediaobjects.svgmediaobject import SVGMediaObject
-from pyzui.windows.dialogwindows.modifysvginputdialog import ModifySVGInputDialog
-from pyzui.windows.dialogwindows.svgpickerinputdialog import OpenSVGPickerInputDialog
+from zooui.objects.mediaobjects.svgmediaobject import SVGMediaObject
+from zooui.windows.dialogwindows.modifysvginputdialog import ModifySVGInputDialog
+from zooui.windows.dialogwindows.svgpickerinputdialog import OpenSVGPickerInputDialog
 
 
 class TestSVGDialogIntegration:
@@ -99,10 +99,10 @@ class TestSVGDialogIntegration:
         mock_svg_path, _svg_dir = mock_svg_directory
 
         # Mock the dialog execution
-        with patch('pyzui.windows.dialogwindows.svgpickerinputdialog.os.path.isdir', return_value=True), \
-             patch('pyzui.windows.dialogwindows.svgpickerinputdialog.os.listdir', return_value=['test_circle.svg']), \
-             patch('pyzui.windows.dialogwindows.svgpickerinputdialog.os.path.join') as mock_join, \
-             patch('pyzui.windows.dialogwindows.svgpickerinputdialog.get_svg_cache') as mock_get_cache:
+        with patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.isdir', return_value=True), \
+             patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.listdir', return_value=['test_circle.svg']), \
+             patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.join') as mock_join, \
+             patch('zooui.windows.dialogwindows.svgpickerinputdialog.get_svg_cache') as mock_get_cache:
 
             # Setup mock for os.path.join to avoid recursion
             mock_join.side_effect = lambda *args: '/'.join(args)
@@ -110,7 +110,7 @@ class TestSVGDialogIntegration:
             # Mock SVG cache
             mock_cache = Mock()
             mock_cache.store_svg.return_value = "svg_modified123"
-            mock_cache.get_cache_path.return_value = Path("/tmp/pyzui_svg_/svg_modified123.svg")
+            mock_cache.get_cache_path.return_value = Path("/tmp/zooui_svg_/svg_modified123.svg")
             mock_get_cache.return_value = mock_cache
 
             # Create dialog and simulate user interaction
@@ -140,8 +140,8 @@ class TestSVGDialogIntegration:
                 assert 'stroke-width="15"' in stored_content
 
                 # Create SVGMediaObject from cache hash - need to mock get_svg_cache and QtSvg for SVGMediaObject
-                with patch('pyzui.objects.mediaobjects.svgmediaobject.get_svg_cache', return_value=mock_cache), \
-                     patch('pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer') as mock_renderer_class:
+                with patch('zooui.objects.mediaobjects.svgmediaobject.get_svg_cache', return_value=mock_cache), \
+                     patch('zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer') as mock_renderer_class:
 
                     # Mock renderer
                     mock_renderer = Mock()
@@ -177,7 +177,7 @@ class TestSVGDialogIntegration:
 
         try:
             # Mock QtSvg for SVGMediaObject creation
-            with patch('pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer') as mock_renderer_class:
+            with patch('zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer') as mock_renderer_class:
                 mock_renderer = Mock()
                 mock_renderer.load.return_value = True
                 mock_renderer.defaultSize.return_value = Mock(width=lambda: 100, height=lambda: 100)
@@ -186,9 +186,9 @@ class TestSVGDialogIntegration:
                 svg_object = SVGMediaObject(svg_file, mock_scene)
 
             # Mock the modify dialog
-            with patch('pyzui.windows.dialogwindows.modifysvginputdialog.QDialog') as mock_dialog_class, \
-                 patch('pyzui.windows.dialogwindows.modifysvginputdialog.QMessageBox') as mock_msgbox_class, \
-                 patch('pyzui.windows.dialogwindows.modifysvginputdialog.get_svg_cache') as mock_get_cache:
+            with patch('zooui.windows.dialogwindows.modifysvginputdialog.QDialog') as mock_dialog_class, \
+                 patch('zooui.windows.dialogwindows.modifysvginputdialog.QMessageBox') as mock_msgbox_class, \
+                 patch('zooui.windows.dialogwindows.modifysvginputdialog.get_svg_cache') as mock_get_cache:
 
                 # Setup dialog to accept modifications
                 mock_dialog = Mock()
@@ -223,7 +223,7 @@ class TestSVGDialogIntegration:
                 with patch.object(modify_dialog, '_main_dialog', return_value=mock_dialog), \
                      patch.object(modify_dialog, '_show_source_warning_dialog', return_value=True):
                     # Also mock QDialog.DialogCode.Accepted
-                    with patch('pyzui.windows.dialogwindows.modifysvginputdialog.QDialog.DialogCode.Accepted', 1):
+                    with patch('zooui.windows.dialogwindows.modifysvginputdialog.QDialog.DialogCode.Accepted', 1):
                         # Run dialog
                         ok, new_cache_hash = modify_dialog._run_dialog()
 
@@ -276,7 +276,7 @@ class TestSVGDialogIntegration:
         new_scene = Mock()
         new_scene.viewport_size = (800, 600)
 
-        with patch('pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer') as mock_renderer_class:
+        with patch('zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer') as mock_renderer_class:
             mock_renderer = Mock()
             mock_renderer.load.return_value = True
             mock_renderer.defaultSize.return_value = Mock(width=lambda: 200, height=lambda: 200)
@@ -296,7 +296,7 @@ class TestSVGDialogIntegration:
         And modify dialog is opened later
         Then the same color should appear in color history
         """
-        color_dir = tmp_path / ".pyzui" / "colorstore"
+        color_dir = tmp_path / ".zooui" / "colorstore"
         color_dir.mkdir(parents=True, exist_ok=True)
         color_file = color_dir / "color_list.txt"
 
@@ -305,10 +305,10 @@ class TestSVGDialogIntegration:
             f.write("ff0000\n00ff00\n0000ff\n")
 
         # Test picker dialog loads colors
-        with patch('pyzui.windows.dialogwindows.svgpickerinputdialog.os.path.isfile', return_value=True), \
-             patch('pyzui.windows.dialogwindows.svgpickerinputdialog.os.path.isdir', return_value=True), \
-             patch('pyzui.windows.dialogwindows.svgpickerinputdialog.os.environ', {}), \
-             patch('pyzui.windows.dialogwindows.svgpickerinputdialog.os.path.expanduser', return_value=str(tmp_path)):
+        with patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.isfile', return_value=True), \
+             patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.isdir', return_value=True), \
+             patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.environ', {}), \
+             patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.expanduser', return_value=str(tmp_path)):
 
             picker_dialog = OpenSVGPickerInputDialog()
 
@@ -326,9 +326,9 @@ class TestSVGDialogIntegration:
                     f.write(str(code) + '\n')
 
         # Test modify dialog loads updated colors
-        with patch('pyzui.windows.dialogwindows.modifysvginputdialog.os.path.isfile', return_value=True), \
-             patch('pyzui.windows.dialogwindows.modifysvginputdialog.os.environ', {}), \
-             patch('pyzui.windows.dialogwindows.modifysvginputdialog.os.path.expanduser', return_value=str(tmp_path)):
+        with patch('zooui.windows.dialogwindows.modifysvginputdialog.os.path.isfile', return_value=True), \
+             patch('zooui.windows.dialogwindows.modifysvginputdialog.os.environ', {}), \
+             patch('zooui.windows.dialogwindows.modifysvginputdialog.os.path.expanduser', return_value=str(tmp_path)):
 
             mock_svg_object = Mock()
             mock_svg_object._media_id = "test.svg"
@@ -357,10 +357,10 @@ class TestSVGDialogIntegration:
 
         try:
             # Import actual cache for integration test
-            from pyzui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import SVGCache
+            from zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import SVGCache
 
             # Use temporary cache directory
-            cache_dir = tempfile.mkdtemp(prefix="pyzui_test_cache_")
+            cache_dir = tempfile.mkdtemp(prefix="zooui_test_cache_")
 
             try:
                 # Create cache instance
@@ -384,8 +384,8 @@ class TestSVGDialogIntegration:
                 assert cache_path.exists()
 
                 # Create SVGMediaObject from cache hash - need to mock get_svg_cache
-                with patch('pyzui.objects.mediaobjects.svgmediaobject.get_svg_cache', return_value=cache), \
-                     patch('pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer') as mock_renderer_class:
+                with patch('zooui.objects.mediaobjects.svgmediaobject.get_svg_cache', return_value=cache), \
+                     patch('zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer') as mock_renderer_class:
 
                     # Mock renderer
                     mock_renderer = Mock()
@@ -441,7 +441,7 @@ class TestSVGDialogIntegration:
                 os.unlink(invalid_svg)
 
         # Test 2: Missing SVG directory in picker dialog
-        with patch('pyzui.windows.dialogwindows.svgpickerinputdialog.os.path.isdir', return_value=False):
+        with patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.isdir', return_value=False):
             dialog = OpenSVGPickerInputDialog()
 
             # Should handle missing directory gracefully
@@ -449,7 +449,7 @@ class TestSVGDialogIntegration:
             assert len(dialog.SVG_NAMES) == 0
 
         # Test 3: Modify dialog with non-cache file (should show warning)
-        with patch('pyzui.windows.dialogwindows.modifysvginputdialog.QMessageBox') as mock_msgbox_class:
+        with patch('zooui.windows.dialogwindows.modifysvginputdialog.QMessageBox') as mock_msgbox_class:
             mock_msgbox = Mock()
             mock_msgbox.exec.return_value = 0  # No (user cancels)
             mock_msgbox_class.return_value = mock_msgbox
@@ -477,10 +477,10 @@ class TestSVGDialogIntegration:
         And object retrieval should be fast
         """
         # Import actual cache
-        from pyzui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import SVGCache
+        from zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import SVGCache
 
         # Use temporary cache directory
-        cache_dir = tempfile.mkdtemp(prefix="pyzui_test_perf_")
+        cache_dir = tempfile.mkdtemp(prefix="zooui_test_perf_")
 
         try:
             cache = SVGCache(cache_root=cache_dir)
@@ -503,8 +503,8 @@ class TestSVGDialogIntegration:
                 cache_hash = cache.store_svg(modified_svg)
 
                 # Create object - need to mock get_svg_cache
-                with patch('pyzui.objects.mediaobjects.svgmediaobject.get_svg_cache', return_value=cache), \
-                     patch('pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer') as mock_renderer_class:
+                with patch('zooui.objects.mediaobjects.svgmediaobject.get_svg_cache', return_value=cache), \
+                     patch('zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer') as mock_renderer_class:
 
                     # Mock renderer
                     mock_renderer = Mock()

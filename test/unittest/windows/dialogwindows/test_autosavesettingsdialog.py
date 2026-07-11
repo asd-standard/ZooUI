@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ## Copyright (C) 2009 David Roberts <d@vidr.cc>
 ##
 ## This program is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@ from unittest.mock import Mock, patch
 
 from PySide6 import QtWidgets
 
-from pyzui.windows.dialogwindows.autosavesettingsdialog import AutosaveSettingsDialog
+from zooui.windows.dialogwindows.autosavesettingsdialog import AutosaveSettingsDialog
 
 
 class TestAutosaveSettingsDialog:

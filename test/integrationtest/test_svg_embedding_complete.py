@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -30,8 +30,8 @@ import tempfile
 import urllib.parse
 from unittest.mock import Mock, patch
 
-from pyzui.objects.mediaobjects.svgmediaobject import SVGMediaObject
-from pyzui.objects.scene.scene import Scene
+from zooui.objects.mediaobjects.svgmediaobject import SVGMediaObject
+from zooui.objects.scene.scene import Scene
 
 
 class TestSVGEmbeddingComplete:
@@ -128,7 +128,7 @@ class TestSVGEmbeddingComplete:
         Then the SVG content is embedded
         """
         # Mock the SVG renderer
-        with patch('pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer') as mock_renderer_class:
+        with patch('zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer') as mock_renderer_class:
             mock_renderer = Mock()
             mock_renderer.load.return_value = True
             mock_renderer.defaultSize.return_value = Mock(width=lambda: 100, height=lambda: 100)
@@ -150,7 +150,7 @@ class TestSVGEmbeddingComplete:
                 svg_obj.mark_as_modified()
 
                 # Mock cache to return content
-                with patch('pyzui.objects.mediaobjects.svgmediaobject.get_svg_cache') as mock_get_cache:
+                with patch('zooui.objects.mediaobjects.svgmediaobject.get_svg_cache') as mock_get_cache:
                     mock_cache = Mock()
                     mock_cache.get_svg_content.return_value = svg_content
                     mock_get_cache.return_value = mock_cache
@@ -251,7 +251,7 @@ class TestSVGEmbeddingComplete:
                 import io
                 import logging
 
-                from pyzui.logger import get_logger
+                from zooui.logger import get_logger
 
                 log_capture_string = io.StringIO()
                 ch = logging.StreamHandler(log_capture_string)

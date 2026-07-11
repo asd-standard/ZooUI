@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -15,10 +15,10 @@
 
 from unittest.mock import Mock, PropertyMock, patch
 
-from pyzui.objects.mediaobjects.mediaobject import MediaObject, RenderMode
-from pyzui.objects.mediaobjects.stringmediaobject import StringMediaObject
-from pyzui.objects.mediaobjects.svgmediaobject import SVGMediaObject
-from pyzui.objects.mediaobjects.tiledmediaobject import TiledMediaObject
+from zooui.objects.mediaobjects.mediaobject import MediaObject, RenderMode
+from zooui.objects.mediaobjects.stringmediaobject import StringMediaObject
+from zooui.objects.mediaobjects.svgmediaobject import SVGMediaObject
+from zooui.objects.mediaobjects.tiledmediaobject import TiledMediaObject
 
 
 class TestSizeVisibility:
@@ -56,7 +56,7 @@ class TestSizeVisibility:
         scene.viewport_size = (800, 600)
         scene.zoomlevel = 0
 
-        with patch('pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer') as mock_renderer_class:
+        with patch('zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer') as mock_renderer_class:
             mock_renderer = Mock()
             mock_renderer.load.return_value = True
             mock_renderer.defaultSize.return_value = Mock(width=lambda: 100, height=lambda: 100)
@@ -136,7 +136,7 @@ class TestSizeVisibility:
         scene.zoomlevel = 0
 
         # Mock tiled media object creation
-        with patch('pyzui.objects.mediaobjects.tiledmediaobject.TileManager') as mock_tilemanager:
+        with patch('zooui.objects.mediaobjects.tiledmediaobject.TileManager') as mock_tilemanager:
             mock_tilemanager.get_tile_robust.return_value = Mock(size=(256, 256))
 
             tiled_obj = TiledMediaObject('test.jpg', scene)
@@ -180,7 +180,7 @@ class TestSizeVisibility:
         assert callable(media_obj.is_size_visible)
 
         # Test SVGMediaObject
-        with patch('pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer') as mock_renderer_class:
+        with patch('zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer') as mock_renderer_class:
             mock_renderer = Mock()
             mock_renderer.load.return_value = True
             mock_renderer.defaultSize.return_value = Mock(width=lambda: 100, height=lambda: 100)
@@ -196,7 +196,7 @@ class TestSizeVisibility:
         assert callable(string_obj.is_size_visible)
 
         # Test TiledMediaObject
-        with patch('pyzui.objects.mediaobjects.tiledmediaobject.TileManager') as mock_tilemanager:
+        with patch('zooui.objects.mediaobjects.tiledmediaobject.TileManager') as mock_tilemanager:
             mock_tilemanager.get_tile_robust.return_value = Mock(size=(256, 256))
 
             tiled_obj = TiledMediaObject('test.jpg', scene)

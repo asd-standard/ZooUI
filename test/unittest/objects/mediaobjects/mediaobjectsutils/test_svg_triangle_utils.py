@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ## Copyright (C) 2009 David Roberts <d@vidr.cc>
 ##
 ## This program is free software; you can redistribute it and/or
@@ -28,7 +28,7 @@ import tempfile
 
 import pytest
 
-from pyzui.objects.mediaobjects.mediaobjectsutils import elongate_triangle, get_triangle_bounds, is_triangle_svg
+from zooui.objects.mediaobjects.mediaobjectsutils import elongate_triangle, get_triangle_bounds, is_triangle_svg
 
 
 class TestSVGTriangleUtils:
@@ -41,7 +41,7 @@ class TestSVGTriangleUtils:
 
     def setup_method(self):
         """Create test directory and sample SVG files."""
-        self.test_dir = tempfile.mkdtemp(prefix="pyzui_test_")
+        self.test_dir = tempfile.mkdtemp(prefix="zooui_test_")
         self.up_triangle_svg = os.path.join(self.test_dir, "up_triangle.svg")
         self.down_triangle_svg = os.path.join(self.test_dir, "down_triangle.svg")
         self.non_triangle_svg = os.path.join(self.test_dir, "not_triangle.svg")

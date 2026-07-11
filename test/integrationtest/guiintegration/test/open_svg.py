@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ## Copyright (C) 2009 David Roberts <d@vidr.cc>
 ##
 ## This program is free software; you can redistribute it and/or
@@ -34,7 +34,7 @@ def run(ctx: GUITestContext) -> None:
     ensure_test_scene_loaded(ctx)
     ctx.log.action("Opening SVG picker dialog")
     close_open_dialog(ctx)
-    from pyzui.windows.dialogwindows.dialogwindows import DialogWindows
+    from zooui.windows.dialogwindows.dialogwindows import DialogWindows
 
     with patch.object(
         DialogWindows.open_svg_picker_input_dialog, "_run_dialog", return_value=(True, ctx.resources["temp_svg"])

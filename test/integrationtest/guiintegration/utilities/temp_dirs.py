@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ## Copyright (C) 2009 David Roberts <d@vidr.cc>
 ##
 ## This program is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@ from pathlib import Path
 def get_pytest_style_temp_dir() -> Path:
     """
     Create a temp directory structure similar to pytest:
-    /tmp/pytest-of-{username}/pytest-{n}/pyzui_gui_test0/
+    /tmp/pytest-of-{username}/pytest-{n}/zooui_gui_test0/
     """
     username = getpass.getuser()
     base_dir = Path(f"/tmp/pytest-of-{username}")
@@ -45,7 +45,7 @@ def get_pytest_style_temp_dir() -> Path:
     pytest_dir = base_dir / f"pytest-{next_num}"
     pytest_dir.mkdir(exist_ok=True)
 
-    test_dir = pytest_dir / "pyzui_gui_test0"
+    test_dir = pytest_dir / "zooui_gui_test0"
     test_dir.mkdir(exist_ok=True)
 
     return test_dir

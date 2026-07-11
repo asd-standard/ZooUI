@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -14,7 +14,7 @@
 ## along with this program; if not, see <https://www.gnu.org/licenses/>.
 
 
-from pyzui.windows.mainwindow import MainWindow
+from zooui.windows.mainwindow import MainWindow
 
 
 class TestMainWindow:
@@ -22,20 +22,20 @@ class TestMainWindow:
     Feature: MainWindow Module
 
     This class tests the mainwindow module to ensure it exists and is properly structured
-    within the PyZUI windows system.
+    within the ZooUI windows system.
     """
 
     def test_module_exists(self):
         """
         Scenario: Verify mainwindow module exists
 
-        Given the PyZUI windows system
+        Given the ZooUI windows system
         When importing the mainwindow module
         Then the module should be successfully imported
         """
-        import pyzui.windows.mainwindow
+        import zooui.windows.mainwindow
 
-        assert pyzui.windows.mainwindow is not None
+        assert zooui.windows.mainwindow is not None
 
     def test_placeholder(self):
         """

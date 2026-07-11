@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ## Copyright (C) 2009 David Roberts <d@vidr.cc>
 ##
 ## This program is free software; you can redistribute it and/or
@@ -15,10 +15,10 @@
 ## along with this program; if not, see <https://www.gnu.org/licenses/>.
 
 """
-GUI Integration Tests for PyZUI
+GUI Integration Tests for ZooUI
 ================================
 
-This module contains end-to-end GUI integration tests that launch the full PyZUI
+This module contains end-to-end GUI integration tests that launch the full ZooUI
 application and perform all possible user interactions as described in the
 userinterface.rst documentation.
 
@@ -139,9 +139,9 @@ from guiintegration.utilities.qt_simulation import trigger_action  # noqa: E402
 from guiintegration.utilities.temp_dirs import get_pytest_style_temp_dir  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-import pyzui.tilesystem.tilemanager as TileManager  # noqa: E402
-from pyzui.logger import LoggerConfig  # noqa: E402
-from pyzui.windows.mainwindow import MainWindow  # noqa: E402
+import zooui.tilesystem.tilemanager as TileManager  # noqa: E402
+from zooui.logger import LoggerConfig  # noqa: E402
+from zooui.windows.mainwindow import MainWindow  # noqa: E402
 
 
 @dataclass
@@ -161,7 +161,7 @@ class GUIIntegrationTest:
     """
     GUI Integration Test Runner
 
-    This class manages the PyZUI application and performs all GUI tests.
+    This class manages the ZooUI application and performs all GUI tests.
     Run directly with python (not pytest).
     """
 
@@ -413,7 +413,7 @@ def wait_raw(ms: int, _description: str = "") -> None:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="PyZUI GUI Integration Tests",
+        description="ZooUI GUI Integration Tests",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

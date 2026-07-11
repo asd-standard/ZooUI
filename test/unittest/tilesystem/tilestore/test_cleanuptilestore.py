@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -21,7 +21,7 @@ sys.modules["tilestore"] = MagicMock()
 sys.modules["logger"] = MagicMock()
 
 # Import the cleanuptilestore module
-from pyzui.tilesystem.tilestore import cleanuptilestore
+from zooui.tilesystem.tilestore import cleanuptilestore
 
 
 class TestCleanupTilestore:
@@ -33,10 +33,10 @@ class TestCleanupTilestore:
     statistics display, and configurable age-based cleanup.
     """
 
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.TileStore.get_tilestore_stats")
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.TileStore.cleanup_old_tiles")
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.LoggerConfig.initialize")
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.get_logger")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.TileStore.get_tilestore_stats")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.TileStore.cleanup_old_tiles")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.LoggerConfig.initialize")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.get_logger")
     @patch("sys.argv", ["cleanuptilestore.py"])
     def test_main_default_behavior(self, mock_logger_factory, mock_logger_init, mock_cleanup, mock_stats):
         """
@@ -67,9 +67,9 @@ class TestCleanupTilestore:
         mock_cleanup.assert_called_once_with(max_age_days=3, dry_run=False)
         mock_logger_init.assert_called_once()
 
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.TileStore.get_tilestore_stats")
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.LoggerConfig.initialize")
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.get_logger")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.TileStore.get_tilestore_stats")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.LoggerConfig.initialize")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.get_logger")
     @patch("sys.argv", ["cleanuptilestore.py", "--stats"])
     def test_main_stats_only(self, mock_logger_factory, mock_logger_init, mock_stats):
         """
@@ -96,10 +96,10 @@ class TestCleanupTilestore:
         assert "200" in print_output  # file count
         assert "750.5" in print_output or "750.50" in print_output  # total size
 
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.TileStore.get_tilestore_stats")
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.TileStore.cleanup_old_tiles")
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.LoggerConfig.initialize")
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.get_logger")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.TileStore.get_tilestore_stats")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.TileStore.cleanup_old_tiles")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.LoggerConfig.initialize")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.get_logger")
     @patch("sys.argv", ["cleanuptilestore.py", "--dry-run"])
     def test_main_dry_run(self, mock_logger_factory, mock_logger_init, mock_cleanup, mock_stats):
         """
@@ -132,10 +132,10 @@ class TestCleanupTilestore:
         print_output = " ".join([str(call[0][0]) for call in mock_print.call_args_list])
         assert "DRY RUN" in print_output or "Would delete" in print_output
 
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.TileStore.get_tilestore_stats")
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.TileStore.cleanup_old_tiles")
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.LoggerConfig.initialize")
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.get_logger")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.TileStore.get_tilestore_stats")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.TileStore.cleanup_old_tiles")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.LoggerConfig.initialize")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.get_logger")
     @patch("sys.argv", ["cleanuptilestore.py", "--age", "7"])
     def test_main_custom_age(self, mock_logger_factory, mock_logger_init, mock_cleanup, mock_stats):
         """
@@ -163,10 +163,10 @@ class TestCleanupTilestore:
         assert result == 0
         mock_cleanup.assert_called_once_with(max_age_days=7, dry_run=False)
 
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.TileStore.get_tilestore_stats")
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.TileStore.cleanup_old_tiles")
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.LoggerConfig.initialize")
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.get_logger")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.TileStore.get_tilestore_stats")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.TileStore.cleanup_old_tiles")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.LoggerConfig.initialize")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.get_logger")
     @patch("sys.argv", ["cleanuptilestore.py", "--verbose"])
     def test_main_verbose_mode(self, mock_logger_factory, mock_logger_init, mock_cleanup, mock_stats):
         """
@@ -196,10 +196,10 @@ class TestCleanupTilestore:
         init_call = mock_logger_init.call_args
         assert init_call.kwargs["verbose"] is True
 
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.TileStore.get_tilestore_stats")
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.TileStore.cleanup_old_tiles")
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.LoggerConfig.initialize")
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.get_logger")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.TileStore.get_tilestore_stats")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.TileStore.cleanup_old_tiles")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.LoggerConfig.initialize")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.get_logger")
     @patch("sys.argv", ["cleanuptilestore.py", "--debug"])
     def test_main_debug_mode(self, mock_logger_factory, mock_logger_init, mock_cleanup, mock_stats):
         """
@@ -229,10 +229,10 @@ class TestCleanupTilestore:
         init_call = mock_logger_init.call_args
         assert init_call.kwargs["debug"] is True
 
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.TileStore.get_tilestore_stats")
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.TileStore.cleanup_old_tiles")
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.LoggerConfig.initialize")
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.get_logger")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.TileStore.get_tilestore_stats")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.TileStore.cleanup_old_tiles")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.LoggerConfig.initialize")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.get_logger")
     @patch("sys.argv", ["cleanuptilestore.py"])
     def test_main_with_errors(self, mock_logger_factory, mock_logger_init, mock_cleanup, mock_stats):
         """
@@ -264,10 +264,10 @@ class TestCleanupTilestore:
         print_output = " ".join([str(call[0][0]) for call in mock_print.call_args_list])
         assert "Errors:" in print_output or "2" in print_output
 
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.TileStore.get_tilestore_stats")
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.TileStore.cleanup_old_tiles")
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.LoggerConfig.initialize")
-    @patch("pyzui.tilesystem.tilestore.cleanuptilestore.get_logger")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.TileStore.get_tilestore_stats")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.TileStore.cleanup_old_tiles")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.LoggerConfig.initialize")
+    @patch("zooui.tilesystem.tilestore.cleanuptilestore.get_logger")
     @patch("sys.argv", ["cleanuptilestore.py", "--stats", "--dry-run"])
     def test_main_stats_with_dry_run(self, mock_logger_factory, mock_logger_init, mock_cleanup, mock_stats):
         """

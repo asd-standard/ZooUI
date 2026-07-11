@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ## Copyright (C) 2009 David Roberts <d@vidr.cc>
 ##
 ## This program is free software; you can redistribute it and/or
@@ -17,7 +17,7 @@
 """
 Feature: Configuration Management
 
-The ConfigManager class manages PyZUI configuration with ~/.pyzui/config.json
+The ConfigManager class manages ZooUI configuration with ~/.zooui/config.json
 as single source of truth. It provides validation, default creation, and
 temporary overrides.
 """
@@ -29,7 +29,7 @@ from pathlib import Path
 
 import pytest
 
-from pyzui.config import ConfigManager, ValidationError
+from zooui.config import ConfigManager, ValidationError
 
 
 class TestConfigManager:
@@ -46,11 +46,11 @@ class TestConfigManager:
 
         Given no config_file parameter
         When ConfigManager is created
-        Then it should use ~/.pyzui/config.json
+        Then it should use ~/.zooui/config.json
         """
         manager = ConfigManager()
 
-        expected_path = str(Path.home() / ".pyzui" / "config.json")
+        expected_path = str(Path.home() / ".zooui" / "config.json")
         assert manager.get_config_path() == expected_path
 
     def test_init_custom_path(self):
@@ -438,7 +438,7 @@ class TestConfigManager:
         # Test config with tilde paths
         config = {
             'autosave': {
-                'backup_dir': '~/.pyzui/backups',
+                'backup_dir': '~/.zooui/backups',
                 'custom_path': '~/custom/path'
             },
             'logging': {
@@ -482,7 +482,7 @@ class TestConfigManager:
         Given ConfigManager.DEFAULT_CONFIG
         Then backup_dir should not contain tilde
         """
-        from pyzui.config import ConfigManager
+        from zooui.config import ConfigManager
 
         # Check that DEFAULT_CONFIG has expanded path
         backup_dir = ConfigManager.DEFAULT_CONFIG['autosave']['backup_dir']
@@ -490,7 +490,7 @@ class TestConfigManager:
 
         # Should be a valid expanded path
         assert backup_dir.startswith(str(Path.home()))
-        assert '.pyzui/backups' in backup_dir or '.pyzui\\backups' in backup_dir
+        assert '.zooui/backups' in backup_dir or '.zooui\\backups' in backup_dir
 
     def test_load_expands_tilde_paths(self):
         """

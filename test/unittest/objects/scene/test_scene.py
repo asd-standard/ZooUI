@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -24,20 +24,20 @@ class TestScene:
     Feature: Scene Module
 
     This class tests the Scene module to ensure it exists and the Scene class is properly
-    defined within the PyZUI scene system.
+    defined within the ZooUI scene system.
     """
 
     def test_module_exists(self):
         """
         Scenario: Verify scene module exists
 
-        Given the PyZUI scene system
+        Given the ZooUI scene system
         When importing the scene module
         Then the module should be successfully imported
         """
-        import pyzui.objects.scene.scene
+        import zooui.objects.scene.scene
 
-        assert pyzui.objects.scene.scene is not None
+        assert zooui.objects.scene.scene is not None
 
     def test_scene_class_exists(self):
         """
@@ -47,7 +47,7 @@ class TestScene:
         When checking for the Scene class
         Then the class should be defined
         """
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.scene.scene import Scene
 
         assert Scene is not None
 
@@ -71,8 +71,8 @@ class TestScene:
         When the scene is rendered
         Then smaller objects should be rendered after (on top of) larger objects
         """
-        from pyzui.objects.mediaobjects import mediaobject as MediaObject
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.mediaobjects import mediaobject as MediaObject
+        from zooui.objects.scene.scene import Scene
 
         # Create a scene with smaller_on_top (default)
         scene = Scene()
@@ -143,8 +143,8 @@ class TestScene:
         When the scene is rendered
         Then larger objects should be rendered after (on top of) smaller objects
         """
-        from pyzui.objects.mediaobjects import mediaobject as MediaObject
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.mediaobjects import mediaobject as MediaObject
+        from zooui.objects.scene.scene import Scene
 
         # Create a scene and set render order to larger_on_top
         scene = Scene()
@@ -213,8 +213,8 @@ class TestScene:
         When render_order is changed at runtime
         Then the next render pass uses the new order
         """
-        from pyzui.objects.mediaobjects import mediaobject as MediaObject
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.mediaobjects import mediaobject as MediaObject
+        from zooui.objects.scene.scene import Scene
 
         scene = Scene()
         scene.viewport_size = (800, 600)
@@ -282,7 +282,7 @@ class TestScene:
         When getting and setting render_order
         Then valid values are accepted and invalid values raise ValueError
         """
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.scene.scene import Scene
 
         scene = Scene()
 
@@ -308,7 +308,7 @@ class TestScene:
         When a Scene is created with that config
         Then the scene's render_order should be 'larger_on_top'
         """
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.scene.scene import Scene
 
         # Scene with larger_on_top config
         scene = Scene(config={"render": {"order": "larger_on_top"}})
@@ -330,7 +330,7 @@ class TestScene:
         When a single object is removed
         Then only that object should be removed from the scene
         """
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.scene.scene import Scene
 
         # Create a scene
         scene = Scene()
@@ -375,7 +375,7 @@ class TestScene:
         When a list of objects is removed
         Then all objects in the list should be removed from the scene
         """
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.scene.scene import Scene
 
         # Create a scene
         scene = Scene()
@@ -417,8 +417,8 @@ class TestScene:
         When objects are removed
         Then media ID cleanup should only purge when no objects remain with that ID
         """
-        from pyzui.objects.scene.scene import Scene
-        from pyzui.tilesystem import tilemanager as TileManager
+        from zooui.objects.scene.scene import Scene
+        from zooui.tilesystem import tilemanager as TileManager
 
         # Create a scene
         scene = Scene()
@@ -480,7 +480,7 @@ class TestScene:
         """
         from unittest.mock import mock_open, patch
 
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.scene.scene import Scene
 
         # Create a scene with some initial mediaobjects
         scene = Scene()
@@ -549,7 +549,7 @@ StringMediaObject\tTest String\t0.5\t-20.0\t10.0
         """
         from unittest.mock import mock_open, patch
 
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.scene.scene import Scene
 
         scene = Scene()
         scene.viewport_size = (800, 600)
@@ -574,7 +574,7 @@ StringMediaObject\tTest String\t0.5\t-20.0\t10.0
         When attempting to import the scene
         Then FileNotFoundError should be raised
         """
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.scene.scene import Scene
 
         scene = Scene()
 
@@ -591,7 +591,7 @@ StringMediaObject\tTest String\t0.5\t-20.0\t10.0
         """
         from unittest.mock import mock_open, patch
 
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.scene.scene import Scene
 
         scene = Scene()
 
@@ -611,7 +611,7 @@ StringMediaObject\tTest String\t0.5\t-20.0\t10.0
         """
         from unittest.mock import mock_open, patch
 
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.scene.scene import Scene
 
         scene = Scene()
         scene.viewport_size = (800, 600)
@@ -655,7 +655,7 @@ TiledMediaObject\timage.jpg\t1.0\t0.0\t0.0
         When _fit_imported_objects is called
         Then object positions and zoomlevels should be scaled to fill the viewport
         """
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.scene.scene import Scene
 
         scene = Scene()
         scene.viewport_size = (800, 600)
@@ -684,7 +684,7 @@ TiledMediaObject\timage.jpg\t1.0\t0.0\t0.0
         When _fit_imported_objects is called
         Then object positions and zoomlevels should be decreased to fit the viewport
         """
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.scene.scene import Scene
 
         scene = Scene()
         scene.viewport_size = (800, 600)
@@ -713,7 +713,7 @@ TiledMediaObject\timage.jpg\t1.0\t0.0\t0.0
         When _fit_imported_objects is called
         Then no error should be raised
         """
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.scene.scene import Scene
 
         scene = Scene()
         scene.viewport_size = (800, 600)
@@ -729,7 +729,7 @@ TiledMediaObject\timage.jpg\t1.0\t0.0\t0.0
         When _fit_imported_objects is called
         Then no error should be raised (objects keep their original zoomlevels)
         """
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.scene.scene import Scene
 
         scene = Scene()
         scene.viewport_size = (0, 0)
@@ -755,7 +755,7 @@ TiledMediaObject\timage.jpg\t1.0\t0.0\t0.0
         When _fit_imported_objects is called
         Then the difference in zoomlevels should be preserved
         """
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.scene.scene import Scene
 
         scene = Scene()
         scene.viewport_size = (800, 600)
@@ -789,7 +789,7 @@ TiledMediaObject\timage.jpg\t1.0\t0.0\t0.0
         When _fit_imported_objects is called
         Then positions should be scaled relative to the group centroid
         """
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.scene.scene import Scene
 
         scene = Scene()
         scene.viewport_size = (2000, 2000)
@@ -831,7 +831,7 @@ TiledMediaObject\timage.jpg\t1.0\t0.0\t0.0
         When _fit_imported_objects is called
         Then scaling uses the combined bounding box of all objects
         """
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.scene.scene import Scene
 
         scene = Scene()
         scene.viewport_size = (800, 600)
@@ -877,7 +877,7 @@ TiledMediaObject\timage.jpg\t1.0\t0.0\t0.0
         """
         from unittest.mock import patch
 
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.scene.scene import Scene
 
         scene = Scene()
 
@@ -931,7 +931,7 @@ TiledMediaObject\timage.jpg\t1.0\t0.0\t0.0
         """
         from unittest.mock import patch
 
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.scene.scene import Scene
 
         scene = Scene()
 
@@ -977,7 +977,7 @@ TiledMediaObject\timage.jpg\t1.0\t0.0\t0.0
         """
         from unittest.mock import patch
 
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.scene.scene import Scene
 
         scene = Scene()
 
@@ -1006,7 +1006,7 @@ TiledMediaObject\timage.jpg\t1.0\t0.0\t0.0
         """
         from unittest.mock import patch
 
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.scene.scene import Scene
 
         scene = Scene()
 
@@ -1089,7 +1089,7 @@ TiledMediaObject\timage.jpg\t1.0\t0.0\t0.0
         """
         from unittest.mock import patch
 
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.scene.scene import Scene
 
         scene = Scene()
 
@@ -1150,7 +1150,7 @@ class TestSceneShutdownThreads:
         When shutdown_threads() is called
         Then the parallel renderer's shutdown() method should be invoked
         """
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.scene.scene import Scene
 
         scene = Scene()
         mock_renderer = Mock()
@@ -1168,7 +1168,7 @@ class TestSceneShutdownThreads:
         When shutdown_threads() is called
         Then no error should occur
         """
-        from pyzui.objects.scene.scene import Scene
+        from zooui.objects.scene.scene import Scene
 
         scene = Scene()
         try:

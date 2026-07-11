@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ## Copyright (C) 2009 David Roberts <d@vidr.cc>
 ##
 ## This program is free software; you can redistribute it and/or
@@ -28,7 +28,7 @@ import tempfile
 
 import pytest
 
-from pyzui.objects.mediaobjects.mediaobjectsutils import (
+from zooui.objects.mediaobjects.mediaobjectsutils import (
     elongate_diagonal_stick,
     elongate_stick,
     get_diagonal_stick_direction,
@@ -48,7 +48,7 @@ class TestSVGStickUtils:
 
     def setup_method(self):
         """Create test directory and sample SVG files."""
-        self.test_dir = tempfile.mkdtemp(prefix="pyzui_test_")
+        self.test_dir = tempfile.mkdtemp(prefix="zooui_test_")
         self.horizontal_stick_svg = os.path.join(self.test_dir, "horizontal_stick.svg")
         self.vertical_stick_svg = os.path.join(self.test_dir, "vertical_stick.svg")
         self.diagonal_stick_svg = os.path.join(self.test_dir, "diagonal_stick.svg")

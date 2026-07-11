@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -18,8 +18,8 @@ from unittest.mock import Mock
 import pytest
 from PySide6 import QtCore, QtGui
 
-from pyzui.objects.mediaobjects.stringmediaobject import StringMediaObject
-from pyzui.objects.mediaobjects.mediaobjectsutils.string.textlayout import TextAlignment, TextLayoutData
+from zooui.objects.mediaobjects.stringmediaobject import StringMediaObject
+from zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout import TextAlignment, TextLayoutData
 
 
 class TestTextLayoutData:

@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -15,7 +15,7 @@
 
 from unittest.mock import Mock, mock_open, patch
 
-from pyzui.converters.pdfconverter import PDFConverter
+from zooui.converters.pdfconverter import PDFConverter
 
 
 class TestPDFConverter:
@@ -48,7 +48,7 @@ class TestPDFConverter:
         When checking its type
         Then it should be an instance of Converter
         """
-        from pyzui.converters.converter import Converter
+        from zooui.converters.converter import Converter
 
         converter = PDFConverter("input.pdf", "output.ppm")
         assert isinstance(converter, Converter)
@@ -198,7 +198,7 @@ class TestPDFConverter:
 
     @patch("os.listdir")
     @patch("builtins.open", new_callable=mock_open)
-    @patch("pyzui.converters.pdfconverter.read_ppm_header")
+    @patch("zooui.converters.pdfconverter.read_ppm_header")
     @patch("shutil.copyfileobj")
     def test_merge_single_page(self, mock_copyfile, mock_read_header, mock_file, mock_listdir):
         """
@@ -225,7 +225,7 @@ class TestPDFConverter:
 
     @patch("os.listdir")
     @patch("builtins.open", new_callable=mock_open)
-    @patch("pyzui.converters.pdfconverter.read_ppm_header")
+    @patch("zooui.converters.pdfconverter.read_ppm_header")
     @patch("shutil.copyfileobj")
     def test_merge_multiple_pages(self, mock_copyfile, mock_read_header, mock_file, mock_listdir):
         """
@@ -259,7 +259,7 @@ class TestPDFConverter:
 
     @patch("os.listdir")
     @patch("builtins.open", new_callable=mock_open)
-    @patch("pyzui.converters.pdfconverter.read_ppm_header")
+    @patch("zooui.converters.pdfconverter.read_ppm_header")
     def test_merge_handles_ioerror(self, mock_read_header, mock_file, mock_listdir):
         """
         Scenario: Handle IOError during page merging
@@ -347,7 +347,7 @@ class TestPDFConverter:
 
     @patch("os.listdir")
     @patch("builtins.open", new_callable=mock_open)
-    @patch("pyzui.converters.pdfconverter.read_ppm_header")
+    @patch("zooui.converters.pdfconverter.read_ppm_header")
     @patch("shutil.copyfileobj")
     def test_merge_sets_progress(self, mock_copyfile, mock_read_header, mock_file, mock_listdir):
         """

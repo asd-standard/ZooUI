@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ## Copyright (C) 2009 David Roberts <d@vidr.cc>
 ##
 ## This program is free software; you can redistribute it and/or
@@ -29,7 +29,7 @@ import xml.etree.ElementTree as ET
 
 import pytest
 
-from pyzui.objects.mediaobjects.mediaobjectsutils import elongate_circle, get_circle_bounds, is_circle_svg
+from zooui.objects.mediaobjects.mediaobjectsutils import elongate_circle, get_circle_bounds, is_circle_svg
 
 
 class TestSVGCircleUtils:
@@ -42,7 +42,7 @@ class TestSVGCircleUtils:
 
     def setup_method(self):
         """Create test directory and sample SVG files."""
-        self.test_dir = tempfile.mkdtemp(prefix="pyzui_test_circle_")
+        self.test_dir = tempfile.mkdtemp(prefix="zooui_test_circle_")
         self.circle_svg = os.path.join(self.test_dir, "circle.svg")
         self.ellipse_svg = os.path.join(self.test_dir, "ellipse.svg")
         self.non_circle_svg = os.path.join(self.test_dir, "not_circle.svg")
@@ -201,7 +201,7 @@ class TestSVGCircleUtils:
         assert cache_hash.startswith("svg_")
 
         # Verify the cache hash can be retrieved
-        from pyzui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
+        from zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
         cache = get_svg_cache()
         elongated_content = cache.get_svg_content(cache_hash)
         assert elongated_content is not None
@@ -237,7 +237,7 @@ class TestSVGCircleUtils:
 
         assert cache_hash.startswith("svg_")
 
-        from pyzui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
+        from zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
         cache = get_svg_cache()
         elongated_content = cache.get_svg_content(cache_hash)
         assert elongated_content is not None
@@ -278,7 +278,7 @@ class TestSVGCircleUtils:
 
         assert cache_hash.startswith("svg_")
 
-        from pyzui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
+        from zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
         cache = get_svg_cache()
         elongated_content = cache.get_svg_content(cache_hash)
         assert elongated_content is not None
@@ -318,7 +318,7 @@ class TestSVGCircleUtils:
 
         assert cache_hash.startswith("svg_")
 
-        from pyzui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
+        from zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
         cache = get_svg_cache()
         elongated_content = cache.get_svg_content(cache_hash)
         assert elongated_content is not None
@@ -366,7 +366,7 @@ class TestSVGCircleUtils:
         cache_hash = elongate_circle(self.circle_svg, 0.2, 0.2)
         assert cache_hash.startswith("svg_")
 
-        from pyzui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
+        from zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
         cache = get_svg_cache()
         elongated_content = cache.get_svg_content(cache_hash)
         assert elongated_content is not None
@@ -391,7 +391,7 @@ class TestSVGCircleUtils:
         """
         cache_hash = elongate_circle(self.circle_svg, 2.0, 2.0)
 
-        from pyzui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
+        from zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
         cache = get_svg_cache()
         elongated_content = cache.get_svg_content(cache_hash)
 
@@ -449,7 +449,7 @@ class TestSVGCircleUtils:
 
         cache_hash = elongate_circle(complex_circle_svg, 1.5, 1.0)
 
-        from pyzui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
+        from zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
         cache = get_svg_cache()
         elongated_content = cache.get_svg_content(cache_hash)
 

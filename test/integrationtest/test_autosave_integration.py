@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ## Copyright (C) 2009 David Roberts <d@vidr.cc>
 ##
 ## This program is free software; you can redistribute it and/or
@@ -30,9 +30,9 @@ from unittest.mock import patch
 
 import pytest
 
-from pyzui.backup.backupmanager import BackupManager
-from pyzui.config import ConfigManager
-from pyzui.objects.scene import scene as Scene
+from zooui.backup.backupmanager import BackupManager
+from zooui.config import ConfigManager
+from zooui.objects.scene import scene as Scene
 
 
 class TestAutosaveIntegration:
@@ -265,7 +265,7 @@ class TestAutosaveIntegration:
 
         # Mock the backup manager's create_backup method to simulate a failure
         # We need to patch at the module level where it's imported in autosave.py
-        with patch('pyzui.backup.backupmanager.BackupManager.create_backup') as mock_create_backup:
+        with patch('zooui.backup.backupmanager.BackupManager.create_backup') as mock_create_backup:
             mock_create_backup.side_effect = Exception("Backup creation failed")
 
             # Save scene - should not crash even if backup fails

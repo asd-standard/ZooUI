@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to PyZUI will be documented in this file.
+All notable changes to ZooUI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -10,6 +10,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Usage Instructions dialog under Help menu, automatically displaying content
   from `docs/source/usageinstructions/userinterface.rst` converted to HTML via
   docutils
+
+### Changed
+- Project renamed from **PyZUI** to **ZooUI**. All package imports (`pyzui` →
+  `zooui`), GPL headers, runtime paths (`~/.pyzui/` → `~/.zooui/`),
+  environment variable (`PYZUI_MP_CONTEXT` → `ZOOUI_MP_CONTEXT`), Qt
+  application identity, logger prefix, conda environment name, launcher script,
+  desktop entry, config files, Sphinx documentation, and build spec were
+  renamed across ~260 files. Old project URLs (`github.com/davidar/pyzui`,
+  `da.vidr.cc/projects/pyzui/`) preserved as historical references.
+
+### Fixed
+- Home scene camera position drifting on first launch when window size differs
+  from the scene default (1280×720). The `viewport_size` setter in `Scene` calls
+  `zoom()` to scale content on resize, which corrupts the `.pzs` file's
+  zoomlevel and origin before the zoom-in animation runs. Fixed in `QZUI` by:
+  - Saving the file's zoomlevel/origin before `viewport_size` assignment and
+    restoring them afterwards in both the deferred (`_run_pending_animation`)
+    and synchronous (`__set_scene`) paths.
+  - Using `isVisible()` instead of just `width>0` to decide when to defer the
+    animation, so it always runs at the final widget size instead of the
+    intermediate QTabWidget layout size.
+- `bump_version.py` screenshot capture corrupting `data/home.pzs` by silently
+  auto-saving viewport-adjusted state back to disk. Fixed by calling
+  `zui.scene.disable_autosave()` immediately after loading the scene.
+- `data/home.pzs` restored to correct zoom/origin values
+  (`-5.0  620.0  300.0`).
 
 ## [0.5.2] - 2026-05-27
 ### Added
@@ -24,7 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Step 48: String modification dialog (right-click) — accepts via Ctrl+Enter
   - Step 49: SVG modification dialog (right-click) — accepts via Ctrl+Enter
 - Documented Ctrl+Enter shortcut in `userinterface.rst` and `svgfeatures.rst`
-- `data/pyzui.desktop` file for freedesktop desktop integration, enabling proper
+- `data/zooui.desktop` file for freedesktop desktop integration, enabling proper
   application icon display on Linux desktop environments (KDE, GNOME, etc.)
 
 ### Fixed
@@ -74,7 +100,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.5.0] - 2026-05-10
 ### Added
 - Configuration management system (ConfigManager) with JSON config files,
-  validation, merge overrides, and example config (`pyzui_config_example.json`)
+  validation, merge overrides, and example config (`zooui_config_example.json`)
 - Autosave/backup system with per-scene directories, configurable interval,
   rotation, and expiration; AutosaveSettingsDialog for user control
 - Zoom limits manager to prevent crashes at extreme zoom levels;
@@ -97,7 +123,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   expire days, disable), zoom defaults, cleanup control, logging flags
 - Build configuration (`pyproject.toml`) and pre-commit hooks (ruff linter +
   formatter)
-- Launcher script (`pyzui.sh`) with conda environment integration
+- Launcher script (`zooui.sh`) with conda environment integration
 - AGENTS.md agent guidelines for AI-assisted development
 - Shutdown orchestration: unified thread cleanup before Qt destruction
 - SVG picker and modifier dialog windows
@@ -119,7 +145,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   → local)
 - Comprehensive type annotations added across all modules
 - Docstrings rewritten and expanded across all modules
-- `pyzui/__init__.py` `__all__` flattened (removed hierarchical nesting)
+- `zooui/__init__.py` `__all__` flattened (removed hierarchical nesting)
 
 ### Fixed
 - Thread safety: `__objects_lock` consistently used for all scene object iteration
@@ -234,7 +260,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Dialog windows system for user interaction
 ### Changed
-- Major restructure: moved all modules into `pyzui/` package
+- Major restructure: moved all modules into `zooui/` package
 - MainWindow and QZUI widget refinements
 - MediaObject class hierarchy improvements
 

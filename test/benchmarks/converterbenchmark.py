@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ## Copyright (C) 2009 David Roberts <d@vidr.cc>
 ##
 ## This program is free software; you can redistribute it and/or
@@ -18,7 +18,7 @@
 Converter Benchmark Module
 
 This module provides benchmarking utilities for measuring the performance
-of PyZUI's image conversion, tiling, and zooming operations. It measures:
+of ZooUI's image conversion, tiling, and zooming operations. It measures:
 - Image conversion to PPM format
 - Tiling performance and memory consumption
 - Zooming performance (cold and warm cache)
@@ -41,13 +41,13 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")
 
 from PySide6 import QtWidgets
 
-import pyzui.objects.scene.scene as Scene
-import pyzui.tilesystem.tilemanager as TileManager
-import pyzui.tilesystem.tilestore as TileStore
-from pyzui.converters.vipsconverter import VipsConverter
-from pyzui.objects.mediaobjects.tiledmediaobject import TiledMediaObject
-from pyzui.objects.scene.qzui import QZUI
-from pyzui.tilesystem.tiler.ppm import PPMTiler, read_ppm_header
+import zooui.objects.scene.scene as Scene
+import zooui.tilesystem.tilemanager as TileManager
+import zooui.tilesystem.tilestore as TileStore
+from zooui.converters.vipsconverter import VipsConverter
+from zooui.objects.mediaobjects.tiledmediaobject import TiledMediaObject
+from zooui.objects.scene.qzui import QZUI
+from zooui.tilesystem.tiler.ppm import PPMTiler, read_ppm_header
 
 
 def mem(size: str = "rss") -> int:

@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -15,7 +15,7 @@
 
 from unittest.mock import Mock, patch
 
-from pyzui.objects.mediaobjects.svgmediaobject import SVGMediaObject
+from zooui.objects.mediaobjects.svgmediaobject import SVGMediaObject
 
 
 class TestSVGMediaObjectEmbedding:
@@ -26,7 +26,7 @@ class TestSVGMediaObjectEmbedding:
     when SVGs are modified (picker dialog, clipboard, svg_*_utils).
     """
 
-    @patch('pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
+    @patch('zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
     def test_is_modified_default_false_for_file_path(self, mock_renderer_class):
         """
         Scenario: SVG loaded from file path is not modified by default
@@ -47,7 +47,7 @@ class TestSVGMediaObjectEmbedding:
         assert obj.is_modified is False
         assert obj.original_file_path == "test.svg"
 
-    @patch('pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
+    @patch('zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
     def test_is_modified_true_for_cache_hash(self, mock_renderer_class):
         """
         Scenario: SVG loaded from cache hash is marked as modified
@@ -63,7 +63,7 @@ class TestSVGMediaObjectEmbedding:
         mock_renderer_class.return_value = mock_renderer
 
         # Mock SVG cache
-        with patch('pyzui.objects.mediaobjects.svgmediaobject.get_svg_cache') as mock_get_cache:
+        with patch('zooui.objects.mediaobjects.svgmediaobject.get_svg_cache') as mock_get_cache:
             mock_cache = Mock()
             mock_path = Mock()
             mock_path.exists.return_value = True
@@ -76,7 +76,7 @@ class TestSVGMediaObjectEmbedding:
             assert obj.is_modified is True
             assert obj.original_file_path is None
 
-    @patch('pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
+    @patch('zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
     def test_mark_as_modified_method(self, mock_renderer_class):
         """
         Scenario: mark_as_modified() sets modification state
@@ -103,7 +103,7 @@ class TestSVGMediaObjectEmbedding:
         # Now should be modified
         assert obj.is_modified is True
 
-    @patch('pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
+    @patch('zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
     def test_get_svg_content_from_cache_hash(self, mock_renderer_class):
         """
         Scenario: Get SVG content from cache hash
@@ -121,7 +121,7 @@ class TestSVGMediaObjectEmbedding:
         test_content = '<svg><circle cx="50" cy="50" r="40"/></svg>'
 
         # Mock SVG cache
-        with patch('pyzui.objects.mediaobjects.svgmediaobject.get_svg_cache') as mock_get_cache:
+        with patch('zooui.objects.mediaobjects.svgmediaobject.get_svg_cache') as mock_get_cache:
             mock_cache = Mock()
             mock_path = Mock()
             mock_path.exists.return_value = True
@@ -144,7 +144,7 @@ class TestSVGMediaObjectEmbedding:
             # Still only called once due to caching
             mock_cache.get_svg_content.assert_called_once()
 
-    @patch('pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
+    @patch('zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
     def test_get_svg_content_from_file_path(self, mock_renderer_class):
         """
         Scenario: Get SVG content from file path
@@ -162,7 +162,7 @@ class TestSVGMediaObjectEmbedding:
         test_content = '<svg><circle cx="50" cy="50" r="40"/></svg>'
 
         # Mock Path.read_text
-        with patch('pyzui.objects.mediaobjects.svgmediaobject.Path') as mock_path_class:
+        with patch('zooui.objects.mediaobjects.svgmediaobject.Path') as mock_path_class:
             mock_path = Mock()
             mock_path.read_text.return_value = test_content
             mock_path_class.return_value = mock_path
@@ -182,7 +182,7 @@ class TestSVGMediaObjectEmbedding:
             # Still only called once due to caching
             mock_path.read_text.assert_called_once()
 
-    @patch('pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
+    @patch('zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
     def test_get_svg_content_error_file_not_found(self, mock_renderer_class):
         """
         Scenario: Get SVG content when file doesn't exist
@@ -198,7 +198,7 @@ class TestSVGMediaObjectEmbedding:
         mock_renderer_class.return_value = mock_renderer
 
         # Mock Path.read_text to raise exception
-        with patch('pyzui.objects.mediaobjects.svgmediaobject.Path') as mock_path_class:
+        with patch('zooui.objects.mediaobjects.svgmediaobject.Path') as mock_path_class:
             mock_path = Mock()
             mock_path.read_text.side_effect = FileNotFoundError("File not found")
             mock_path_class.return_value = mock_path
@@ -214,7 +214,7 @@ class TestSVGMediaObjectEmbedding:
             assert content is None
             obj._SVGMediaObject__logger.error.assert_called()
 
-    @patch('pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
+    @patch('zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
     def test_set_svg_content(self, mock_renderer_class):
         """
         Scenario: Set SVG content
@@ -244,7 +244,7 @@ class TestSVGMediaObjectEmbedding:
         assert obj.is_modified is True
         assert obj.get_svg_content() == test_content
 
-    @patch('pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
+    @patch('zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
     def test_to_dict_includes_modification_state(self, mock_renderer_class):
         """
         Scenario: to_dict() includes modification state
@@ -283,7 +283,7 @@ class TestSVGMediaObjectEmbedding:
             assert 'original_file_path' in result
             assert result['original_file_path'] == 'test.svg'
 
-    @patch('pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
+    @patch('zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
     def test_from_dict_restores_modification_state(self, mock_renderer_class):
         """
         Scenario: from_dict() restores modification state

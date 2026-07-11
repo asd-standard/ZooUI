@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -17,7 +17,7 @@ import math
 
 import pytest
 
-from pyzui.objects.physicalobject import PhysicalObject
+from zooui.objects.physicalobject import PhysicalObject
 
 
 class TestPhysicalObject:
@@ -25,7 +25,7 @@ class TestPhysicalObject:
     Feature: PhysicalObject Class
 
     This class tests the PhysicalObject functionality including position tracking, velocity management,
-    physics simulation, and coordinate transformations used for animation and movement in PyZUI.
+    physics simulation, and coordinate transformations used for animation and movement in ZooUI.
     """
 
     def test_init(self):

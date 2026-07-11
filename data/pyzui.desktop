@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=PyZUI
-Comment=Python Zooming User Interface
-Exec=env CONDA_ENV=pyzui /home/asd/Projects/pyzui/pyzui.sh %F
-Icon=/home/asd/Projects/pyzui/data/icon.png
-Categories=Graphics;Viewer;
-StartupWMClass=pyzui
-Terminal=false

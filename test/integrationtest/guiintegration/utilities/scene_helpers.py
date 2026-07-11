@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ## Copyright (C) 2009 David Roberts <d@vidr.cc>
 ##
 ## This program is free software; you can redistribute it and/or
@@ -29,7 +29,7 @@ from PySide6.QtWidgets import QApplication, QDialog, QFileDialog
 if TYPE_CHECKING:
     from guiintegration.main import GUITestContext
 
-    from pyzui.objects.mediaobjects.svgmediaobject import SVGMediaObject
+    from zooui.objects.mediaobjects.svgmediaobject import SVGMediaObject
 
 
 def load_media_directory_with_action(ctx: GUITestContext) -> None:
@@ -46,7 +46,7 @@ def add_test_string(ctx: GUITestContext) -> None:
     """Add a test string below the images."""
     ctx.log.detail("Adding test string to scene")
     try:
-        from pyzui.objects.mediaobjects.stringmediaobject import StringMediaObject
+        from zooui.objects.mediaobjects.stringmediaobject import StringMediaObject
 
         test_string = "string:00ff00:GUI Integration Test - All Images Loaded"
         mediaobject = StringMediaObject(test_string, ctx.window.zui.scene)
@@ -75,7 +75,7 @@ def add_svg_to_scene(ctx: GUITestContext, svg_filename: str, position: tuple | N
     Returns:
         The created SVGMediaObject
     """
-    from pyzui.objects.mediaobjects.svgmediaobject import SVGMediaObject
+    from zooui.objects.mediaobjects.svgmediaobject import SVGMediaObject
 
     ctx.log.detail(f"Adding SVG: {svg_filename}")
     try:

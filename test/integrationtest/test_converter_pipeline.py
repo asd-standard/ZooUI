@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -44,10 +44,10 @@ from concurrent.futures import ThreadPoolExecutor
 import pytest
 from PIL import Image
 
-from pyzui.converters.pdfconverter import PDFConverter
-from pyzui.converters.vipsconverter import VipsConverter
-from pyzui.tilesystem import tilemanager, tilestore
-from pyzui.tilesystem.tiler import Tiler
+from zooui.converters.pdfconverter import PDFConverter
+from zooui.converters.vipsconverter import VipsConverter
+from zooui.tilesystem import tilemanager, tilestore
+from zooui.tilesystem.tiler import Tiler
 
 
 class ConcreteTiler(Tiler):
@@ -118,7 +118,7 @@ def temp_tilestore(tmp_path):
     Yields:
         str: Path to the temporary tilestore directory.
     """
-    from pyzui.tilesystem.tilestore import tilestore as ts_module
+    from zooui.tilesystem.tilestore import tilestore as ts_module
 
     original_tile_dir = ts_module.tile_dir
     temp_dir = str(tmp_path / "tilestore")
@@ -754,7 +754,7 @@ class TestConverterThreading:
         """
         from concurrent.futures import wait
 
-        from pyzui.converters import converterrunner
+        from zooui.converters import converterrunner
 
         futures = []
         outfiles = []
@@ -801,7 +801,7 @@ class TestConcurrentConversionOperations:
         """
         from concurrent.futures import wait
 
-        from pyzui.converters import converterrunner
+        from zooui.converters import converterrunner
 
         files_to_convert = [
             (sample_images["png"], str(tmp_path / "out1.ppm")),
@@ -840,7 +840,7 @@ class TestConcurrentConversionOperations:
         """
         from concurrent.futures import wait
 
-        from pyzui.converters import converterrunner
+        from zooui.converters import converterrunner
 
         # Initialize tilemanager locally
         tilemanager.init(total_cache_size=100, auto_cleanup=False)
@@ -905,7 +905,7 @@ class TestConcurrentTiling:
         import threading
         from concurrent.futures import wait
 
-        from pyzui.converters import converterrunner
+        from zooui.converters import converterrunner
 
         # Create multiple PPM files using converterrunner (process-based)
         ppm_files = []

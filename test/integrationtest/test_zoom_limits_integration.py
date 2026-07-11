@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ## Copyright (C) 2009 David Roberts <d@vidr.cc>
 ##
 ## This program is free software; you can redistribute it and/or
@@ -24,10 +24,10 @@ when inserting StringMediaObject at extreme zoom levels.
 import pytest
 from PySide6 import QtWidgets
 
-from pyzui.objects.mediaobjects.stringmediaobject import StringMediaObject
-from pyzui.objects.objectsutils import ZoomManager
-from pyzui.objects.physicalobject import PhysicalObject
-from pyzui.objects.scene import scene as Scene
+from zooui.objects.mediaobjects.stringmediaobject import StringMediaObject
+from zooui.objects.objectsutils import ZoomManager
+from zooui.objects.physicalobject import PhysicalObject
+from zooui.objects.scene import scene as Scene
 
 
 class TestZoomLimitsIntegration:

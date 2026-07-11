@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -17,7 +17,7 @@ from unittest.mock import Mock, patch
 
 from PIL import Image
 
-from pyzui.tilesystem.tileproviders import StaticTileProvider
+from zooui.tilesystem.tileproviders import StaticTileProvider
 
 
 class TestStaticTileProvider:
@@ -48,15 +48,15 @@ class TestStaticTileProvider:
         When a StaticTileProvider is instantiated
         Then it should be an instance of TileProvider
         """
-        from pyzui.tilesystem.tileproviders import TileProvider
+        from zooui.tilesystem.tileproviders import TileProvider
 
         tilecache = Mock()
         provider = StaticTileProvider(tilecache)
         assert isinstance(provider, TileProvider)
 
-    @patch("pyzui.tilesystem.tileproviders.statictileprovider.TileStore.get_metadata")
-    @patch("pyzui.tilesystem.tileproviders.statictileprovider.TileStore.get_tile_path")
-    @patch("pyzui.tilesystem.tileproviders.statictileprovider.Image.open")
+    @patch("zooui.tilesystem.tileproviders.statictileprovider.TileStore.get_metadata")
+    @patch("zooui.tilesystem.tileproviders.statictileprovider.TileStore.get_tile_path")
+    @patch("zooui.tilesystem.tileproviders.statictileprovider.Image.open")
     def test_load_success(self, mock_open, mock_path, mock_metadata):
         """
         Scenario: Successfully load a tile from disk
@@ -80,7 +80,7 @@ class TestStaticTileProvider:
         assert result == mock_image
         mock_image.load.assert_called_once()
 
-    @patch("pyzui.tilesystem.tileproviders.statictileprovider.TileStore.get_metadata")
+    @patch("zooui.tilesystem.tileproviders.statictileprovider.TileStore.get_metadata")
     def test_load_exceeds_maxtilelevel(self, mock_metadata):
         """
         Scenario: Request tile beyond maximum level
@@ -98,9 +98,9 @@ class TestStaticTileProvider:
 
         assert result is None
 
-    @patch("pyzui.tilesystem.tileproviders.statictileprovider.TileStore.get_metadata")
-    @patch("pyzui.tilesystem.tileproviders.statictileprovider.TileStore.get_tile_path")
-    @patch("pyzui.tilesystem.tileproviders.statictileprovider.Image.open")
+    @patch("zooui.tilesystem.tileproviders.statictileprovider.TileStore.get_metadata")
+    @patch("zooui.tilesystem.tileproviders.statictileprovider.TileStore.get_tile_path")
+    @patch("zooui.tilesystem.tileproviders.statictileprovider.Image.open")
     def test_load_ioerror(self, mock_open, mock_path, mock_metadata):
         """
         Scenario: Handle missing tile file
@@ -121,9 +121,9 @@ class TestStaticTileProvider:
 
         assert result is None
 
-    @patch("pyzui.tilesystem.tileproviders.statictileprovider.TileStore.get_metadata")
-    @patch("pyzui.tilesystem.tileproviders.statictileprovider.TileStore.get_tile_path")
-    @patch("pyzui.tilesystem.tileproviders.statictileprovider.Image.open")
+    @patch("zooui.tilesystem.tileproviders.statictileprovider.TileStore.get_metadata")
+    @patch("zooui.tilesystem.tileproviders.statictileprovider.TileStore.get_tile_path")
+    @patch("zooui.tilesystem.tileproviders.statictileprovider.Image.open")
     def test_load_valid_tilelevel(self, mock_open, mock_path, mock_metadata):
         """
         Scenario: Load tile at maximum level boundary
@@ -145,9 +145,9 @@ class TestStaticTileProvider:
 
         assert result == mock_image
 
-    @patch("pyzui.tilesystem.tileproviders.statictileprovider.TileStore.get_metadata")
-    @patch("pyzui.tilesystem.tileproviders.statictileprovider.TileStore.get_tile_path")
-    @patch("pyzui.tilesystem.tileproviders.statictileprovider.Image.open")
+    @patch("zooui.tilesystem.tileproviders.statictileprovider.TileStore.get_metadata")
+    @patch("zooui.tilesystem.tileproviders.statictileprovider.TileStore.get_tile_path")
+    @patch("zooui.tilesystem.tileproviders.statictileprovider.Image.open")
     def test_load_calls_correct_methods(self, mock_open, mock_path, mock_metadata):
         """
         Scenario: Verify tile store interaction

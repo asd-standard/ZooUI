@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ## Copyright (C) 2009 David Roberts <d@vidr.cc>
 ##
 ## This program is free software; you can redistribute it and/or
@@ -21,7 +21,7 @@ The ZoomManager class enforces zoom limits to prevent crashes at extreme
 zoom levels by clamping values to configurable minimum and maximum bounds.
 """
 
-from pyzui.objects.objectsutils import ZoomManager
+from zooui.objects.objectsutils import ZoomManager
 
 
 class TestZoomManager:

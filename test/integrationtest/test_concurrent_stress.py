@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -30,8 +30,8 @@ from concurrent.futures import wait
 import pytest
 from PIL import Image
 
-from pyzui.converters import converterrunner
-from pyzui.tilesystem.tiler import tilerrunner
+from zooui.converters import converterrunner
+from zooui.tilesystem.tiler import tilerrunner
 
 
 def is_pyvips_available():

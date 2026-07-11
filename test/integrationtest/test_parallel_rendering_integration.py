@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -23,10 +23,10 @@ from unittest.mock import Mock
 
 from PySide6 import QtCore, QtGui
 
-from pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout import ParallelLayoutCalculator
-from pyzui.objects.mediaobjects.mediaobjectsutils.string.textlayout import TextLayoutData
-from pyzui.objects.scene.sceneutils.prioritybatcher import PriorityBatcher
-from pyzui.objects.scene.scene import Scene
+from zooui.objects.mediaobjects.mediaobjectsutils.string.parallellayout import ParallelLayoutCalculator
+from zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout import TextLayoutData
+from zooui.objects.scene.sceneutils.prioritybatcher import PriorityBatcher
+from zooui.objects.scene.scene import Scene
 
 
 class TestParallelRenderingIntegration:
@@ -97,7 +97,7 @@ class TestParallelRenderingIntegration:
             mock_objects.append(obj)
 
         # Create prioritized objects
-        from pyzui.objects.scene.sceneutils.prioritybatcher import BatchPriority, PrioritizedObject
+        from zooui.objects.scene.sceneutils.prioritybatcher import BatchPriority, PrioritizedObject
 
         prioritized_objects = []
         for i, obj in enumerate(mock_objects):

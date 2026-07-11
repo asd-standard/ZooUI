@@ -1,8 +1,8 @@
-# Welcome to PyZUI Documentation!
+# Welcome to ZooUI Documentation!
 
 ---
 
-PyZUI is an implementation of a Zooming User Interface (ZUI) for Python.
+ZooUI is an implementation of a Zooming User Interface (ZUI) for Python.
 Media is laid out upon an infinite virtual desktop, with the user able to
 pan and zoom through the collection.
 
@@ -15,7 +15,7 @@ Full documentation available at [asd-standard.github.io/zoomy](https://asd-stand
 This project is a fork of [github.com/davidar/pyzui](https://github.com/davidar/pyzui),
 original work from which it derives its architecture and features.
 
-## PyZUI is compatible with the following media formats:
+## ZooUI is compatible with the following media formats:
 
 - All images recognized by VIPS
 - PDF documents
@@ -29,13 +29,13 @@ be under COPYING.txt on project root, otherwise visit [gnu.org](https://www.gnu.
 ---
 
 > **Note:** This documentation covers setup, usage, technical/development documentation,
-> testing/benchmarking documentation and contribution guidelines for PyZUI.
+> testing/benchmarking documentation and contribution guidelines for ZooUI.
 
 ---
 
-# PyZui installation instructions
+# ZooUI installation instructions
 
-This PyZUI fork was developed with debian 13 "trixie" as d.e and a miniconda for
+This ZooUI fork was developed with debian 13 "trixie" as d.e and a miniconda for
 dependencies management. It has also been tested on AArch64 and Win11, always
 with a miniconda environment managing all dependencies.
 
@@ -44,7 +44,7 @@ https://github.com/davidar/pyzui
 
 ## Dependencies
 
-PyZui has been developed with the following python version
+ZooUI has been developed with the following python version
 
 - python=3.12.12
 
@@ -68,7 +68,7 @@ with all the core dependencies installed trough the default Anaconda channel:
 conda install "package"="version number"
 ```
 
-PyZUI depends on the following Python packages:
+ZooUI depends on the following Python packages:
 
 - pyside6=6.7.2
 - pillow=12.0.0
@@ -103,9 +103,9 @@ using Wayland as display server you can also install:
 
 - Install miniconda and follow the instructions in the DEPENDENCIES section
 
-## Running PyZUI
+## Running ZooUI
 
-- PyZUI can be run by activating the environment as explained in the DEPENDENCIES
+- ZooUI can be run by activating the environment as explained in the DEPENDENCIES
   section:
 
 ```bash
@@ -125,17 +125,17 @@ python main.py
 ### Windows specific instructions
 
 - You have to install Windows subsystem for linux, (wsl), the default linux
-  distribution should work, nevertheless if you want to be 100% sure the PyZui
+  distribution should work, nevertheless if you want to be 100% sure the ZooUI
   have been tested with ubuntu 24.04.
 
 - Once you have wsl installed you need to install miniconda on it, then you can
   create an environment and install all the dependencies as explained in the
   DEPENDENCIES section.
 
-### Running PyZui (Windows)
+### Running ZooUI (Windows)
 
-- You can then run PyZui by launching your wsl environment, navigate to the root
-  of the pyzui project and run:
+- You can then run ZooUI by launching your wsl environment, navigate to the root
+  of the zooui project and run:
 
 ```bash
 python main.py
@@ -143,14 +143,14 @@ python main.py
 
 ## Generating Documentation
 
-- Install sphinx on the conda environment you have created for the PyZui project.
+- Install sphinx on the conda environment you have created for the ZooUI project.
 
 ```bash
 conda activate "environment name"
 conda install sphinx
 ```
 
-- Once installed sphinx on the PyZui project environment go to the project root
+- Once installed sphinx on the ZooUI project environment go to the project root
   and then:
 
 ```bash
@@ -179,14 +179,14 @@ with any web browser
 - Be aware, building documentation cause certain s docs project configuration
   files to be wiped, if you just wish to update documentation go to GENERATING
   DOCUMENTATION
-- Install sphinx on the conda environment you have created for the PyZui project.
+- Install sphinx on the conda environment you have created for the ZooUI project.
 
 ```bash
 conda activate "environment name"
 conda install sphinx
 ```
 
-- Once installed sphinx on the PyZui project environment go to "project root"/docs
+- Once installed sphinx on the ZooUI project environment go to "project root"/docs
   and run:
 
 ```bash
@@ -216,7 +216,7 @@ docs/
 
 ```bash
 sphinx-apidoc -e -o source/ ..
-sphinx-apidoc -e -o source/ ../pyzui
+sphinx-apidoc -e -o source/ ../zooui
 ```
 
 - Then open ./docs/source/conf.py and add

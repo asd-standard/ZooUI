@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -64,7 +64,7 @@ class TestModifySVGInputDialog:
         When creating ModifySVGInputDialog
         Then it should recognize it as a cache file
         """
-        from pyzui.windows.dialogwindows.modifysvginputdialog import ModifySVGInputDialog
+        from zooui.windows.dialogwindows.modifysvginputdialog import ModifySVGInputDialog
 
         dialog = ModifySVGInputDialog(mock_svg_object)
 
@@ -81,7 +81,7 @@ class TestModifySVGInputDialog:
         When creating ModifySVGInputDialog
         Then it should recognize it as a file path
         """
-        from pyzui.windows.dialogwindows.modifysvginputdialog import ModifySVGInputDialog
+        from zooui.windows.dialogwindows.modifysvginputdialog import ModifySVGInputDialog
 
         mock_svg = Mock()
         mock_svg._media_id = "/home/user/test.svg"
@@ -99,14 +99,14 @@ class TestModifySVGInputDialog:
         """
         Scenario: Initialize dialog with /tmp file
 
-        Given an SVGMediaObject with /tmp/pyzui_svg_ file path
+        Given an SVGMediaObject with /tmp/zooui_svg_ file path
         When creating ModifySVGInputDialog
         Then it should recognize it as a tmp file
         """
-        from pyzui.windows.dialogwindows.modifysvginputdialog import ModifySVGInputDialog
+        from zooui.windows.dialogwindows.modifysvginputdialog import ModifySVGInputDialog
 
         mock_svg = Mock()
-        mock_svg._media_id = "/tmp/pyzui_svg_/test.svg"
+        mock_svg._media_id = "/tmp/zooui_svg_/test.svg"
         mock_svg.get_svg_content.return_value = '''<?xml version="1.0" encoding="UTF-8"?>
 <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
     <circle cx="100" cy="100" r="70" stroke="blue" stroke-width="3" fill="none"/>
@@ -125,7 +125,7 @@ class TestModifySVGInputDialog:
         When extracting current color
         Then it should return hex color code
         """
-        from pyzui.windows.dialogwindows.modifysvginputdialog import ModifySVGInputDialog
+        from zooui.windows.dialogwindows.modifysvginputdialog import ModifySVGInputDialog
 
         dialog = ModifySVGInputDialog(mock_svg_object)
         color = dialog._extract_current_color()
@@ -140,7 +140,7 @@ class TestModifySVGInputDialog:
         When extracting current thickness
         Then it should return thickness value
         """
-        from pyzui.windows.dialogwindows.modifysvginputdialog import ModifySVGInputDialog
+        from zooui.windows.dialogwindows.modifysvginputdialog import ModifySVGInputDialog
 
         dialog = ModifySVGInputDialog(mock_svg_object)
         thickness = dialog._extract_current_thickness()
@@ -155,7 +155,7 @@ class TestModifySVGInputDialog:
         When converting to hex
         Then it should return correct hex codes
         """
-        from pyzui.windows.dialogwindows.modifysvginputdialog import ModifySVGInputDialog
+        from zooui.windows.dialogwindows.modifysvginputdialog import ModifySVGInputDialog
 
         # Create dialog with mock object
         mock_svg = Mock()
@@ -178,7 +178,7 @@ class TestModifySVGInputDialog:
         When validating source
         Then it should return True (safe)
         """
-        from pyzui.windows.dialogwindows.modifysvginputdialog import ModifySVGInputDialog
+        from zooui.windows.dialogwindows.modifysvginputdialog import ModifySVGInputDialog
 
         dialog = ModifySVGInputDialog(mock_svg_object)
         assert dialog._validate_svg_source()
@@ -191,7 +191,7 @@ class TestModifySVGInputDialog:
         When validating source
         Then it should show warning dialog
         """
-        from pyzui.windows.dialogwindows.modifysvginputdialog import ModifySVGInputDialog
+        from zooui.windows.dialogwindows.modifysvginputdialog import ModifySVGInputDialog
 
         # Mock SVG object with file path
         mock_svg = Mock()
@@ -214,9 +214,9 @@ class TestModifySVGInputDialog:
         When modifying color and thickness
         Then it should return new cache hash
         """
-        from pyzui.windows.dialogwindows.modifysvginputdialog import ModifySVGInputDialog
+        from zooui.windows.dialogwindows.modifysvginputdialog import ModifySVGInputDialog
 
-        with patch('pyzui.windows.dialogwindows.modifysvginputdialog.get_svg_cache', return_value=mock_svg_cache):
+        with patch('zooui.windows.dialogwindows.modifysvginputdialog.get_svg_cache', return_value=mock_svg_cache):
             dialog = ModifySVGInputDialog(mock_svg_object)
             cache_hash = dialog._modify_svg_file('ff0000', '10')
 
@@ -231,7 +231,7 @@ class TestModifySVGInputDialog:
         When user cancels
         Then it should return (False, None)
         """
-        from pyzui.windows.dialogwindows.modifysvginputdialog import ModifySVGInputDialog
+        from zooui.windows.dialogwindows.modifysvginputdialog import ModifySVGInputDialog
 
         # Mock dialog to return rejected
         with patch.object(ModifySVGInputDialog, '_main_dialog') as mock_main_dialog:
@@ -244,7 +244,7 @@ class TestModifySVGInputDialog:
 
             assert result == (False, None)
 
-    @patch('pyzui.windows.dialogwindows.modifysvginputdialog.get_svg_cache')
+    @patch('zooui.windows.dialogwindows.modifysvginputdialog.get_svg_cache')
     def test_run_dialog_accepted_with_changes(self, mock_get_cache, qapp, mock_svg_object):
         """
         Scenario: User accepts dialog with changes
@@ -253,7 +253,7 @@ class TestModifySVGInputDialog:
         When user accepts
         Then it should return (True, cache_hash)
         """
-        from pyzui.windows.dialogwindows.modifysvginputdialog import ModifySVGInputDialog
+        from zooui.windows.dialogwindows.modifysvginputdialog import ModifySVGInputDialog
 
         # Mock cache
         mock_cache = Mock()
@@ -298,7 +298,7 @@ class TestModifySVGInputDialog:
         import os
         # Get project root directory
         project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
-        scene_path = os.path.join(project_root, 'pyzui/objects/scene/scene.py')
+        scene_path = os.path.join(project_root, 'zooui/objects/scene/scene.py')
 
         # Check if file exists before reading
         if os.path.exists(scene_path):

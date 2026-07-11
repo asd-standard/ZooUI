@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ## Copyright (C) 2009 David Roberts <d@vidr.cc>
 ##
 ## This program is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@ import os
 import tempfile
 from unittest.mock import Mock, patch
 
-from pyzui.objects.scene import scene as Scene
+from zooui.objects.scene import scene as Scene
 
 
 class TestSceneAutosave:
@@ -237,7 +237,7 @@ class TestSceneAutosave:
         """
         config = {"autosave": {"enabled": True, "interval": 300, "max_backups": 20}}
 
-        with patch('pyzui.backup.backupmanager.BackupManager') as mock_backup_class:
+        with patch('zooui.backup.backupmanager.BackupManager') as mock_backup_class:
             mock_backup = Mock()
             mock_backup_class.return_value = mock_backup
 

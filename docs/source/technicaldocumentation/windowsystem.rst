@@ -3,7 +3,7 @@
 Window System
 =============
 
-This document provides a comprehensive overview of the window system architecture in PyZUI,
+This document provides a comprehensive overview of the window system architecture in ZooUI,
 explaining how the graphical user interface is structured, how user input is handled, and how
 the application integrates with the PySide6 (Qt) framework to create an interactive zooming
 interface.
@@ -179,7 +179,7 @@ application window, providing menus, actions, tab management, and file operation
                      autosave_config: dict[str, Any] | None = None) -> None:
             QtWidgets.QMainWindow.__init__(self)
 
-            self.setWindowTitle("PyZUI")
+            self.setWindowTitle("ZooUI")
             self.__config = config or {}
             self.__autosave_config = autosave_config or {}
 
@@ -254,7 +254,7 @@ MainWindow manages multiple scenes through a ``QTabWidget``:
         """Sync render order checkbox and window title on tab switch."""
         zui = self.current_zui
         if zui:
-            self.setWindowTitle(f"PyZUI - {zui.scene.__last_save_path or 'Untitled'}")
+            self.setWindowTitle(f"ZooUI - {zui.scene.__last_save_path or 'Untitled'}")
 
 **Menu Structure:**
 
@@ -325,7 +325,7 @@ Scene Operations
         """Open scene from .pzs file via file dialog. Opens in new tab."""
         filename = QFileDialog.getOpenFileName(
             self, "Open scene", self.__prev_dir,
-            "PyZUI Scenes (*.pzs)")
+            "ZooUI Scenes (*.pzs)")
         if filename:
             scene = Scene.load_scene(filename)
             self._add_tab(scene)
@@ -335,7 +335,7 @@ Scene Operations
         If objects are selected, saves only the selection."""
         filename = QFileDialog.getSaveFileName(
             self, "Save scene", "scene.pzs",
-            "PyZUI Scenes (*.pzs)")
+            "ZooUI Scenes (*.pzs)")
         if not filename:
             return
         scene = self.current_zui.scene
@@ -486,7 +486,7 @@ View Settings
 
     def __action_toggle_render_order(self) -> None:
         """Toggle render order between smaller_on_top and larger_on_top.
-        Persists setting to ~/.pyzui/config.json."""
+        Persists setting to ~/.zooui/config.json."""
         action = self.__action["render_order_smaller_top"]
         new_mode = "smaller_on_top" if action.isChecked() else "larger_on_top"
         scene = self.current_zui.scene
@@ -512,7 +512,7 @@ View Settings
 
     def __action_zoom_settings(self) -> None:
         """Open zoom settings dialog for level limits."""
-        from pyzui.windows.dialogwindows.zoomsettingsdialog import ZoomSettingsDialog
+        from zooui.windows.dialogwindows.zoomsettingsdialog import ZoomSettingsDialog
         dialog = ZoomSettingsDialog(self.__config.get('zoom', {}))
         ok, zoom_config = dialog._run_dialog()
         if ok and zoom_config:
@@ -541,7 +541,7 @@ Error Handling
     def __show_error(self, text: str, details: Any) -> None:
         """Display error dialog with details."""
         dialog = QMessageBox(self)
-        dialog.setWindowTitle("PyZUI - Error")
+        dialog.setWindowTitle("ZooUI - Error")
         dialog.setText(text)
         dialog.setDetailedText(str(details))
         dialog.setIcon(QMessageBox.Warning)
@@ -878,7 +878,7 @@ Dialog for creating new text objects with color selection.
 - **Text Input**: Multi-line text editor with 16pt font
 - **Color Selection**: Grid of 24 recently used colors
 - **Custom Colors**: Hex color input field (e.g., #ff5733)
-- **Color Persistence**: Recent colors saved to ``~/.pyzui/colorstore/color_list.txt``
+- **Color Persistence**: Recent colors saved to ``~/.zooui/colorstore/color_list.txt``
 - **Color Display**: Visual color squares next to hex codes
 
 **Dialog Layout:**
@@ -920,8 +920,8 @@ Dialog for creating new text objects with color selection.
 
 Colors are stored in a deque (max 24 items) and persisted to disk:
 
-- **Windows**: ``%APPDATA%\pyzui\colorstore\color_list.txt``
-- **Unix/Linux**: ``~/.pyzui/colorstore/color_list.txt``
+- **Windows**: ``%APPDATA%\zooui\colorstore\color_list.txt``
+- **Unix/Linux**: ``~/.zooui/colorstore/color_list.txt``
 
 Format: One hex color per line (e.g., ``ff0000``)
 
@@ -978,7 +978,7 @@ and thickness customization. Triggered by **File > Open new SVG** (Ctrl+G).
 - **Color Selection**: Grid of 24 recently used colors (shared with string dialogs)
 - **Custom Colors**: Hex color input field
 - **Thickness Control**: Line thickness for the selected SVG shape
-- **Color Persistence**: Recent colors saved to ``~/.pyzui/colorstore/color_list.txt``
+- **Color Persistence**: Recent colors saved to ``~/.zooui/colorstore/color_list.txt``
 
 **Dialog Layout:**
 
@@ -1074,8 +1074,8 @@ objects. Triggered by right-clicking an SVG shape in the scene.
 
 **See Also:**
 
-- :doc:`../pyzui/modifysvginputdialog` — API reference
-- :doc:`../pyzui/svgcache` — SVG cache storage
+- :doc:`../zooui/modifysvginputdialog` — API reference
+- :doc:`../zooui/svgcache` — SVG cache storage
 
 .. _modify-tiled-media-dialog:
 
@@ -1151,8 +1151,8 @@ original position, zoom level, and center point.
 
 **See Also:**
 
-- :doc:`../pyzui/modifytiledmediaobjectdialog` — API reference
-- :doc:`../pyzui/converterrunner` — Process-based parallel conversion
+- :doc:`../zooui/modifytiledmediaobjectdialog` — API reference
+- :doc:`../zooui/converterrunner` — Process-based parallel conversion
 
 ZoomSensitivityDialog
 ~~~~~~~~~~~~~~~~~~~~~
@@ -1256,7 +1256,7 @@ Dialog for configuring zoom level limits and clamping. Accessed via
 
 .. code-block:: python
 
-    from pyzui.windows.dialogwindows.zoomsettingsdialog import ZoomSettingsDialog
+    from zooui.windows.dialogwindows.zoomsettingsdialog import ZoomSettingsDialog
 
     dialog = ZoomSettingsDialog({'min': -10, 'max': 12, 'default': 0})
     ok, zoom_config = dialog._run_dialog()
@@ -1269,7 +1269,7 @@ Dialog for configuring zoom level limits and clamping. Accessed via
 **Integration with ZoomManager:**
 
 The configured limits are applied to :class:`ZoomManager` which enforces them
-during zoom operations. See :doc:`../pyzui/zoommanager` for details.
+during zoom operations. See :doc:`../zooui/zoommanager` for details.
 
 .. note::
 
@@ -1306,7 +1306,7 @@ Dialog for configuring the autosave backup system. Accessed via
     │  Expire After (days):        [7  ]         │
     │                                            │
     │  Backups are stored in:                    │
-    │  ~/.pyzui/backups/                         │
+    │  ~/.zooui/backups/                         │
     │  Each scene has its own subdirectory.      │
     │  Oldest backups are rotated automatically. │
     │                                            │
@@ -1330,9 +1330,9 @@ Dialog for configuring the autosave backup system. Accessed via
 
 **See Also:**
 
-- :doc:`../pyzui/autosavesettingsdialog` — API reference
-- :doc:`../pyzui/autosave` — SceneAutosaveManager
-- :doc:`../pyzui/backupmanager` — BackupManager
+- :doc:`../zooui/autosavesettingsdialog` — API reference
+- :doc:`../zooui/autosave` — SceneAutosaveManager
+- :doc:`../zooui/backupmanager` — BackupManager
 
 Integration Patterns
 --------------------
@@ -1627,7 +1627,7 @@ Basic Application Setup
 .. code-block:: python
 
     from PySide6.QtWidgets import QApplication
-    from pyzui.windows.mainwindow import MainWindow
+    from zooui.windows.mainwindow import MainWindow
 
     # Create Qt application
     app = QApplication(sys.argv)
@@ -1648,8 +1648,8 @@ Custom QZUI Widget
 .. code-block:: python
 
     # Embed QZUI in custom window
-    from pyzui.objects.scene.qzui import QZUI
-    from pyzui.objects.scene.scene import Scene
+    from zooui.objects.scene.qzui import QZUI
+    from zooui.objects.scene.scene import Scene
 
     class CustomWindow(QMainWindow):
         def __init__(self):
@@ -1674,7 +1674,7 @@ Programmatic Scene Manipulation
     scene = window.current_zui.scene
 
     # Add media programmatically
-    from pyzui.objects.mediaobjects import TiledMediaObject
+    from zooui.objects.mediaobjects import TiledMediaObject
 
     img = TiledMediaObject('photo.jpg', scene)
     img.pos = (0, 0)
@@ -1691,7 +1691,7 @@ Custom Dialogs
 .. code-block:: python
 
     # String input
-    from pyzui.windows.dialogwindows import OpenNewStringInputDialog
+    from zooui.windows.dialogwindows import OpenNewStringInputDialog
 
     dialog = OpenNewStringInputDialog()
     ok, uri = dialog._run_dialog()
@@ -1699,7 +1699,7 @@ Custom Dialogs
         print(f"Created string: {uri}")
 
     # SVG picker
-    from pyzui.windows.dialogwindows import OpenSVGPickerInputDialog
+    from zooui.windows.dialogwindows import OpenSVGPickerInputDialog
 
     dialog = OpenSVGPickerInputDialog()
     ok, uri = dialog._run_dialog()
@@ -1707,7 +1707,7 @@ Custom Dialogs
         print(f"Created SVG: {uri}")
 
     # Autosave settings
-    from pyzui.windows.dialogwindows import AutosaveSettingsDialog
+    from zooui.windows.dialogwindows import AutosaveSettingsDialog
 
     dialog = AutosaveSettingsDialog({'enabled': True, 'interval': 300})
     ok, config = dialog._run_dialog()
@@ -1838,17 +1838,17 @@ DialogWindows
 Key Classes
 ~~~~~~~~~~~
 
-- :class:`pyzui.windows.mainwindow.MainWindow` - Main application window with tab management
-- :class:`pyzui.objects.scene.qzui.QZUI` - Central rendering widget (per tab)
-- :class:`pyzui.windows.dialogwindows.dialogwindows.DialogWindows` - Dialog container
-- :class:`pyzui.windows.dialogwindows.stringinputdialog.OpenNewStringInputDialog` - New string dialog
-- :class:`pyzui.windows.dialogwindows.modifystringdialog.ModifyStringInputDialog` - Edit string dialog
-- :class:`pyzui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog` - SVG file browser
-- :class:`pyzui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog` - SVG color/thickness editor
-- :class:`pyzui.windows.dialogwindows.modifytiledmediaobjectdialog.ModifyTiledMediaObjectDialog` - Image manipulation
-- :class:`pyzui.windows.dialogwindows.zoomsensitivitydialog.open_zoom_sensitivity_input_dialog` - Zoom speed settings
-- :class:`pyzui.windows.dialogwindows.zoomsettingsdialog.ZoomSettingsDialog` - Zoom level limits
-- :class:`pyzui.windows.dialogwindows.autosavesettingsdialog.AutosaveSettingsDialog` - Autosave configuration
+- :class:`zooui.windows.mainwindow.MainWindow` - Main application window with tab management
+- :class:`zooui.objects.scene.qzui.QZUI` - Central rendering widget (per tab)
+- :class:`zooui.windows.dialogwindows.dialogwindows.DialogWindows` - Dialog container
+- :class:`zooui.windows.dialogwindows.stringinputdialog.OpenNewStringInputDialog` - New string dialog
+- :class:`zooui.windows.dialogwindows.modifystringdialog.ModifyStringInputDialog` - Edit string dialog
+- :class:`zooui.windows.dialogwindows.svgpickerinputdialog.OpenSVGPickerInputDialog` - SVG file browser
+- :class:`zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog` - SVG color/thickness editor
+- :class:`zooui.windows.dialogwindows.modifytiledmediaobjectdialog.ModifyTiledMediaObjectDialog` - Image manipulation
+- :class:`zooui.windows.dialogwindows.zoomsensitivitydialog.open_zoom_sensitivity_input_dialog` - Zoom speed settings
+- :class:`zooui.windows.dialogwindows.zoomsettingsdialog.ZoomSettingsDialog` - Zoom level limits
+- :class:`zooui.windows.dialogwindows.autosavesettingsdialog.AutosaveSettingsDialog` - Autosave configuration
 
 See Also
 --------
@@ -1857,10 +1857,10 @@ See Also
 - :doc:`tilingsystem` - Tile rendering system
 - :doc:`../usageinstructions/userinterface` - User interaction guide
 - :doc:`projectstructure` - Overall project organization
-- :doc:`../pyzui/svgpickerinputdialog` - SVG picker dialog API
-- :doc:`../pyzui/modifysvginputdialog` - SVG modifier dialog API
-- :doc:`../pyzui/modifytiledmediaobjectdialog` - Tiled media modifier dialog API
-- :doc:`../pyzui/autosavesettingsdialog` - Autosave settings dialog API
-- :doc:`../pyzui/zoommanager` - Zoom level clamping
-- :doc:`../pyzui/zoomsettingsdialog` - Zoom settings dialog API
-- :doc:`../pyzui/autosave` - SceneAutosaveManager
+- :doc:`../zooui/svgpickerinputdialog` - SVG picker dialog API
+- :doc:`../zooui/modifysvginputdialog` - SVG modifier dialog API
+- :doc:`../zooui/modifytiledmediaobjectdialog` - Tiled media modifier dialog API
+- :doc:`../zooui/autosavesettingsdialog` - Autosave settings dialog API
+- :doc:`../zooui/zoommanager` - Zoom level clamping
+- :doc:`../zooui/zoomsettingsdialog` - Zoom settings dialog API
+- :doc:`../zooui/autosave` - SceneAutosaveManager

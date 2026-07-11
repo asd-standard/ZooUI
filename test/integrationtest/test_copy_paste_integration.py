@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -14,7 +14,7 @@
 ## along with this program; if not, see <https://www.gnu.org/licenses/>.
 
 """
-Integration tests for copy/paste functionality in PyZUI.
+Integration tests for copy/paste functionality in ZooUI.
 
 These tests verify the complete copy/paste workflow including:
 - Scene clipboard operations
@@ -25,8 +25,8 @@ These tests verify the complete copy/paste workflow including:
 
 from unittest.mock import Mock, patch
 
-from pyzui.objects.mediaobjects.svgmediaobject import SVGMediaObject
-from pyzui.objects.scene.scene import Scene
+from zooui.objects.mediaobjects.svgmediaobject import SVGMediaObject
+from zooui.objects.scene.scene import Scene
 
 
 class TestCopyPasteIntegration:
@@ -38,7 +38,7 @@ class TestCopyPasteIntegration:
     and selection behavior.
     """
 
-    @patch('pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
+    @patch('zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
     def test_single_svg_copy_paste(self, mock_renderer_class):
         """
         Scenario: Copy and paste a single SVGMediaObject
@@ -91,7 +91,7 @@ class TestCopyPasteIntegration:
         assert pasted is not svg_obj
         assert pasted.media_id == svg_obj.media_id
 
-    @patch('pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
+    @patch('zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
     def test_multiple_svg_copy_paste(self, mock_renderer_class):
         """
         Scenario: Copy and paste multiple SVGMediaObjects
@@ -146,7 +146,7 @@ class TestCopyPasteIntegration:
             assert pasted is not objects[i]
             assert pasted.media_id == objects[i].media_id
 
-    @patch('pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
+    @patch('zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
     def test_empty_selection_copy(self, mock_renderer_class):
         """
         Scenario: Copy with no selection
@@ -170,7 +170,7 @@ class TestCopyPasteIntegration:
         pasted_objects = scene.paste()
         assert pasted_objects == []
 
-    @patch('pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
+    @patch('zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
     def test_empty_clipboard_paste(self, mock_renderer_class):
         """
         Scenario: Paste with empty clipboard
@@ -191,7 +191,7 @@ class TestCopyPasteIntegration:
         pasted_objects = scene.paste()
         assert pasted_objects == []
 
-    @patch('pyzui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
+    @patch('zooui.objects.mediaobjects.svgmediaobject.QtSvg.QSvgRenderer')
     def test_copy_clear_clipboard(self, mock_renderer_class):
         """
         Scenario: Copy replaces previous clipboard contents

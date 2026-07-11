@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -17,7 +17,7 @@ import logging
 import tempfile
 from pathlib import Path
 
-from pyzui.logger import ColoredFormatter, LoggerConfig, get_logger
+from zooui.logger import ColoredFormatter, LoggerConfig, get_logger
 
 
 class TestLoggerConfig:
@@ -25,7 +25,7 @@ class TestLoggerConfig:
     Feature: Logger Configuration
 
     This test suite validates the LoggerConfig class which provides centralized
-    logging configuration for PyZUI with support for multiple log levels,
+    logging configuration for ZooUI with support for multiple log levels,
     console and file output, rotating log files, and runtime control.
     """
 
@@ -108,7 +108,7 @@ class TestLoggerConfig:
             )
 
             assert LoggerConfig._log_dir == Path(temp_dir)
-            assert LoggerConfig._log_file == Path(temp_dir) / "pyzui.log"
+            assert LoggerConfig._log_file == Path(temp_dir) / "zooui.log"
             assert LoggerConfig._log_file.parent.exists()
 
     def test_get_logger_auto_initializes(self):
@@ -123,7 +123,7 @@ class TestLoggerConfig:
         logger = LoggerConfig.get_logger("TestModule")
 
         assert LoggerConfig._initialized is True
-        assert logger.name == "pyzui.TestModule"
+        assert logger.name == "zooui.TestModule"
         assert isinstance(logger, logging.Logger)
 
     def test_get_logger_caches_loggers(self):
@@ -237,7 +237,7 @@ class TestLoggerConfig:
             )
 
             log_path = LoggerConfig.get_log_file_path()
-            assert log_path == Path(temp_dir) / "pyzui.log"
+            assert log_path == Path(temp_dir) / "zooui.log"
 
     def test_get_log_file_path_no_file_logging(self):
         """
@@ -304,20 +304,20 @@ class TestLoggerConfig:
                 debug=False,
                 log_to_file=True,
                 log_to_console=False,
-                log_dir="~/.pyzui/test_logs",
+                log_dir="~/.zooui/test_logs",
                 colored_output=False,
                 verbose=False,
             )
 
             # Check that log_dir was expanded (should start with tmpdir)
             assert str(LoggerConfig._log_dir).startswith(tmpdir)
-            assert ".pyzui/test_logs" in str(LoggerConfig._log_dir)
+            assert ".zooui/test_logs" in str(LoggerConfig._log_dir)
 
             # Directory should have been created
             assert LoggerConfig._log_dir.exists()
 
             # Log file should exist
-            assert (LoggerConfig._log_dir / "pyzui.log").exists()
+            assert (LoggerConfig._log_dir / "zooui.log").exists()
 
             # Verify the path doesn't contain tilde
             assert "~" not in str(LoggerConfig._log_dir)
@@ -350,7 +350,7 @@ class TestLoggerConfig:
             assert expanded_path.exists()
 
             # Log file should exist
-            assert (expanded_path / "pyzui.log").exists()
+            assert (expanded_path / "zooui.log").exists()
 
     def test_path_expanduser_behavior(self, monkeypatch):
         """
@@ -370,16 +370,16 @@ class TestLoggerConfig:
             monkeypatch.setattr("os.path.expanduser", mock_expanduser)
 
             # Test Path.expanduser() directly
-            tilde_path = Path("~/.pyzui/logs")
+            tilde_path = Path("~/.zooui/logs")
             expanded = tilde_path.expanduser()
 
             # Should expand tilde
             assert "~" not in str(expanded)
             assert str(expanded).startswith(tmpdir)
-            assert ".pyzui/logs" in str(expanded)
+            assert ".zooui/logs" in str(expanded)
 
             # Test with already expanded path
-            already_expanded = Path(tmpdir + "/.pyzui/logs")
+            already_expanded = Path(tmpdir + "/.zooui/logs")
             same_expanded = already_expanded.expanduser()
 
             # Should remain the same (or similar)
@@ -525,7 +525,7 @@ class TestGetLoggerFunction:
         """
         logger = get_logger("TestModule")
 
-        assert logger.name == "pyzui.TestModule"
+        assert logger.name == "zooui.TestModule"
         assert isinstance(logger, logging.Logger)
 
     def test_get_logger_consistent_with_class_method(self):

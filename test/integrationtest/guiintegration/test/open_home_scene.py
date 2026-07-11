@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ## Copyright (C) 2009 David Roberts <d@vidr.cc>
 ##
 ## This program is free software; you can redistribute it and/or
@@ -33,7 +33,7 @@ def run(ctx: GUITestContext) -> None:
     wait(ctx, SHORT_DELAY_MS)
     ctx.log.action("Opening home scene (Ctrl+Home)")
     trigger_action(ctx, "open_scene_home")
-    wait_for_image_load(ctx, "Home scene with PyZUI logo")
-    wait(ctx, DEFAULT_DELAY_MS, "Observe: PyZUI logo should be visible")
+    wait_for_image_load(ctx, "Home scene with ZooUI logo")
+    wait(ctx, DEFAULT_DELAY_MS, "Observe: ZooUI logo should be visible")
     ctx.scene_loaded = False
     ctx.log.success("Home scene loaded")

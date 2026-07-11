@@ -1,0 +1,319 @@
+## ZooUI - Zooming User Interface
+## Copyright (C) 2009 David Roberts <d@vidr.cc>
+##
+## This program is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License
+## as published by the Free Software Foundation; either version 3
+## of the License, or (at your option) any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program; if not, see <https://www.gnu.org/licenses/>.
+
+"""Modify string dialog with color selection."""
+
+import os
+from collections import deque
+from typing import TYPE_CHECKING
+
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QColor, QFont, QKeySequence, QPainter, QShortcut
+from PySide6.QtWidgets import (
+    QDialog,
+    QDialogButtonBox,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QSizePolicy,
+    QTextEdit,
+    QVBoxLayout,
+    QWidget,
+)
+
+from zooui.logger import get_logger
+
+if TYPE_CHECKING:
+    from PySide6.QtGui import QPaintEvent
+    from PySide6.QtWidgets import QLineEdit, QTextEdit
+
+# Type aliases
+ColorCode = str
+DialogResult = tuple[bool, str, str, str]
+
+
+class ModifyStringInputDialog:
+    """
+    Constructor :
+        ModifyStringInputDialog(media_id)
+    Parameters :
+        media_id : Optional[str]
+
+    ModifyStringInputDialog(media_id) --> None
+
+    Gather the string through a dialog and let select the color.
+    Also gives a selection column of the last 20 used colors.
+    """
+
+    def __init__(self, media_id: str | None) -> None:
+        """
+        Constructor :
+            ModifyStringInputDialog(media_id)
+        Parameters :
+            media_id : Optional[str]
+
+        ModifyStringInputDialog(media_id) --> None
+
+        Create a new ModifyStringInputDialog for editing an existing string media object.
+
+        The media_id parameter contains the string URI in format 'string:RRGGBB:text'.
+        If media_id is provided, the dialog is pre-populated with the existing color
+        and text. Loads previously used colors from the color store file.
+        """
+        self.start_string: str = ""
+        self.string_color: str = ""
+        self.passed_color: str = ""
+        self.color_codes: deque[ColorCode] = deque(maxlen=24)
+        self.text_edit: QTextEdit
+        self.custom_color_input: QLineEdit
+        self.__logger = get_logger("ModifyStringInputDialog")
+
+        if media_id is None:
+            pass
+        elif media_id[:6] == "string":
+            self.string_color = media_id[7:13]
+            self.start_string = media_id[14:]
+        else:
+            pass
+
+        ## set the default tilestore directory, this can be overridden if required
+        if "APPDATA" in os.environ:
+            ## Windows
+            self.color_dir = os.path.join(os.environ["APPDATA"], "zooui", "colorstore")
+        else:
+            ## Unix
+            self.color_dir = os.path.join(os.path.expanduser("~"), ".zooui", "colorstore")
+
+        if os.path.isfile(self.color_dir + "/color_list.txt"):
+            with open(self.color_dir + "/color_list.txt") as f:
+                for line in f:
+                    stripline = line.strip()
+                    stripline = stripline.lower()
+                    if len(stripline) == 6 and stripline not in self.color_codes:
+                        self.color_codes.append(stripline)
+
+        else:
+            if os.path.isdir(self.color_dir):
+                f = open(self.color_dir + "/color_list.txt", "w")
+                self.color_codes.append("ff0000")
+                f.write("ff0000\n")
+                self.color_codes.append("00ff00")
+                f.write("00ff00\n")
+                self.color_codes.append("0000ff")
+                f.write("0000ff\n")
+                f.close()
+            else:
+                os.mkdir(self.color_dir)
+                f = open(self.color_dir + "/color_list.txt", "w")
+                self.color_codes.append("ff0000")
+                f.write("ff0000\n")
+                self.color_codes.append("00ff00")
+                f.write("00ff00\n")
+                self.color_codes.append("0000ff")
+                f.write("0000ff\n")
+                f.close()
+
+    def _color_square(self, color_code: ColorCode) -> QWidget:
+        """
+        Method :
+            ModifyStringInputDialog._color_square(color_code)
+        Parameters :
+            color_code : str
+
+        ModifyStringInputDialog._color_square(color_code) --> QWidget
+
+        Creates a colored square widget.
+        """
+        color_square = QWidget()
+        color = QColor("#" + str(color_code))
+        color_square.setFixedSize(20, 20)
+
+        def paintEvent(event: "QPaintEvent") -> None:
+            painter = QPainter(color_square)
+            painter.fillRect(color_square.rect(), color)
+            # Explicit .end() is required: a QPainter left active on its
+            # paint device can corrupt Qt's C++ paint engine state,
+            # eventually causing a SIGSEGV crash in long-running sessions.
+            painter.end()
+
+        color_square.paintEvent = paintEvent
+
+        return color_square
+
+    def _color_button_click(self, color: ColorCode) -> None:
+        """
+        Method :
+            ModifyStringInputDialog._color_button_click(color)
+        Parameters :
+            color : str
+
+        ModifyStringInputDialog._color_button_click(color) --> None
+
+        Handles color button click event.
+        """
+        self.string_color = color
+
+    def _color_button(self, color_code: ColorCode) -> QWidget:
+        """
+        Method :
+            ModifyStringInputDialog._color_button(color_code)
+        Parameters :
+            color_code : str
+
+        ModifyStringInputDialog._color_button(color_code) --> QWidget
+
+        Creates a color selection button.
+        """
+        color_widget = QWidget()
+
+        layout = QHBoxLayout()
+        layout.setContentsMargins(5, 2, 5, 2)
+        layout.setSpacing(10)
+
+        color_square = self._color_square(color_code)
+        label = QLabel(color_code)
+
+        # Create a QPushButton but use a QWidget wrapper to hold square + label
+        button = QPushButton()
+        button.setLayout(layout)
+        button.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+
+        # Add widget and label to the layout inside the button
+        layout.addWidget(color_square)
+        layout.addWidget(label)
+        layout.addStretch()
+
+        # Make the whole widget act like a button by forwarding clicks
+        button.clicked.connect(lambda: self._color_button_click(color_code))
+
+        # Our main layout for this widget is the button only
+        main_layout = QHBoxLayout(color_widget)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.addWidget(button)
+
+        return color_widget
+
+    def _main_dialog(self) -> QDialog:
+        """
+        Method :
+            ModifyStringInputDialog._main_dialog()
+        Parameters :
+            None
+
+        ModifyStringInputDialog._main_dialog() --> QDialog
+
+        Creates and configures the main dialog window.
+        """
+        dialog = QDialog()
+        dialog.setWindowTitle("String input:")
+        dialog.resize(900, 600)
+
+        # Create text edit widget
+        self.text_edit = QTextEdit(dialog)  # Input string is going to be typed in here
+        font = QFont()
+        font.setPointSize(16)  # Set desired font size
+        self.text_edit.setFont(font)
+
+        self.text_edit.setPlainText(self.start_string)
+        # Align text to top-left (horizontal only by default)
+        self.text_edit.setAlignment(Qt.AlignmentFlag.AlignLeft)
+
+        # Create a text input field for custom color entry
+        self.custom_color_input = QLineEdit(dialog)  # Color code it's going to be typed here
+        self.custom_color_input.setPlaceholderText("Enter custom color (e.g., #ff5733)")
+
+        # Create OK/Cancel buttons
+        buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel, dialog)
+        buttons.accepted.connect(dialog.accept)
+        buttons.rejected.connect(dialog.reject)
+
+        # Layout setup
+        main_layout = QHBoxLayout(dialog)
+        color_layout = QVBoxLayout()
+        color_layout.setContentsMargins(0, 0, 0, 0)
+        color_layout.setSpacing(2)
+
+        for code in self.color_codes:
+            btn = self._color_button(code)
+            btn.setFixedWidth(120)
+            color_layout.addWidget(btn)
+
+        color_layout.addStretch()
+
+        text_layout = QVBoxLayout()
+        text_layout.addWidget(self.text_edit)
+        text_layout.addWidget(self.custom_color_input)
+        text_layout.addWidget(buttons)
+
+        main_layout.addLayout(text_layout)
+        main_layout.addLayout(color_layout)
+
+        QShortcut(QKeySequence("Ctrl+Return"), dialog, dialog.accept)
+        QShortcut(QKeySequence("Ctrl+Enter"), dialog, dialog.accept)
+
+        return dialog
+
+    def _run_dialog(self) -> DialogResult:
+        """
+        Method :
+            ModifyStringInputDialog._run_dialog()
+        Parameters :
+            None
+
+        ModifyStringInputDialog._run_dialog() --> Tuple[bool, str, str, str]
+
+        Runs the dialog and returns the result.
+        Returns (ok, media_id, color, text) where ok is True if accepted.
+        """
+        dialog = self._main_dialog()
+        # Run dialog and get result
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            media_id = ""
+
+            if len(self.custom_color_input.text()) == 6 or len(self.custom_color_input.text()) == 7:
+                self.string_color = self.custom_color_input.text()
+
+                if len(self.string_color) == 6:
+                    self.color_codes.append(self.string_color)
+                    f = open(self.color_dir + "/color_list.txt", "w")
+                    for i in self.color_codes:
+                        f.write(str(i) + "\n")
+                    f.close()
+
+                if self.string_color[0] == "#":
+                    self.string_color = self.string_color[1:]
+                    self.color_codes.append(self.string_color)
+                    f = open(self.color_dir + "/color_list.txt", "w")
+                    for i in self.color_codes:
+                        f.write(str(i) + "\n")
+                    f.close()
+
+                if len(self.string_color) == 7 and self.string_color[0] != "#":
+                    pass
+
+            elif len(self.string_color) != 6:
+                self.__logger.warning("Invalid string color length")
+            try:
+                media_id = "string:" + str(self.string_color) + ":" + str(self.text_edit.toPlainText())
+
+            except Exception as e:
+                self.__logger.error("Error creating media_id: %s", e)
+            ok = True
+            return ok, media_id, self.string_color, self.text_edit.toPlainText()
+        else:
+            ok = False
+            return ok, "", "", ""

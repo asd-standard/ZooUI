@@ -3,15 +3,15 @@
 Unit Testing Guide
 ==================
 
-This document provides a comprehensive guide to unit testing PyZUI during development,
+This document provides a comprehensive guide to unit testing ZooUI during development,
 including testing patterns, best practices, and guidelines for writing new tests.
-The PyZUI test suite uses pytest with BDD-style documentation and comprehensive coverage
+The ZooUI test suite uses pytest with BDD-style documentation and comprehensive coverage
 of all major components.
 
 Overview
 --------
 
-The PyZUI unit test suite is designed to:
+The ZooUI unit test suite is designed to:
 
 1. Validate core functionality of all components
 2. Prevent regressions during development
@@ -85,18 +85,18 @@ Located at ``test/unittest/conftest.py``, this file configures pytest for the te
 
     """
     Pytest configuration file for unittest directory.
-    Sets up Python path so tests can import from pyzui package.
+    Sets up Python path so tests can import from zooui package.
     """
     import sys
     import os
 
-    # Add pyzui root to Python path
-    pyzui_root = os.path.abspath(os.path.join(
+    # Add zooui root to Python path
+    zooui_root = os.path.abspath(os.path.join(
         os.path.dirname(__file__), '../..'))
-    if pyzui_root not in sys.path:
-        sys.path.insert(0, pyzui_root)
+    if zooui_root not in sys.path:
+        sys.path.insert(0, zooui_root)
 
-This ensures all tests can import from the ``pyzui`` package regardless of
+This ensures all tests can import from the ``zooui`` package regardless of
 the current working directory.
 
 Running Tests
@@ -167,7 +167,7 @@ Advanced Options
 
 .. code-block:: bash
 
-    pytest --cov=pyzui --cov-report=html
+    pytest --cov=zooui --cov-report=html
     # Open htmlcov/index.html in browser
 
 **Run only tests matching pattern:**
@@ -194,7 +194,7 @@ Every test module should follow this structure:
 
     import pytest
     from unittest.mock import Mock, patch, MagicMock
-    from pyzui.module import ClassToTest
+    from zooui.module import ClassToTest
 
     class TestClassName:
         """
@@ -467,7 +467,7 @@ Match the structure of the source code:
 
 .. code-block:: text
 
-    Source: pyzui/tilesystem/tilecache.py
+    Source: zooui/tilesystem/tilecache.py
     Test:   test/unittest/tilesystem/test_tilecache.py
 
 **2. Import Dependencies**
@@ -476,7 +476,7 @@ Match the structure of the source code:
 
     import pytest
     from unittest.mock import Mock, patch
-    from pyzui.module import ClassToTest
+    from zooui.module import ClassToTest
 
 **3. Create Test Class**
 
@@ -555,7 +555,7 @@ Complete test file template:
 
     import pytest
     from unittest.mock import Mock, patch, MagicMock
-    from pyzui.module import ClassName
+    from zooui.module import ClassName
 
     class TestClassName:
         """
@@ -1087,20 +1087,20 @@ Generating Coverage Reports
 
 .. code-block:: bash
 
-    pytest --cov=pyzui --cov-report=html
+    pytest --cov=zooui --cov-report=html
     open htmlcov/index.html
 
 **Terminal Report:**
 
 .. code-block:: bash
 
-    pytest --cov=pyzui --cov-report=term-missing
+    pytest --cov=zooui --cov-report=term-missing
 
 **Coverage for Specific Module:**
 
 .. code-block:: bash
 
-    pytest --cov=pyzui.tilesystem --cov-report=term
+    pytest --cov=zooui.tilesystem --cov-report=term
 
 Interpreting Coverage
 ~~~~~~~~~~~~~~~~~~~~~
@@ -1156,7 +1156,7 @@ Running Tests in CI
         - name: Run tests
           run: |
             cd test/unittest
-            pytest --cov=pyzui --cov-report=xml
+            pytest --cov=zooui --cov-report=xml
 
         - name: Upload coverage
           uses: codecov/codecov-action@v2
@@ -1194,7 +1194,7 @@ Common Issues
     pytest
 
     # Or set PYTHONPATH
-    export PYTHONPATH=/path/to/pyzui:$PYTHONPATH
+    export PYTHONPATH=/path/to/zooui:$PYTHONPATH
     pytest
 
 **Qt Tests Failing:**
@@ -1273,7 +1273,7 @@ real (unmockable) Python stdlib resources.
 Tests that call ``tilemanager.init(auto_cleanup=True)`` register a real
 ``atexit`` handler (``atexit.register`` is stdlib and cannot be mocked).
 After all ``@patch`` decorators are undone, that handler fires on the
-**real** ``~/.pyzui/tilestore/`` directory, which can contain tens of
+**real** ``~/.zooui/tilestore/`` directory, which can contain tens of
 thousands of files (over 80,000 in a heavily-used installation).
 Walking and ``stat``-ing every file can take several minutes, which
 masquerades as a hang.
@@ -1297,20 +1297,20 @@ Both causes are handled by hooks in ``test/unittest/conftest.py``:
 
     def pytest_sessionstart(session):
         """Disable tilemanager atexit so tests never register real handlers."""
-        from pyzui.tilesystem import tilemanager
+        from zooui.tilesystem import tilemanager
         tilemanager.__cleanup_enabled = False
 
     def pytest_sessionfinish(session, exitstatus):
         """Prevent expensive cleanup from blocking pytest exit."""
         # TileManager: mark cleanup as already executed
-        from pyzui.tilesystem import tilemanager
+        from zooui.tilesystem import tilemanager
         tilemanager.__cleanup_executed = True
         tilemanager.__cleanup_enabled = False
 
         # ConverterRunner / TilerRunner: prevent atexit from firing
-        from pyzui.converters import converterrunner
+        from zooui.converters import converterrunner
         converterrunner._atexit_registered = False
-        from pyzui.tilesystem.tiler import tilerrunner
+        from zooui.tilesystem.tiler import tilerrunner
         tilerrunner._atexit_registered = False
 
         # Force-clean the multiprocessing resource tracker
@@ -1346,7 +1346,7 @@ Essential Commands
     pytest
 
     # Run with coverage
-    pytest --cov=pyzui
+    pytest --cov=zooui
 
     # Run specific file
     pytest test_file.py
@@ -1416,7 +1416,7 @@ Documentation
 - **Unittest.mock**: https://docs.python.org/3/library/unittest.mock.html
 - **Coverage.py**: https://coverage.readthedocs.io/
 
-PyZUI-Specific
+ZooUI-Specific
 ~~~~~~~~~~~~~~
 
 - :doc:`../technicaldocumentation/objectsystem` - Understanding object architecture
@@ -1437,7 +1437,7 @@ Reference these for patterns:
 Conclusion
 ----------
 
-The PyZUI test suite provides comprehensive coverage of all major components using pytest
+The ZooUI test suite provides comprehensive coverage of all major components using pytest
 and BDD-style documentation. When adding new features:
 
 1. Write tests first (TDD) or alongside implementation

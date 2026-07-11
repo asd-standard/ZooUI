@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -45,12 +45,12 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import pytest
 from PIL import Image
 
-from pyzui.tilesystem import tilemanager, tilestore
-from pyzui.tilesystem.tile import Tile
-from pyzui.tilesystem.tilemanager import TileNotAvailable, TileNotLoaded
-from pyzui.tilesystem.tileproviders.tileprovider import TileProvider
-from pyzui.tilesystem.tiler import Tiler
-from pyzui.tilesystem.tilestore import TileCache
+from zooui.tilesystem import tilemanager, tilestore
+from zooui.tilesystem.tile import Tile
+from zooui.tilesystem.tilemanager import TileNotAvailable, TileNotLoaded
+from zooui.tilesystem.tileproviders.tileprovider import TileProvider
+from zooui.tilesystem.tiler import Tiler
+from zooui.tilesystem.tilestore import TileCache
 
 
 def wait_for_load_count(provider, expected, timeout=10.0):
@@ -145,7 +145,7 @@ def temp_tilestore(tmp_path):
     Yields:
         str: Path to the temporary tilestore directory.
     """
-    from pyzui.tilesystem.tilestore import tilestore as ts_module
+    from zooui.tilesystem.tilestore import tilestore as ts_module
 
     original_tile_dir = ts_module.tile_dir
     temp_dir = str(tmp_path / "tilestore")

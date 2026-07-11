@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ## Copyright (C) 2009 David Roberts <d@vidr.cc>
 ##
 ## This program is free software; you can redistribute it and/or
@@ -16,7 +16,7 @@
 
 """GUI test logger with visual formatting for human-readable test output."""
 
-from pyzui.logger import get_logger
+from zooui.logger import get_logger
 
 
 class GUITestLogger:

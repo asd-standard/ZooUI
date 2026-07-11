@@ -266,13 +266,13 @@ and Qt. This is the **recommended** approach for tiling — the thread-based
 
 The ``tilerrunner`` module uses ``ProcessPoolExecutor`` with ``'spawn'`` context
 (default, for safety). The context can be overridden via the ``PYZUI_MP_CONTEXT``
-environment variable (see :doc:`../pyzui/tilerrunner` for details).
+environment variable (see :doc:`../zooui/tilerrunner` for details).
 
 **Key Functions:**
 
 .. code-block:: python
 
-    from pyzui.tilesystem.tiler import tilerrunner
+    from zooui.tilesystem.tiler import tilerrunner
 
     # Initialize process pool (optional, auto-initialized on first use)
     tilerrunner.init(max_workers=2)
@@ -343,7 +343,7 @@ The ``TileStore`` module manages disk-based tile storage and metadata persistenc
 
 Tiles are organized by media ID using SHA1 hashing::
 
-    ~/.pyzui/tilestore/
+    ~/.zooui/tilestore/
     └── <sha1_hash_of_media_id>/
         ├── metadata
         ├── 00/
@@ -405,7 +405,7 @@ default to improve startup performance.
     tilemanager.init(auto_cleanup=False)
 
     # Run cleanup manually
-    from pyzui.tilesystem.tilestore import auto_cleanup
+    from zooui.tilesystem.tilestore import auto_cleanup
     stats = auto_cleanup(max_age_days=3, enable=True, collect_stats=False)
 
 **Cleanup Behavior:**
@@ -440,7 +440,7 @@ tilestore cleanup, runnable via:
 
 .. code-block:: bash
 
-    python -m pyzui.tilesystem.tilestore.cleanuptilestore --age 7 --stats --verbose
+    python -m zooui.tilesystem.tilestore.cleanuptilestore --age 7 --stats --verbose
 
 **Command-line Options:**
 
@@ -458,7 +458,7 @@ specified options, and prints a formatted summary of the results.
 TileCache
 ~~~~~~~~~
 
-The ``TileCache`` class (at ``pyzui/tilesystem/tilestore/tilecache.py``) provides
+The ``TileCache`` class (at ``zooui/tilesystem/tilestore/tilecache.py``) provides
 in-memory LRU (Least Recently Used) caching of tiles.
 
 **Features:**
@@ -550,7 +550,7 @@ The ``TileManager`` module coordinates tile requests between providers and cache
 
 .. code-block:: python
 
-    from pyzui.tilesystem import tilemanager
+    from zooui.tilesystem import tilemanager
 
     # Before forking (if using PYZUI_MP_CONTEXT=fork)
     tilemanager.pause()
@@ -640,7 +640,7 @@ does not exist on disk.
 Generates tiles procedurally. The only concrete subclass in the codebase is:
 
 - ``FernTileProvider``: Barnsley fern fractal (at
-  ``pyzui/tilesystem/tileproviders/ferndynamictileprovider.py``)
+  ``zooui/tilesystem/tileproviders/ferndynamictileprovider.py``)
 
 Dynamic provider tiles go to the permanent cache (like StaticProvider tiles),
 not the temporary cache.
@@ -781,8 +781,8 @@ Usage Examples
 
 .. code-block:: python
 
-    from pyzui.tilesystem.tiler import tilerrunner
-    from pyzui.tilesystem import tilestore, tilemanager
+    from zooui.tilesystem.tiler import tilerrunner
+    from zooui.tilesystem import tilestore, tilemanager
 
     # Initialize the tilemanager
     tilemanager.init(total_cache_size=1024, auto_cleanup=True,
@@ -810,7 +810,7 @@ Usage Examples
 
 .. code-block:: python
 
-    from pyzui.tilesystem import tilemanager
+    from zooui.tilesystem import tilemanager
 
     # Pause all providers before forking
     tilemanager.pause()
@@ -856,10 +856,10 @@ Usage Examples
 .. code-block:: bash
 
     # CLI utility
-    python -m pyzui.tilesystem.tilestore.cleanuptilestore --age 30 --dry-run --stats
+    python -m zooui.tilesystem.tilestore.cleanuptilestore --age 30 --dry-run --stats
 
     # Or programmatically
-    from pyzui.tilesystem.tilestore import cleanup_old_tiles
+    from zooui.tilesystem.tilestore import cleanup_old_tiles
 
     cleanup_old_tiles(max_age_days=30, dry_run=True)
 
@@ -868,13 +868,13 @@ API Reference
 
 For detailed API documentation, see:
 
-- :doc:`../pyzui/tile`
-- :doc:`../pyzui/tiler`
-- :doc:`../pyzui/tilerrunner`
-- :doc:`../pyzui/tilestore`
-- :doc:`../pyzui/tilecache`
-- :doc:`../pyzui/tilemanager`
-- :doc:`../pyzui/tileprovider`
+- :doc:`../zooui/tile`
+- :doc:`../zooui/tiler`
+- :doc:`../zooui/tilerrunner`
+- :doc:`../zooui/tilestore`
+- :doc:`../zooui/tilecache`
+- :doc:`../zooui/tilemanager`
+- :doc:`../zooui/tileprovider`
 
 See Also
 --------

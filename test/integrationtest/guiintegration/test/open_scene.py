@@ -1,4 +1,4 @@
-## PyZUI - Python Zooming User Interface
+## ZooUI - Zooming User Interface
 ## Copyright (C) 2009 David Roberts <d@vidr.cc>
 ##
 ## This program is free software; you can redistribute it and/or
@@ -36,7 +36,7 @@ def run(ctx: GUITestContext) -> None:
     wait(ctx, SHORT_DELAY_MS)
     ctx.log.action(f"Opening scene: {ctx.resources['test_scene']}")
     try:
-        from pyzui.objects.scene import scene as Scene
+        from zooui.objects.scene import scene as Scene
 
         ctx.window.zui.scene = Scene.load_scene(ctx.resources["test_scene"])
         ctx.app.processEvents()
