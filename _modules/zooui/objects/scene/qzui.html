@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>zooui.objects.scene.qzui &#8212; ZooUI 0.5.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=cc7d0dec" />
+    <script src="../../../../_static/documentation_options.js?v=8e576371"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for zooui.objects.scene.qzui</h1><div class="highlight"><pre>
+<span></span><span class="c1">## ZooUI - Zooming User Interface</span>
+<span class="c1">## Copyright (C) 2009 David Roberts &lt;d@vidr.cc&gt;</span>
+<span class="c1">##</span>
+<span class="c1">## This program is free software; you can redistribute it and/or</span>
+<span class="c1">## modify it under the terms of the GNU General Public License</span>
+<span class="c1">## as published by the Free Software Foundation; either version 3</span>
+<span class="c1">## of the License, or (at your option) any later version.</span>
+<span class="c1">##</span>
+<span class="c1">## This program is distributed in the hope that it will be useful,</span>
+<span class="c1">## but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1">## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1">## GNU General Public License for more details.</span>
+<span class="c1">##</span>
+<span class="c1">## You should have received a copy of the GNU General Public License</span>
+<span class="c1">## along with this program; if not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
+
+<span class="sd">&quot;&quot;&quot;QWidget for displaying the ZUI.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">PySide6</span><span class="w"> </span><span class="kn">import</span> <span class="n">QtCore</span><span class="p">,</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtWidgets</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">zooui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zooui.objects.mediaobjects.mediaobjectsutils.svg.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">elongate_circle</span><span class="p">,</span>
+    <span class="n">elongate_diagonal_arrow</span><span class="p">,</span>
+    <span class="n">elongate_square</span><span class="p">,</span>
+    <span class="n">elongate_stick</span><span class="p">,</span>
+    <span class="n">elongate_straight_arrow</span><span class="p">,</span>
+    <span class="n">elongate_triangle</span><span class="p">,</span>
+    <span class="n">is_circle_svg</span><span class="p">,</span>
+    <span class="n">is_diagonal_arrow_svg</span><span class="p">,</span>
+    <span class="n">is_square_svg</span><span class="p">,</span>
+    <span class="n">is_stick_svg</span><span class="p">,</span>
+    <span class="n">is_straight_arrow_svg</span><span class="p">,</span>
+    <span class="n">is_triangle_svg</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zooui.objects.mediaobjects.svgmediaobject</span><span class="w"> </span><span class="kn">import</span> <span class="n">SVGMediaObject</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zooui.objects.scene</span><span class="w"> </span><span class="kn">import</span> <span class="n">scene</span> <span class="k">as</span> <span class="n">Scene</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zooui.tilesystem</span><span class="w"> </span><span class="kn">import</span> <span class="n">tilemanager</span> <span class="k">as</span> <span class="n">TileManager</span>
+
+
+<div class="viewcode-block" id="QZUI">
+<a class="viewcode-back" href="../../../../zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">QZUI</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QWidget</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Constructor :</span>
+<span class="sd">        QZUI(parent, framerate, zoom_sensitivity)</span>
+<span class="sd">    Parameters :</span>
+<span class="sd">        parent : Optional[QtWidgets.QWidget]</span>
+<span class="sd">        framerate : int</span>
+<span class="sd">        zoom_sensitivity : int</span>
+
+<span class="sd">    QZUI(parent, framerate, zoom_sensitivity) --&gt; None</span>
+
+<span class="sd">    QZUI widgets that are used for rendering the ZUI.</span>
+<span class="sd">    This class defines all the methods to retrieve events, Mouse, Keyboard, etc.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#: link error variable to QtCore.Signal()</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">parent</span><span class="p">:</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QWidget</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">framerate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span>
+        <span class="n">zoom_sensitivity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">autosave_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor :</span>
+<span class="sd">            QZUI(parent, framerate, zoom_sensitivity, config, autosave_config)</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            parent : Optional[QtWidgets.QWidget]</span>
+<span class="sd">            framerate : int</span>
+<span class="sd">            zoom_sensitivity : int</span>
+<span class="sd">            config : Optional[Dict[str, Any]]</span>
+<span class="sd">            autosave_config : Optional[Dict[str, Any]]</span>
+
+<span class="sd">        QZUI(parent, framerate, zoom_sensitivity, config, autosave_config) --&gt; None</span>
+
+<span class="sd">        Create a new QZUI QWidget with the given `parent` widget.</span>
+<span class="sd">        Initializes the widget with specified framerate and zoom sensitivity.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QWidget</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+
+        <span class="c1"># Use provided config or create empty dict</span>
+        <span class="n">config_dict</span> <span class="o">=</span> <span class="n">config</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="c1"># Merge autosave config if provided separately (backward compatibility)</span>
+        <span class="k">if</span> <span class="n">autosave_config</span> <span class="ow">and</span> <span class="s2">&quot;autosave&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config_dict</span><span class="p">:</span>
+            <span class="n">config_dict</span><span class="p">[</span><span class="s2">&quot;autosave&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">autosave_config</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__scene</span><span class="p">:</span> <span class="n">Scene</span><span class="o">.</span><span class="n">Scene</span> <span class="o">=</span> <span class="n">Scene</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config_dict</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mouse_right_down</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mouse_left_down</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mousepos</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__shift_held</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__alt_held</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__control_held</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__dropped_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__draft</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Rectangle drawing state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__drawing_rect</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__rect_start</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__rect_end</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Deferred zoom animation for when widget hasn&#39;t been sized yet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__scene_animation_pending</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__timer</span><span class="p">:</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QBasicTimer</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QBasicTimer</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__framerate</span><span class="p">:</span> <span class="nb">int</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">zoom_sensitivity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">zoom_sensitivity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reduced_framerate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">framerate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">framerate</span>  <span class="c1"># type: ignore[no-redef]</span>
+
+        <span class="c1"># Logger for arrow elongation and other operations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;QZUI&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setFocusPolicy</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ClickFocus</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setMouseTracking</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__zoom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_steps</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            __zoom(num_steps)</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            num_steps : float</span>
+
+<span class="sd">        __zoom(num_steps) --&gt; None</span>
+
+<span class="sd">        Increase the z velocity of the appropriate object by an amount</span>
+<span class="sd">        proportional to num_steps.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__alt_held</span><span class="p">:</span>
+            <span class="n">scale</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mi">16</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">scale</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__active_object</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">active_object</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__active_object</span><span class="p">:</span>
+                <span class="n">active_object</span><span class="o">.</span><span class="n">centre</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mousepos</span>
+                <span class="n">active_object</span><span class="o">.</span><span class="n">vz</span> <span class="o">+=</span> <span class="n">scale</span> <span class="o">*</span> <span class="n">num_steps</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__active_object</span><span class="o">.</span><span class="n">centre</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mousepos</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__active_object</span><span class="o">.</span><span class="n">vz</span> <span class="o">+=</span> <span class="n">scale</span> <span class="o">*</span> <span class="n">num_steps</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__centre</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            __centre()</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            None</span>
+
+<span class="sd">        __centre() --&gt; None</span>
+
+<span class="sd">        Aim the appropriate object such that the point under the cursor will</span>
+<span class="sd">        move to the centre of the screen.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mousepos</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__active_object</span><span class="o">.</span><span class="n">vx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__active_object</span><span class="o">.</span><span class="n">vy</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__active_object</span><span class="o">.</span><span class="n">aim</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mousepos</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__active_object</span><span class="o">.</span><span class="n">aim</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mousepos</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<div class="viewcode-block" id="QZUI.paintEvent">
+<a class="viewcode-back" href="../../../../zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI.paintEvent">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">paintEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPaintEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            paintEvent(event)</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            event : QtGui.QPaintEvent</span>
+
+<span class="sd">        paintEvent(event) --&gt; None</span>
+
+<span class="sd">        Method that allows you to perform custom painting on a widget.</span>
+
+<span class="sd">        It is part of the event handling system, and you typically override it in a subclass of a QWidget</span>
+<span class="sd">        (or any subclass like QLabel, QFrame, etc.) to draw graphics using the QPainter class.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">framerate</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">framerate</span><span class="p">)</span>
+
+        <span class="n">painter</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPainter</span><span class="p">()</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">begin</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1">## paint background</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">fillRect</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">(),</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">)</span>
+
+            <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="c1">## render scene</span>
+            <span class="n">errors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">painter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__draft</span><span class="p">)</span>  <span class="c1">#</span>
+
+            <span class="c1">## show errors</span>
+            <span class="k">for</span> <span class="n">mediaobject</span> <span class="ow">in</span> <span class="n">errors</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s2">&quot;Error loading </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">mediaobject</span><span class="p">))</span>
+
+            <span class="c1">## Check if scene needs repaint (e.g., after SVG modification)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">check_and_clear_repaint_flag</span><span class="p">():</span>
+                <span class="c1"># Schedule another repaint to show updated content</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+            <span class="c1">## Draw selection rectangle if currently drawing</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__drawing_rect</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rect_start</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rect_end</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">action_draw_rect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__rect_start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rect_end</span><span class="p">,</span> <span class="n">painter</span><span class="p">,</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">green</span><span class="p">)</span>
+
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mouse_left_down</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__active_object</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">active_object</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__active_object</span><span class="p">:</span>
+                    <span class="n">active_object</span><span class="o">.</span><span class="n">vx</span> <span class="o">=</span> <span class="n">active_object</span><span class="o">.</span><span class="n">vy</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__active_object</span><span class="o">.</span><span class="n">vx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__active_object</span><span class="o">.</span><span class="n">vy</span> <span class="o">=</span> <span class="mf">0.0</span></div>
+
+
+<div class="viewcode-block" id="QZUI.timerEvent">
+<a class="viewcode-back" href="../../../../zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI.timerEvent">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">timerEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QTimerEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            timerEvent(event)</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            event : QtCore.QTimerEvent</span>
+
+<span class="sd">        timerEvent(event) --&gt; None</span>
+
+<span class="sd">        Handle timer events to update the scene rendering.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isVisible</span><span class="p">():</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">timerId</span><span class="p">()</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__timer</span><span class="o">.</span><span class="n">timerId</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">moving</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__dropped_frames</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__draft</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1">## Scene or MediaObjects are moving so drop Frames</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dropped_frames</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">framerate</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduced_framerate</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__dropped_frames</span> <span class="o">=</span> <span class="mi">0</span>
+
+                    <span class="c1">## since the framerate is reduced, we</span>
+                    <span class="c1">## can do high-quality rendering</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__draft</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">repaint</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1">## drop current frame</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__dropped_frames</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QWidget</span><span class="o">.</span><span class="n">timerEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QZUI.wheelEvent">
+<a class="viewcode-back" href="../../../../zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI.wheelEvent">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wheelEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QWheelEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            wheelEvent(event)</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            event : QtGui.QWheelEvent</span>
+
+<span class="sd">        wheelEvent(event) --&gt; None</span>
+
+<span class="sd">        Handle mouse wheel events for zooming or shape elongation.</span>
+
+<span class="sd">        Arrow elongation: Ctrl+wheel on selected arrow SVG</span>
+<span class="sd">        Square elongation: Ctrl/Shift/Alt+wheel on selected square SVG</span>
+<span class="sd">        720° scroll = 2x factor change (1° = 1/360 factor change)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check for modifier key+wheel with single SVG selection</span>
+        <span class="c1"># Check both tracked state and event modifiers (Alt key might be intercepted by window manager)</span>
+        <span class="n">modifiers</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">modifiers</span><span class="p">()</span>
+        <span class="n">ctrl_pressed</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">modifiers</span> <span class="o">&amp;</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">KeyboardModifier</span><span class="o">.</span><span class="n">ControlModifier</span><span class="p">)</span>
+        <span class="n">shift_pressed</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">modifiers</span> <span class="o">&amp;</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">KeyboardModifier</span><span class="o">.</span><span class="n">ShiftModifier</span><span class="p">)</span>
+        <span class="n">alt_pressed</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">modifiers</span> <span class="o">&amp;</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">KeyboardModifier</span><span class="o">.</span><span class="n">AltModifier</span><span class="p">)</span>
+
+        <span class="n">has_modifier</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__control_held</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">__shift_held</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">__alt_held</span> <span class="ow">or</span> <span class="n">ctrl_pressed</span> <span class="ow">or</span> <span class="n">shift_pressed</span> <span class="ow">or</span> <span class="n">alt_pressed</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Debug logging</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Wheel event - Tracked: Ctrl=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__control_held</span><span class="si">}</span><span class="s2">, Shift=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__shift_held</span><span class="si">}</span><span class="s2">, Alt=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__alt_held</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Wheel event - Event modifiers: Ctrl=</span><span class="si">{</span><span class="n">ctrl_pressed</span><span class="si">}</span><span class="s2">, Shift=</span><span class="si">{</span><span class="n">shift_pressed</span><span class="si">}</span><span class="s2">, Alt=</span><span class="si">{</span><span class="n">alt_pressed</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wheel event - has_modifier=</span><span class="si">{</span><span class="n">has_modifier</span><span class="si">}</span><span class="s2">, selection=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selection</span><span class="w"> </span><span class="ow">is</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="kc">None</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">has_modifier</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selection</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selection</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selection</span><span class="p">,</span> <span class="n">SVGMediaObject</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="n">svg_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selection</span>
+            <span class="n">svg_path</span> <span class="o">=</span> <span class="n">svg_obj</span><span class="o">.</span><span class="n">_media_id</span>
+
+            <span class="c1"># Check if it&#39;s any type of arrow SVG</span>
+            <span class="n">is_arrow</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">arrow_type</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="k">if</span> <span class="n">is_straight_arrow_svg</span><span class="p">(</span><span class="n">svg_path</span><span class="p">):</span>
+                <span class="n">is_arrow</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">arrow_type</span> <span class="o">=</span> <span class="s2">&quot;straight&quot;</span>
+            <span class="k">elif</span> <span class="n">is_diagonal_arrow_svg</span><span class="p">(</span><span class="n">svg_path</span><span class="p">):</span>
+                <span class="n">is_arrow</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">arrow_type</span> <span class="o">=</span> <span class="s2">&quot;diagonal&quot;</span>
+
+            <span class="k">if</span> <span class="n">is_arrow</span><span class="p">:</span>
+                <span class="c1"># Arrow elongation only works with Ctrl key</span>
+                <span class="c1"># Check both tracked state and event modifiers</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__control_held</span> <span class="ow">or</span> <span class="n">ctrl_pressed</span><span class="p">):</span>
+                    <span class="c1"># Fall through to normal zoom if not Ctrl</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Arrow elongation requires Ctrl key, falling through to normal zoom&quot;</span><span class="p">)</span>
+                    <span class="k">pass</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Calculate elongation factor from wheel delta</span>
+                    <span class="c1"># 720° = 2x factor, so 1° = 1/360 factor change</span>
+                    <span class="n">num_degrees</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">angleDelta</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">()</span>
+
+                    <span class="c1"># Sensitivity: 1/360 per degree</span>
+                    <span class="c1"># Positive scroll (up) elongates, negative shortens</span>
+                    <span class="n">elongation_delta</span> <span class="o">=</span> <span class="n">num_degrees</span> <span class="o">/</span> <span class="mf">360.0</span>
+                    <span class="n">current_factor</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">+</span> <span class="n">elongation_delta</span>
+
+                    <span class="c1"># Apply minimum factor (0.2x)</span>
+                    <span class="k">if</span> <span class="n">current_factor</span> <span class="o">&lt;</span> <span class="mf">0.2</span><span class="p">:</span>
+                        <span class="n">current_factor</span> <span class="o">=</span> <span class="mf">0.2</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Clamped scale factor to minimum 0.2&quot;</span><span class="p">)</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Attempting </span><span class="si">{</span><span class="n">arrow_type</span><span class="si">}</span><span class="s2"> arrow elongation: factor=</span><span class="si">{</span><span class="n">current_factor</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, degrees=</span><span class="si">{</span><span class="n">num_degrees</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="c1"># Elongate arrow (returns cache hash)</span>
+                        <span class="n">cache_hash</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                        <span class="k">if</span> <span class="n">arrow_type</span> <span class="o">==</span> <span class="s2">&quot;straight&quot;</span><span class="p">:</span>
+                            <span class="n">cache_hash</span> <span class="o">=</span> <span class="n">elongate_straight_arrow</span><span class="p">(</span><span class="n">svg_path</span><span class="p">,</span> <span class="n">current_factor</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>  <span class="c1"># diagonal</span>
+                            <span class="n">cache_hash</span> <span class="o">=</span> <span class="n">elongate_diagonal_arrow</span><span class="p">(</span><span class="n">svg_path</span><span class="p">,</span> <span class="n">current_factor</span><span class="p">)</span>
+
+                        <span class="c1"># Update SVGMediaObject with new cache hash</span>
+                        <span class="n">svg_obj</span><span class="o">.</span><span class="n">_media_id</span> <span class="o">=</span> <span class="n">cache_hash</span>
+                        <span class="n">svg_obj</span><span class="o">.</span><span class="n">mark_as_modified</span><span class="p">()</span>
+
+                        <span class="c1"># Force SVG renderer to reload from cache</span>
+                        <span class="n">renderer</span> <span class="o">=</span> <span class="n">svg_obj</span><span class="o">.</span><span class="n">_SVGMediaObject__renderer</span>
+                        <span class="c1"># Get cache path directly</span>
+                        <span class="kn">from</span><span class="w"> </span><span class="nn">zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_svg_cache</span>
+
+                        <span class="n">cache_path</span> <span class="o">=</span> <span class="n">get_svg_cache</span><span class="p">()</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span><span class="n">cache_hash</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">renderer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cache_path</span><span class="p">)):</span>
+                            <span class="c1"># Update SVG dimensions from reloaded renderer</span>
+                            <span class="n">size</span> <span class="o">=</span> <span class="n">renderer</span><span class="o">.</span><span class="n">defaultSize</span><span class="p">()</span>
+                            <span class="n">svg_obj</span><span class="o">.</span><span class="n">_SVGMediaObject__width</span> <span class="o">=</span> <span class="n">size</span><span class="o">.</span><span class="n">width</span><span class="p">()</span>
+                            <span class="n">svg_obj</span><span class="o">.</span><span class="n">_SVGMediaObject__height</span> <span class="o">=</span> <span class="n">size</span><span class="o">.</span><span class="n">height</span><span class="p">()</span>
+
+                            <span class="c1"># Clear size cache to force recalculation</span>
+                            <span class="n">svg_obj</span><span class="o">.</span><span class="n">_SVGMediaObject__cached_scale</span> <span class="o">=</span> <span class="kc">None</span>
+                            <span class="n">svg_obj</span><span class="o">.</span><span class="n">_SVGMediaObject__cached_onscreen_size</span> <span class="o">=</span> <span class="kc">None</span>
+
+                            <span class="c1"># Trigger repaint</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="p">(</span><span class="n">arrow_type</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;Arrow&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}</span><span class="s2"> arrow elongated successfully, cache hash: </span><span class="si">{</span><span class="n">cache_hash</span><span class="si">}</span><span class="s2">, dimensions: </span><span class="si">{</span><span class="n">size</span><span class="o">.</span><span class="n">width</span><span class="p">()</span><span class="si">}</span><span class="s2">x</span><span class="si">{</span><span class="n">size</span><span class="o">.</span><span class="n">height</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+                            <span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to reload SVG renderer for cache hash: </span><span class="si">{</span><span class="n">cache_hash</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="c1"># Log error but don&#39;t crash</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="p">(</span><span class="n">arrow_type</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;Arrow&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}</span><span class="s2"> arrow elongation failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="c1"># Fall through to normal zoom</span>
+
+                    <span class="k">return</span>  <span class="c1"># Skip normal zoom when arrow elongation was attempted</span>
+
+            <span class="c1"># Check if it&#39;s a square SVG</span>
+            <span class="k">elif</span> <span class="n">is_square_svg</span><span class="p">(</span><span class="n">svg_path</span><span class="p">):</span>
+                <span class="c1"># Calculate elongation factor from wheel delta</span>
+                <span class="c1"># 720° = 2x factor, so 1° = 1/360 factor change</span>
+                <span class="n">num_degrees</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">angleDelta</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">()</span>
+
+                <span class="c1"># Sensitivity: 1/360 per degree</span>
+                <span class="c1"># Positive scroll (up) elongates, negative shortens</span>
+                <span class="n">elongation_delta</span> <span class="o">=</span> <span class="n">num_degrees</span> <span class="o">/</span> <span class="mf">360.0</span>
+                <span class="n">current_factor</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">+</span> <span class="n">elongation_delta</span>
+
+                <span class="c1"># Apply minimum factor (0.2x)</span>
+                <span class="k">if</span> <span class="n">current_factor</span> <span class="o">&lt;</span> <span class="mf">0.2</span><span class="p">:</span>
+                    <span class="n">current_factor</span> <span class="o">=</span> <span class="mf">0.2</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Clamped scale factor to minimum 0.2&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Use event modifiers (already calculated above)</span>
+                <span class="c1"># ctrl_pressed, shift_pressed, alt_pressed are already defined</span>
+
+                <span class="n">scale_x</span> <span class="o">=</span> <span class="mf">1.0</span>
+                <span class="n">scale_y</span> <span class="o">=</span> <span class="mf">1.0</span>
+                <span class="n">scaling_mode</span> <span class="o">=</span> <span class="kc">None</span>
+
+                <span class="k">if</span> <span class="n">ctrl_pressed</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">shift_pressed</span><span class="p">:</span>
+                    <span class="c1"># Ctrl only: proportional scaling (both axes)</span>
+                    <span class="n">scale_x</span> <span class="o">=</span> <span class="n">scale_y</span> <span class="o">=</span> <span class="n">current_factor</span>
+                    <span class="n">scaling_mode</span> <span class="o">=</span> <span class="s2">&quot;proportional&quot;</span>
+                <span class="k">elif</span> <span class="n">shift_pressed</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">ctrl_pressed</span><span class="p">:</span>
+                    <span class="c1"># Shift only: X-only scaling</span>
+                    <span class="n">scale_x</span> <span class="o">=</span> <span class="n">current_factor</span>
+                    <span class="n">scale_y</span> <span class="o">=</span> <span class="mf">1.0</span>
+                    <span class="n">scaling_mode</span> <span class="o">=</span> <span class="s2">&quot;X-only&quot;</span>
+                <span class="k">elif</span> <span class="n">ctrl_pressed</span> <span class="ow">and</span> <span class="n">shift_pressed</span><span class="p">:</span>
+                    <span class="c1"># Ctrl+Shift: Y-only scaling</span>
+                    <span class="n">scale_x</span> <span class="o">=</span> <span class="mf">1.0</span>
+                    <span class="n">scale_y</span> <span class="o">=</span> <span class="n">current_factor</span>
+                    <span class="n">scaling_mode</span> <span class="o">=</span> <span class="s2">&quot;Y-only (Ctrl+Shift)&quot;</span>
+
+                <span class="c1"># Only attempt square elongation if we have a valid modifier combination</span>
+                <span class="k">if</span> <span class="n">scaling_mode</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Attempting square elongation: X=</span><span class="si">{</span><span class="n">scale_x</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, Y=</span><span class="si">{</span><span class="n">scale_y</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, mode=</span><span class="si">{</span><span class="n">scaling_mode</span><span class="si">}</span><span class="s2">, degrees=</span><span class="si">{</span><span class="n">num_degrees</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="c1"># Elongate square (returns cache hash)</span>
+                        <span class="n">cache_hash</span> <span class="o">=</span> <span class="n">elongate_square</span><span class="p">(</span><span class="n">svg_path</span><span class="p">,</span> <span class="n">scale_x</span><span class="p">,</span> <span class="n">scale_y</span><span class="p">)</span>
+
+                        <span class="c1"># Update SVGMediaObject with new cache hash</span>
+                        <span class="n">svg_obj</span><span class="o">.</span><span class="n">_media_id</span> <span class="o">=</span> <span class="n">cache_hash</span>
+                        <span class="n">svg_obj</span><span class="o">.</span><span class="n">mark_as_modified</span><span class="p">()</span>
+
+                        <span class="c1"># Force SVG renderer to reload from cache</span>
+                        <span class="n">renderer</span> <span class="o">=</span> <span class="n">svg_obj</span><span class="o">.</span><span class="n">_SVGMediaObject__renderer</span>
+                        <span class="c1"># Get cache path directly</span>
+                        <span class="kn">from</span><span class="w"> </span><span class="nn">zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_svg_cache</span>
+
+                        <span class="n">cache_path</span> <span class="o">=</span> <span class="n">get_svg_cache</span><span class="p">()</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span><span class="n">cache_hash</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">renderer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cache_path</span><span class="p">)):</span>
+                            <span class="c1"># Update SVG dimensions from reloaded renderer</span>
+                            <span class="n">size</span> <span class="o">=</span> <span class="n">renderer</span><span class="o">.</span><span class="n">defaultSize</span><span class="p">()</span>
+                            <span class="n">svg_obj</span><span class="o">.</span><span class="n">_SVGMediaObject__width</span> <span class="o">=</span> <span class="n">size</span><span class="o">.</span><span class="n">width</span><span class="p">()</span>
+                            <span class="n">svg_obj</span><span class="o">.</span><span class="n">_SVGMediaObject__height</span> <span class="o">=</span> <span class="n">size</span><span class="o">.</span><span class="n">height</span><span class="p">()</span>
+
+                            <span class="c1"># Clear size cache to force recalculation</span>
+                            <span class="n">svg_obj</span><span class="o">.</span><span class="n">_SVGMediaObject__cached_scale</span> <span class="o">=</span> <span class="kc">None</span>
+                            <span class="n">svg_obj</span><span class="o">.</span><span class="n">_SVGMediaObject__cached_onscreen_size</span> <span class="o">=</span> <span class="kc">None</span>
+
+                            <span class="c1"># Trigger repaint</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;Square elongated successfully, cache hash: </span><span class="si">{</span><span class="n">cache_hash</span><span class="si">}</span><span class="s2">, dimensions: </span><span class="si">{</span><span class="n">size</span><span class="o">.</span><span class="n">width</span><span class="p">()</span><span class="si">}</span><span class="s2">x</span><span class="si">{</span><span class="n">size</span><span class="o">.</span><span class="n">height</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+                            <span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to reload SVG renderer for cache hash: </span><span class="si">{</span><span class="n">cache_hash</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="c1"># Log error but don&#39;t crash</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Square elongation failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="c1"># Fall through to normal zoom</span>
+
+                    <span class="k">return</span>  <span class="c1"># Skip normal zoom when square elongation was attempted</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No valid scaling mode for square. Ctrl=</span><span class="si">{</span><span class="n">ctrl_pressed</span><span class="si">}</span><span class="s2">, Shift=</span><span class="si">{</span><span class="n">shift_pressed</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="c1"># Fall through to normal zoom</span>
+
+            <span class="c1"># Check if it&#39;s a circle SVG</span>
+            <span class="k">elif</span> <span class="n">is_circle_svg</span><span class="p">(</span><span class="n">svg_path</span><span class="p">):</span>
+                <span class="c1"># Calculate elongation factor from wheel delta</span>
+                <span class="c1"># 720° = 2x factor, so 1° = 1/360 factor change</span>
+                <span class="n">num_degrees</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">angleDelta</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">()</span>
+
+                <span class="c1"># Sensitivity: 1/360 per degree</span>
+                <span class="c1"># Positive scroll (up) elongates, negative shortens</span>
+                <span class="n">elongation_delta</span> <span class="o">=</span> <span class="n">num_degrees</span> <span class="o">/</span> <span class="mf">360.0</span>
+                <span class="n">current_factor</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">+</span> <span class="n">elongation_delta</span>
+
+                <span class="c1"># Apply minimum factor (0.2x)</span>
+                <span class="k">if</span> <span class="n">current_factor</span> <span class="o">&lt;</span> <span class="mf">0.2</span><span class="p">:</span>
+                    <span class="n">current_factor</span> <span class="o">=</span> <span class="mf">0.2</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Clamped scale factor to minimum 0.2&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Use event modifiers (already calculated above)</span>
+                <span class="c1"># ctrl_pressed, shift_pressed, alt_pressed are already defined</span>
+
+                <span class="n">scale_x</span> <span class="o">=</span> <span class="mf">1.0</span>
+                <span class="n">scale_y</span> <span class="o">=</span> <span class="mf">1.0</span>
+                <span class="n">scaling_mode</span> <span class="o">=</span> <span class="kc">None</span>
+
+                <span class="k">if</span> <span class="n">ctrl_pressed</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">shift_pressed</span><span class="p">:</span>
+                    <span class="c1"># Ctrl only: proportional scaling (both axes)</span>
+                    <span class="n">scale_x</span> <span class="o">=</span> <span class="n">scale_y</span> <span class="o">=</span> <span class="n">current_factor</span>
+                    <span class="n">scaling_mode</span> <span class="o">=</span> <span class="s2">&quot;proportional&quot;</span>
+                <span class="k">elif</span> <span class="n">shift_pressed</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">ctrl_pressed</span><span class="p">:</span>
+                    <span class="c1"># Shift only: X-only scaling</span>
+                    <span class="n">scale_x</span> <span class="o">=</span> <span class="n">current_factor</span>
+                    <span class="n">scale_y</span> <span class="o">=</span> <span class="mf">1.0</span>
+                    <span class="n">scaling_mode</span> <span class="o">=</span> <span class="s2">&quot;X-only&quot;</span>
+                <span class="k">elif</span> <span class="n">ctrl_pressed</span> <span class="ow">and</span> <span class="n">shift_pressed</span><span class="p">:</span>
+                    <span class="c1"># Ctrl+Shift: Y-only scaling</span>
+                    <span class="n">scale_x</span> <span class="o">=</span> <span class="mf">1.0</span>
+                    <span class="n">scale_y</span> <span class="o">=</span> <span class="n">current_factor</span>
+                    <span class="n">scaling_mode</span> <span class="o">=</span> <span class="s2">&quot;Y-only (Ctrl+Shift)&quot;</span>
+
+                <span class="c1"># Only attempt circle elongation if we have a valid modifier combination</span>
+                <span class="k">if</span> <span class="n">scaling_mode</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Attempting circle elongation: X=</span><span class="si">{</span><span class="n">scale_x</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, Y=</span><span class="si">{</span><span class="n">scale_y</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, mode=</span><span class="si">{</span><span class="n">scaling_mode</span><span class="si">}</span><span class="s2">, degrees=</span><span class="si">{</span><span class="n">num_degrees</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="c1"># Elongate circle (returns cache hash)</span>
+                        <span class="n">cache_hash</span> <span class="o">=</span> <span class="n">elongate_circle</span><span class="p">(</span><span class="n">svg_path</span><span class="p">,</span> <span class="n">scale_x</span><span class="p">,</span> <span class="n">scale_y</span><span class="p">)</span>
+
+                        <span class="c1"># Update SVGMediaObject with new cache hash</span>
+                        <span class="n">svg_obj</span><span class="o">.</span><span class="n">_media_id</span> <span class="o">=</span> <span class="n">cache_hash</span>
+                        <span class="n">svg_obj</span><span class="o">.</span><span class="n">mark_as_modified</span><span class="p">()</span>
+
+                        <span class="c1"># Force SVG renderer to reload from cache</span>
+                        <span class="n">renderer</span> <span class="o">=</span> <span class="n">svg_obj</span><span class="o">.</span><span class="n">_SVGMediaObject__renderer</span>
+                        <span class="c1"># Get cache path directly</span>
+                        <span class="kn">from</span><span class="w"> </span><span class="nn">zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_svg_cache</span>
+
+                        <span class="n">cache_path</span> <span class="o">=</span> <span class="n">get_svg_cache</span><span class="p">()</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span><span class="n">cache_hash</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">renderer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cache_path</span><span class="p">)):</span>
+                            <span class="c1"># Update SVG dimensions from reloaded renderer</span>
+                            <span class="n">size</span> <span class="o">=</span> <span class="n">renderer</span><span class="o">.</span><span class="n">defaultSize</span><span class="p">()</span>
+                            <span class="n">svg_obj</span><span class="o">.</span><span class="n">_SVGMediaObject__width</span> <span class="o">=</span> <span class="n">size</span><span class="o">.</span><span class="n">width</span><span class="p">()</span>
+                            <span class="n">svg_obj</span><span class="o">.</span><span class="n">_SVGMediaObject__height</span> <span class="o">=</span> <span class="n">size</span><span class="o">.</span><span class="n">height</span><span class="p">()</span>
+
+                            <span class="c1"># Clear size cache to force recalculation</span>
+                            <span class="n">svg_obj</span><span class="o">.</span><span class="n">_SVGMediaObject__cached_scale</span> <span class="o">=</span> <span class="kc">None</span>
+                            <span class="n">svg_obj</span><span class="o">.</span><span class="n">_SVGMediaObject__cached_onscreen_size</span> <span class="o">=</span> <span class="kc">None</span>
+
+                            <span class="c1"># Trigger repaint</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;Circle elongated successfully, cache hash: </span><span class="si">{</span><span class="n">cache_hash</span><span class="si">}</span><span class="s2">, dimensions: </span><span class="si">{</span><span class="n">size</span><span class="o">.</span><span class="n">width</span><span class="p">()</span><span class="si">}</span><span class="s2">x</span><span class="si">{</span><span class="n">size</span><span class="o">.</span><span class="n">height</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+                            <span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to reload SVG renderer for cache hash: </span><span class="si">{</span><span class="n">cache_hash</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="c1"># Log error but don&#39;t crash</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Circle elongation failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="c1"># Fall through to normal zoom</span>
+
+                    <span class="k">return</span>  <span class="c1"># Skip normal zoom when circle elongation was attempted</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No valid scaling mode for circle. Ctrl=</span><span class="si">{</span><span class="n">ctrl_pressed</span><span class="si">}</span><span class="s2">, Shift=</span><span class="si">{</span><span class="n">shift_pressed</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="c1"># Fall through to normal zoom</span>
+
+            <span class="c1"># Check if it&#39;s a triangle SVG</span>
+            <span class="k">elif</span> <span class="n">is_triangle_svg</span><span class="p">(</span><span class="n">svg_path</span><span class="p">):</span>
+                <span class="c1"># Calculate elongation factor from wheel delta</span>
+                <span class="c1"># 720° = 2x factor, so 1° = 1/360 factor change</span>
+                <span class="n">num_degrees</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">angleDelta</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">()</span>
+
+                <span class="c1"># Sensitivity: 1/360 per degree</span>
+                <span class="c1"># Positive scroll (up) elongates, negative shortens</span>
+                <span class="n">elongation_delta</span> <span class="o">=</span> <span class="n">num_degrees</span> <span class="o">/</span> <span class="mf">360.0</span>
+                <span class="n">current_factor</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">+</span> <span class="n">elongation_delta</span>
+
+                <span class="c1"># Apply minimum factor (0.2x)</span>
+                <span class="k">if</span> <span class="n">current_factor</span> <span class="o">&lt;</span> <span class="mf">0.2</span><span class="p">:</span>
+                    <span class="n">current_factor</span> <span class="o">=</span> <span class="mf">0.2</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Clamped scale factor to minimum 0.2&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Use event modifiers (already calculated above)</span>
+                <span class="c1"># ctrl_pressed, shift_pressed, alt_pressed are already defined</span>
+
+                <span class="n">scale_x</span> <span class="o">=</span> <span class="mf">1.0</span>
+                <span class="n">scale_y</span> <span class="o">=</span> <span class="mf">1.0</span>
+                <span class="n">scaling_mode</span> <span class="o">=</span> <span class="kc">None</span>
+
+                <span class="k">if</span> <span class="n">ctrl_pressed</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">shift_pressed</span><span class="p">:</span>
+                    <span class="c1"># Ctrl only: proportional scaling (both axes)</span>
+                    <span class="n">scale_x</span> <span class="o">=</span> <span class="n">scale_y</span> <span class="o">=</span> <span class="n">current_factor</span>
+                    <span class="n">scaling_mode</span> <span class="o">=</span> <span class="s2">&quot;proportional&quot;</span>
+                <span class="k">elif</span> <span class="n">shift_pressed</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">ctrl_pressed</span><span class="p">:</span>
+                    <span class="c1"># Shift only: X-only scaling</span>
+                    <span class="n">scale_x</span> <span class="o">=</span> <span class="n">current_factor</span>
+                    <span class="n">scale_y</span> <span class="o">=</span> <span class="mf">1.0</span>
+                    <span class="n">scaling_mode</span> <span class="o">=</span> <span class="s2">&quot;X-only&quot;</span>
+                <span class="k">elif</span> <span class="n">ctrl_pressed</span> <span class="ow">and</span> <span class="n">shift_pressed</span><span class="p">:</span>
+                    <span class="c1"># Ctrl+Shift: Y-only scaling</span>
+                    <span class="n">scale_x</span> <span class="o">=</span> <span class="mf">1.0</span>
+                    <span class="n">scale_y</span> <span class="o">=</span> <span class="n">current_factor</span>
+                    <span class="n">scaling_mode</span> <span class="o">=</span> <span class="s2">&quot;Y-only (Ctrl+Shift)&quot;</span>
+
+                <span class="c1"># Only attempt triangle elongation if we have a valid modifier combination</span>
+                <span class="k">if</span> <span class="n">scaling_mode</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Attempting triangle elongation: X=</span><span class="si">{</span><span class="n">scale_x</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, Y=</span><span class="si">{</span><span class="n">scale_y</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, mode=</span><span class="si">{</span><span class="n">scaling_mode</span><span class="si">}</span><span class="s2">, degrees=</span><span class="si">{</span><span class="n">num_degrees</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="c1"># Elongate triangle (returns cache hash)</span>
+                        <span class="n">cache_hash</span> <span class="o">=</span> <span class="n">elongate_triangle</span><span class="p">(</span><span class="n">svg_path</span><span class="p">,</span> <span class="n">scale_x</span><span class="p">,</span> <span class="n">scale_y</span><span class="p">)</span>
+
+                        <span class="c1"># Update SVGMediaObject with new cache hash</span>
+                        <span class="n">svg_obj</span><span class="o">.</span><span class="n">_media_id</span> <span class="o">=</span> <span class="n">cache_hash</span>
+                        <span class="n">svg_obj</span><span class="o">.</span><span class="n">mark_as_modified</span><span class="p">()</span>
+
+                        <span class="c1"># Force SVG renderer to reload from cache</span>
+                        <span class="n">renderer</span> <span class="o">=</span> <span class="n">svg_obj</span><span class="o">.</span><span class="n">_SVGMediaObject__renderer</span>
+                        <span class="c1"># Get cache path directly</span>
+                        <span class="kn">from</span><span class="w"> </span><span class="nn">zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_svg_cache</span>
+
+                        <span class="n">cache_path</span> <span class="o">=</span> <span class="n">get_svg_cache</span><span class="p">()</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span><span class="n">cache_hash</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">renderer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cache_path</span><span class="p">)):</span>
+                            <span class="c1"># Update SVG dimensions from reloaded renderer</span>
+                            <span class="n">size</span> <span class="o">=</span> <span class="n">renderer</span><span class="o">.</span><span class="n">defaultSize</span><span class="p">()</span>
+                            <span class="n">svg_obj</span><span class="o">.</span><span class="n">_SVGMediaObject__width</span> <span class="o">=</span> <span class="n">size</span><span class="o">.</span><span class="n">width</span><span class="p">()</span>
+                            <span class="n">svg_obj</span><span class="o">.</span><span class="n">_SVGMediaObject__height</span> <span class="o">=</span> <span class="n">size</span><span class="o">.</span><span class="n">height</span><span class="p">()</span>
+
+                            <span class="c1"># Clear size cache to force recalculation</span>
+                            <span class="n">svg_obj</span><span class="o">.</span><span class="n">_SVGMediaObject__cached_scale</span> <span class="o">=</span> <span class="kc">None</span>
+                            <span class="n">svg_obj</span><span class="o">.</span><span class="n">_SVGMediaObject__cached_onscreen_size</span> <span class="o">=</span> <span class="kc">None</span>
+
+                            <span class="c1"># Trigger repaint</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;Triangle elongated successfully, cache hash: </span><span class="si">{</span><span class="n">cache_hash</span><span class="si">}</span><span class="s2">, dimensions: </span><span class="si">{</span><span class="n">size</span><span class="o">.</span><span class="n">width</span><span class="p">()</span><span class="si">}</span><span class="s2">x</span><span class="si">{</span><span class="n">size</span><span class="o">.</span><span class="n">height</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+                            <span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to reload SVG renderer for cache hash: </span><span class="si">{</span><span class="n">cache_hash</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="c1"># Log error but don&#39;t crash</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Triangle elongation failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="c1"># Fall through to normal zoom</span>
+
+                    <span class="k">return</span>  <span class="c1"># Skip normal zoom when triangle elongation was attempted</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;No valid scaling mode for triangle. Ctrl=</span><span class="si">{</span><span class="n">ctrl_pressed</span><span class="si">}</span><span class="s2">, Shift=</span><span class="si">{</span><span class="n">shift_pressed</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                    <span class="c1"># Fall through to normal zoom</span>
+
+            <span class="c1"># Check if it&#39;s a stick SVG</span>
+            <span class="k">elif</span> <span class="n">is_stick_svg</span><span class="p">(</span><span class="n">svg_path</span><span class="p">):</span>
+                <span class="c1"># Calculate elongation factor from wheel delta</span>
+                <span class="c1"># 720° = 2x factor, so 1° = 1/360 factor change</span>
+                <span class="n">num_degrees</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">angleDelta</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">()</span>
+
+                <span class="c1"># Sensitivity: 1/360 per degree</span>
+                <span class="c1"># Positive scroll (up) elongates, negative shortens</span>
+                <span class="n">elongation_delta</span> <span class="o">=</span> <span class="n">num_degrees</span> <span class="o">/</span> <span class="mf">360.0</span>
+                <span class="n">current_factor</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">+</span> <span class="n">elongation_delta</span>
+
+                <span class="c1"># Apply minimum factor (0.2x)</span>
+                <span class="k">if</span> <span class="n">current_factor</span> <span class="o">&lt;</span> <span class="mf">0.2</span><span class="p">:</span>
+                    <span class="n">current_factor</span> <span class="o">=</span> <span class="mf">0.2</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Clamped scale factor to minimum 0.2&quot;</span><span class="p">)</span>
+
+                <span class="c1"># For sticks, we only need Ctrl modifier (like arrows)</span>
+                <span class="c1"># No need for X/Y scaling modes since sticks are 1D</span>
+                <span class="k">if</span> <span class="n">ctrl_pressed</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Attempting stick elongation: factor=</span><span class="si">{</span><span class="n">current_factor</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, degrees=</span><span class="si">{</span><span class="n">num_degrees</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="c1"># Elongate stick (returns cache hash)</span>
+                        <span class="n">cache_hash</span> <span class="o">=</span> <span class="n">elongate_stick</span><span class="p">(</span><span class="n">svg_path</span><span class="p">,</span> <span class="n">current_factor</span><span class="p">)</span>
+
+                        <span class="c1"># Update SVGMediaObject with new cache hash</span>
+                        <span class="n">svg_obj</span><span class="o">.</span><span class="n">_media_id</span> <span class="o">=</span> <span class="n">cache_hash</span>
+                        <span class="n">svg_obj</span><span class="o">.</span><span class="n">mark_as_modified</span><span class="p">()</span>
+
+                        <span class="c1"># Force SVG renderer to reload from cache</span>
+                        <span class="n">renderer</span> <span class="o">=</span> <span class="n">svg_obj</span><span class="o">.</span><span class="n">_SVGMediaObject__renderer</span>
+                        <span class="c1"># Get cache path directly</span>
+                        <span class="kn">from</span><span class="w"> </span><span class="nn">zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_svg_cache</span>
+
+                        <span class="n">cache_path</span> <span class="o">=</span> <span class="n">get_svg_cache</span><span class="p">()</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span><span class="n">cache_hash</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">renderer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cache_path</span><span class="p">)):</span>
+                            <span class="c1"># Update SVG dimensions from reloaded renderer</span>
+                            <span class="n">size</span> <span class="o">=</span> <span class="n">renderer</span><span class="o">.</span><span class="n">defaultSize</span><span class="p">()</span>
+                            <span class="n">svg_obj</span><span class="o">.</span><span class="n">_SVGMediaObject__width</span> <span class="o">=</span> <span class="n">size</span><span class="o">.</span><span class="n">width</span><span class="p">()</span>
+                            <span class="n">svg_obj</span><span class="o">.</span><span class="n">_SVGMediaObject__height</span> <span class="o">=</span> <span class="n">size</span><span class="o">.</span><span class="n">height</span><span class="p">()</span>
+
+                            <span class="c1"># Clear size cache to force recalculation</span>
+                            <span class="n">svg_obj</span><span class="o">.</span><span class="n">_SVGMediaObject__cached_scale</span> <span class="o">=</span> <span class="kc">None</span>
+                            <span class="n">svg_obj</span><span class="o">.</span><span class="n">_SVGMediaObject__cached_onscreen_size</span> <span class="o">=</span> <span class="kc">None</span>
+
+                            <span class="c1"># Trigger repaint</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;Stick elongated successfully, cache hash: </span><span class="si">{</span><span class="n">cache_hash</span><span class="si">}</span><span class="s2">, dimensions: </span><span class="si">{</span><span class="n">size</span><span class="o">.</span><span class="n">width</span><span class="p">()</span><span class="si">}</span><span class="s2">x</span><span class="si">{</span><span class="n">size</span><span class="o">.</span><span class="n">height</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+                            <span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to reload SVG renderer for cache hash: </span><span class="si">{</span><span class="n">cache_hash</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="c1"># Log error but don&#39;t crash</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stick elongation failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="c1"># Fall through to normal zoom</span>
+
+                    <span class="k">return</span>  <span class="c1"># Skip normal zoom when stick elongation was attempted</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No Ctrl modifier for stick elongation. Ctrl=</span><span class="si">{</span><span class="n">ctrl_pressed</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="c1"># Fall through to normal zoom</span>
+
+        <span class="c1"># Normal zoom behavior</span>
+        <span class="n">num_degrees</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">angleDelta</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">()</span>
+        <span class="n">num_steps</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">num_degrees</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">zoom_sensitivity</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mousepos</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">position</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">()),</span> <span class="nb">int</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">position</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">()))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__zoom</span><span class="p">(</span><span class="n">num_steps</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QZUI.mousePressEvent">
+<a class="viewcode-back" href="../../../../zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI.mousePressEvent">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mousePressEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMouseEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            mousePressEvent(event)</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            event : QtGui.QMouseEvent</span>
+
+<span class="sd">        mousePressEvent(event) --&gt; None</span>
+
+<span class="sd">        Handle mouse press events for object selection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">button</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">LeftButton</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__mouse_left_down</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__mousepos</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">position</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">()),</span> <span class="nb">int</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">position</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">()))</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__control_held</span><span class="p">:</span>
+                <span class="c1"># Start rectangle drawing</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__drawing_rect</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__rect_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mousepos</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__rect_end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mousepos</span>
+                <span class="c1"># Don&#39;t change selection when drawing rectangle</span>
+
+            <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__shift_held</span><span class="p">:</span>
+                <span class="c1">## shift-click won&#39;t change the selection</span>
+                <span class="c1"># Only change selection if clicking on a non-selected object</span>
+                <span class="n">clicked_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__mousepos</span><span class="p">)</span>
+
+                <span class="c1"># Check if we&#39;re clicking on an already-selected object</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selection</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="c1"># Multiple selection - check if clicked object is in the list</span>
+                    <span class="k">if</span> <span class="n">clicked_object</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selection</span><span class="p">:</span>
+                        <span class="c1"># Don&#39;t change selection, allow dragging</span>
+                        <span class="k">pass</span>
+                    <span class="k">elif</span> <span class="n">clicked_object</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="c1"># Clicking on empty space - keep multi-selection for dragging</span>
+                        <span class="k">pass</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># Clicking on a different object - select just that object</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selection</span> <span class="o">=</span> <span class="n">clicked_object</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">clicked_object</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selection</span><span class="p">:</span>
+                    <span class="c1"># Don&#39;t change selection, allow dragging</span>
+                    <span class="k">pass</span>
+                <span class="k">elif</span> <span class="n">clicked_object</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># Clicking on empty space with single selection - keep selection for dragging</span>
+                    <span class="k">pass</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selection</span> <span class="o">=</span> <span class="n">clicked_object</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__drawing_rect</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__rect_start</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__rect_end</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">button</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">RightButton</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__mouse_right_down</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__mousepos</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">position</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">()),</span> <span class="nb">int</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">position</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">()))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__shift_held</span><span class="p">:</span>
+                <span class="c1">## shift-click won&#39;t change the selection</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">right_selection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__mousepos</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QZUI.mouseMoveEvent">
+<a class="viewcode-back" href="../../../../zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI.mouseMoveEvent">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mouseMoveEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMouseEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            mouseMoveEvent(event)</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            event : QtGui.QMouseEvent</span>
+
+<span class="sd">        mouseMoveEvent(event) --&gt; None</span>
+
+<span class="sd">        Handle mouse move events for dragging objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">buttons</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">LeftButton</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mouse_left_down</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mousepos</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__drawing_rect</span><span class="p">:</span>
+                <span class="c1"># Update rectangle end position for drawing</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__rect_end</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">position</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">()),</span> <span class="nb">int</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">position</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">()))</span>
+                <span class="c1"># Trigger repaint to show updated rectangle</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Original object dragging logic</span>
+                <span class="n">mx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">position</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">())</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mousepos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">my</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">position</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mousepos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+                <span class="n">t</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">framerate</span>
+
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__active_object</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">active_object</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__active_object</span><span class="p">:</span>
+                        <span class="n">active_object</span><span class="o">.</span><span class="n">aim</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">my</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+                        <span class="n">active_object</span><span class="o">.</span><span class="n">aim</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">mx</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__active_object</span><span class="o">.</span><span class="n">aim</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">my</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__active_object</span><span class="o">.</span><span class="n">aim</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">mx</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mousepos</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">position</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">()),</span> <span class="nb">int</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">position</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">()))</span></div>
+
+
+<div class="viewcode-block" id="QZUI.mouseReleaseEvent">
+<a class="viewcode-back" href="../../../../zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI.mouseReleaseEvent">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mouseReleaseEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMouseEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            mouseReleaseEvent(event)</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            event : QtGui.QMouseEvent</span>
+
+<span class="sd">        mouseReleaseEvent(event) --&gt; None</span>
+
+<span class="sd">        Handle mouse release events.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">button</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">LeftButton</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mouse_left_down</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__mouse_left_down</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__drawing_rect</span><span class="p">:</span>
+                <span class="c1"># Finish rectangle drawing</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__drawing_rect</span> <span class="o">=</span> <span class="kc">False</span>
+
+                <span class="c1"># If we have valid rectangle coordinates, select objects within it</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rect_start</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rect_end</span><span class="p">:</span>
+                    <span class="c1"># Get objects within the rectangle</span>
+                    <span class="n">selected_objects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__rect_start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rect_end</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">selected_objects</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selection</span> <span class="o">=</span> <span class="n">selected_objects</span>
+
+                <span class="c1"># Clear rectangle coordinates</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__rect_start</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__rect_end</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="c1"># Trigger repaint to remove rectangle</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="QZUI.keyPressEvent">
+<a class="viewcode-back" href="../../../../zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI.keyPressEvent">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">keyPressEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QKeyEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            keyPressEvent(event)</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            event : QtGui.QKeyEvent</span>
+
+<span class="sd">        keyPressEvent(event) --&gt; None</span>
+
+<span class="sd">        Handle key press events for navigation and control.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__alt_held</span><span class="p">:</span>
+            <span class="n">move_amount</span> <span class="o">=</span> <span class="mi">16</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">move_amount</span> <span class="o">=</span> <span class="mi">16</span>
+
+        <span class="n">key</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">key</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_Escape</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selection</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_PageUp</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__zoom</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_PageDown</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__zoom</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_Up</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__active_object</span><span class="o">.</span><span class="n">aim</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="o">-</span><span class="n">move_amount</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_Down</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__active_object</span><span class="o">.</span><span class="n">aim</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">move_amount</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_Left</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__active_object</span><span class="o">.</span><span class="n">aim</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="o">-</span><span class="n">move_amount</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_Right</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__active_object</span><span class="o">.</span><span class="n">aim</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">move_amount</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_Shift</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__shift_held</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_Alt</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__alt_held</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_Control</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__control_held</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_Space</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__centre</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_Delete</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selection</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selection</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selection</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_C</span> <span class="ow">and</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">modifiers</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ControlModifier</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selection</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">copy_selection</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_V</span> <span class="ow">and</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">modifiers</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ControlModifier</span><span class="p">):</span>
+            <span class="c1"># Paste at mouse position or viewport centre</span>
+            <span class="c1"># Convert from screen coordinates to scene coordinates</span>
+            <span class="n">scene_origin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">origin</span>
+            <span class="n">scene_zoomlevel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">zoomlevel</span>
+            <span class="n">scale</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**-</span><span class="n">scene_zoomlevel</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mousepos</span><span class="p">:</span>
+                <span class="c1"># Convert mouse position from screen to scene coordinates</span>
+                <span class="n">mouse_x</span><span class="p">,</span> <span class="n">mouse_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mousepos</span>
+                <span class="n">scene_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">mouse_x</span> <span class="o">-</span> <span class="n">scene_origin</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">scale</span>
+                <span class="n">scene_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">mouse_y</span> <span class="o">-</span> <span class="n">scene_origin</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">scale</span>
+                <span class="n">paste_pos</span> <span class="o">=</span> <span class="p">(</span><span class="n">scene_x</span><span class="p">,</span> <span class="n">scene_y</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Calculate viewport centre in scene coordinates</span>
+                <span class="c1"># Viewport centre is at (width/2, height/2) in screen coordinates</span>
+                <span class="n">viewport_centre_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span>
+                <span class="n">viewport_centre_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span>
+                <span class="n">scene_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">viewport_centre_x</span> <span class="o">-</span> <span class="n">scene_origin</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">scale</span>
+                <span class="n">scene_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">viewport_centre_y</span> <span class="o">-</span> <span class="n">scene_origin</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">scale</span>
+                <span class="n">paste_pos</span> <span class="o">=</span> <span class="p">(</span><span class="n">scene_x</span><span class="p">,</span> <span class="n">scene_y</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">paste</span><span class="p">(</span><span class="n">paste_pos</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QWidget</span><span class="o">.</span><span class="n">keyPressEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QZUI.keyReleaseEvent">
+<a class="viewcode-back" href="../../../../zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI.keyReleaseEvent">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">keyReleaseEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QKeyEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            keyReleaseEvent(event)</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            event : QtGui.QKeyEvent</span>
+
+<span class="sd">        keyReleaseEvent(event) --&gt; None</span>
+
+<span class="sd">        Handle key release events.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">key</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_Shift</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__shift_held</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_Alt</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__alt_held</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_Control</span><span class="p">:</span>
+            <span class="c1"># Clear rectangle drawing state when Control key is released</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__drawing_rect</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__drawing_rect</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__rect_start</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__rect_end</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="c1"># Trigger repaint to clear drawn rectangle</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__control_held</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QWidget</span><span class="o">.</span><span class="n">keyPressEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QZUI.resizeEvent">
+<a class="viewcode-back" href="../../../../zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI.resizeEvent">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resizeEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QResizeEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            resizeEvent(event)</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            event : QtGui.QResizeEvent</span>
+
+<span class="sd">        resizeEvent(event) --&gt; None</span>
+
+<span class="sd">        Handle resize events to update the viewport size.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__scene</span><span class="o">.</span><span class="n">viewport_size</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">())</span>
+
+        <span class="c1"># Defer zoom animation to next event loop iteration so the widget</span>
+        <span class="c1"># has its final layout size (avoids running at intermediate sizes</span>
+        <span class="c1"># during progressive layout passes with QTabWidget).</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__scene_animation_pending</span><span class="p">:</span>
+            <span class="n">QtCore</span><span class="o">.</span><span class="n">QTimer</span><span class="o">.</span><span class="n">singleShot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_pending_animation</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QZUI._run_pending_animation">
+<a class="viewcode-back" href="../../../../zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI._run_pending_animation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_run_pending_animation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the deferred zoom-in animation once the widget is sized.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__scene_animation_pending</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__scene_animation_pending</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__scene</span><span class="p">,</span> <span class="s2">&quot;_Scene__objects&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__scene</span><span class="o">.</span><span class="n">_Scene__objects</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">target_z</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_pending_target_z&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">target_z</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__scene</span><span class="o">.</span><span class="n">zoomlevel</span> <span class="o">=</span> <span class="n">target_z</span>
+                        <span class="n">origin</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_pending_target_origin&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">origin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">__scene</span><span class="o">.</span><span class="n">origin</span> <span class="o">=</span> <span class="n">origin</span>
+                        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pending_target_z</span>
+                        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pending_target_origin</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__scene</span><span class="o">.</span><span class="n">vx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__scene</span><span class="o">.</span><span class="n">vy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__scene</span><span class="o">.</span><span class="n">vz</span> <span class="o">=</span> <span class="mf">0.0</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__scene</span><span class="o">.</span><span class="n">centre</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__scene</span><span class="o">.</span><span class="n">zoom</span><span class="p">(</span><span class="o">-</span><span class="mf">5.0</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__scene</span><span class="o">.</span><span class="n">aim</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+                <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="QZUI.focusOutEvent">
+<a class="viewcode-back" href="../../../../zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI.focusOutEvent">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">focusOutEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QFocusEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            focusOutEvent(event)</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            event : QtGui.QFocusEvent</span>
+
+<span class="sd">        focusOutEvent(event) --&gt; None</span>
+
+<span class="sd">        Handle focus out events to reset keyboard modifiers and rectangle drawing state.</span>
+<span class="sd">        This prevents rectangle drawing from persisting when widget loses focus (e.g., during save dialog).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Reset all keyboard modifiers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__shift_held</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__alt_held</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__control_held</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Reset rectangle drawing state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__drawing_rect</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__rect_start</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__rect_end</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Trigger repaint to clear any drawn rectangle</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+        <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QWidget</span><span class="o">.</span><span class="n">focusOutEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__active_object</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Property :</span>
+<span class="sd">            __active_object</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            None</span>
+
+<span class="sd">        __active_object --&gt; Any</span>
+
+<span class="sd">        Return the currently active object (either selected object or scene).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selection</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__shift_held</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selection</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__get_framerate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            __get_framerate()</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            None</span>
+
+<span class="sd">        __get_framerate() --&gt; int</span>
+
+<span class="sd">        Return the rendering framerate.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__framerate</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__set_framerate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">framerate</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            __set_framerate(framerate)</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            framerate : int</span>
+
+<span class="sd">        __set_framerate(framerate) --&gt; None</span>
+
+<span class="sd">        Set the rendering framerate.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__framerate</span> <span class="o">=</span> <span class="n">framerate</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__framerate</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__timer</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">1000</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">__framerate</span><span class="p">),</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">__timer</span><span class="o">.</span><span class="n">isActive</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__timer</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+    <span class="n">framerate</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_framerate</span><span class="p">,</span> <span class="n">__set_framerate</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__get_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Scene.Scene&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            __get_scene()</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            None</span>
+
+<span class="sd">        __get_scene() --&gt; Scene.Scene</span>
+
+<span class="sd">        Return the scene currently being viewed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__scene</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__set_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scene</span><span class="p">:</span> <span class="s2">&quot;Scene.Scene&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            __set_scene(scene)</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            scene : Scene.Scene</span>
+
+<span class="sd">        __set_scene(scene) --&gt; None</span>
+
+<span class="sd">        Set the scene to be viewed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Stop autosave on current scene before replacement.</span>
+        <span class="c1"># Only call disable_autosave if it is actually active —</span>
+        <span class="c1"># avoids redundant QTimer.stop() and prevents log noise</span>
+        <span class="c1"># from the rapid disable/enable/disable cycle during</span>
+        <span class="c1"># scene open / new-scene operations.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__scene</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__scene</span><span class="p">,</span> <span class="s2">&quot;_Scene__autosave_manager&quot;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">mgr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__scene</span><span class="o">.</span><span class="n">_Scene__autosave_manager</span>
+                <span class="k">if</span> <span class="n">mgr</span><span class="o">.</span><span class="n">_autosave_active</span><span class="p">:</span>
+                    <span class="n">mgr</span><span class="o">.</span><span class="n">disable_autosave</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">pass</span>  <span class="c1"># Scene is being replaced anyway</span>
+        <span class="n">TileManager</span><span class="o">.</span><span class="n">purge</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__scene</span> <span class="o">=</span> <span class="n">scene</span>
+        <span class="n">target_z</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">zoomlevel</span>
+        <span class="n">target_origin</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">origin</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__scene</span><span class="o">.</span><span class="n">viewport_size</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">())</span>
+
+        <span class="c1">## Reset mouse/keyboard and rectangle selection state when loading new scene</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mouse_right_down</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mouse_left_down</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mousepos</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__shift_held</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__alt_held</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__control_held</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__dropped_frames</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__draft</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Reset rectangle drawing state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__drawing_rect</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__rect_start</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__rect_end</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Apply zoom animation only for loaded scenes (not new scenes)</span>
+        <span class="c1"># New scenes should use the default_zoomlevel from config</span>
+        <span class="c1"># Loaded scenes have objects, new scenes are empty</span>
+        <span class="c1"># Defer animation if widget not visible yet (during init with QTabWidget)</span>
+        <span class="c1"># or hasn&#39;t been sized yet</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__scene</span><span class="p">,</span> <span class="s2">&quot;_Scene__objects&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__scene</span><span class="o">.</span><span class="n">_Scene__objects</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">isVisible</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__scene</span><span class="o">.</span><span class="n">zoomlevel</span> <span class="o">=</span> <span class="n">target_z</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__scene</span><span class="o">.</span><span class="n">origin</span> <span class="o">=</span> <span class="n">target_origin</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__scene</span><span class="o">.</span><span class="n">vx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__scene</span><span class="o">.</span><span class="n">vy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__scene</span><span class="o">.</span><span class="n">vz</span> <span class="o">=</span> <span class="mf">0.0</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__scene</span><span class="o">.</span><span class="n">centre</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__scene</span><span class="o">.</span><span class="n">zoom</span><span class="p">(</span><span class="o">-</span><span class="mf">5.0</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__scene</span><span class="o">.</span><span class="n">aim</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__scene_animation_pending</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_pending_target_z</span> <span class="o">=</span> <span class="n">target_z</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_pending_target_origin</span> <span class="o">=</span> <span class="n">target_origin</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__scene_animation_pending</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+            <span class="c1"># Handle mock objects in tests</span>
+            <span class="k">pass</span>
+
+    <span class="n">scene</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_scene</span><span class="p">,</span> <span class="n">__set_scene</span><span class="p">)</span></div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">ZooUI</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html">ZooUI installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/userinterface.html">User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/svgfeatures.html">SVG Features</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/configsystem.html">Configuration System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/objectsystem.html">Object System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/windowsystem.html">Window System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/backup.html">Backup System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testingdocumentation/unittest.html">Unit Testing Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testingdocumentation/integrationtest.html">Integration Testing Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../benchmarksdocumentation/qzuibenchmark.html">QZUI Benchmark Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../benchmarksdocumentation/converterbenchmark.html">Converter Benchmark Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributionguidelines/codestyle.html">Code Style Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../zooui.html">zooui package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, David Roberts, Andrea Silvestri.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

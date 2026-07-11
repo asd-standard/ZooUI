@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Tiled media object &#8212; PyZui 0.5.2 documentation</title>
+    <title>Tiled media object &#8212; ZooUI 0.5.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cc7d0dec" />
@@ -39,7 +39,7 @@
 for efficient zooming. Source media is first converted to PPM format using the
 <a class="reference internal" href="convertersystem.html"><span class="doc">Converter System</span></a>, then passed to the
 <a class="reference internal" href="tilingsystem.html"><span class="doc">Tiling System</span></a> which creates a multi-resolution
-tile pyramid stored on disk via <span class="xref std std-doc">../pyzui/tilestore</span>.</p>
+tile pyramid stored on disk via <span class="xref std std-doc">../zooui/tilestore</span>.</p>
 <section id="application-flow">
 <h2>Application Flow<a class="headerlink" href="#application-flow" title="Link to this heading">¶</a></h2>
 <p>Here is the complete lifecycle of a TiledMediaObject, from creation to rendering:</p>
@@ -104,7 +104,7 @@ tile pyramid stored on disk via <span class="xref std std-doc">../pyzui/tilestor
 │    • Reads PPM header: read_ppm_header(f)                       │
 │    • Gets image dimensions (width, height)                      │
 │    • Sets __outpath = TileStore.get_media_path(media_id)        │
-│      → ~/.pyzui/tilestore/&lt;media_id_hash&gt;/                      │
+│      → ~/.zooui/tilestore/&lt;media_id_hash&gt;/                      │
 └────────────────────┬────────────────────────────────────────────┘
                      │
 ┌────────────────────▼────────────────────────────────────────────┐
@@ -157,7 +157,7 @@ tile pyramid stored on disk via <span class="xref std std-doc">../pyzui/tilestor
 │ 9. TILE STORAGE: TileStore.get_tile_path()                      │
 │                                                                 │
 │    Directory structure created:                                 │
-│    ~/.pyzui/tilestore/                                          │
+│    ~/.zooui/tilestore/                                          │
 │    └── &lt;media_id_hash&gt;/                                         │
 │        ├── metadata.json  (width, height, tilesize, etc.)       │
 │        ├── 0/             (Level 0: full resolution)            │
@@ -180,7 +180,7 @@ tile pyramid stored on disk via <span class="xref std std-doc">../pyzui/tilestor
 │ 10. METADATA STORAGE                                            │
 │     TileStore.write_metadata(media_id, ...)                     │
 │                                                                 │
-│     Saves to: ~/.pyzui/tilestore/&lt;hash&gt;/metadata.json           │
+│     Saves to: ~/.zooui/tilestore/&lt;hash&gt;/metadata.json           │
 │     Content:                                                    │
 │     {                                                           │
 │       &quot;filext&quot;: &quot;jpg&quot;,                                          │
@@ -456,7 +456,7 @@ from the saved values.</p>
 <p>Unlike <code class="docutils literal notranslate"><span class="pre">SVGMediaObject</span></code>, which stores editable content in memory and
 requires <code class="docutils literal notranslate"><span class="pre">from_dict</span></code> for clipboard copy/paste operations,
 <code class="docutils literal notranslate"><span class="pre">TiledMediaObject</span></code> references an external file whose tile data is
-persisted in the <code class="docutils literal notranslate"><span class="pre">~/.pyzui/tilestore/</span></code> directory. The <code class="docutils literal notranslate"><span class="pre">media_id</span></code>
+persisted in the <code class="docutils literal notranslate"><span class="pre">~/.zooui/tilestore/</span></code> directory. The <code class="docutils literal notranslate"><span class="pre">media_id</span></code>
 reference is the only state that needs to be preserved.</p>
 </section>
 <section id="tilestore-persistence">
@@ -464,7 +464,7 @@ reference is the only state that needs to be preserved.</p>
 <p>Tile data survives across scene saves because:</p>
 <ol class="arabic simple">
 <li><p>Converted and tiled data is stored persistently in
-<code class="docutils literal notranslate"><span class="pre">~/.pyzui/tilestore/&lt;media_id_hash&gt;/</span></code></p></li>
+<code class="docutils literal notranslate"><span class="pre">~/.zooui/tilestore/&lt;media_id_hash&gt;/</span></code></p></li>
 <li><p>The scene <code class="docutils literal notranslate"><span class="pre">.pzs</span></code> file stores only the <code class="docutils literal notranslate"><span class="pre">media_id</span></code> reference, not the
 tile data itself</p></li>
 <li><p>On reload, <code class="docutils literal notranslate"><span class="pre">TileManager.tiled(media_id)</span></code> at init time detects
@@ -490,12 +490,12 @@ context without the underlying file.</p>
 <li><p><a class="reference internal" href="convertersystem.html"><span class="doc">Converter System</span></a> — Media format conversion</p></li>
 <li><p><a class="reference internal" href="tilingsystem.html"><span class="doc">Tiling System</span></a> — Tile pyramid generation</p></li>
 <li><p><a class="reference internal" href="objectsystem.html"><span class="doc">Object System</span></a> — Object system architecture</p></li>
-<li><p><span class="xref std std-doc">../pyzui/converterrunner</span> — Process-based parallel conversion</p></li>
-<li><p><span class="xref std std-doc">../pyzui/tilerrunner</span> — Process-based parallel tiling</p></li>
-<li><p><span class="xref std std-doc">../pyzui/tilestore</span> — Persistent tile storage</p></li>
-<li><p><span class="xref std std-doc">../pyzui/tilecache</span> — In-memory LRU tile cache</p></li>
-<li><p><span class="xref std std-doc">../pyzui/tilemanager</span> — Tile coordination and caching</p></li>
-<li><p><span class="xref std std-doc">../pyzui/modifytiledmediaobjectdialog</span> — Image manipulation dialog</p></li>
+<li><p><span class="xref std std-doc">../zooui/converterrunner</span> — Process-based parallel conversion</p></li>
+<li><p><span class="xref std std-doc">../zooui/tilerrunner</span> — Process-based parallel tiling</p></li>
+<li><p><span class="xref std std-doc">../zooui/tilestore</span> — Persistent tile storage</p></li>
+<li><p><span class="xref std std-doc">../zooui/tilecache</span> — In-memory LRU tile cache</p></li>
+<li><p><span class="xref std std-doc">../zooui/tilemanager</span> — Tile coordination and caching</p></li>
+<li><p><span class="xref std std-doc">../zooui/modifytiledmediaobjectdialog</span> — Image manipulation dialog</p></li>
 </ul>
 </section>
 </section>
@@ -507,7 +507,7 @@ context without the underlying file.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../index.html">PyZui</a></h1>
+<h1 class="logo"><a href="../index.html">ZooUI</a></h1>
 
 
 
@@ -519,9 +519,9 @@ context without the underlying file.</p>
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html">PyZui installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html">ZooUI installation instructions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#dependencies">Dependencies</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#running-pyzui">Running PyZUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
@@ -562,7 +562,7 @@ context without the underlying file.</p>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../pyzui.html">pyzui package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zooui.html">zooui package</a></li>
 </ul>
 
 <div class="relations">

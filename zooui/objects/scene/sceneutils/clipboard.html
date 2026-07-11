@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>zooui.objects.scene.sceneutils.clipboard module &#8212; ZooUI 0.5.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=cc7d0dec" />
+    <script src="../../../../_static/documentation_options.js?v=8e576371"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="zooui.objects.scene.sceneutils.parallel module" href="parallel.html" />
+    <link rel="prev" title="zooui.objects.scene.sceneutils.autosave module" href="autosave.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-zooui.objects.scene.sceneutils.clipboard">
+<span id="zooui-objects-scene-sceneutils-clipboard-module"></span><h1>zooui.objects.scene.sceneutils.clipboard module<a class="headerlink" href="#module-zooui.objects.scene.sceneutils.clipboard" title="Link to this heading">¶</a></h1>
+<p>SceneClipboardManager - Clipboard functionality for Scene class.</p>
+<p>This class manages copy/paste operations for SVG objects within a scene.
+It was extracted from the Scene class to improve modularity and maintainability.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.clipboard.SceneClipboardManager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zooui.objects.scene.sceneutils.clipboard.</span></span><span class="sig-name descname"><span class="pre">SceneClipboardManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scene</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zooui/objects/scene/sceneutils/clipboard.html#SceneClipboardManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.scene.sceneutils.clipboard.SceneClipboardManager" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Manager for scene clipboard functionality.</p>
+<p>This class handles copy and paste operations for SVG objects within a scene.
+It maintains an internal clipboard and provides methods for copying selected
+objects and pasting them with optional offset.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.clipboard.SceneClipboardManager._scene">
+<span class="sig-name descname"><span class="pre">_scene</span></span><a class="headerlink" href="#zooui.objects.scene.sceneutils.clipboard.SceneClipboardManager._scene" title="Link to this definition">¶</a></dt>
+<dd><p>Reference to the parent Scene object</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.clipboard.SceneClipboardManager._logger">
+<span class="sig-name descname"><span class="pre">_logger</span></span><a class="headerlink" href="#zooui.objects.scene.sceneutils.clipboard.SceneClipboardManager._logger" title="Link to this definition">¶</a></dt>
+<dd><p>Logger instance for clipboard operations</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.clipboard.SceneClipboardManager._clipboard">
+<span class="sig-name descname"><span class="pre">_clipboard</span></span><a class="headerlink" href="#zooui.objects.scene.sceneutils.clipboard.SceneClipboardManager._clipboard" title="Link to this definition">¶</a></dt>
+<dd><p>List of serialized object data for clipboard storage</p>
+</dd></dl>
+
+<p>Initialize SceneClipboardManager.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>scene</strong> – Parent Scene object</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.clipboard.SceneClipboardManager.copy_selection">
+<span class="sig-name descname"><span class="pre">copy_selection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zooui/objects/scene/sceneutils/clipboard.html#SceneClipboardManager.copy_selection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.scene.sceneutils.clipboard.SceneClipboardManager.copy_selection" title="Link to this definition">¶</a></dt>
+<dd><p>Copy selected SVG objects to internal clipboard.</p>
+<p>Only SVGMediaObjects are supported for copy/paste.
+Deselects copied objects after copying.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.clipboard.SceneClipboardManager.paste">
+<span class="sig-name descname"><span class="pre">paste</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offset_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zooui/objects/scene/sceneutils/clipboard.html#SceneClipboardManager.paste"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.scene.sceneutils.clipboard.SceneClipboardManager.paste" title="Link to this definition">¶</a></dt>
+<dd><p>Paste SVG objects from clipboard with fixed offset.</p>
+<p>Only SVGMediaObjects are supported for copy/paste.
+Selects pasted objects after pasting.
+Logs warning for unsupported object types.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>offset_position</strong> – Optional offset position for pasted objects</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of pasted SVGMediaObject instances</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.clipboard.SceneClipboardManager.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zooui/objects/scene/sceneutils/clipboard.html#SceneClipboardManager.clear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.scene.sceneutils.clipboard.SceneClipboardManager.clear" title="Link to this definition">¶</a></dt>
+<dd><p>Clear the clipboard.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.clipboard.SceneClipboardManager.has_content">
+<span class="sig-name descname"><span class="pre">has_content</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zooui/objects/scene/sceneutils/clipboard.html#SceneClipboardManager.has_content"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.scene.sceneutils.clipboard.SceneClipboardManager.has_content" title="Link to this definition">¶</a></dt>
+<dd><p>Check if clipboard has content.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if clipboard has content, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.clipboard.SceneClipboardManager.get_content_count">
+<span class="sig-name descname"><span class="pre">get_content_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zooui/objects/scene/sceneutils/clipboard.html#SceneClipboardManager.get_content_count"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.scene.sceneutils.clipboard.SceneClipboardManager.get_content_count" title="Link to this definition">¶</a></dt>
+<dd><p>Get number of items in clipboard.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of items in clipboard</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><span class="xref std std-doc">zooui/objects/scene/scene</span> - Scene management</p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">ZooUI</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html">ZooUI installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/userinterface.html">User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/svgfeatures.html">SVG Features</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/configsystem.html">Configuration System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/objectsystem.html">Object System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/windowsystem.html">Window System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/backup.html">Backup System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testingdocumentation/unittest.html">Unit Testing Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testingdocumentation/integrationtest.html">Integration Testing Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../benchmarksdocumentation/qzuibenchmark.html">QZUI Benchmark Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../benchmarksdocumentation/converterbenchmark.html">Converter Benchmark Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributionguidelines/codestyle.html">Code Style Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../zooui.html">zooui package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../backup.html">backup package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../converters.html">converters package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../objects.html">objects package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tilesystem.html">tilesystem package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../windows.html">windows package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../config.html">zooui.config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../logger.html">zooui.logger module</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../zooui.html">zooui package</a><ul>
+  <li><a href="../../../objects.html">objects package</a><ul>
+      <li>Previous: <a href="autosave.html" title="previous chapter">zooui.objects.scene.sceneutils.autosave module</a></li>
+      <li>Next: <a href="parallel.html" title="next chapter">zooui.objects.scene.sceneutils.parallel module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, David Roberts, Andrea Silvestri.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../../../../_sources/zooui/objects/scene/sceneutils/clipboard.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,14 +1,14 @@
-.. PyZUI project structure file
+.. ZooUI project structure file
 
 Reading Documentation
 =====================
 
-This guide explains the documentation conventions used throughout the PyZUI codebase.
+This guide explains the documentation conventions used throughout the ZooUI codebase.
 
 Docstring Format
 ----------------
 
-Every class and method (both public and private) in PyZUI includes comprehensive docstrings following a consistent format. Understanding this format will help you navigate the API documentation effectively.
+Every class and method (both public and private) in ZooUI includes comprehensive docstrings following a consistent format. Understanding this format will help you navigate the API documentation effectively.
 
 Constructor/Method Signature
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -57,7 +57,7 @@ This indicates the type returned by the method or constructor.
 Example Docstring
 ~~~~~~~~~~~~~~~~~
 
-Here's a complete example of how docstrings are structured in PyZUI::
+Here's a complete example of how docstrings are structured in ZooUI::
 
     class TileManager:
         """
@@ -72,7 +72,7 @@ Here's a complete example of how docstrings are structured in PyZUI::
 
         TileManager(cache_size, auto_cleanup) --> TileManager
 
-        Manages tile caching and retrieval for the PyZUI system.
+        Manages tile caching and retrieval for the ZooUI system.
         Coordinates between tile providers and maintains a two-tier
         cache for optimal performance.
         """

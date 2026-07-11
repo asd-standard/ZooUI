@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Tiling System &#8212; PyZui 0.5.2 documentation</title>
+    <title>Tiling System &#8212; ZooUI 0.5.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cc7d0dec" />
@@ -277,9 +277,9 @@ and Qt. This is the <strong>recommended</strong> approach for tiling — the thr
 <p><strong>Architecture:</strong></p>
 <p>The <code class="docutils literal notranslate"><span class="pre">tilerrunner</span></code> module uses <code class="docutils literal notranslate"><span class="pre">ProcessPoolExecutor</span></code> with <code class="docutils literal notranslate"><span class="pre">'spawn'</span></code> context
 (default, for safety). The context can be overridden via the <code class="docutils literal notranslate"><span class="pre">PYZUI_MP_CONTEXT</span></code>
-environment variable (see <span class="xref std std-doc">../pyzui/tilerrunner</span> for details).</p>
+environment variable (see <span class="xref std std-doc">../zooui/tilerrunner</span> for details).</p>
 <p><strong>Key Functions:</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.tilesystem.tiler</span><span class="w"> </span><span class="kn">import</span> <span class="n">tilerrunner</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">zooui.tilesystem.tiler</span><span class="w"> </span><span class="kn">import</span> <span class="n">tilerrunner</span>
 
 <span class="c1"># Initialize process pool (optional, auto-initialized on first use)</span>
 <span class="n">tilerrunner</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
@@ -345,7 +345,7 @@ when converting and tiling media files. The conversion and tiling pipeline is:</
 <p>The <code class="docutils literal notranslate"><span class="pre">TileStore</span></code> module manages disk-based tile storage and metadata persistence.</p>
 <p><strong>Directory Structure:</strong></p>
 <p>Tiles are organized by media ID using SHA1 hashing:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>~/.pyzui/tilestore/
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>~/.zooui/tilestore/
 └── &lt;sha1_hash_of_media_id&gt;/
     ├── metadata
     ├── 00/
@@ -400,7 +400,7 @@ default to improve startup performance.</p>
 <span class="n">tilemanager</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">auto_cleanup</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="c1"># Run cleanup manually</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.tilesystem.tilestore</span><span class="w"> </span><span class="kn">import</span> <span class="n">auto_cleanup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zooui.tilesystem.tilestore</span><span class="w"> </span><span class="kn">import</span> <span class="n">auto_cleanup</span>
 <span class="n">stats</span> <span class="o">=</span> <span class="n">auto_cleanup</span><span class="p">(</span><span class="n">max_age_days</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">enable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">collect_stats</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -428,7 +428,7 @@ results are logged.</p>
 <h3>Standalone Cleanup CLI (cleanuptilestore)<a class="headerlink" href="#standalone-cleanup-cli-cleanuptilestore" title="Link to this heading">¶</a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">cleanuptilestore.py</span></code> module provides a standalone CLI utility for manual
 tilestore cleanup, runnable via:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pyzui.tilesystem.tilestore.cleanuptilestore<span class="w"> </span>--age<span class="w"> </span><span class="m">7</span><span class="w"> </span>--stats<span class="w"> </span>--verbose
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>zooui.tilesystem.tilestore.cleanuptilestore<span class="w"> </span>--age<span class="w"> </span><span class="m">7</span><span class="w"> </span>--stats<span class="w"> </span>--verbose
 </pre></div>
 </div>
 <p><strong>Command-line Options:</strong></p>
@@ -444,7 +444,7 @@ specified options, and prints a formatted summary of the results.</p>
 </section>
 <section id="tilecache">
 <h3>TileCache<a class="headerlink" href="#tilecache" title="Link to this heading">¶</a></h3>
-<p>The <code class="docutils literal notranslate"><span class="pre">TileCache</span></code> class (at <code class="docutils literal notranslate"><span class="pre">pyzui/tilesystem/tilestore/tilecache.py</span></code>) provides
+<p>The <code class="docutils literal notranslate"><span class="pre">TileCache</span></code> class (at <code class="docutils literal notranslate"><span class="pre">zooui/tilesystem/tilestore/tilecache.py</span></code>) provides
 in-memory LRU (Least Recently Used) caching of tiles.</p>
 <p><strong>Features:</strong></p>
 <ul class="simple">
@@ -520,7 +520,7 @@ conversion when <code class="docutils literal notranslate"><span class="pre">PYZ
 <li><p><code class="docutils literal notranslate"><span class="pre">resume()</span></code>: Resume all paused TileProvider threads.</p></li>
 </ul>
 <p><strong>Pause/Resume Integration:</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.tilesystem</span><span class="w"> </span><span class="kn">import</span> <span class="n">tilemanager</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">zooui.tilesystem</span><span class="w"> </span><span class="kn">import</span> <span class="n">tilemanager</span>
 
 <span class="c1"># Before forking (if using PYZUI_MP_CONTEXT=fork)</span>
 <span class="n">tilemanager</span><span class="o">.</span><span class="n">pause</span><span class="p">()</span>
@@ -597,7 +597,7 @@ does not exist on disk.</p>
 <p>Generates tiles procedurally. The only concrete subclass in the codebase is:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">FernTileProvider</span></code>: Barnsley fern fractal (at
-<code class="docutils literal notranslate"><span class="pre">pyzui/tilesystem/tileproviders/ferndynamictileprovider.py</span></code>)</p></li>
+<code class="docutils literal notranslate"><span class="pre">zooui/tilesystem/tileproviders/ferndynamictileprovider.py</span></code>)</p></li>
 </ul>
 <p>Dynamic provider tiles go to the permanent cache (like StaticProvider tiles),
 not the temporary cache.</p>
@@ -727,8 +727,8 @@ frequently accessed or represent pending load slots</p></li>
 <section id="usage-examples">
 <h2>Usage Examples<a class="headerlink" href="#usage-examples" title="Link to this heading">¶</a></h2>
 <p><strong>Tiling an Image (Process-Based, Recommended):</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.tilesystem.tiler</span><span class="w"> </span><span class="kn">import</span> <span class="n">tilerrunner</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.tilesystem</span><span class="w"> </span><span class="kn">import</span> <span class="n">tilestore</span><span class="p">,</span> <span class="n">tilemanager</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">zooui.tilesystem.tiler</span><span class="w"> </span><span class="kn">import</span> <span class="n">tilerrunner</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zooui.tilesystem</span><span class="w"> </span><span class="kn">import</span> <span class="n">tilestore</span><span class="p">,</span> <span class="n">tilemanager</span>
 
 <span class="c1"># Initialize the tilemanager</span>
 <span class="n">tilemanager</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">total_cache_size</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">auto_cleanup</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -754,7 +754,7 @@ frequently accessed or represent pending load slots</p></li>
 </pre></div>
 </div>
 <p><strong>Pausing Providers (for fork-based conversions):</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.tilesystem</span><span class="w"> </span><span class="kn">import</span> <span class="n">tilemanager</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">zooui.tilesystem</span><span class="w"> </span><span class="kn">import</span> <span class="n">tilemanager</span>
 
 <span class="c1"># Pause all providers before forking</span>
 <span class="n">tilemanager</span><span class="o">.</span><span class="n">pause</span><span class="p">()</span>
@@ -794,10 +794,10 @@ frequently accessed or represent pending load slots</p></li>
 </div>
 <p><strong>Manual Tilestore Cleanup:</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># CLI utility</span>
-python<span class="w"> </span>-m<span class="w"> </span>pyzui.tilesystem.tilestore.cleanuptilestore<span class="w"> </span>--age<span class="w"> </span><span class="m">30</span><span class="w"> </span>--dry-run<span class="w"> </span>--stats
+python<span class="w"> </span>-m<span class="w"> </span>zooui.tilesystem.tilestore.cleanuptilestore<span class="w"> </span>--age<span class="w"> </span><span class="m">30</span><span class="w"> </span>--dry-run<span class="w"> </span>--stats
 
 <span class="c1"># Or programmatically</span>
-from<span class="w"> </span>pyzui.tilesystem.tilestore<span class="w"> </span>import<span class="w"> </span>cleanup_old_tiles
+from<span class="w"> </span>zooui.tilesystem.tilestore<span class="w"> </span>import<span class="w"> </span>cleanup_old_tiles
 
 cleanup_old_tiles<span class="o">(</span><span class="nv">max_age_days</span><span class="o">=</span><span class="m">30</span>,<span class="w"> </span><span class="nv">dry_run</span><span class="o">=</span>True<span class="o">)</span>
 </pre></div>
@@ -807,13 +807,13 @@ cleanup_old_tiles<span class="o">(</span><span class="nv">max_age_days</span><sp
 <h2>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">¶</a></h2>
 <p>For detailed API documentation, see:</p>
 <ul class="simple">
-<li><p><span class="xref std std-doc">../pyzui/tile</span></p></li>
-<li><p><span class="xref std std-doc">../pyzui/tiler</span></p></li>
-<li><p><span class="xref std std-doc">../pyzui/tilerrunner</span></p></li>
-<li><p><span class="xref std std-doc">../pyzui/tilestore</span></p></li>
-<li><p><span class="xref std std-doc">../pyzui/tilecache</span></p></li>
-<li><p><span class="xref std std-doc">../pyzui/tilemanager</span></p></li>
-<li><p><span class="xref std std-doc">../pyzui/tileprovider</span></p></li>
+<li><p><span class="xref std std-doc">../zooui/tile</span></p></li>
+<li><p><span class="xref std std-doc">../zooui/tiler</span></p></li>
+<li><p><span class="xref std std-doc">../zooui/tilerrunner</span></p></li>
+<li><p><span class="xref std std-doc">../zooui/tilestore</span></p></li>
+<li><p><span class="xref std std-doc">../zooui/tilecache</span></p></li>
+<li><p><span class="xref std std-doc">../zooui/tilemanager</span></p></li>
+<li><p><span class="xref std std-doc">../zooui/tileprovider</span></p></li>
 </ul>
 </section>
 <section id="see-also">
@@ -833,7 +833,7 @@ cleanup_old_tiles<span class="o">(</span><span class="nv">max_age_days</span><sp
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../index.html">PyZui</a></h1>
+<h1 class="logo"><a href="../index.html">ZooUI</a></h1>
 
 
 
@@ -845,9 +845,9 @@ cleanup_old_tiles<span class="o">(</span><span class="nv">max_age_days</span><sp
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html">PyZui installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html">ZooUI installation instructions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#dependencies">Dependencies</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#running-pyzui">Running PyZUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
@@ -888,7 +888,7 @@ cleanup_old_tiles<span class="o">(</span><span class="nv">max_age_days</span><sp
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../pyzui.html">pyzui package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zooui.html">zooui package</a></li>
 </ul>
 
 <div class="relations">

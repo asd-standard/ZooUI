@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Logging System &#8212; PyZui 0.5.2 documentation</title>
+    <title>Logging System &#8212; ZooUI 0.5.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cc7d0dec" />
@@ -37,11 +37,11 @@
 <h1>Logging System<a class="headerlink" href="#logging-system" title="Link to this heading">¶</a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
-<p>PyZUI implements a centralized logging system that provides consistent, configurable logging across all modules. The system is designed to facilitate debugging, track application behavior, and diagnose issues effectively.</p>
+<p>ZooUI implements a centralized logging system that provides consistent, configurable logging across all modules. The system is designed to facilitate debugging, track application behavior, and diagnose issues effectively.</p>
 </section>
 <section id="architecture">
 <h2>Architecture<a class="headerlink" href="#architecture" title="Link to this heading">¶</a></h2>
-<p>The logging system is built around the <code class="docutils literal notranslate"><span class="pre">LoggerConfig</span></code> class in <code class="docutils literal notranslate"><span class="pre">pyzui/logger.py</span></code>, which provides:</p>
+<p>The logging system is built around the <code class="docutils literal notranslate"><span class="pre">LoggerConfig</span></code> class in <code class="docutils literal notranslate"><span class="pre">zooui/logger.py</span></code>, which provides:</p>
 <ul class="simple">
 <li><p><strong>Centralized configuration</strong> - Single initialization point for all logging behavior</p></li>
 <li><p><strong>Multiple output targets</strong> - Console and/or file logging with independent level control</p></li>
@@ -118,7 +118,7 @@ python<span class="w"> </span>main.py<span class="w"> </span>--debug
 python<span class="w"> </span>main.py<span class="w"> </span>--verbose
 
 <span class="c1"># Specify custom log directory</span>
-python<span class="w"> </span>main.py<span class="w"> </span>--log-dir<span class="w"> </span>/tmp/pyzui-logs
+python<span class="w"> </span>main.py<span class="w"> </span>--log-dir<span class="w"> </span>/tmp/zooui-logs
 
 <span class="c1"># Disable console output (file logging only)</span>
 python<span class="w"> </span>main.py<span class="w"> </span>--no-console
@@ -147,14 +147,14 @@ python<span class="w"> </span>main.py<span class="w"> </span>--no-color
 </pre></div>
 </div>
 <p>Load the configuration with:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>main.py<span class="w"> </span>--config<span class="w"> </span>pyzui_config.json
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>main.py<span class="w"> </span>--config<span class="w"> </span>zooui_config.json
 </pre></div>
 </div>
 </section>
 <section id="programmatic-configuration">
 <h3>Programmatic Configuration<a class="headerlink" href="#programmatic-configuration" title="Link to this heading">¶</a></h3>
 <p>Initialize logging programmatically using the <code class="docutils literal notranslate"><span class="pre">LoggerConfig</span></code> class:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoggerConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">zooui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoggerConfig</span>
 
 <span class="n">LoggerConfig</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span>
     <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>              <span class="c1"># Enable debug mode</span>
@@ -173,7 +173,7 @@ python<span class="w"> </span>main.py<span class="w"> </span>--no-color
 <section id="basic-usage-in-modules">
 <h3>Basic Usage in Modules<a class="headerlink" href="#basic-usage-in-modules" title="Link to this heading">¶</a></h3>
 <p>To use logging in your code, import the <code class="docutils literal notranslate"><span class="pre">get_logger</span></code> function:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">zooui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">MyClass</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -191,7 +191,7 @@ python<span class="w"> </span>main.py<span class="w"> </span>--no-color
             <span class="k">raise</span>
 </pre></div>
 </div>
-<p>Loggers are named with a <code class="docutils literal notranslate"><span class="pre">pyzui.</span></code> prefix internally (e.g., <code class="docutils literal notranslate"><span class="pre">pyzui.MyClass</span></code>)
+<p>Loggers are named with a <code class="docutils literal notranslate"><span class="pre">zooui.</span></code> prefix internally (e.g., <code class="docutils literal notranslate"><span class="pre">zooui.MyClass</span></code>)
 and are cached — repeated calls to <code class="docutils literal notranslate"><span class="pre">get_logger('MyClass')</span></code> return the same
 instance. If logging hasn’t been initialized yet, the first call to
 <code class="docutils literal notranslate"><span class="pre">get_logger()</span></code> auto-initializes the system with default settings
@@ -213,7 +213,7 @@ instance. If logging hasn’t been initialized yet, the first call to
 <section id="runtime-control">
 <h3>Runtime Control<a class="headerlink" href="#runtime-control" title="Link to this heading">¶</a></h3>
 <p>Adjust logging behavior during execution:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoggerConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">zooui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoggerConfig</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
 <span class="c1"># Enable debug mode at runtime</span>
@@ -257,14 +257,14 @@ python<span class="w"> </span>main.py<span class="w"> </span>--verbose
 python<span class="w"> </span>main.py<span class="w"> </span>--debug
 
 <span class="c1"># Step 4: Review detailed logs in file</span>
-tail<span class="w"> </span>-f<span class="w"> </span>logs/pyzui.log<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>TileManager
+tail<span class="w"> </span>-f<span class="w"> </span>logs/zooui.log<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>TileManager
 </pre></div>
 </div>
 </section>
 <section id="debugging-specific-components">
 <h3>Debugging Specific Components<a class="headerlink" href="#debugging-specific-components" title="Link to this heading">¶</a></h3>
 <p>For targeted debugging, enable debug logging only for specific modules:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoggerConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">zooui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoggerConfig</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
 <span class="c1"># Initialize with normal logging</span>
@@ -368,7 +368,7 @@ tail<span class="w"> </span>-f<span class="w"> </span>logs/pyzui.log<span class=
 </pre></div>
 </div>
 <p>Example output:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>[INFO    ] main                      | Starting PyZUI application
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>[INFO    ] main                      | Starting ZooUI application
 [DEBUG   ] TileManager               | Initializing tile cache with 100 MB
 [WARNING ] Scene                     | Object &#39;text1&#39; outside visible bounds
 [ERROR   ] PDFConverter              | Failed to convert document.pdf: File not found
@@ -390,7 +390,7 @@ tail<span class="w"> </span>-f<span class="w"> </span>logs/pyzui.log<span class=
 </pre></div>
 </div>
 <p>Example output:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>2025-12-09 14:23:45 | [INFO    ] | main                      | main                 | Starting PyZUI application
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>2025-12-09 14:23:45 | [INFO    ] | main                      | main                 | Starting ZooUI application
 2025-12-09 14:23:45 | [DEBUG   ] | TileManager               | __init__             | Initializing tile cache with 100 MB
 2025-12-09 14:23:46 | [WARNING ] | Scene                     | add_object           | Object &#39;text1&#39; outside visible bounds
 2025-12-09 14:23:47 | [ERROR   ] | PDFConverter              | convert              | Failed to convert document.pdf: File not found
@@ -403,11 +403,11 @@ tail<span class="w"> </span>-f<span class="w"> </span>logs/pyzui.log<span class=
 <section id="log-file-location">
 <h3>Log File Location<a class="headerlink" href="#log-file-location" title="Link to this heading">¶</a></h3>
 <p>By default, logs are written to:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>./logs/pyzui.log
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>./logs/zooui.log
 </pre></div>
 </div>
 <p>Specify a custom location with:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>main.py<span class="w"> </span>--log-dir<span class="w"> </span>/var/log/pyzui
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>main.py<span class="w"> </span>--log-dir<span class="w"> </span>/var/log/zooui
 </pre></div>
 </div>
 </section>
@@ -415,42 +415,42 @@ tail<span class="w"> </span>-f<span class="w"> </span>logs/pyzui.log<span class=
 <h3>Rotation Strategy<a class="headerlink" href="#rotation-strategy" title="Link to this heading">¶</a></h3>
 <p>Log files automatically rotate when they reach 10 MB. The system maintains:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">pyzui.log</span></code> - Current log file</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">pyzui.log.1</span></code> - Previous log file</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">pyzui.log.2</span></code> - Second previous log file</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">pyzui.log.3</span></code> - Third previous log file</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">pyzui.log.4</span></code> - Fourth previous log file</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">pyzui.log.5</span></code> - Fifth previous log file (oldest retained)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zooui.log</span></code> - Current log file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zooui.log.1</span></code> - Previous log file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zooui.log.2</span></code> - Second previous log file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zooui.log.3</span></code> - Third previous log file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zooui.log.4</span></code> - Fourth previous log file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zooui.log.5</span></code> - Fifth previous log file (oldest retained)</p></li>
 </ul>
-<p>When <code class="docutils literal notranslate"><span class="pre">pyzui.log</span></code> reaches 10 MB:
-1. <code class="docutils literal notranslate"><span class="pre">pyzui.log.5</span></code> is deleted
-2. <code class="docutils literal notranslate"><span class="pre">pyzui.log.4</span></code> → <code class="docutils literal notranslate"><span class="pre">pyzui.log.5</span></code>
-3. <code class="docutils literal notranslate"><span class="pre">pyzui.log.3</span></code> → <code class="docutils literal notranslate"><span class="pre">pyzui.log.4</span></code>
-4. <code class="docutils literal notranslate"><span class="pre">pyzui.log.2</span></code> → <code class="docutils literal notranslate"><span class="pre">pyzui.log.3</span></code>
-5. <code class="docutils literal notranslate"><span class="pre">pyzui.log.1</span></code> → <code class="docutils literal notranslate"><span class="pre">pyzui.log.2</span></code>
-6. <code class="docutils literal notranslate"><span class="pre">pyzui.log</span></code> → <code class="docutils literal notranslate"><span class="pre">pyzui.log.1</span></code>
-7. New <code class="docutils literal notranslate"><span class="pre">pyzui.log</span></code> is created</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">zooui.log</span></code> reaches 10 MB:
+1. <code class="docutils literal notranslate"><span class="pre">zooui.log.5</span></code> is deleted
+2. <code class="docutils literal notranslate"><span class="pre">zooui.log.4</span></code> → <code class="docutils literal notranslate"><span class="pre">zooui.log.5</span></code>
+3. <code class="docutils literal notranslate"><span class="pre">zooui.log.3</span></code> → <code class="docutils literal notranslate"><span class="pre">zooui.log.4</span></code>
+4. <code class="docutils literal notranslate"><span class="pre">zooui.log.2</span></code> → <code class="docutils literal notranslate"><span class="pre">zooui.log.3</span></code>
+5. <code class="docutils literal notranslate"><span class="pre">zooui.log.1</span></code> → <code class="docutils literal notranslate"><span class="pre">zooui.log.2</span></code>
+6. <code class="docutils literal notranslate"><span class="pre">zooui.log</span></code> → <code class="docutils literal notranslate"><span class="pre">zooui.log.1</span></code>
+7. New <code class="docutils literal notranslate"><span class="pre">zooui.log</span></code> is created</p>
 </section>
 <section id="viewing-logs">
 <h3>Viewing Logs<a class="headerlink" href="#viewing-logs" title="Link to this heading">¶</a></h3>
 <p>Common commands for log analysis:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># View real-time logs</span>
-tail<span class="w"> </span>-f<span class="w"> </span>logs/pyzui.log
+tail<span class="w"> </span>-f<span class="w"> </span>logs/zooui.log
 
 <span class="c1"># Search for errors</span>
-grep<span class="w"> </span>ERROR<span class="w"> </span>logs/pyzui.log
+grep<span class="w"> </span>ERROR<span class="w"> </span>logs/zooui.log
 
 <span class="c1"># View recent errors</span>
-grep<span class="w"> </span>ERROR<span class="w"> </span>logs/pyzui.log<span class="w"> </span><span class="p">|</span><span class="w"> </span>tail<span class="w"> </span>-20
+grep<span class="w"> </span>ERROR<span class="w"> </span>logs/zooui.log<span class="w"> </span><span class="p">|</span><span class="w"> </span>tail<span class="w"> </span>-20
 
 <span class="c1"># Find logs for specific module</span>
-grep<span class="w"> </span>TileManager<span class="w"> </span>logs/pyzui.log
+grep<span class="w"> </span>TileManager<span class="w"> </span>logs/zooui.log
 
 <span class="c1"># View logs with context (5 lines before/after)</span>
-grep<span class="w"> </span>-C<span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="s2">&quot;Exception&quot;</span><span class="w"> </span>logs/pyzui.log
+grep<span class="w"> </span>-C<span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="s2">&quot;Exception&quot;</span><span class="w"> </span>logs/zooui.log
 
 <span class="c1"># Count errors by type</span>
-grep<span class="w"> </span>ERROR<span class="w"> </span>logs/pyzui.log<span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="s1">&#39;|&#39;</span><span class="w"> </span>-f4<span class="w"> </span><span class="p">|</span><span class="w"> </span>sort<span class="w"> </span><span class="p">|</span><span class="w"> </span>uniq<span class="w"> </span>-c
+grep<span class="w"> </span>ERROR<span class="w"> </span>logs/zooui.log<span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="s1">&#39;|&#39;</span><span class="w"> </span>-f4<span class="w"> </span><span class="p">|</span><span class="w"> </span>sort<span class="w"> </span><span class="p">|</span><span class="w"> </span>uniq<span class="w"> </span>-c
 </pre></div>
 </div>
 </section>
@@ -462,7 +462,7 @@ grep<span class="w"> </span>ERROR<span class="w"> </span>logs/pyzui.log<span cla
 <dl class="py class">
 <dt class="sig sig-object py" id="LoggerConfig">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LoggerConfig</span></span><a class="headerlink" href="#LoggerConfig" title="Link to this definition">¶</a></dt>
-<dd><p>Centralized logger configuration for PyZUI.</p>
+<dd><p>Centralized logger configuration for ZooUI.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="LoggerConfig.initialize">
 <span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_to_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_to_console</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colored_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#LoggerConfig.initialize" title="Link to this definition">¶</a></dt>
@@ -560,7 +560,7 @@ auto-initializing logging with defaults if it hasn’t been set up yet.</p>
 </dd>
 </dl>
 <p>Example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">zooui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s1">&#39;MyModule&#39;</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Module initialized&#39;</span><span class="p">)</span>
@@ -716,7 +716,7 @@ the log level. Used internally by <code class="docutils literal notranslate"><sp
 <li><p>Check log level is appropriate for the messages</p></li>
 <li><p>Ensure handlers are configured:</p></li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoggerConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">zooui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoggerConfig</span>
 <span class="n">LoggerConfig</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -730,7 +730,7 @@ the log level. Used internally by <code class="docutils literal notranslate"><sp
 <dt><strong>Cannot find log files</strong></dt><dd><ul class="simple">
 <li><p>Check log file path:</p></li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoggerConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">zooui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoggerConfig</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">LoggerConfig</span><span class="o">.</span><span class="n">get_log_file_path</span><span class="p">())</span>
 </pre></div>
 </div>
@@ -769,7 +769,7 @@ the log level. Used internally by <code class="docutils literal notranslate"><sp
 </pre></div>
 </div>
 <p><strong>New Code</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">zooui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">MyClass</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -811,7 +811,7 @@ the log level. Used internally by <code class="docutils literal notranslate"><sp
 </pre></div>
 </div>
 <p><strong>Step 4: Review detailed logs</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>grep<span class="w"> </span><span class="s2">&quot;tile 12345&quot;</span><span class="w"> </span>logs/pyzui.log
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>grep<span class="w"> </span><span class="s2">&quot;tile 12345&quot;</span><span class="w"> </span>logs/zooui.log
 <span class="m">2025</span>-12-09<span class="w"> </span><span class="m">14</span>:23:45<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="o">[</span>DEBUG<span class="w">   </span><span class="o">]</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>TileManager<span class="w">  </span><span class="p">|</span><span class="w"> </span>load_tile<span class="w">     </span><span class="p">|</span><span class="w"> </span>Loading<span class="w"> </span>tile<span class="w"> </span><span class="m">12345</span>
 <span class="m">2025</span>-12-09<span class="w"> </span><span class="m">14</span>:23:45<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="o">[</span>ERROR<span class="w">   </span><span class="o">]</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>TileManager<span class="w">  </span><span class="p">|</span><span class="w"> </span>load_tile<span class="w">     </span><span class="p">|</span><span class="w"> </span>Failed<span class="w"> </span>to<span class="w"> </span>load<span class="w"> </span>tile<span class="w"> </span><span class="m">12345</span>
 </pre></div>
@@ -821,7 +821,7 @@ the log level. Used internally by <code class="docutils literal notranslate"><sp
 <section id="conditional-debugging">
 <h3>Conditional Debugging<a class="headerlink" href="#conditional-debugging" title="Link to this heading">¶</a></h3>
 <p>Enable debugging conditionally based on runtime conditions:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoggerConfig</span><span class="p">,</span> <span class="n">get_logger</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">zooui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoggerConfig</span><span class="p">,</span> <span class="n">get_logger</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">TileManager</span><span class="p">:</span>
@@ -836,7 +836,7 @@ the log level. Used internally by <code class="docutils literal notranslate"><sp
     <span class="k">def</span><span class="w"> </span><span class="nf">load_tile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_id</span><span class="p">):</span>
         <span class="c1"># Temporarily enable debug for this tile if marked</span>
         <span class="k">if</span> <span class="n">tile_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug_tile_ids</span><span class="p">:</span>
-            <span class="n">old_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;pyzui.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">level</span>
+            <span class="n">old_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;zooui.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">level</span>
             <span class="n">LoggerConfig</span><span class="o">.</span><span class="n">set_level</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="s1">&#39;TileManager&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Loading tile </span><span class="si">{</span><span class="n">tile_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -852,7 +852,7 @@ the log level. Used internally by <code class="docutils literal notranslate"><sp
 <h3>Performance Profiling with Logging<a class="headerlink" href="#performance-profiling-with-logging" title="Link to this heading">¶</a></h3>
 <p>Use logging to identify performance bottlenecks:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zooui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">Converter</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -889,8 +889,8 @@ the log level. Used internally by <code class="docutils literal notranslate"><sp
 <section id="see-also">
 <h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><a class="reference internal" href="../contributionguidelines/contributionguidelines.html"><span class="doc">Contribution Guidelines</span></a> - Guidelines for contributing to PyZUI</p></li>
-<li><p><a class="reference internal" href="../gettingstarted/installation.html"><span class="doc">PyZui installation instructions</span></a> - Installation instructions</p></li>
+<li><p><a class="reference internal" href="../contributionguidelines/contributionguidelines.html"><span class="doc">Contribution Guidelines</span></a> - Guidelines for contributing to ZooUI</p></li>
+<li><p><a class="reference internal" href="../gettingstarted/installation.html"><span class="doc">ZooUI installation instructions</span></a> - Installation instructions</p></li>
 <li><p><a class="reference internal" href="../main.html"><span class="doc">&lt;no title&gt;</span></a> - Main documentation</p></li>
 </ul>
 </section>
@@ -903,7 +903,7 @@ the log level. Used internally by <code class="docutils literal notranslate"><sp
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../index.html">PyZui</a></h1>
+<h1 class="logo"><a href="../index.html">ZooUI</a></h1>
 
 
 
@@ -915,9 +915,9 @@ the log level. Used internally by <code class="docutils literal notranslate"><sp
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html">PyZui installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html">ZooUI installation instructions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#dependencies">Dependencies</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#running-pyzui">Running PyZUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
@@ -958,7 +958,7 @@ the log level. Used internally by <code class="docutils literal notranslate"><sp
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../pyzui.html">pyzui package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zooui.html">zooui package</a></li>
 </ul>
 
 <div class="relations">

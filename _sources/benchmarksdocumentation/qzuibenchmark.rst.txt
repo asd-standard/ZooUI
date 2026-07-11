@@ -1,4 +1,4 @@
-.. PyZui benchmarks instruction file,
+.. ZooUI benchmarks instruction file,
 
 QZUI Benchmark Documentation
 ============================
@@ -7,7 +7,7 @@ Overview
 --------
 
 The QZUI Benchmark is a comprehensive performance testing tool for
-PyZUI that measures rendering performance and memory consumption under
+ZooUI that measures rendering performance and memory consumption under
 load. It continuously populates a scene with media objects while
 monitoring frame timing and resource usage.
 
@@ -46,7 +46,7 @@ Run a basic 30-second benchmark with zoom/pan movement:
 
 .. code-block:: bash
 
-   cd /path/to/pyzui
+   cd /path/to/zooui
    python test/benchmarks/stress_benchmark.py
 
 Run with custom settings:
@@ -78,12 +78,12 @@ custom settings:
 
 .. code-block:: bash
 
-   # From the pyzui project root directory
+   # From the zooui project root directory
    python test/benchmarks/stress_benchmark.py
 
 This will:
 
-1. Launch a PyZUI window (1280x720 by default)
+1. Launch a ZooUI window (1280x720 by default)
 2. Add 10 initial objects to the scene
 3. Run for 30 seconds, adding 5 objects per second
 4. Apply continuous zoom oscillation (10s cycle) and pan movement (8s cycle)
@@ -233,7 +233,7 @@ The benchmark produces output in three stages.
 
 .. code-block:: text
 
-   PyZUI QZUI Benchmark
+   ZooUI QZUI Benchmark
    ============================================================
    Configuration:
      Target FPS:        30
@@ -549,7 +549,7 @@ Fallback (`/proc/self/status`):
 Performance Optimizations
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-PyZUI includes several performance optimizations for mathematical operations
+ZooUI includes several performance optimizations for mathematical operations
 that are critical for rendering performance:
 
 **Exponential Functions**
@@ -567,13 +567,13 @@ that are critical for rendering performance:
 **Optimized Files**
     These optimizations were applied to the following critical files:
 
-    - ``pyzui/objects/physicalobject.py`` - Core zoom calculations
-    - ``pyzui/objects/mediaobjects/tiledmediaobject.py`` - Tile rendering
-    - ``pyzui/tilesystem/tilemanager.py`` - Tile management
-    - ``pyzui/tilesystem/tiler/tiler.py`` - Tile generation
-    - ``pyzui/tilesystem/tileproviders/ferndynamictileprovider.py`` - Dynamic tiles
-    - ``pyzui/objects/scene/scene.py`` - Scene zoom operations
-    - ``pyzui/objects/mediaobjects/mediaobject.py`` - Media object zoom
+    - ``zooui/objects/physicalobject.py`` - Core zoom calculations
+    - ``zooui/objects/mediaobjects/tiledmediaobject.py`` - Tile rendering
+    - ``zooui/tilesystem/tilemanager.py`` - Tile management
+    - ``zooui/tilesystem/tiler/tiler.py`` - Tile generation
+    - ``zooui/tilesystem/tileproviders/ferndynamictileprovider.py`` - Dynamic tiles
+    - ``zooui/objects/scene/scene.py`` - Scene zoom operations
+    - ``zooui/objects/mediaobjects/mediaobject.py`` - Media object zoom
 
 **Benchmark Impact**
     These optimizations improve overall rendering performance, particularly
@@ -680,7 +680,7 @@ Example Python analysis:
 License
 -------
 
-This benchmark is part of PyZUI and licensed under GNU GPLv2.
+This benchmark is part of ZooUI and licensed under GNU GPLv2.
 
 Copyright (C) 2009  
 David Roberts <d@vidr.cc>

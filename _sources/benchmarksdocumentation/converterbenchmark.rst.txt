@@ -1,4 +1,4 @@
-.. PyZui converter benchmark instruction file,
+.. ZooUI converter benchmark instruction file,
 
 Converter Benchmark Documentation
 ==================================
@@ -6,7 +6,7 @@ Converter Benchmark Documentation
 Overview
 --------
 
-The Converter Benchmark is a performance testing tool for PyZUI's image
+The Converter Benchmark is a performance testing tool for ZooUI's image
 conversion and tiling pipeline. It measures the complete workflow from
 source image to tiled representation, including:
 
@@ -41,7 +41,7 @@ Run a benchmark on a single image:
 
 .. code-block:: bash
 
-   cd /path/to/pyzui
+   cd /path/to/zooui
    python test/benchmarks/converterbenchmark.py data/sample.jpg
 
 Benchmark multiple images:
@@ -75,7 +75,7 @@ The benchmark will:
 1. Convert the image to PPM format using libvips
 2. Extract image dimensions and metadata
 3. Tile the image into a pyramidal structure
-4. Launch a PyZUI window (800x600)
+4. Launch a ZooUI window (800x600)
 5. Perform cold cache zoom test (100 frames)
 6. Perform warm cache zoom test (100 frames)
 7. Display comprehensive performance metrics
@@ -289,7 +289,7 @@ Entry point for the benchmark utility.
 
 **Responsibilities:**
 
-- Initialize PyZUI systems
+- Initialize ZooUI systems
 - Parse command-line arguments
 - Validate input file
 - Create temporary files
@@ -494,7 +494,7 @@ Related Documentation
 License
 -------
 
-This benchmark is part of PyZUI and licensed under GNU GPLv2.
+This benchmark is part of ZooUI and licensed under GNU GPLv2.
 
 Copyright (C) 2009
 David Roberts <d@vidr.cc>

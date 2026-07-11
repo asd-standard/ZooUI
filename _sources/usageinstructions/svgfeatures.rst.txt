@@ -1,18 +1,18 @@
-.. PyZUI SVG Features Documentation
+.. ZooUI SVG Features Documentation
 
 SVG Features
 ============
 
-PyZUI provides comprehensive support for Scalable Vector Graphics (SVG) files,
+ZooUI provides comprehensive support for Scalable Vector Graphics (SVG) files,
 allowing users to add, modify, and manipulate vector graphics within the
 zooming user interface. This document covers all SVG-related features available
-in PyZUI.
+in ZooUI.
 
 Overview
 --------
 
 SVG (Scalable Vector Graphics) is an XML-based vector image format that
-supports interactivity and animation. In PyZUI, SVG files can be:
+supports interactivity and animation. In ZooUI, SVG files can be:
 
 - Added to scenes as media objects
 - Modified with custom colors and line thickness
@@ -32,7 +32,7 @@ Key Features
 Adding SVG Objects
 ------------------
 
-There are two main ways to add SVG objects to your PyZUI scene:
+There are two main ways to add SVG objects to your ZooUI scene:
 
 **Method 1: Using the SVG Picker Dialog**
 
@@ -47,7 +47,7 @@ There are two main ways to add SVG objects to your PyZUI scene:
 **Method 2: Direct File Import**
 
 SVG files can also be added directly by:
-- Dragging and dropping SVG files into the PyZUI window
+- Dragging and dropping SVG files into the ZooUI window
 - Using the "Add Media" dialog to select SVG files
 - Loading scene files that contain embedded SVG objects
 
@@ -74,7 +74,7 @@ interface for selecting and customizing SVG files:
 
 **Available SVG Files:**
 
-PyZUI includes a collection of basic shapes in the ``data/SVG/`` directory:
+ZooUI includes a collection of basic shapes in the ``data/SVG/`` directory:
 
 - Arrows (various directions)
 - Geometric shapes (circles, squares, triangles)
@@ -116,12 +116,12 @@ be used with a warning message.
 Color Management
 ----------------
 
-PyZUI maintains a color history system that persists across sessions:
+ZooUI maintains a color history system that persists across sessions:
 
 **Color History Features:**
 
 - Stores up to 24 recently used colors
-- Colors saved in ``~/.pyzui/colorstore/color_list.txt``
+- Colors saved in ``~/.zooui/colorstore/color_list.txt``
 - Colors shared between SVG picker and modify dialogs
 - Default colors: white (ffffff), red (ff0000), green (00ff00), blue (0000ff)
 
@@ -134,18 +134,18 @@ PyZUI maintains a color history system that persists across sessions:
 SVG Cache System
 ----------------
 
-PyZUI uses an efficient SVG cache system to store modified SVG files:
+ZooUI uses an efficient SVG cache system to store modified SVG files:
 
 **Cache Features:**
 
-- **Location**: ``/tmp/pyzui_svg_/`` directory (temporary storage)
+- **Location**: ``/tmp/zooui_svg_/`` directory (temporary storage)
 - **Format**: ``svg_{8_char_sha1_hash}.svg`` files
 - **Deduplication**: Same content = same hash (saves storage)
 - **Flat Structure**: All files in single directory (no subfolders)
 
 **How it works:**
 
-1. When you modify an SVG (color/thickness), PyZUI creates a modified version
+1. When you modify an SVG (color/thickness), ZooUI creates a modified version
 2. The modified content is hashed (SHA1, first 8 chars)
 3. File is saved as ``svg_{hash}.svg`` in cache directory
 4. SVG objects reference the cache hash instead of original file
@@ -161,7 +161,7 @@ PyZUI uses an efficient SVG cache system to store modified SVG files:
 SVG Embedding in Scene Files
 ----------------------------
 
-Modified SVG objects can be embedded directly in PyZUI scene (``.pzs``) files:
+Modified SVG objects can be embedded directly in ZooUI scene (``.pzs``) files:
 
 **Embedding Behavior:**
 
@@ -195,7 +195,7 @@ Modified SVG objects can be embedded directly in PyZUI scene (``.pzs``) files:
 SVG Utilities
 -------------
 
-PyZUI includes specialized utilities for working with SVG files:
+ZooUI includes specialized utilities for working with SVG files:
 
 **Arrow Utilities (``svgarrowutils.py``):**
 
@@ -238,7 +238,7 @@ Best Practices
 - **SVG Not Rendering**: Check if file is valid XML, try opening in browser
 - **Colors Not Applying**: Some SVGs use CSS classes instead of inline attributes
 - **Performance Issues**: Reduce number of SVG objects or simplify complex SVGs
-- **Cache Issues**: Clear ``/tmp/pyzui_svg_/`` directory and restart PyZUI
+- **Cache Issues**: Clear ``/tmp/zooui_svg_/`` directory and restart ZooUI
 
 Advanced Usage
 --------------
@@ -249,8 +249,8 @@ SVG objects can be added programmatically:
 
 .. code-block:: python
 
-    from pyzui.objects.scene.scene import Scene
-    from pyzui.objects.mediaobjects.svgmediaobject import SVGMediaObject
+    from zooui.objects.scene.scene import Scene
+    from zooui.objects.mediaobjects.svgmediaobject import SVGMediaObject
     
     # Create scene
     scene = Scene()
@@ -269,9 +269,9 @@ SVG objects can be added programmatically:
 
 To use your own SVG files:
 
-1. Create a ``data/SVG/`` directory in your PyZUI installation
+1. Create a ``data/SVG/`` directory in your ZooUI installation
 2. Add ``.svg`` files to this directory
-3. Restart PyZUI to see new files in the picker dialog
+3. Restart ZooUI to see new files in the picker dialog
 
 **SVG Cache Management:**
 
@@ -280,13 +280,13 @@ Advanced users can manage the SVG cache:
 .. code-block:: bash
 
     # List cached SVG files
-    ls /tmp/pyzui_svg_/
+    ls /tmp/zooui_svg_/
     
     # Clear cache (will be recreated as needed)
-    rm -rf /tmp/pyzui_svg_/
+    rm -rf /tmp/zooui_svg_/
     
     # Monitor cache size
-    du -sh /tmp/pyzui_svg_/
+    du -sh /tmp/zooui_svg_/
 
 Examples
 --------
@@ -300,7 +300,7 @@ Examples
 
 **Example 2: Annotation Workflow**
 
-1. Load an image into PyZUI
+1. Load an image into ZooUI
 2. Add triangle SVGs to highlight important areas
 3. Color triangles yellow with transparency
 4. Add text labels near triangles
@@ -338,7 +338,7 @@ Planned improvements for SVG support:
 See Also
 --------
 
-- :doc:`../pyzui/svgmediaobject` - SVGMediaObject API documentation
-- :doc:`../pyzui/svgpickerinputdialog` - SVG Picker Dialog API
-- :doc:`../pyzui/modifysvginputdialog` - Modify SVG Dialog API
+- :doc:`../zooui/svgmediaobject` - SVGMediaObject API documentation
+- :doc:`../zooui/svgpickerinputdialog` - SVG Picker Dialog API
+- :doc:`../zooui/modifysvginputdialog` - Modify SVG Dialog API
 - :doc:`../technicaldocumentation/objectsystem` - Object system overview

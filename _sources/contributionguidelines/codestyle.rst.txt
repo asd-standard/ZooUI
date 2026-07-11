@@ -1,10 +1,10 @@
-.. PyZUI code style guidelines file,
+.. ZooUI code style guidelines file,
 
 Code Style Guidelines
 =====================
 
 This document describes the coding conventions, formatting rules, and quality
-checks that all contributions to the PyZUI codebase must follow.
+checks that all contributions to the ZooUI codebase must follow.
 
 Code Style
 ----------
@@ -87,11 +87,11 @@ Formatting Requirements
 File Headers
 ^^^^^^^^^^^^
 
-All source files in ``./pyzui`` should include the GPL license header:
+All source files in ``./zooui`` should include the GPL license header:
 
 .. code-block:: python
 
-     ## PyZUI - Python Zooming User Interface
+     ## ZooUI - Python Zooming User Interface
     ## Copyright (C) 2009  David Roberts <d@vidr.cc>
     ##
     ## This program is free software; you can redistribute it and/or
@@ -172,10 +172,10 @@ complete signatures.
 .. code-block:: bash
 
    # Check all source files
-   conda run -n <env-name> mypy --explicit-package-bases --follow-imports=skip pyzui/
+   conda run -n <env-name> mypy --explicit-package-bases --follow-imports=skip zooui/
 
    # Check a single file
-   conda run -n <env-name> mypy pyzui/path/to/file.py
+   conda run -n <env-name> mypy zooui/path/to/file.py
 
 **Note**: Mypy is run manually, not in pre-commit. Per-file overrides in
 ``pyproject.toml`` suppress known false positives from name-mangling,
@@ -208,7 +208,7 @@ Coding Conventions
 ------------------
 
 The following coding conventions must be followed for all contributions to the
-``./pyzui`` codebase and the ``./test`` codebase.
+``./zooui`` codebase and the ``./test`` codebase.
 
 Docstring Format
 ^^^^^^^^^^^^^^^^
@@ -447,7 +447,7 @@ constant with forward references:
 
 .. code-block:: python
 
-    # File: pyzui/tilesystem/tileproviders/dynamictileprovider.py
+    # File: zooui/tilesystem/tileproviders/dynamictileprovider.py
     from typing import TYPE_CHECKING, Optional, Tuple, Any
     from PySide6 import QtGui
 

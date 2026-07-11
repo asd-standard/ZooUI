@@ -1,4 +1,4 @@
-.. PyZui contribution instruction file,
+.. ZooUI contribution instruction file,
 
 Contribution Guidelines
 =======================
@@ -8,7 +8,7 @@ Contribution Guidelines
 naming rules, type hints, docstring format, and code quality checks that all
 contributions must follow.
 
-Welcome to the PyZUI contribution guidelines! We appreciate your interest in
+Welcome to the ZooUI contribution guidelines! We appreciate your interest in
 contributing to this project.
 
 Project Expectations
@@ -35,14 +35,14 @@ Getting Started with Contributing
 
 1. **Fork the Repository**
 
-   Start by forking the PyZUI repository on GitHub to your own account.
+   Start by forking the ZooUI repository on GitHub to your own account.
 
 2. **Clone Your Fork**
 
    .. code-block:: bash
 
       git clone https://github.com/YOUR_USERNAME/pyzui.git
-      cd pyzui
+      cd zooui
 
 3. **Set Up the Development Environment**
 
@@ -233,7 +233,7 @@ Getting Started with Contributing
 
    **Scenario C: Creating a Completely New Module**
 
-   When creating a new ``.py`` module (e.g., ``pyzui/tilesystem/tileoptimizer.py``):
+   When creating a new ``.py`` module (e.g., ``zooui/tilesystem/tileoptimizer.py``):
 
    - Create a corresponding test file mirroring the source structure
    - Include all necessary imports and fixtures
@@ -257,7 +257,7 @@ Getting Started with Contributing
        from unittest.mock import Mock, patch, MagicMock
        from PIL import Image
 
-       from pyzui.tilesystem.tileoptimizer import TileOptimizer, OptimizationResult
+       from zooui.tilesystem.tileoptimizer import TileOptimizer, OptimizationResult
 
 
        class TestTileOptimizer:
@@ -334,7 +334,7 @@ Getting Started with Contributing
 
    *Checklist for new test modules:*
 
-   - [ ] File path mirrors source path (``pyzui/x/y.py`` -> ``test/unittest/x/test_y.py``)
+   - [ ] File path mirrors source path (``zooui/x/y.py`` -> ``test/unittest/x/test_y.py``)
    - [ ] Module docstring describes what is being tested
    - [ ] All necessary imports are included
    - [ ] Test class for each public class in the source module
@@ -520,7 +520,7 @@ Test Guidelines
 
        from unittest.mock import Mock, patch, MagicMock
 
-       @patch('pyzui.tilesystem.tileproviders.statictileprovider.Image.open')
+       @patch('zooui.tilesystem.tileproviders.statictileprovider.Image.open')
        def test_load_success(self, mock_open):
            ...
 
@@ -562,7 +562,7 @@ When contributing tests, please follow these guidelines:
 
    Place tests in a location that mirrors the source code structure:
 
-   - Source: ``pyzui/tilesystem/tile.py``
+   - Source: ``zooui/tilesystem/tile.py``
    - Test: ``test/unittest/tilesystem/test_tile.py``
 
 2. **One Test Class per Feature/Class:**
@@ -610,8 +610,8 @@ When contributing tests, please follow these guidelines:
 Versioning and Release Workflow
 --------------------------------
 
-PyZUI uses **Semantic Versioning** (SemVer) in ``MAJOR.MINOR.PATCH`` format.
-The single source of truth for the version is ``pyzui/__init__.py`` →
+ZooUI uses **Semantic Versioning** (SemVer) in ``MAJOR.MINOR.PATCH`` format.
+The single source of truth for the version is ``zooui/__init__.py`` →
 ``__version__``.
 
 **Version bump criteria:**
@@ -643,7 +643,7 @@ or public API.
 
 2. Run the bump script. This updates **three** locations automatically:
 
-   - ``pyzui/__init__.py`` — the canonical ``__version__`` string
+   - ``zooui/__init__.py`` — the canonical ``__version__`` string
    - ``data/home.pzs`` — the version text displayed in the default scene
 
    .. code-block:: bash
@@ -681,12 +681,12 @@ Submitting Your Contribution
 7. Create a pull request with a clear description of your changes
 8. Be responsive to feedback during the review process
 
-Thank you for contributing to PyZUI!
+Thank you for contributing to ZooUI!
 
 Contributing to Documentation
 -----------------------------
 
-Documentation is a critical part of PyZUI that helps users understand and
+Documentation is a critical part of ZooUI that helps users understand and
 effectively use the software. This section covers guidelines for contributing
 to the Sphinx-based documentation in the ``./docs/`` directory.
 
@@ -699,7 +699,7 @@ to the Sphinx-based documentation in the ``./docs/`` directory.
 
 **Sphinx Extensions Used:**
 
-PyZUI documentation uses the following Sphinx extensions:
+ZooUI documentation uses the following Sphinx extensions:
 
 - ``sphinx.ext.autodoc``: Automatically documents Python docstrings
 - ``sphinx.ext.autosummary``: Creates summary tables for modules
@@ -721,7 +721,7 @@ Documentation Quality Standards
 
 **Examples and Use Cases:**
 
-- Provide real-world examples from the PyZUI codebase
+- Provide real-world examples from the ZooUI codebase
 - Include complete, tested code snippets
 - Document edge cases and common pitfalls
 - Show before/after comparisons when demonstrating improvements
@@ -864,4 +864,4 @@ contributions (fork, branch, pull request). Ensure your documentation:
 - Maintains consistency with existing documentation
 - Includes appropriate examples and cross-references
 
-Thank you for contributing to PyZUI!
+Thank you for contributing to ZooUI!

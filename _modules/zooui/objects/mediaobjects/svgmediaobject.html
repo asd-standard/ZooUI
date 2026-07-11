@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>zooui.objects.mediaobjects.svgmediaobject &#8212; ZooUI 0.5.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=cc7d0dec" />
+    <script src="../../../../_static/documentation_options.js?v=8e576371"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for zooui.objects.mediaobjects.svgmediaobject</h1><div class="highlight"><pre>
+<span></span><span class="c1">## ZooUI - Zooming User Interface</span>
+<span class="c1">## Copyright (C) 2009 David Roberts &lt;d@vidr.cc&gt;</span>
+<span class="c1">##</span>
+<span class="c1">## This program is free software; you can redistribute it and/or</span>
+<span class="c1">## modify it under the terms of the GNU General Public License</span>
+<span class="c1">## as published by the Free Software Foundation; either version 3</span>
+<span class="c1">## of the License, or (at your option) any later version.</span>
+<span class="c1">##</span>
+<span class="c1">## This program is distributed in the hope that it will be useful,</span>
+<span class="c1">## but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1">## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1">## GNU General Public License for more details.</span>
+<span class="c1">##</span>
+<span class="c1">## You should have received a copy of the GNU General Public License</span>
+<span class="c1">## along with this program; if not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
+
+<span class="sd">&quot;&quot;&quot;``SVG`` objects to be displayed in the ZUI.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">PySide6</span><span class="w"> </span><span class="kn">import</span> <span class="n">QtCore</span><span class="p">,</span> <span class="n">QtSvg</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">zooui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.mediaobject</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoadError</span><span class="p">,</span> <span class="n">MediaObject</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.mediaobjectsutils.svg.svgcache.svgcache</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_svg_cache</span>
+
+
+<div class="viewcode-block" id="SVGMediaObject">
+<a class="viewcode-back" href="../../../../zooui/objects/mediaobjects/svgmediaobject.html#zooui.objects.mediaobjects.svgmediaobject.SVGMediaObject">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SVGMediaObject</span><span class="p">(</span><span class="n">MediaObject</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Constructor :</span>
+<span class="sd">        SVGMediaObject(media_id, scene)</span>
+<span class="sd">    Parameters :</span>
+<span class="sd">        media_id : str</span>
+<span class="sd">        scene : Scene</span>
+
+<span class="sd">    SVGMediaObject(media_id, scene) --&gt; None</span>
+
+<span class="sd">    SVGMediaObject objects are used to represent SVG images that can be</span>
+<span class="sd">    rendered in the ZUI.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__get_svg_load_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">media_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the file path to load SVG from, handling cache hashes.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            media_id: Either a file path or cache hash (starting with ``&#39;svg_&#39;``)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            File path to load</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check if media_id is a cache hash (starts with &#39;svg_&#39;)</span>
+        <span class="k">if</span> <span class="n">media_id</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;svg_&quot;</span><span class="p">):</span>
+            <span class="c1"># It&#39;s a cache hash, get path from cache</span>
+            <span class="n">svg_cache</span> <span class="o">=</span> <span class="n">get_svg_cache</span><span class="p">()</span>
+            <span class="n">cache_path</span> <span class="o">=</span> <span class="n">svg_cache</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span><span class="n">media_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">cache_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="c1"># Try to get content from cache (might have been stored elsewhere)</span>
+                <span class="n">content</span> <span class="o">=</span> <span class="n">svg_cache</span><span class="o">.</span><span class="n">get_svg_content</span><span class="p">(</span><span class="n">media_id</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">content</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">LoadError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SVG cache hash not found: </span><span class="si">{</span><span class="n">media_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="c1"># Re-store in cache (in case cache was cleaned up)</span>
+                <span class="n">svg_cache</span><span class="o">.</span><span class="n">store_svg</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">cache_path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># It&#39;s a file path</span>
+            <span class="k">return</span> <span class="n">media_id</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">media_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">scene</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor :</span>
+<span class="sd">            SVGMediaObject(media_id, scene)</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            media_id : str (can be file path or cache hash starting with ``&#39;svg_&#39;``)</span>
+<span class="sd">            scene : Scene</span>
+
+<span class="sd">        SVGMediaObject(media_id, scene) --&gt; None</span>
+
+<span class="sd">        Initialize a new SVGMediaObject from the SVG file identified by media_id,</span>
+<span class="sd">        and the parent Scene referenced by scene.</span>
+
+<span class="sd">        Creates a QSvgRenderer and attempts to load the SVG file.</span>
+<span class="sd">        Raises LoadError if the SVG file cannot be parsed.</span>
+
+<span class="sd">        Stores the default width and height of the SVG image for rendering</span>
+<span class="sd">        calculations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Initialize the parent MediaObject with media_id and scene reference</span>
+        <span class="c1"># This sets up self._media_id, self._scene, and PhysicalObject attributes</span>
+        <span class="n">MediaObject</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">media_id</span><span class="p">,</span> <span class="n">scene</span><span class="p">)</span>
+
+        <span class="c1"># Create a QSvgRenderer instance to parse and render SVG content</span>
+        <span class="c1"># QSvgRenderer handles SVG parsing, animation, and rendering onto QPainter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__renderer</span><span class="p">:</span> <span class="n">QtSvg</span><span class="o">.</span><span class="n">QSvgRenderer</span> <span class="o">=</span> <span class="n">QtSvg</span><span class="o">.</span><span class="n">QSvgRenderer</span><span class="p">()</span>
+
+        <span class="c1"># Determine if media_id is a cache hash or file path</span>
+        <span class="n">load_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_svg_load_path</span><span class="p">(</span><span class="n">media_id</span><span class="p">)</span>
+
+        <span class="c1"># Attempt to load the SVG file</span>
+        <span class="c1"># load() returns True on success, False if the file cannot be parsed</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__renderer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">load_path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">LoadError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unable to parse SVG file: </span><span class="si">{</span><span class="n">media_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Get the default (intrinsic) size of the SVG image as a QSize object</span>
+        <span class="c1"># defaultSize() returns the size specified in the SVG&#39;s width/height attributes</span>
+        <span class="n">size</span><span class="p">:</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QSize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__renderer</span><span class="o">.</span><span class="n">defaultSize</span><span class="p">()</span>
+
+        <span class="c1"># Extract the width in pixels from the QSize object</span>
+        <span class="c1"># This is the SVG&#39;s native width before any scaling is applied</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">size</span><span class="o">.</span><span class="n">width</span><span class="p">()</span>
+
+        <span class="c1"># Extract the height in pixels from the QSize object</span>
+        <span class="c1"># This is the SVG&#39;s native height before any scaling is applied</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">size</span><span class="o">.</span><span class="n">height</span><span class="p">()</span>
+
+        <span class="c1"># Initialize private variables for caching optimizations</span>
+        <span class="c1"># These start as None and store computed values when first accessed</span>
+
+        <span class="c1"># Stores the scale value (2^(scene.zoomlevel + object.zoomlevel))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Stores the calculated (width, height) tuple for this SVG at current scale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_onscreen_size</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Track modification state and cache SVG content</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;SVGMediaObject&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Track if SVG has been modified (picker, clipboard, or svg_*_utils)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__is_modified</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Cache SVG content in memory for performance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_svg_content</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Store original file path for file-based SVGs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__original_file_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">media_id</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;svg_&quot;</span><span class="p">):</span>
+            <span class="c1"># It&#39;s a file path, not cache hash</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__original_file_path</span> <span class="o">=</span> <span class="n">media_id</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Cache hash - mark as modified (from picker/clipboard)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__is_modified</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1"># Class variable: indicates this media object supports transparency</span>
+    <span class="c1"># SVG images can have transparent backgrounds, so they cannot hide objects behind them</span>
+    <span class="n">transparent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1"># Maximum SVG size for embedding warning (1MB)</span>
+    <span class="n">MAX_EMBEDDED_SVG_SIZE_BYTES</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>
+
+<div class="viewcode-block" id="SVGMediaObject.render">
+<a class="viewcode-back" href="../../../../zooui/objects/mediaobjects/svgmediaobject.html#zooui.objects.mediaobjects.svgmediaobject.SVGMediaObject.render">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">painter</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            SVGMediaObject.render(painter, mode)</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            painter : QPainter</span>
+<span class="sd">            mode : int</span>
+
+<span class="sd">        SVGMediaObject.render(painter, mode) --&gt; None</span>
+
+<span class="sd">        Render the SVG image using the given painter and render mode.</span>
+
+<span class="sd">        Note: Size visibility is checked by the scene via is_size_visible().</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get top-left corner position of the SVG object on screen</span>
+        <span class="c1"># self.topleft is a property that returns tuple (x, y) in screen coordinates</span>
+        <span class="n">x</span><span class="p">:</span> <span class="nb">float</span>
+        <span class="n">y</span><span class="p">:</span> <span class="nb">float</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">topleft</span>
+
+        <span class="c1"># Get the on-screen dimensions of the SVG at current scale</span>
+        <span class="c1"># onscreen_size returns (width, height) scaled by the current zoom level</span>
+        <span class="n">w</span><span class="p">:</span> <span class="nb">float</span>
+        <span class="n">h</span><span class="p">:</span> <span class="nb">float</span>
+        <span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">onscreen_size</span>
+
+        <span class="c1"># Render the SVG into a floating-point rectangle on the painter</span>
+        <span class="c1"># QtCore.QRectF(x, y, width, height) defines the target rendering area</span>
+        <span class="c1"># QSvgRenderer.render() scales the SVG vector graphics to fit the rectangle</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__renderer</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">painter</span><span class="p">,</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QRectF</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="SVGMediaObject.is_size_visible">
+<a class="viewcode-back" href="../../../../zooui/objects/mediaobjects/svgmediaobject.html#zooui.objects.mediaobjects.svgmediaobject.SVGMediaObject.is_size_visible">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_size_visible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        SVG-specific size visibility check.</span>
+
+<span class="sd">        Returns False if SVG is too small or too large to be visible,</span>
+<span class="sd">        otherwise returns super().is_size_visible(mode).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># First check base class (handles Invisible mode)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">is_size_visible</span><span class="p">(</span><span class="n">mode</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># SVG-specific size checks (same thresholds as current render())</span>
+        <span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">onscreen_size</span>
+        <span class="n">viewport_w</span><span class="p">,</span> <span class="n">viewport_h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">viewport_size</span>
+
+        <span class="c1"># Check if too small: min dimension &gt; viewport_min / 55</span>
+        <span class="n">not_too_small</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">int</span><span class="p">((</span><span class="nb">min</span><span class="p">(</span><span class="n">viewport_w</span><span class="p">,</span> <span class="n">viewport_h</span><span class="p">))</span> <span class="o">/</span> <span class="mi">55</span><span class="p">)</span>
+
+        <span class="c1"># Check if too large: max dimension &lt; viewport_max / 0.5</span>
+        <span class="n">not_too_large</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">int</span><span class="p">((</span><span class="nb">max</span><span class="p">(</span><span class="n">viewport_w</span><span class="p">,</span> <span class="n">viewport_h</span><span class="p">))</span> <span class="o">/</span> <span class="mf">0.5</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">not_too_small</span> <span class="ow">and</span> <span class="n">not_too_large</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">onscreen_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Property :</span>
+<span class="sd">            SVGMediaObject.onscreen_size</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            None</span>
+
+<span class="sd">        SVGMediaObject.onscreen_size --&gt; Tuple[float, float]</span>
+
+<span class="sd">        Return the on-screen size of the SVG image.</span>
+
+<span class="sd">        Multiplies the SVG&#39;s native width and height by the current scale factor.</span>
+<span class="sd">        The scale factor is derived from the combined scene and object zoom levels.</span>
+
+<span class="sd">        Uses caching to avoid recalculating size on every access.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">current_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span>
+
+        <span class="c1"># Return cached size if scale hasn&#39;t changed</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_scale</span> <span class="o">==</span> <span class="n">current_scale</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_onscreen_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_onscreen_size</span>
+
+        <span class="c1"># Calculate on-screen dimensions by multiplying native pixel size by scale</span>
+        <span class="c1"># self.scale returns 2^(scene.zoomlevel + object.zoomlevel)</span>
+        <span class="c1"># self.__width and self.__height are the SVG&#39;s intrinsic dimensions</span>
+        <span class="n">w</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__width</span> <span class="o">*</span> <span class="n">current_scale</span>
+        <span class="n">h</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__height</span> <span class="o">*</span> <span class="n">current_scale</span>
+
+        <span class="c1"># Update cache</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_scale</span> <span class="o">=</span> <span class="n">current_scale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_onscreen_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_modified</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if SVG has been modified.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_modified</span>
+
+<div class="viewcode-block" id="SVGMediaObject.mark_as_modified">
+<a class="viewcode-back" href="../../../../zooui/objects/mediaobjects/svgmediaobject.html#zooui.objects.mediaobjects.svgmediaobject.SVGMediaObject.mark_as_modified">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mark_as_modified</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mark SVG as modified (e.g., after svg_*_utils modification).&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__is_modified</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># Clear cached content since it will change</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_svg_content</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">original_file_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get original file path if SVG was loaded from file.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__original_file_path</span>
+
+<div class="viewcode-block" id="SVGMediaObject.get_svg_content">
+<a class="viewcode-back" href="../../../../zooui/objects/mediaobjects/svgmediaobject.html#zooui.objects.mediaobjects.svgmediaobject.SVGMediaObject.get_svg_content">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_svg_content</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get current SVG content with caching.</span>
+<span class="sd">        Returns None if content cannot be retrieved.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Return cached content if available</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_svg_content</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_svg_content</span>
+
+        <span class="c1"># Get content from cache or file</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;svg_&quot;</span><span class="p">):</span>
+            <span class="c1"># Cache hash - get from SVG cache</span>
+            <span class="n">svg_cache</span> <span class="o">=</span> <span class="n">get_svg_cache</span><span class="p">()</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="n">svg_cache</span><span class="o">.</span><span class="n">get_svg_content</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># File path - read from file</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">content</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to read SVG file </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">content</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Cache the content</span>
+        <span class="k">if</span> <span class="n">content</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__cached_svg_content</span> <span class="o">=</span> <span class="n">content</span>
+
+        <span class="k">return</span> <span class="n">content</span></div>
+
+
+<div class="viewcode-block" id="SVGMediaObject.set_svg_content">
+<a class="viewcode-back" href="../../../../zooui/objects/mediaobjects/svgmediaobject.html#zooui.objects.mediaobjects.svgmediaobject.SVGMediaObject.set_svg_content">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_svg_content</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">content</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set SVG content (for embedded SVGs on load).&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_svg_content</span> <span class="o">=</span> <span class="n">content</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__is_modified</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="SVGMediaObject.to_dict">
+<a class="viewcode-back" href="../../../../zooui/objects/mediaobjects/svgmediaobject.html#zooui.objects.mediaobjects.svgmediaobject.SVGMediaObject.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            SVGMediaObject.to_dict()</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            None</span>
+
+<span class="sd">        SVGMediaObject.to_dict() --&gt; Dict[str, Any]</span>
+
+<span class="sd">        Serialize SVGMediaObject with SVG-specific state.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__width</span><span class="p">,</span>
+                <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__height</span><span class="p">,</span>
+                <span class="s2">&quot;transparent&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">transparent</span><span class="p">,</span>
+                <span class="s2">&quot;is_modified&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_modified</span><span class="p">,</span>
+                <span class="s2">&quot;original_file_path&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__original_file_path</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__original_file_path</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="SVGMediaObject.from_dict">
+<a class="viewcode-back" href="../../../../zooui/objects/mediaobjects/svgmediaobject.html#zooui.objects.mediaobjects.svgmediaobject.SVGMediaObject.from_dict">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">scene</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;SVGMediaObject&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            SVGMediaObject.from_dict(data, scene)</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            data : Dict[str, Any]</span>
+<span class="sd">            scene : Any</span>
+
+<span class="sd">        SVGMediaObject.from_dict(data, scene) --&gt; SVGMediaObject</span>
+
+<span class="sd">        Create SVGMediaObject from serialized data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;media_id&quot;</span><span class="p">],</span> <span class="n">scene</span><span class="p">)</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">_y</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">_z</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">]</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">vx</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">vy</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">vz</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;velocity&quot;</span><span class="p">]</span>
+
+        <span class="c1"># Restore modification state if present</span>
+        <span class="k">if</span> <span class="s2">&quot;is_modified&quot;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">__is_modified</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;is_modified&quot;</span><span class="p">]</span>
+
+        <span class="c1"># Restore original file path if present</span>
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;original_file_path&quot;</span><span class="p">):</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">__original_file_path</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;original_file_path&quot;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">obj</span></div>
+</div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">ZooUI</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html">ZooUI installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/userinterface.html">User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/svgfeatures.html">SVG Features</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/configsystem.html">Configuration System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/objectsystem.html">Object System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/windowsystem.html">Window System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/backup.html">Backup System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testingdocumentation/unittest.html">Unit Testing Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testingdocumentation/integrationtest.html">Integration Testing Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../benchmarksdocumentation/qzuibenchmark.html">QZUI Benchmark Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../benchmarksdocumentation/converterbenchmark.html">Converter Benchmark Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributionguidelines/codestyle.html">Code Style Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../zooui.html">zooui package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, David Roberts, Andrea Silvestri.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

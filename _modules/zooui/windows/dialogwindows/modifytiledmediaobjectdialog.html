@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>zooui.windows.dialogwindows.modifytiledmediaobjectdialog &#8212; ZooUI 0.5.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=cc7d0dec" />
+    <script src="../../../../_static/documentation_options.js?v=8e576371"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for zooui.windows.dialogwindows.modifytiledmediaobjectdialog</h1><div class="highlight"><pre>
+<span></span><span class="c1">## ZooUI - Zooming User Interface</span>
+<span class="c1">## Copyright (C) 2009 David Roberts &lt;d@vidr.cc&gt;</span>
+<span class="c1">##</span>
+<span class="c1">## This program is free software; you can redistribute it and/or</span>
+<span class="c1">## modify it under the terms of the GNU General Public License</span>
+<span class="c1">## as published by the Free Software Foundation; either version 3</span>
+<span class="c1">## of the License, or (at your option) any later version.</span>
+<span class="c1">##</span>
+<span class="c1">## This program is distributed in the hope that it will be useful,</span>
+<span class="c1">## but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1">## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1">## GNU General Public License for more details.</span>
+<span class="c1">##</span>
+<span class="c1">## You should have received a copy of the GNU General Public License</span>
+<span class="c1">## along with this program; if not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
+
+<span class="sd">&quot;&quot;&quot;Tiled media object editing dialog with image manipulation options.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Literal</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">PySide6.QtCore</span><span class="w"> </span><span class="kn">import</span> <span class="n">Qt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PySide6.QtGui</span><span class="w"> </span><span class="kn">import</span> <span class="n">QImage</span><span class="p">,</span> <span class="n">QPixmap</span><span class="p">,</span> <span class="n">QTransform</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PySide6.QtWidgets</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">QDialog</span><span class="p">,</span>
+    <span class="n">QDialogButtonBox</span><span class="p">,</span>
+    <span class="n">QHBoxLayout</span><span class="p">,</span>
+    <span class="n">QLabel</span><span class="p">,</span>
+    <span class="n">QPushButton</span><span class="p">,</span>
+    <span class="n">QSizePolicy</span><span class="p">,</span>
+    <span class="n">QVBoxLayout</span><span class="p">,</span>
+    <span class="n">QWidget</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">zooui.converters.vipsconverter</span><span class="w"> </span><span class="kn">import</span> <span class="n">VipsConverter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zooui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zooui.objects.mediaobjects.tiledmediaobject</span><span class="w"> </span><span class="kn">import</span> <span class="n">TiledMediaObject</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zooui.tilesystem</span><span class="w"> </span><span class="kn">import</span> <span class="n">tilemanager</span> <span class="k">as</span> <span class="n">TileManager</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">Logger</span>
+
+
+<span class="c1"># Type aliases</span>
+<span class="n">DialogResult</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="ModifyTiledMediaObjectDialog">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifytiledmediaobjectdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifyTiledMediaObjectDialog">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModifyTiledMediaObjectDialog</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Constructor :</span>
+<span class="sd">        ModifyTiledMediaObjectDialog(mediaobject)</span>
+<span class="sd">    Parameters :</span>
+<span class="sd">        mediaobject : TiledMediaObject</span>
+
+<span class="sd">    ModifyTiledMediaObjectDialog(mediaobject) --&gt; None</span>
+
+<span class="sd">    Display the tiled media object with image manipulation options.</span>
+<span class="sd">    Shows the top tile of the tiled media object and provides buttons</span>
+<span class="sd">    for image manipulation (rotate, invert colors, black and white).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ModifyTiledMediaObjectDialog.__init__">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifytiledmediaobjectdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifyTiledMediaObjectDialog.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mediaobject</span><span class="p">:</span> <span class="n">TiledMediaObject</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            ModifyTiledMediaObjectDialog.__init__(mediaobject)</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            mediaobject : TiledMediaObject</span>
+
+<span class="sd">        ModifyTiledMediaObjectDialog.__init__(mediaobject) --&gt; None</span>
+
+<span class="sd">        Initialize the dialog with the given mediaobject.</span>
+<span class="sd">        Loads the top tile (0,0,0) of the tiled media object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mediaobject</span><span class="p">:</span> <span class="n">TiledMediaObject</span> <span class="o">=</span> <span class="n">mediaobject</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">media_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">mediaobject</span><span class="o">.</span><span class="n">_media_id</span> <span class="k">if</span> <span class="n">mediaobject</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tile_image</span><span class="p">:</span> <span class="n">QImage</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_rotation</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">270</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Track rotation angle in degrees</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">invert_colors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># Track invert colors state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">black_and_white</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># Track black and white state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_label</span><span class="p">:</span> <span class="n">QLabel</span>
+
+        <span class="c1"># Initialize logger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="p">:</span> <span class="n">Logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;ModifyTiledMediaObjectDialog&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Try to load the top tile</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">media_id</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">tile</span> <span class="o">=</span> <span class="n">TileManager</span><span class="o">.</span><span class="n">get_tile</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">media_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+                <span class="c1"># Access the private __image attribute (Tile private attribute)</span>
+                <span class="c1"># This is a PIL.ImageQt.ImageQt object</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">tile</span><span class="p">,</span> <span class="s2">&quot;_Tile__image&quot;</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">tile_image</span> <span class="o">=</span> <span class="n">tile</span><span class="o">.</span><span class="n">_Tile__image</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully loaded tile for media_id: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">media_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error loading tile: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tile_image</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="ModifyTiledMediaObjectDialog._create_button_panel">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifytiledmediaobjectdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifyTiledMediaObjectDialog._create_button_panel">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_button_panel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QWidget</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            ModifyTiledMediaObjectDialog._create_button_panel()</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            None</span>
+
+<span class="sd">        ModifyTiledMediaObjectDialog._create_button_panel() --&gt; QWidget</span>
+
+<span class="sd">        Creates the button panel with image manipulation options.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">button_panel</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">setSpacing</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+
+        <span class="c1"># Create buttons for image manipulation</span>
+        <span class="n">rotate_left_btn</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;Rotate Left&quot;</span><span class="p">)</span>
+        <span class="n">rotate_left_btn</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Policy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Policy</span><span class="o">.</span><span class="n">Fixed</span><span class="p">)</span>
+        <span class="n">rotate_left_btn</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_rotate_left</span><span class="p">)</span>
+
+        <span class="n">rotate_right_btn</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;Rotate Right&quot;</span><span class="p">)</span>
+        <span class="n">rotate_right_btn</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Policy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Policy</span><span class="o">.</span><span class="n">Fixed</span><span class="p">)</span>
+        <span class="n">rotate_right_btn</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_rotate_right</span><span class="p">)</span>
+
+        <span class="n">invert_colors_btn</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;Invert Colors&quot;</span><span class="p">)</span>
+        <span class="n">invert_colors_btn</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Policy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Policy</span><span class="o">.</span><span class="n">Fixed</span><span class="p">)</span>
+        <span class="n">invert_colors_btn</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_invert_colors</span><span class="p">)</span>
+
+        <span class="n">black_white_btn</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;Black and White&quot;</span><span class="p">)</span>
+        <span class="n">black_white_btn</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Policy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Policy</span><span class="o">.</span><span class="n">Fixed</span><span class="p">)</span>
+        <span class="n">black_white_btn</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_black_white</span><span class="p">)</span>
+
+        <span class="c1"># Add buttons to layout</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">rotate_left_btn</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">rotate_right_btn</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">invert_colors_btn</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">black_white_btn</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+
+        <span class="n">button_panel</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">button_panel</span></div>
+
+
+<div class="viewcode-block" id="ModifyTiledMediaObjectDialog._create_image_panel">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifytiledmediaobjectdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifyTiledMediaObjectDialog._create_image_panel">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_image_panel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QWidget</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            ModifyTiledMediaObjectDialog._create_image_panel()</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            None</span>
+
+<span class="sd">        ModifyTiledMediaObjectDialog._create_image_panel() --&gt; QWidget</span>
+
+<span class="sd">        Creates the image display panel showing the top tile.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">image_panel</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">setSpacing</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Create label to display the tile image</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_label</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_label</span><span class="o">.</span><span class="n">setAlignment</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">AlignmentFlag</span><span class="o">.</span><span class="n">AlignTop</span> <span class="o">|</span> <span class="n">Qt</span><span class="o">.</span><span class="n">AlignmentFlag</span><span class="o">.</span><span class="n">AlignHCenter</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile_image</span><span class="p">:</span>
+            <span class="c1"># Convert QImage to QPixmap and display</span>
+            <span class="n">pixmap</span> <span class="o">=</span> <span class="n">QPixmap</span><span class="o">.</span><span class="n">fromImage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile_image</span><span class="p">)</span>
+            <span class="c1"># Scale the image to fit nicely in the dialog</span>
+            <span class="n">scaled_pixmap</span> <span class="o">=</span> <span class="n">pixmap</span><span class="o">.</span><span class="n">scaled</span><span class="p">(</span>
+                <span class="mi">400</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">AspectRatioMode</span><span class="o">.</span><span class="n">KeepAspectRatio</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">TransformationMode</span><span class="o">.</span><span class="n">SmoothTransformation</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image_label</span><span class="o">.</span><span class="n">setPixmap</span><span class="p">(</span><span class="n">scaled_pixmap</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image_label</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;No image available&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image_label</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="s2">&quot;QLabel { background-color: #ddd; padding: 20px; }&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image_label</span><span class="o">.</span><span class="n">setMinimumSize</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_label</span><span class="p">,</span> <span class="n">alignment</span><span class="o">=</span><span class="n">Qt</span><span class="o">.</span><span class="n">AlignmentFlag</span><span class="o">.</span><span class="n">AlignTop</span> <span class="o">|</span> <span class="n">Qt</span><span class="o">.</span><span class="n">AlignmentFlag</span><span class="o">.</span><span class="n">AlignHCenter</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+        <span class="n">image_panel</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">image_panel</span></div>
+
+
+<div class="viewcode-block" id="ModifyTiledMediaObjectDialog._main_dialog">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifytiledmediaobjectdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifyTiledMediaObjectDialog._main_dialog">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_main_dialog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QDialog</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            ModifyTiledMediaObjectDialog._main_dialog()</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            None</span>
+
+<span class="sd">        ModifyTiledMediaObjectDialog._main_dialog() --&gt; QDialog</span>
+
+<span class="sd">        Creates and configures the main dialog window.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dialog</span> <span class="o">=</span> <span class="n">QDialog</span><span class="p">()</span>
+        <span class="n">dialog</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s2">&quot;Tiled Media Object Options&quot;</span><span class="p">)</span>
+        <span class="n">dialog</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Policy</span><span class="o">.</span><span class="n">Minimum</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Policy</span><span class="o">.</span><span class="n">Minimum</span><span class="p">)</span>
+
+        <span class="c1"># Create main layout</span>
+        <span class="n">main_layout</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">(</span><span class="n">dialog</span><span class="p">)</span>
+
+        <span class="c1"># Create image panel (left side)</span>
+        <span class="n">image_panel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_image_panel</span><span class="p">()</span>
+
+        <span class="c1"># Create button panel (right side)</span>
+        <span class="n">button_panel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_button_panel</span><span class="p">()</span>
+        <span class="n">button_panel</span><span class="o">.</span><span class="n">setFixedWidth</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+
+        <span class="c1"># Add panels to main layout</span>
+        <span class="n">main_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">image_panel</span><span class="p">,</span> <span class="n">stretch</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">main_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">button_panel</span><span class="p">,</span> <span class="n">stretch</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Create Apply/Cancel buttons at the bottom</span>
+        <span class="n">button_layout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="n">button_layout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+
+        <span class="n">buttons</span> <span class="o">=</span> <span class="n">QDialogButtonBox</span><span class="p">(</span>
+            <span class="n">QDialogButtonBox</span><span class="o">.</span><span class="n">StandardButton</span><span class="o">.</span><span class="n">Apply</span> <span class="o">|</span> <span class="n">QDialogButtonBox</span><span class="o">.</span><span class="n">StandardButton</span><span class="o">.</span><span class="n">Cancel</span><span class="p">,</span> <span class="n">dialog</span>
+        <span class="p">)</span>
+        <span class="n">buttons</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="n">QDialogButtonBox</span><span class="o">.</span><span class="n">StandardButton</span><span class="o">.</span><span class="n">Apply</span><span class="p">)</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dialog</span><span class="o">.</span><span class="n">accept</span><span class="p">)</span>
+        <span class="n">buttons</span><span class="o">.</span><span class="n">rejected</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dialog</span><span class="o">.</span><span class="n">reject</span><span class="p">)</span>
+
+        <span class="c1"># Create a container for the main content and buttons</span>
+        <span class="n">container</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="n">container_layout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">(</span><span class="n">container</span><span class="p">)</span>
+
+        <span class="n">content_widget</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="n">content_widget</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">main_layout</span><span class="p">)</span>
+
+        <span class="n">container_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">content_widget</span><span class="p">)</span>
+        <span class="n">container_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">buttons</span><span class="p">)</span>
+
+        <span class="c1"># Set the container as the dialog&#39;s main widget</span>
+        <span class="n">final_layout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">(</span><span class="n">dialog</span><span class="p">)</span>
+        <span class="n">final_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">container</span><span class="p">)</span>
+
+        <span class="c1"># Adjust dialog size to fit content</span>
+        <span class="n">dialog</span><span class="o">.</span><span class="n">adjustSize</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">dialog</span></div>
+
+
+<div class="viewcode-block" id="ModifyTiledMediaObjectDialog._run_dialog">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifytiledmediaobjectdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifyTiledMediaObjectDialog._run_dialog">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_run_dialog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            ModifyTiledMediaObjectDialog._run_dialog()</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            None</span>
+
+<span class="sd">        ModifyTiledMediaObjectDialog._run_dialog() --&gt; Tuple[bool, Optional[str]]</span>
+
+<span class="sd">        Runs the dialog and returns the result.</span>
+<span class="sd">        Returns (ok, media_id) where ok is True if accepted.</span>
+<span class="sd">        If rotation occurred, replaces the mediaobject in the scene.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dialog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_main_dialog</span><span class="p">()</span>
+
+        <span class="c1"># Run dialog and get result</span>
+        <span class="k">if</span> <span class="n">dialog</span><span class="o">.</span><span class="n">exec</span><span class="p">()</span> <span class="o">==</span> <span class="n">QDialog</span><span class="o">.</span><span class="n">DialogCode</span><span class="o">.</span><span class="n">Accepted</span><span class="p">:</span>
+            <span class="c1"># Check if any transformation was applied</span>
+            <span class="n">has_transformations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_rotation</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">invert_colors</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">black_and_white</span>
+
+            <span class="k">if</span> <span class="n">has_transformations</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;OK pressed - applying transformations: &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;rotation=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_rotation</span><span class="si">}</span><span class="s2">°, &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;invert=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">invert_colors</span><span class="si">}</span><span class="s2">, &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;b&amp;w=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">black_and_white</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+                <span class="c1"># Get the original source file</span>
+                <span class="n">infile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mediaobject</span><span class="o">.</span><span class="n">_TiledMediaObject__tmpfile</span>  <span class="c1"># type: ignore[attr-defined]</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">infile</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">infile</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Source file not found: </span><span class="si">{</span><span class="n">infile</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
+
+                <span class="c1"># Create unique temp file for transformed output</span>
+                <span class="n">fd</span><span class="p">,</span> <span class="n">outfile</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkstemp</span><span class="p">(</span><span class="s2">&quot;.ppm&quot;</span><span class="p">)</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
+
+                <span class="c1"># Use VipsConverter with all transformation parameters</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Converting with VipsConverter: </span><span class="si">{</span><span class="n">infile</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">outfile</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">converter</span> <span class="o">=</span> <span class="n">VipsConverter</span><span class="p">(</span>
+                    <span class="n">infile</span><span class="p">,</span>
+                    <span class="n">outfile</span><span class="p">,</span>
+                    <span class="n">rotation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">current_rotation</span><span class="p">,</span>
+                    <span class="n">invert_colors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">invert_colors</span><span class="p">,</span>
+                    <span class="n">black_and_white</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">black_and_white</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">converter</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="n">converter</span><span class="o">.</span><span class="n">error</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;VipsConverter failed: </span><span class="si">{</span><span class="n">converter</span><span class="o">.</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
+
+                <span class="c1"># Replace the mediaobject with the transformed version</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_replace_mediaobject_with_rotated</span><span class="p">(</span><span class="n">outfile</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">outfile</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">media_id</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="ModifyTiledMediaObjectDialog._update_image_display">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifytiledmediaobjectdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifyTiledMediaObjectDialog._update_image_display">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_image_display</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            ModifyTiledMediaObjectDialog._update_image_display()</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            None</span>
+
+<span class="sd">        ModifyTiledMediaObjectDialog._update_image_display() --&gt; None</span>
+
+<span class="sd">        Update the image display with current rotation, invert, and grayscale effects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tile_image</span><span class="p">:</span>
+            <span class="c1"># Start with a copy of the original image</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="n">QImage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tile_image</span><span class="p">)</span>
+
+            <span class="c1"># Apply black and white (grayscale) if enabled</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">black_and_white</span><span class="p">:</span>
+                <span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">convertToFormat</span><span class="p">(</span><span class="n">QImage</span><span class="o">.</span><span class="n">Format</span><span class="o">.</span><span class="n">Format_Grayscale8</span><span class="p">)</span>
+                <span class="c1"># Convert back to RGB for further processing</span>
+                <span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">convertToFormat</span><span class="p">(</span><span class="n">QImage</span><span class="o">.</span><span class="n">Format</span><span class="o">.</span><span class="n">Format_RGB32</span><span class="p">)</span>
+
+            <span class="c1"># Apply color inversion if enabled</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">invert_colors</span><span class="p">:</span>
+                <span class="n">image</span><span class="o">.</span><span class="n">invertPixels</span><span class="p">()</span>
+
+            <span class="c1"># Convert QImage to QPixmap</span>
+            <span class="n">pixmap</span> <span class="o">=</span> <span class="n">QPixmap</span><span class="o">.</span><span class="n">fromImage</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+
+            <span class="c1"># Apply rotation transformation</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_rotation</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">transform</span> <span class="o">=</span> <span class="n">QTransform</span><span class="p">()</span>
+                <span class="n">transform</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_rotation</span><span class="p">)</span>
+                <span class="n">pixmap</span> <span class="o">=</span> <span class="n">pixmap</span><span class="o">.</span><span class="n">transformed</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">TransformationMode</span><span class="o">.</span><span class="n">SmoothTransformation</span><span class="p">)</span>
+
+            <span class="c1"># Scale the image to fit nicely in the dialog</span>
+            <span class="n">scaled_pixmap</span> <span class="o">=</span> <span class="n">pixmap</span><span class="o">.</span><span class="n">scaled</span><span class="p">(</span>
+                <span class="mi">400</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">AspectRatioMode</span><span class="o">.</span><span class="n">KeepAspectRatio</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">TransformationMode</span><span class="o">.</span><span class="n">SmoothTransformation</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image_label</span><span class="o">.</span><span class="n">setPixmap</span><span class="p">(</span><span class="n">scaled_pixmap</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ModifyTiledMediaObjectDialog._replace_mediaobject_with_rotated">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifytiledmediaobjectdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifyTiledMediaObjectDialog._replace_mediaobject_with_rotated">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_replace_mediaobject_with_rotated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rotated_ppm_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            ModifyTiledMediaObjectDialog._replace_mediaobject_with_rotated(rotated_ppm_path)</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            rotated_ppm_path : str</span>
+
+<span class="sd">        ModifyTiledMediaObjectDialog._replace_mediaobject_with_rotated(rotated_ppm_path) --&gt; bool</span>
+
+<span class="sd">        Remove the current mediaobject from scene and add the rotated PPM as a new mediaobject.</span>
+<span class="sd">        Returns True if successful, False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Get the scene</span>
+            <span class="n">scene</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mediaobject</span><span class="o">.</span><span class="n">_scene</span>
+
+            <span class="c1"># Store the old mediaobject&#39;s position and zoom for the new one</span>
+            <span class="n">old_topleft</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mediaobject</span><span class="o">.</span><span class="n">topleft</span>
+            <span class="n">old_bottomright</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mediaobject</span><span class="o">.</span><span class="n">bottomright</span>
+            <span class="n">old_centre</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mediaobject</span><span class="o">.</span><span class="n">centre</span>
+            <span class="n">old_zoomlevel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mediaobject</span><span class="o">.</span><span class="n">zoomlevel</span>
+
+            <span class="c1"># Clear selection references before removing to prevent stale rectangle drawing</span>
+            <span class="k">if</span> <span class="n">scene</span><span class="o">.</span><span class="n">selection</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">mediaobject</span><span class="p">:</span>
+                <span class="n">scene</span><span class="o">.</span><span class="n">selection</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">scene</span><span class="o">.</span><span class="n">right_selection</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">mediaobject</span><span class="p">:</span>
+                <span class="n">scene</span><span class="o">.</span><span class="n">right_selection</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="c1"># Remove the old mediaobject from the scene</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Removing old mediaobject from scene&quot;</span><span class="p">)</span>
+            <span class="n">scene</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mediaobject</span><span class="p">)</span>
+
+            <span class="c1"># Create a new TiledMediaObject with the rotated PPM</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Creating new TiledMediaObject with rotated PPM: </span><span class="si">{</span><span class="n">rotated_ppm_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">new_mediaobject</span> <span class="o">=</span> <span class="n">TiledMediaObject</span><span class="p">(</span><span class="n">rotated_ppm_path</span><span class="p">,</span> <span class="n">scene</span><span class="p">,</span> <span class="n">autofit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">new_mediaobject</span><span class="o">.</span><span class="n">_TiledMediaObject__tmpfile</span> <span class="o">=</span> <span class="n">rotated_ppm_path</span>  <span class="c1"># type: ignore[attr-defined]</span>
+
+            <span class="c1"># Set the new mediaobject to the same position and zoom as the old one</span>
+            <span class="n">new_mediaobject</span><span class="o">.</span><span class="n">fit</span><span class="p">((</span><span class="n">old_topleft</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">old_topleft</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">old_bottomright</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">old_bottomright</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">new_mediaobject</span><span class="o">.</span><span class="n">centre</span> <span class="o">=</span> <span class="n">old_centre</span>
+            <span class="n">new_mediaobject</span><span class="o">.</span><span class="n">zoomlevel</span> <span class="o">=</span> <span class="n">old_zoomlevel</span>
+
+            <span class="c1"># Add the new mediaobject to the scene</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Adding new mediaobject to scene&quot;</span><span class="p">)</span>
+            <span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">new_mediaobject</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Successfully replaced mediaobject with rotated version&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error replacing mediaobject: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+    <span class="c1"># Button handlers</span>
+<div class="viewcode-block" id="ModifyTiledMediaObjectDialog._on_rotate_left">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifytiledmediaobjectdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifyTiledMediaObjectDialog._on_rotate_left">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_rotate_left</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            ModifyTiledMediaObjectDialog._on_rotate_left()</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            None</span>
+
+<span class="sd">        ModifyTiledMediaObjectDialog._on_rotate_left() --&gt; None</span>
+
+<span class="sd">        Rotate the image 90 degrees counter-clockwise (left).</span>
+<span class="sd">        Updates preview only; actual rotation applied on OK.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_rotation</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_rotation</span> <span class="o">-</span> <span class="mi">90</span><span class="p">)</span> <span class="o">%</span> <span class="mi">360</span>  <span class="c1"># type: ignore[assignment]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_image_display</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rotated left - current rotation: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_rotation</span><span class="si">}</span><span class="s2">°&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ModifyTiledMediaObjectDialog._on_rotate_right">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifytiledmediaobjectdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifyTiledMediaObjectDialog._on_rotate_right">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_rotate_right</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            ModifyTiledMediaObjectDialog._on_rotate_right()</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            None</span>
+
+<span class="sd">        ModifyTiledMediaObjectDialog._on_rotate_right() --&gt; None</span>
+
+<span class="sd">        Rotate the image 90 degrees clockwise (right).</span>
+<span class="sd">        Updates preview only; actual rotation applied on OK.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_rotation</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_rotation</span> <span class="o">+</span> <span class="mi">90</span><span class="p">)</span> <span class="o">%</span> <span class="mi">360</span>  <span class="c1"># type: ignore[assignment]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_image_display</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rotated right - current rotation: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_rotation</span><span class="si">}</span><span class="s2">°&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ModifyTiledMediaObjectDialog._on_invert_colors">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifytiledmediaobjectdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifyTiledMediaObjectDialog._on_invert_colors">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_invert_colors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            ModifyTiledMediaObjectDialog._on_invert_colors()</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            None</span>
+
+<span class="sd">        ModifyTiledMediaObjectDialog._on_invert_colors() --&gt; None</span>
+
+<span class="sd">        Toggle invert colors effect.</span>
+<span class="sd">        Updates preview only; actual effect applied on OK.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">invert_colors</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">invert_colors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_image_display</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invert colors toggled: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">invert_colors</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ModifyTiledMediaObjectDialog._on_black_white">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifytiledmediaobjectdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifyTiledMediaObjectDialog._on_black_white">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_black_white</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            ModifyTiledMediaObjectDialog._on_black_white()</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            None</span>
+
+<span class="sd">        ModifyTiledMediaObjectDialog._on_black_white() --&gt; None</span>
+
+<span class="sd">        Toggle black and white (grayscale) effect.</span>
+<span class="sd">        Updates preview only; actual effect applied on OK.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">black_and_white</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">black_and_white</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_image_display</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Black and white toggled: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">black_and_white</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">ZooUI</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html">ZooUI installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/userinterface.html">User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/svgfeatures.html">SVG Features</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/configsystem.html">Configuration System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/objectsystem.html">Object System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/windowsystem.html">Window System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/backup.html">Backup System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testingdocumentation/unittest.html">Unit Testing Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testingdocumentation/integrationtest.html">Integration Testing Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../benchmarksdocumentation/qzuibenchmark.html">QZUI Benchmark Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../benchmarksdocumentation/converterbenchmark.html">Converter Benchmark Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributionguidelines/codestyle.html">Code Style Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../zooui.html">zooui package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, David Roberts, Andrea Silvestri.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

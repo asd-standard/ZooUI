@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>zooui.objects.scene.sceneutils.prioritybatcher module &#8212; ZooUI 0.5.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=cc7d0dec" />
+    <script src="../../../../_static/documentation_options.js?v=8e576371"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="tilesystem package" href="../../../tilesystem.html" />
+    <link rel="prev" title="zooui.objects.scene.sceneutils.parallel module" href="parallel.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-zooui.objects.scene.sceneutils.prioritybatcher">
+<span id="zooui-objects-scene-sceneutils-prioritybatcher-module"></span><h1>zooui.objects.scene.sceneutils.prioritybatcher module<a class="headerlink" href="#module-zooui.objects.scene.sceneutils.prioritybatcher" title="Link to this heading">¶</a></h1>
+<p>PriorityBatcher class for viewport-aware object batching.</p>
+<p>This class manages batching of text objects for parallel rendering based on
+their distance from the viewport center, ensuring closest objects are rendered first.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.BatchPriority">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zooui.objects.scene.sceneutils.prioritybatcher.</span></span><span class="sig-name descname"><span class="pre">BatchPriority</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zooui/objects/scene/sceneutils/prioritybatcher.html#BatchPriority"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.BatchPriority" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Priority levels for text object batching.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.BatchPriority.HIGH">
+<span class="sig-name descname"><span class="pre">HIGH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.BatchPriority.HIGH" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.BatchPriority.MEDIUM">
+<span class="sig-name descname"><span class="pre">MEDIUM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.BatchPriority.MEDIUM" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.BatchPriority.LOW">
+<span class="sig-name descname"><span class="pre">LOW</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.BatchPriority.LOW" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.BatchPriority.BACKGROUND">
+<span class="sig-name descname"><span class="pre">BACKGROUND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.BatchPriority.BACKGROUND" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PrioritizedObject">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zooui.objects.scene.sceneutils.prioritybatcher.</span></span><span class="sig-name descname"><span class="pre">PrioritizedObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">priority</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zooui/objects/scene/sceneutils/prioritybatcher.html#PrioritizedObject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PrioritizedObject" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zooui.objects.scene.sceneutils.prioritybatcher.PrioritizedObject.object" title="zooui.objects.scene.sceneutils.prioritybatcher.PrioritizedObject.object"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Wrapper for objects with priority for heapq.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PrioritizedObject.priority">
+<span class="sig-name descname"><span class="pre">priority</span></span><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PrioritizedObject.priority" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PrioritizedObject.distance">
+<span class="sig-name descname"><span class="pre">distance</span></span><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PrioritizedObject.distance" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PrioritizedObject.index">
+<span class="sig-name descname"><span class="pre">index</span></span><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PrioritizedObject.index" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PrioritizedObject.object">
+<span class="sig-name descname"><span class="pre">object</span></span><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PrioritizedObject.object" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PrioritizedObject.layout_data">
+<span class="sig-name descname"><span class="pre">layout_data</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PrioritizedObject.layout_data" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zooui.objects.scene.sceneutils.prioritybatcher.</span></span><span class="sig-name descname"><span class="pre">PriorityBatcher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_batches</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">viewport_center</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">viewport_rect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zooui/objects/scene/sceneutils/prioritybatcher.html#PriorityBatcher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Manages batching of text objects for parallel rendering.</p>
+<p>This class organizes text objects into priority batches based on their
+distance from the viewport center, ensuring that objects closest to the
+viewport are rendered first for optimal perceived performance.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.batch_size">
+<span class="sig-name descname"><span class="pre">batch_size</span></span><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.batch_size" title="Link to this definition">¶</a></dt>
+<dd><p>Number of objects per batch</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.max_batches">
+<span class="sig-name descname"><span class="pre">max_batches</span></span><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.max_batches" title="Link to this definition">¶</a></dt>
+<dd><p>Maximum number of batches to create</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.viewport_center">
+<span class="sig-name descname"><span class="pre">viewport_center</span></span><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.viewport_center" title="Link to this definition">¶</a></dt>
+<dd><p>Current viewport center coordinates</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.viewport_rect">
+<span class="sig-name descname"><span class="pre">viewport_rect</span></span><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.viewport_rect" title="Link to this definition">¶</a></dt>
+<dd><p>Current viewport rectangle</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.priority_thresholds">
+<span class="sig-name descname"><span class="pre">priority_thresholds</span></span><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.priority_thresholds" title="Link to this definition">¶</a></dt>
+<dd><p>Distance thresholds for each priority level</p>
+</dd></dl>
+
+<p>Initialize the PriorityBatcher.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch_size</strong> – Number of objects per batch (default: 10)</p></li>
+<li><p><strong>max_batches</strong> – Maximum number of batches to create (default: 10)</p></li>
+<li><p><strong>viewport_center</strong> – Initial viewport center coordinates</p></li>
+<li><p><strong>viewport_rect</strong> – Initial viewport rectangle</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.update_viewport">
+<span class="sig-name descname"><span class="pre">update_viewport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">viewport_center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">viewport_rect</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zooui/objects/scene/sceneutils/prioritybatcher.html#PriorityBatcher.update_viewport"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.update_viewport" title="Link to this definition">¶</a></dt>
+<dd><p>Update the viewport information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>viewport_center</strong> – New viewport center coordinates</p></li>
+<li><p><strong>viewport_rect</strong> – New viewport rectangle</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.add_objects">
+<span class="sig-name descname"><span class="pre">add_objects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">objects</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zooui/objects/scene/sceneutils/prioritybatcher.html#PriorityBatcher.add_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.add_objects" title="Link to this definition">¶</a></dt>
+<dd><p>Add objects to be batched.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>objects</strong> – List of objects (typically StringMediaObjects)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.clear_objects">
+<span class="sig-name descname"><span class="pre">clear_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zooui/objects/scene/sceneutils/prioritybatcher.html#PriorityBatcher.clear_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.clear_objects" title="Link to this definition">¶</a></dt>
+<dd><p>Clear all objects from the batcher.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.calculate_distance">
+<span class="sig-name descname"><span class="pre">calculate_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zooui/objects/scene/sceneutils/prioritybatcher.html#PriorityBatcher.calculate_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.calculate_distance" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate distance from object to viewport center.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>obj</strong> – Object with x, y attributes</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Euclidean distance to viewport center</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.get_priority">
+<span class="sig-name descname"><span class="pre">get_priority</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zooui/objects/scene/sceneutils/prioritybatcher.html#PriorityBatcher.get_priority"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.get_priority" title="Link to this definition">¶</a></dt>
+<dd><p>Get priority level based on distance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>distance</strong> – Distance from viewport center</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>BatchPriority level</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.is_in_viewport">
+<span class="sig-name descname"><span class="pre">is_in_viewport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zooui/objects/scene/sceneutils/prioritybatcher.html#PriorityBatcher.is_in_viewport"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.is_in_viewport" title="Link to this definition">¶</a></dt>
+<dd><p>Check if object is in current viewport.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>obj</strong> – Object with position and size attributes</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if object intersects viewport, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.create_batches">
+<span class="sig-name descname"><span class="pre">create_batches</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zooui/objects/scene/sceneutils/prioritybatcher.html#PriorityBatcher.create_batches"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.create_batches" title="Link to this definition">¶</a></dt>
+<dd><p>Create priority-based batches of objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of batches, each batch is a list of PrioritizedObject</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.get_batch_metadata">
+<span class="sig-name descname"><span class="pre">get_batch_metadata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zooui/objects/scene/sceneutils/prioritybatcher.html#PriorityBatcher.get_batch_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.get_batch_metadata" title="Link to this definition">¶</a></dt>
+<dd><p>Get metadata for all batches.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of metadata dictionaries for each batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.get_object_count">
+<span class="sig-name descname"><span class="pre">get_object_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zooui/objects/scene/sceneutils/prioritybatcher.html#PriorityBatcher.get_object_count"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.get_object_count" title="Link to this definition">¶</a></dt>
+<dd><p>Get total number of objects in batcher.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of objects</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.get_visible_object_count">
+<span class="sig-name descname"><span class="pre">get_visible_object_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zooui/objects/scene/sceneutils/prioritybatcher.html#PriorityBatcher.get_visible_object_count"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.get_visible_object_count" title="Link to this definition">¶</a></dt>
+<dd><p>Get number of objects currently in viewport.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of objects in viewport</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.get_cache_hit_rate">
+<span class="sig-name descname"><span class="pre">get_cache_hit_rate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zooui/objects/scene/sceneutils/prioritybatcher.html#PriorityBatcher.get_cache_hit_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.get_cache_hit_rate" title="Link to this definition">¶</a></dt>
+<dd><p>Get cache hit rate for layout data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Cache hit rate as float between 0 and 1</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.update_layout_cache">
+<span class="sig-name descname"><span class="pre">update_layout_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zooui/objects/scene/sceneutils/prioritybatcher.html#PriorityBatcher.update_layout_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.update_layout_cache" title="Link to this definition">¶</a></dt>
+<dd><p>Update layout cache for an object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> – Object index</p></li>
+<li><p><strong>layout_data</strong> – Pre-calculated layout data</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.get_layout_cache">
+<span class="sig-name descname"><span class="pre">get_layout_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zooui/objects/scene/sceneutils/prioritybatcher.html#PriorityBatcher.get_layout_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.get_layout_cache" title="Link to this definition">¶</a></dt>
+<dd><p>Get layout data from cache.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> – Object index</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>TextLayoutData if cached, None otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.clear_layout_cache">
+<span class="sig-name descname"><span class="pre">clear_layout_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zooui/objects/scene/sceneutils/prioritybatcher.html#PriorityBatcher.clear_layout_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.clear_layout_cache" title="Link to this definition">¶</a></dt>
+<dd><p>Clear all layout cache.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.invalidate_cache_for_object">
+<span class="sig-name descname"><span class="pre">invalidate_cache_for_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zooui/objects/scene/sceneutils/prioritybatcher.html#PriorityBatcher.invalidate_cache_for_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.invalidate_cache_for_object" title="Link to this definition">¶</a></dt>
+<dd><p>Invalidate cache for specific object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> – Object index</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.get_statistics">
+<span class="sig-name descname"><span class="pre">get_statistics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zooui/objects/scene/sceneutils/prioritybatcher.html#PriorityBatcher.get_statistics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.scene.sceneutils.prioritybatcher.PriorityBatcher.get_statistics" title="Link to this definition">¶</a></dt>
+<dd><p>Get statistics about current batching state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary with statistics</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><span class="xref std std-doc">zooui/objects/scene/scene</span> - Scene management</p></li>
+<li><p><span class="xref std std-doc">zooui/objects/scene/qzui</span> - QZUI rendering widget</p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">ZooUI</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html">ZooUI installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/userinterface.html">User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/svgfeatures.html">SVG Features</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/configsystem.html">Configuration System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/objectsystem.html">Object System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/windowsystem.html">Window System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/backup.html">Backup System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testingdocumentation/unittest.html">Unit Testing Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testingdocumentation/integrationtest.html">Integration Testing Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../benchmarksdocumentation/qzuibenchmark.html">QZUI Benchmark Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../benchmarksdocumentation/converterbenchmark.html">Converter Benchmark Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributionguidelines/codestyle.html">Code Style Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../zooui.html">zooui package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../backup.html">backup package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../converters.html">converters package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../objects.html">objects package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tilesystem.html">tilesystem package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../windows.html">windows package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../config.html">zooui.config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../logger.html">zooui.logger module</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../zooui.html">zooui package</a><ul>
+  <li><a href="../../../objects.html">objects package</a><ul>
+      <li>Previous: <a href="parallel.html" title="previous chapter">zooui.objects.scene.sceneutils.parallel module</a></li>
+      <li>Next: <a href="../../../tilesystem.html" title="next chapter">tilesystem package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, David Roberts, Andrea Silvestri.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../../../../_sources/zooui/objects/scene/sceneutils/prioritybatcher.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

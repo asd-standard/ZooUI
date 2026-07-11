@@ -3,7 +3,7 @@
 SVG Utility Ecosystem
 =====================
 
-This document provides a comprehensive overview of the SVG utility ecosystem in PyZUI,
+This document provides a comprehensive overview of the SVG utility ecosystem in ZooUI,
 explaining the content-addressable SVG cache, the five shape-type-specific detection and
 elongation utilities, their shared architecture patterns, and their integration with the
 scene widget and dialog system.
@@ -68,7 +68,7 @@ Architecture
                   │
     ┌─────────────▼───────────────────────────────────────────────────┐
     │                       SVGCache                                  │
-    │  • Storage: /tmp/pyzui_svg_/ (flat directory)                   │
+    │  • Storage: /tmp/zooui_svg_/ (flat directory)                   │
     │  • Addressing: svg_{8-char SHA1} content hash                   │
     │  • store_svg() — deduplicate, validate, write                   │
     │  • get_svg_content() — read by hash                             │
@@ -98,7 +98,7 @@ All elongation results and picker-created SVGs are stored here.
 
 .. code-block:: text
 
-    /tmp/pyzui_svg_/
+    /tmp/zooui_svg_/
     ├── svg_a1b2c3d4.svg
     ├── svg_e5f6a7b8.svg
     └── ...
@@ -123,7 +123,7 @@ detects cache references by checking ``if media_id.startswith('svg_')``.
 
 .. code-block:: python
 
-    from pyzui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import (
+    from zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import (
         get_svg_cache,
     )
 
@@ -559,7 +559,7 @@ Programmatic Shape Detection and Elongation
 
 .. code-block:: python
 
-    from pyzui.objects.mediaobjects.mediaobjectsutils.svg import (
+    from zooui.objects.mediaobjects.mediaobjectsutils.svg import (
         is_arrow_svg,
         is_circle_svg,
         is_square_svg,
@@ -589,7 +589,7 @@ Working with SVGCache
 
 .. code-block:: python
 
-    from pyzui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import (
+    from zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import (
         get_svg_cache,
         compute_svg_hash,
     )
@@ -609,7 +609,7 @@ Working with SVGCache
 
     # Get file path for QSvgRenderer
     path = cache.get_cache_path(svg_hash)
-    print(f"On disk: {path}")  # /tmp/pyzui_svg_/svg_a1b2c3d4.svg
+    print(f"On disk: {path}")  # /tmp/zooui_svg_/svg_a1b2c3d4.svg
 
     # Compute hash without storing
     hash_only = compute_svg_hash("<svg>...</svg>")
@@ -625,8 +625,8 @@ See Also
 - :doc:`../usageinstructions/svgfeatures` — User-facing SVG features guide
 - :doc:`windowsystem` — SVG picker and modifier dialog details
 - :doc:`objectsystem` — SVGMediaObject and shape integration
-- :doc:`../pyzui/svgcache` — SVGCache API reference
-- :doc:`../pyzui/svgarrowutils` — Arrow utility API reference
-- :doc:`../pyzui/svgcircleutils` — Circle utility API reference
-- :doc:`../pyzui/svgsquareutils` — Square utility API reference
-- :doc:`../pyzui/svgtriangleutils` — Triangle utility API reference
+- :doc:`../zooui/svgcache` — SVGCache API reference
+- :doc:`../zooui/svgarrowutils` — Arrow utility API reference
+- :doc:`../zooui/svgcircleutils` — Circle utility API reference
+- :doc:`../zooui/svgsquareutils` — Square utility API reference
+- :doc:`../zooui/svgtriangleutils` — Triangle utility API reference

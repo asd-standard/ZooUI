@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout module &#8212; ZooUI 0.5.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=cc7d0dec" />
+    <script src="../../../../../_static/documentation_options.js?v=8e576371"></script>
+    <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="zooui.objects.objectsutils.zoom.zoommanager module" href="../../../objectsutils/zoommanager.html" />
+    <link rel="prev" title="zooui.objects.mediaobjects.mediaobjectsutils.string.parallellayout module" href="parallellayout.html" />
+   
+  <link rel="stylesheet" href="../../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout">
+<span id="zooui-objects-mediaobjects-mediaobjectsutils-string-textlayout-module"></span><h1>zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout module<a class="headerlink" href="#module-zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout" title="Link to this heading">¶</a></h1>
+<p>TextLayoutData class for storing pre-calculated text layout information.</p>
+<p>This class encapsulates all the information needed to render text efficiently
+in parallel, including font metrics, bounding rectangles, and layout options.</p>
+<p>Thread safety: All data is stored as plain Python types (str, float, int).
+Qt GUI objects (QFont, QColor) are only constructed on the main thread in
+render() or via the to_qfont()/to_qcolor() convenience methods. This ensures
+that TextLayoutData can be safely created and passed between threads without
+triggering Qt-internal C++ font database races.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextAlignment">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.</span></span><span class="sig-name descname"><span class="pre">TextAlignment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/zooui/objects/mediaobjects/mediaobjectsutils/string/textlayout.html#TextAlignment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextAlignment" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Text alignment options.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextAlignment.LEFT">
+<span class="sig-name descname"><span class="pre">LEFT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextAlignment.LEFT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextAlignment.CENTER">
+<span class="sig-name descname"><span class="pre">CENTER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextAlignment.CENTER" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextAlignment.RIGHT">
+<span class="sig-name descname"><span class="pre">RIGHT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextAlignment.RIGHT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextAlignment.JUSTIFY">
+<span class="sig-name descname"><span class="pre">JUSTIFY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextAlignment.JUSTIFY" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.</span></span><span class="sig-name descname"><span class="pre">TextLayoutData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_family='Sans</span> <span class="pre">Serif'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_pointsize=12.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_weight=Weight.Normal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_italic=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_r=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_g=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_b=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_a=255</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position=(0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">0.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounding_rect=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_rect=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_rects=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alignment=TextAlignment.LEFT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale=1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opacity=1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_valid=True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/zooui/objects/mediaobjects/mediaobjectsutils/string/textlayout.html#TextLayoutData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Stores pre-calculated text layout information for efficient parallel rendering.</p>
+<p>This class encapsulates all the information needed to render text without
+recalculating font metrics, bounding rectangles, or layout options during
+the rendering phase.</p>
+<p>Font and color are stored as plain data (not Qt objects) so that
+TextLayoutData instances can be safely created on any thread.
+Qt objects are only constructed in render() (called from the main thread).</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.text">
+<span class="sig-name descname"><span class="pre">text</span></span><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.text" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.font_family">
+<span class="sig-name descname"><span class="pre">font_family</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Sans</span> <span class="pre">Serif'</span></em><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.font_family" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.font_pointsize">
+<span class="sig-name descname"><span class="pre">font_pointsize</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">12.0</span></em><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.font_pointsize" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.font_weight">
+<span class="sig-name descname"><span class="pre">font_weight</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">400</span></em><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.font_weight" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.font_italic">
+<span class="sig-name descname"><span class="pre">font_italic</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.font_italic" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.color_r">
+<span class="sig-name descname"><span class="pre">color_r</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.color_r" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.color_g">
+<span class="sig-name descname"><span class="pre">color_g</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.color_g" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.color_b">
+<span class="sig-name descname"><span class="pre">color_b</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.color_b" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.color_a">
+<span class="sig-name descname"><span class="pre">color_a</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">255</span></em><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.color_a" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.position">
+<span class="sig-name descname"><span class="pre">position</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(0.0,</span> <span class="pre">0.0)</span></em><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.position" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.bounding_rect">
+<span class="sig-name descname"><span class="pre">bounding_rect</span></span><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.bounding_rect" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.text_rect">
+<span class="sig-name descname"><span class="pre">text_rect</span></span><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.text_rect" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.line_rects">
+<span class="sig-name descname"><span class="pre">line_rects</span></span><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.line_rects" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.alignment">
+<span class="sig-name descname"><span class="pre">alignment</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.alignment" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.rotation">
+<span class="sig-name descname"><span class="pre">rotation</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.rotation" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.scale">
+<span class="sig-name descname"><span class="pre">scale</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.scale" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.opacity">
+<span class="sig-name descname"><span class="pre">opacity</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.opacity" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.timestamp">
+<span class="sig-name descname"><span class="pre">timestamp</span></span><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.timestamp" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.is_valid">
+<span class="sig-name descname"><span class="pre">is_valid</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.is_valid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.to_qfont">
+<span class="sig-name descname"><span class="pre">to_qfont</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/zooui/objects/mediaobjects/mediaobjectsutils/string/textlayout.html#TextLayoutData.to_qfont"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.to_qfont" title="Link to this definition">¶</a></dt>
+<dd><p>Construct a QFont from the stored plain font data.</p>
+<p>Must be called from the main thread. QFont accesses the global
+system font database, which is not thread-safe.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QtGui.QFont configured with the stored family, size, weight and italic.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.to_qcolor">
+<span class="sig-name descname"><span class="pre">to_qcolor</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/zooui/objects/mediaobjects/mediaobjectsutils/string/textlayout.html#TextLayoutData.to_qcolor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.to_qcolor" title="Link to this definition">¶</a></dt>
+<dd><p>Construct a QColor from the stored RGBA values.</p>
+<p>Safe to call from any thread, but typically called from the main
+thread during rendering.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QtGui.QColor with the stored red, green, blue and alpha.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.from_string_object">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_string_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">viewport_rect</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/zooui/objects/mediaobjects/mediaobjectsutils/string/textlayout.html#TextLayoutData.from_string_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.from_string_object" title="Link to this definition">¶</a></dt>
+<dd><p>Create TextLayoutData from a StringMediaObject.</p>
+<p>Thread-safe: extracts plain data from the string object without
+constructing Qt GUI objects. All Qt object construction is deferred
+to render() (main thread).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>string_obj</strong> – StringMediaObject instance</p></li>
+<li><p><strong>viewport_rect</strong> – Current viewport rectangle in scene coordinates</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>TextLayoutData instance with pre-calculated layout</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.distance_to_viewport_center">
+<span class="sig-name descname"><span class="pre">distance_to_viewport_center</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">viewport_center</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/zooui/objects/mediaobjects/mediaobjectsutils/string/textlayout.html#TextLayoutData.distance_to_viewport_center"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.distance_to_viewport_center" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate distance from text position to viewport center.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>viewport_center</strong> – (x, y) tuple of viewport center</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Euclidean distance</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.is_in_viewport">
+<span class="sig-name descname"><span class="pre">is_in_viewport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">viewport_rect</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/zooui/objects/mediaobjects/mediaobjectsutils/string/textlayout.html#TextLayoutData.is_in_viewport"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.is_in_viewport" title="Link to this definition">¶</a></dt>
+<dd><p>Check if this text is visible in the current viewport.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>viewport_rect</strong> – Current viewport rectangle</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if text is visible, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.render">
+<span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">painter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/zooui/objects/mediaobjects/mediaobjectsutils/string/textlayout.html#TextLayoutData.render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.render" title="Link to this definition">¶</a></dt>
+<dd><p>Render the text using the pre-calculated layout.</p>
+<p>Constructs QFont and QColor on the calling thread (must be the main
+thread for QFont). Uses to_qfont() and to_qcolor() internally.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>painter</strong> – QPainter object to render with</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.invalidate">
+<span class="sig-name descname"><span class="pre">invalidate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/zooui/objects/mediaobjects/mediaobjectsutils/string/textlayout.html#TextLayoutData.invalidate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.invalidate" title="Link to this definition">¶</a></dt>
+<dd><p>Mark this layout data as invalid (e.g., after font change).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.is_stale">
+<span class="sig-name descname"><span class="pre">is_stale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_age_ms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/zooui/objects/mediaobjects/mediaobjectsutils/string/textlayout.html#TextLayoutData.is_stale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.string.textlayout.TextLayoutData.is_stale" title="Link to this definition">¶</a></dt>
+<dd><p>Check if this layout data is stale and should be recalculated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>max_age_ms</strong> – Maximum age in milliseconds before considered stale</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if stale, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><span class="xref std std-doc">zooui/objects/mediaobjects/stringmediaobject</span> - StringMediaObject class</p></li>
+<li><p><span class="xref std std-doc">zooui/objects/mediaobjects/mediaobjectsutils/string/parallellayout</span> - Parallel layout management</p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../../index.html">ZooUI</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../gettingstarted/installation.html">ZooUI installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../usageinstructions/userinterface.html">User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../usageinstructions/svgfeatures.html">SVG Features</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/configsystem.html">Configuration System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/objectsystem.html">Object System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/windowsystem.html">Window System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../technicaldocumentation/backup.html">Backup System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../testingdocumentation/unittest.html">Unit Testing Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../testingdocumentation/integrationtest.html">Integration Testing Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../benchmarksdocumentation/qzuibenchmark.html">QZUI Benchmark Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../benchmarksdocumentation/converterbenchmark.html">Converter Benchmark Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributionguidelines/codestyle.html">Code Style Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../zooui.html">zooui package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../backup.html">backup package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../converters.html">converters package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../objects.html">objects package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../tilesystem.html">tilesystem package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../windows.html">windows package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../config.html">zooui.config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../logger.html">zooui.logger module</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../../zooui.html">zooui package</a><ul>
+  <li><a href="../../../../objects.html">objects package</a><ul>
+      <li>Previous: <a href="parallellayout.html" title="previous chapter">zooui.objects.mediaobjects.mediaobjectsutils.string.parallellayout module</a></li>
+      <li>Next: <a href="../../../objectsutils/zoommanager.html" title="next chapter">zooui.objects.objectsutils.zoom.zoommanager module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, David Roberts, Andrea Silvestri.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../../../../../_sources/zooui/objects/mediaobjects/mediaobjectsutils/string/textlayout.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

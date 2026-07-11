@@ -1,7 +1,7 @@
-PyZui installation instructions
+ZooUI installation instructions
 ===============================
 
-This PyZUI fork was developed with debian 13 "trixie" as d.e and a miniconda for 
+This ZooUI fork was developed with debian 13 "trixie" as d.e and a miniconda for 
 dependencies management. It has also been tested on AArch64 and Win11, always 
 with a miniconda enviroment managing all dependencies.
 
@@ -11,7 +11,7 @@ https://github.com/davidar/pyzui
 Dependencies
 ============
 
-PyZui has been developed with the following python version
+ZooUI has been developed with the following python version
 
 - python=3.12.12
 
@@ -29,7 +29,7 @@ with all the core dependencies installed trough the default Anaconda channel:
 
   conda install "package"="version number"
 
-PyZUI depends on the following Python packages:
+ZooUI depends on the following Python packages:
 
 - pyside6=6.7.2 
 - pillow=12.0.0
@@ -63,10 +63,10 @@ Ubuntu/Debian, AArch64, specific instructions
 
 - Install miniconda and follow the instructions in the DEPENDENCIES section
 
-Running PyZUI
+Running ZooUI
 =============
 
-- PyZUI can be run by activating the enviroment as explained in the DEPENDENCIES 
+- ZooUI can be run by activating the enviroment as explained in the DEPENDENCIES 
   section:
 
   conda activate "enviroment name"
@@ -83,30 +83,30 @@ Windows specific instructions
 -----------------------------
 
 - You have to install Windows subsystem for linux, (wsl), the default linux 
-  distribution should work, nevertheless if you want to be 100% sure th PyZui 
+  distribution should work, nevertheless if you want to be 100% sure th ZooUI 
   have been tested with ubuntu 24.04.
 
 - Once you have wsl installed you need to install miniconda on it, then you can 
   create an enviroment and install all the dependencies as explained in the 
   DEPENDENCIES section.  
 
-Running PyZui (Windows)
+Running ZooUI (Windows)
 -----------------------
 
-- You can then run PyZui by launching your wsl enviroment, navigate to the root 
-  of the pyzui project and run:
+- You can then run ZooUI by launching your wsl enviroment, navigate to the root 
+  of the zooui project and run:
 
   python main.py 
 
 Generating Documentation
 ========================
 
-- Install sphinx on the conda enviroment you have created for the PyZui project.
+- Install sphinx on the conda enviroment you have created for the ZooUI project.
 
  conda activate "enviroment name"
  conda install sphinx
 
-- Once installed sphinx on the PyZui project enviroment go to the project root 
+- Once installed sphinx on the ZooUI project enviroment go to the project root 
   and then: 
   
  ./docs
@@ -128,12 +128,12 @@ Building documentation
 - Be aware, building documentation cause certains docs project configuration 
   files to be wiped, if you just wish to update documentation go to GENERATING 
   DOCUMENTATION  
-- Install sphinx on the conda enviroment you have created for the PyZui project.
+- Install sphinx on the conda enviroment you have created for the ZooUI project.
 
  conda activate "enviroment name"
  conda install sphinx
 
-- Once installed sphinx on the PyZui project enviroment go to "project root"/docs
+- Once installed sphinx on the ZooUI project enviroment go to "project root"/docs
   and run:
 
  sphinx-quickstart
@@ -158,7 +158,7 @@ Building documentation
 - Then navigate to ./docs and run
 
   sphinx-apidoc -e -o source/ ..
-  sphinx-apidoc -e -o source/ ../pyzui
+  sphinx-apidoc -e -o source/ ../zooui
 
 - Then open ./docs/source/conf.py and add
   

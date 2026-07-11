@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Code Style Guidelines &#8212; PyZui 0.5.2 documentation</title>
+    <title>Code Style Guidelines &#8212; ZooUI 0.5.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cc7d0dec" />
@@ -14,7 +14,7 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="pyzui package" href="../pyzui.html" />
+    <link rel="next" title="zooui package" href="../zooui.html" />
     <link rel="prev" title="Contribution Guidelines" href="contributionguidelines.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -36,7 +36,7 @@
   <section id="code-style-guidelines">
 <h1>Code Style Guidelines<a class="headerlink" href="#code-style-guidelines" title="Link to this heading">¶</a></h1>
 <p>This document describes the coding conventions, formatting rules, and quality
-checks that all contributions to the PyZUI codebase must follow.</p>
+checks that all contributions to the ZooUI codebase must follow.</p>
 <section id="code-style">
 <h2>Code Style<a class="headerlink" href="#code-style" title="Link to this heading">¶</a></h2>
 <p>The project follows these code style conventions:</p>
@@ -116,8 +116,8 @@ as a class attribute)</p></li>
 <h2>Formatting Requirements<a class="headerlink" href="#formatting-requirements" title="Link to this heading">¶</a></h2>
 <section id="file-headers">
 <h3>File Headers<a class="headerlink" href="#file-headers" title="Link to this heading">¶</a></h3>
-<p>All source files in <code class="docutils literal notranslate"><span class="pre">./pyzui</span></code> should include the GPL license header:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="c1">## PyZUI - Python Zooming User Interface</span>
+<p>All source files in <code class="docutils literal notranslate"><span class="pre">./zooui</span></code> should include the GPL license header:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="c1">## ZooUI - Python Zooming User Interface</span>
 <span class="c1">## Copyright (C) 2009  David Roberts &lt;d@vidr.cc&gt;</span>
 <span class="c1">##</span>
 <span class="c1">## This program is free software; you can redistribute it and/or</span>
@@ -187,10 +187,10 @@ codebase uses gradual typing (<code class="docutils literal notranslate"><span c
 complete signatures.</p>
 <p><strong>Run the type checker:</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Check all source files</span>
-conda<span class="w"> </span>run<span class="w"> </span>-n<span class="w"> </span>&lt;env-name&gt;<span class="w"> </span>mypy<span class="w"> </span>--explicit-package-bases<span class="w"> </span>--follow-imports<span class="o">=</span>skip<span class="w"> </span>pyzui/
+conda<span class="w"> </span>run<span class="w"> </span>-n<span class="w"> </span>&lt;env-name&gt;<span class="w"> </span>mypy<span class="w"> </span>--explicit-package-bases<span class="w"> </span>--follow-imports<span class="o">=</span>skip<span class="w"> </span>zooui/
 
 <span class="c1"># Check a single file</span>
-conda<span class="w"> </span>run<span class="w"> </span>-n<span class="w"> </span>&lt;env-name&gt;<span class="w"> </span>mypy<span class="w"> </span>pyzui/path/to/file.py
+conda<span class="w"> </span>run<span class="w"> </span>-n<span class="w"> </span>&lt;env-name&gt;<span class="w"> </span>mypy<span class="w"> </span>zooui/path/to/file.py
 </pre></div>
 </div>
 <p><strong>Note</strong>: Mypy is run manually, not in pre-commit. Per-file overrides in
@@ -219,7 +219,7 @@ your local <code class="docutils literal notranslate"><span class="pre">.git</sp
 <section id="coding-conventions">
 <h2>Coding Conventions<a class="headerlink" href="#coding-conventions" title="Link to this heading">¶</a></h2>
 <p>The following coding conventions must be followed for all contributions to the
-<code class="docutils literal notranslate"><span class="pre">./pyzui</span></code> codebase and the <code class="docutils literal notranslate"><span class="pre">./test</span></code> codebase.</p>
+<code class="docutils literal notranslate"><span class="pre">./zooui</span></code> codebase and the <code class="docutils literal notranslate"><span class="pre">./test</span></code> codebase.</p>
 <section id="docstring-format">
 <h3>Docstring Format<a class="headerlink" href="#docstring-format" title="Link to this heading">¶</a></h3>
 <p>All classes, methods, functions, and properties must have docstrings following
@@ -429,7 +429,7 @@ constant with forward references:</p>
 * Self-references within the same class definition</p></li>
 </ul>
 <p><strong>Example from the codebase:</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># File: pyzui/tilesystem/tileproviders/dynamictileprovider.py</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># File: zooui/tilesystem/tileproviders/dynamictileprovider.py</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Any</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">PySide6</span><span class="w"> </span><span class="kn">import</span> <span class="n">QtGui</span>
 
@@ -524,7 +524,7 @@ scenario that triggers the segfault.</p></li>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../index.html">PyZui</a></h1>
+<h1 class="logo"><a href="../index.html">ZooUI</a></h1>
 
 
 
@@ -536,9 +536,9 @@ scenario that triggers the segfault.</p></li>
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html">PyZui installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html">ZooUI installation instructions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#dependencies">Dependencies</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#running-pyzui">Running PyZUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
@@ -579,7 +579,7 @@ scenario that triggers the segfault.</p></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../pyzui.html">pyzui package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zooui.html">zooui package</a></li>
 </ul>
 
 <div class="relations">
@@ -587,7 +587,7 @@ scenario that triggers the segfault.</p></li>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
       <li>Previous: <a href="contributionguidelines.html" title="previous chapter">Contribution Guidelines</a></li>
-      <li>Next: <a href="../pyzui.html" title="next chapter">pyzui package</a></li>
+      <li>Next: <a href="../zooui.html" title="next chapter">zooui package</a></li>
   </ul></li>
 </ul>
 </div>

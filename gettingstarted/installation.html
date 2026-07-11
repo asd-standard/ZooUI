@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>PyZui installation instructions &#8212; PyZui 0.5.2 documentation</title>
+    <title>ZooUI installation instructions &#8212; ZooUI 0.5.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cc7d0dec" />
@@ -15,7 +15,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="User Interface" href="../usageinstructions/userinterface.html" />
-    <link rel="prev" title="Welcome to PyZUI Documentation!" href="../index.html" />
+    <link rel="prev" title="Welcome to ZooUI Documentation!" href="../index.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -33,9 +33,9 @@
 
           <div class="body" role="main">
             
-  <section id="pyzui-installation-instructions">
-<h1>PyZui installation instructions<a class="headerlink" href="#pyzui-installation-instructions" title="Link to this heading">¶</a></h1>
-<p>This PyZUI fork was developed with debian 13 “trixie” as d.e and a miniconda for
+  <section id="zooui-installation-instructions">
+<h1>ZooUI installation instructions<a class="headerlink" href="#zooui-installation-instructions" title="Link to this heading">¶</a></h1>
+<p>This ZooUI fork was developed with debian 13 “trixie” as d.e and a miniconda for
 dependencies management. It has also been tested on AArch64 and Win11, always
 with a miniconda enviroment managing all dependencies.</p>
 <p>This project is a fork, original project can be found at:
@@ -43,7 +43,7 @@ with a miniconda enviroment managing all dependencies.</p>
 </section>
 <section id="dependencies">
 <h1>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading">¶</a></h1>
-<p>PyZui has been developed with the following python version</p>
+<p>ZooUI has been developed with the following python version</p>
 <ul class="simple">
 <li><p>python=3.12.12</p></li>
 </ul>
@@ -61,7 +61,7 @@ enviroment:</p>
 <blockquote>
 <div><p>conda install “package”=”version number”</p>
 </div></blockquote>
-<p>PyZUI depends on the following Python packages:</p>
+<p>ZooUI depends on the following Python packages:</p>
 <ul class="simple">
 <li><p>pyside6=6.7.2</p></li>
 <li><p>pillow=12.0.0</p></li>
@@ -96,10 +96,10 @@ using Wayland as display server you can also install:</p>
 </ul>
 </section>
 </section>
-<section id="running-pyzui">
-<h1>Running PyZUI<a class="headerlink" href="#running-pyzui" title="Link to this heading">¶</a></h1>
+<section id="running-zooui">
+<h1>Running ZooUI<a class="headerlink" href="#running-zooui" title="Link to this heading">¶</a></h1>
 <ul>
-<li><p>PyZUI can be run by activating the enviroment as explained in the DEPENDENCIES
+<li><p>ZooUI can be run by activating the enviroment as explained in the DEPENDENCIES
 section:</p>
 <p>conda activate “enviroment name”</p>
 </li>
@@ -114,18 +114,18 @@ working directory appropriately by itself).</p></li>
 <h2>Windows specific instructions<a class="headerlink" href="#windows-specific-instructions" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>You have to install Windows subsystem for linux, (wsl), the default linux
-distribution should work, nevertheless if you want to be 100% sure th PyZui
+distribution should work, nevertheless if you want to be 100% sure th ZooUI
 have been tested with ubuntu 24.04.</p></li>
 <li><p>Once you have wsl installed you need to install miniconda on it, then you can
 create an enviroment and install all the dependencies as explained in the
 DEPENDENCIES section.</p></li>
 </ul>
 </section>
-<section id="running-pyzui-windows">
-<h2>Running PyZui (Windows)<a class="headerlink" href="#running-pyzui-windows" title="Link to this heading">¶</a></h2>
+<section id="running-zooui-windows">
+<h2>Running ZooUI (Windows)<a class="headerlink" href="#running-zooui-windows" title="Link to this heading">¶</a></h2>
 <ul>
-<li><p>You can then run PyZui by launching your wsl enviroment, navigate to the root
-of the pyzui project and run:</p>
+<li><p>You can then run ZooUI by launching your wsl enviroment, navigate to the root
+of the zooui project and run:</p>
 <p>python main.py</p>
 </li>
 </ul>
@@ -134,14 +134,14 @@ of the pyzui project and run:</p>
 <section id="generating-documentation">
 <h1>Generating Documentation<a class="headerlink" href="#generating-documentation" title="Link to this heading">¶</a></h1>
 <ul class="simple">
-<li><p>Install sphinx on the conda enviroment you have created for the PyZui project.</p></li>
+<li><p>Install sphinx on the conda enviroment you have created for the ZooUI project.</p></li>
 </ul>
 <blockquote>
 <div><p>conda activate “enviroment name”
 conda install sphinx</p>
 </div></blockquote>
 <ul class="simple">
-<li><p>Once installed sphinx on the PyZui project enviroment go to the project root
+<li><p>Once installed sphinx on the ZooUI project enviroment go to the project root
 and then:</p></li>
 </ul>
 <blockquote>
@@ -163,14 +163,14 @@ you might have added. You can visualize documentation by opening</p></li>
 <li><p>Be aware, building documentation cause certains docs project configuration
 files to be wiped, if you just wish to update documentation go to GENERATING
 DOCUMENTATION</p></li>
-<li><p>Install sphinx on the conda enviroment you have created for the PyZui project.</p></li>
+<li><p>Install sphinx on the conda enviroment you have created for the ZooUI project.</p></li>
 </ul>
 <blockquote>
 <div><p>conda activate “enviroment name”
 conda install sphinx</p>
 </div></blockquote>
 <ul class="simple">
-<li><p>Once installed sphinx on the PyZui project enviroment go to “project root”/docs
+<li><p>Once installed sphinx on the ZooUI project enviroment go to “project root”/docs
 and run:</p></li>
 </ul>
 <blockquote>
@@ -196,7 +196,7 @@ Separate source and build dirs: usually Yes</p>
 </li>
 <li><p>Then navigate to ./docs and run</p>
 <p>sphinx-apidoc -e -o source/ ..
-sphinx-apidoc -e -o source/ ../pyzui</p>
+sphinx-apidoc -e -o source/ ../zooui</p>
 </li>
 <li><p>Then open ./docs/source/conf.py and add</p>
 <p>import os
@@ -221,7 +221,7 @@ you might have added. You can visualize documentation by opening ./docs/build/ht
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../index.html">PyZui</a></h1>
+<h1 class="logo"><a href="../index.html">ZooUI</a></h1>
 
 
 
@@ -233,9 +233,9 @@ you might have added. You can visualize documentation by opening ./docs/build/ht
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">PyZui installation instructions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ZooUI installation instructions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#dependencies">Dependencies</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#running-pyzui">Running PyZUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#running-zooui">Running ZooUI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#generating-documentation">Generating Documentation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
@@ -276,14 +276,14 @@ you might have added. You can visualize documentation by opening ./docs/build/ht
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../pyzui.html">pyzui package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zooui.html">zooui package</a></li>
 </ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="../index.html" title="previous chapter">Welcome to PyZUI Documentation!</a></li>
+      <li>Previous: <a href="../index.html" title="previous chapter">Welcome to ZooUI Documentation!</a></li>
       <li>Next: <a href="../usageinstructions/userinterface.html" title="next chapter">User Interface</a></li>
   </ul></li>
 </ul>

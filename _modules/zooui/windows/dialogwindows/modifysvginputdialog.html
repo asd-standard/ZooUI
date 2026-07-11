@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>zooui.windows.dialogwindows.modifysvginputdialog &#8212; ZooUI 0.5.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=cc7d0dec" />
+    <script src="../../../../_static/documentation_options.js?v=8e576371"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for zooui.windows.dialogwindows.modifysvginputdialog</h1><div class="highlight"><pre>
+<span></span><span class="c1">## ZooUI - Zooming User Interface</span>
+<span class="c1">## Copyright (C) 2009 David Roberts &lt;d@vidr.cc&gt;</span>
+<span class="c1">##</span>
+<span class="c1">## This program is free software; you can redistribute it and/or</span>
+<span class="c1">## modify it under the terms of the GNU General Public License</span>
+<span class="c1">## as published by the Free Software Foundation; either version 3</span>
+<span class="c1">## of the License, or (at your option) any later version.</span>
+<span class="c1">##</span>
+<span class="c1">## This program is distributed in the hope that it will be useful,</span>
+<span class="c1">## but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1">## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1">## GNU General Public License for more details.</span>
+<span class="c1">##</span>
+<span class="c1">## You should have received a copy of the GNU General Public License</span>
+<span class="c1">## along with this program; if not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
+
+<span class="sd">&quot;&quot;&quot;SVG modification dialog for changing color and thickness of SVG objects.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xml.etree.ElementTree</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ET</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">deque</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">PySide6</span><span class="w"> </span><span class="kn">import</span> <span class="n">QtCore</span><span class="p">,</span> <span class="n">QtSvg</span><span class="p">,</span> <span class="n">QtWidgets</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PySide6.QtCore</span><span class="w"> </span><span class="kn">import</span> <span class="n">QRectF</span><span class="p">,</span> <span class="n">Qt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PySide6.QtGui</span><span class="w"> </span><span class="kn">import</span> <span class="n">QBrush</span><span class="p">,</span> <span class="n">QColor</span><span class="p">,</span> <span class="n">QKeySequence</span><span class="p">,</span> <span class="n">QPainter</span><span class="p">,</span> <span class="n">QPen</span><span class="p">,</span> <span class="n">QShortcut</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PySide6.QtWidgets</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">QDialog</span><span class="p">,</span>
+    <span class="n">QDialogButtonBox</span><span class="p">,</span>
+    <span class="n">QFrame</span><span class="p">,</span>
+    <span class="n">QGridLayout</span><span class="p">,</span>
+    <span class="n">QHBoxLayout</span><span class="p">,</span>
+    <span class="n">QLabel</span><span class="p">,</span>
+    <span class="n">QLineEdit</span><span class="p">,</span>
+    <span class="n">QMessageBox</span><span class="p">,</span>
+    <span class="n">QPushButton</span><span class="p">,</span>
+    <span class="n">QScrollArea</span><span class="p">,</span>
+    <span class="n">QSizePolicy</span><span class="p">,</span>
+    <span class="n">QVBoxLayout</span><span class="p">,</span>
+    <span class="n">QWidget</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">zooui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_svg_cache</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">PySide6.QtGui</span><span class="w"> </span><span class="kn">import</span> <span class="n">QPaintEvent</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">zooui.objects.mediaobjects.svgmediaobject</span><span class="w"> </span><span class="kn">import</span> <span class="n">SVGMediaObject</span>
+
+<span class="c1"># Type aliases</span>
+<span class="n">ColorCode</span> <span class="o">=</span> <span class="nb">str</span>
+<span class="n">DialogResult</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="ModifySVGInputDialog">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifysvginputdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifySVGInputDialog">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModifySVGInputDialog</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Constructor :</span>
+<span class="sd">        ModifySVGInputDialog(svg_media_object)</span>
+<span class="sd">    Parameters :</span>
+<span class="sd">        svg_media_object : SVGMediaObject</span>
+
+<span class="sd">    ModifySVGInputDialog(svg_media_object) --&gt; None</span>
+
+<span class="sd">    Dialog for modifying color and thickness of existing SVG objects.</span>
+<span class="sd">    Designed for simple shapes (arrows, triangles, circles, squares)</span>
+<span class="sd">    that were added via svgpickerinputdialog.py.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Default values for non-cache files</span>
+    <span class="n">DEFAULT_COLOR</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;000000&quot;</span>  <span class="c1"># Black</span>
+    <span class="n">DEFAULT_THICKNESS</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;10&quot;</span>
+
+<div class="viewcode-block" id="ModifySVGInputDialog.__init__">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifysvginputdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifySVGInputDialog.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">svg_media_object</span><span class="p">:</span> <span class="s2">&quot;SVGMediaObject&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor :</span>
+<span class="sd">            ModifySVGInputDialog(svg_media_object)</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            svg_media_object : SVGMediaObject</span>
+
+<span class="sd">        ModifySVGInputDialog(svg_media_object) --&gt; None</span>
+
+<span class="sd">        Initialize dialog for modifying an existing SVG object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">svg_object</span> <span class="o">=</span> <span class="n">svg_media_object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">original_media_id</span> <span class="o">=</span> <span class="n">svg_media_object</span><span class="o">.</span><span class="n">_media_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;ModifySVGInputDialog&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Determine source type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_cache_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_media_id</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;svg_&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_tmp_file</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_cache_file</span><span class="p">:</span>
+            <span class="c1"># Check if file path is in /tmp/zooui_svg_</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_tmp_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_media_id</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;/tmp/zooui_svg_&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Current values (extract from SVG content)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_current_color</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_thickness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_current_thickness</span><span class="p">()</span>
+
+        <span class="c1"># Modification state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modified_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modified_thickness</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preview_applied</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># UI state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shape_color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_color</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_COLOR</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">color_codes</span><span class="p">:</span> <span class="n">deque</span><span class="p">[</span><span class="n">ColorCode</span><span class="p">]</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="mi">24</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">custom_color_input</span><span class="p">:</span> <span class="n">QLineEdit</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thickness_input</span><span class="p">:</span> <span class="n">QLineEdit</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preview_widget</span><span class="p">:</span> <span class="n">QWidget</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># SVG cache</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_svg_cache</span> <span class="o">=</span> <span class="n">get_svg_cache</span><span class="p">()</span>
+
+        <span class="c1"># Load color history</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_color_history</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ModifySVGInputDialog._load_color_history">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifysvginputdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifySVGInputDialog._load_color_history">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_color_history</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load color history from color store file.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;APPDATA&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+            <span class="n">color_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;APPDATA&quot;</span><span class="p">],</span> <span class="s2">&quot;zooui&quot;</span><span class="p">,</span> <span class="s2">&quot;colorstore&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">color_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">),</span> <span class="s2">&quot;.zooui&quot;</span><span class="p">,</span> <span class="s2">&quot;colorstore&quot;</span><span class="p">)</span>
+
+        <span class="n">color_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">color_dir</span><span class="p">,</span> <span class="s2">&quot;color_list.txt&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">color_file</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">color_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">stripline</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">stripline</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span> <span class="ow">and</span> <span class="n">stripline</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">color_codes</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">color_codes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stripline</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Create default colors if file doesn&#39;t exist</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">color_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">color_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">color</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;ffffff&quot;</span><span class="p">,</span> <span class="s2">&quot;ff0000&quot;</span><span class="p">,</span> <span class="s2">&quot;00ff00&quot;</span><span class="p">,</span> <span class="s2">&quot;0000ff&quot;</span><span class="p">]:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">color_codes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">color</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ModifySVGInputDialog._validate_svg_source">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifysvginputdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifySVGInputDialog._validate_svg_source">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_svg_source</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if SVG is from safe source (``/tmp/zooui_svg_``).</span>
+<span class="sd">        Show warning dialog for other sources.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if safe or user confirms, False if user cancels</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_cache_file</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_tmp_file</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>  <span class="c1"># Safe cache file</span>
+
+        <span class="c1"># Show warning for non-cache files</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_show_source_warning_dialog</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ModifySVGInputDialog._show_source_warning_dialog">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifysvginputdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifySVGInputDialog._show_source_warning_dialog">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_show_source_warning_dialog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Warning: This SVG was not added via SVG Picker dialog.</span>
+<span class="sd">        The modify dialog is designed for simple shapes from data/SVG/.</span>
+
+<span class="sd">        Default values will be used: color=black, stroke-width=10</span>
+<span class="sd">        Continue anyway?</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dialog</span> <span class="o">=</span> <span class="n">QMessageBox</span><span class="p">()</span>
+        <span class="n">dialog</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s2">&quot;ZooUI - Warning&quot;</span><span class="p">)</span>
+        <span class="n">dialog</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;SVG Source Warning&quot;</span><span class="p">)</span>
+        <span class="n">dialog</span><span class="o">.</span><span class="n">setInformativeText</span><span class="p">(</span>
+            <span class="s2">&quot;This SVG was not added via the SVG Picker dialog.</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;The modify dialog is designed for simple shapes (arrows, triangles, circles, squares).</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;Default values will be used: color=black, stroke-width=10</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;Continue anyway?&quot;</span>
+        <span class="p">)</span>
+        <span class="n">dialog</span><span class="o">.</span><span class="n">setIcon</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">Warning</span><span class="p">)</span>
+        <span class="n">dialog</span><span class="o">.</span><span class="n">setStandardButtons</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">Yes</span> <span class="o">|</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">No</span><span class="p">)</span>
+        <span class="n">dialog</span><span class="o">.</span><span class="n">setDefaultButton</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">No</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">dialog</span><span class="o">.</span><span class="n">exec</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">Yes</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ModifySVGInputDialog._color_name_to_hex">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifysvginputdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifySVGInputDialog._color_name_to_hex">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_color_name_to_hex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert color name to hex code.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            color_name: Color name (e.g., &#39;black&#39;, &#39;red&#39;) or hex code</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Hex color without # (e.g., &#39;000000&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># If it&#39;s already hex, return it</span>
+        <span class="k">if</span> <span class="n">color_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">color_name</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+        <span class="c1"># Try to convert color name using QColor</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="n">QColor</span><span class="p">(</span><span class="n">color_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">color</span><span class="o">.</span><span class="n">isValid</span><span class="p">():</span>
+                <span class="c1"># Convert to hex without #</span>
+                <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">color</span><span class="o">.</span><span class="n">name</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="c1"># Default to black if conversion fails</span>
+        <span class="k">return</span> <span class="s2">&quot;000000&quot;</span></div>
+
+
+<div class="viewcode-block" id="ModifySVGInputDialog._extract_current_color">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifysvginputdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifySVGInputDialog._extract_current_color">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_extract_current_color</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract color from SVG content.</span>
+<span class="sd">        For simple shapes, look for stroke or fill attributes.</span>
+<span class="sd">        Returns hex color without # (e.g., &#39;000000&#39; for black).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">svg_object</span><span class="o">.</span><span class="n">get_svg_content</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">content</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Parse XML</span>
+            <span class="n">root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+
+            <span class="c1"># Define namespace</span>
+            <span class="n">ns</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;svg&quot;</span><span class="p">:</span> <span class="s2">&quot;http://www.w3.org/2000/svg&quot;</span><span class="p">}</span>
+
+            <span class="c1"># Look for stroke or fill attributes in shape elements</span>
+            <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">,</span> <span class="s2">&quot;rect&quot;</span><span class="p">,</span> <span class="s2">&quot;circle&quot;</span><span class="p">,</span> <span class="s2">&quot;ellipse&quot;</span><span class="p">,</span> <span class="s2">&quot;line&quot;</span><span class="p">,</span> <span class="s2">&quot;polyline&quot;</span><span class="p">,</span> <span class="s2">&quot;polygon&quot;</span><span class="p">]:</span>
+                <span class="n">elements</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;.//svg:</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ns</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">elements</span><span class="p">:</span>
+                    <span class="c1"># Check stroke first</span>
+                    <span class="n">stroke</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stroke&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">stroke</span> <span class="ow">and</span> <span class="n">stroke</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;transparent&quot;</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_color_name_to_hex</span><span class="p">(</span><span class="n">stroke</span><span class="p">)</span>
+
+                    <span class="c1"># Check fill</span>
+                    <span class="n">fill</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fill&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">fill</span> <span class="ow">and</span> <span class="n">fill</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;transparent&quot;</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_color_name_to_hex</span><span class="p">(</span><span class="n">fill</span><span class="p">)</span>
+
+            <span class="c1"># Also check root element</span>
+            <span class="n">stroke</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stroke&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">stroke</span> <span class="ow">and</span> <span class="n">stroke</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;transparent&quot;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_color_name_to_hex</span><span class="p">(</span><span class="n">stroke</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error extracting color from SVG: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="ModifySVGInputDialog._extract_current_thickness">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifysvginputdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifySVGInputDialog._extract_current_thickness">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_extract_current_thickness</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract stroke-width from SVG content.</span>
+<span class="sd">        Returns string value (e.g., &#39;8&#39;).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">svg_object</span><span class="o">.</span><span class="n">get_svg_content</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">content</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Parse XML</span>
+            <span class="n">root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+
+            <span class="c1"># Define namespace</span>
+            <span class="n">ns</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;svg&quot;</span><span class="p">:</span> <span class="s2">&quot;http://www.w3.org/2000/svg&quot;</span><span class="p">}</span>
+
+            <span class="c1"># Look for stroke-width in shape elements</span>
+            <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">,</span> <span class="s2">&quot;rect&quot;</span><span class="p">,</span> <span class="s2">&quot;circle&quot;</span><span class="p">,</span> <span class="s2">&quot;ellipse&quot;</span><span class="p">,</span> <span class="s2">&quot;line&quot;</span><span class="p">,</span> <span class="s2">&quot;polyline&quot;</span><span class="p">,</span> <span class="s2">&quot;polygon&quot;</span><span class="p">]:</span>
+                <span class="n">elements</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;.//svg:</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ns</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">elements</span><span class="p">:</span>
+                    <span class="n">stroke_width</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stroke-width&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">stroke_width</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">stroke_width</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error extracting thickness from SVG: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="ModifySVGInputDialog._color_square">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifysvginputdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifySVGInputDialog._color_square">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_color_square</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color_code</span><span class="p">:</span> <span class="n">ColorCode</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QWidget</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a colored square widget.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">color_square</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="n">QColor</span><span class="p">(</span><span class="s2">&quot;#&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">color_code</span><span class="p">))</span>
+        <span class="n">color_square</span><span class="o">.</span><span class="n">setFixedSize</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">paintEvent</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="s2">&quot;QPaintEvent&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">painter</span> <span class="o">=</span> <span class="n">QPainter</span><span class="p">(</span><span class="n">color_square</span><span class="p">)</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">fillRect</span><span class="p">(</span><span class="n">color_square</span><span class="o">.</span><span class="n">rect</span><span class="p">(),</span> <span class="n">color</span><span class="p">)</span>
+            <span class="c1"># Explicit .end() required: an unended QPainter corrupts</span>
+            <span class="c1"># Qt&#39;s C++ paint engine, ultimately causing SIGSEGV.</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
+        <span class="n">color_square</span><span class="o">.</span><span class="n">paintEvent</span> <span class="o">=</span> <span class="n">paintEvent</span>
+
+        <span class="k">return</span> <span class="n">color_square</span></div>
+
+
+<div class="viewcode-block" id="ModifySVGInputDialog._color_button_click">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifysvginputdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifySVGInputDialog._color_button_click">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_color_button_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color</span><span class="p">:</span> <span class="n">ColorCode</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle color button click event.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shape_color</span> <span class="o">=</span> <span class="n">color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modified_color</span> <span class="o">=</span> <span class="n">color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_preview</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ModifySVGInputDialog._color_button">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifysvginputdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifySVGInputDialog._color_button">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_color_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color_code</span><span class="p">:</span> <span class="n">ColorCode</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QWidget</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a color selection button.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">color_widget</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">setSpacing</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+
+        <span class="n">color_square</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_color_square</span><span class="p">(</span><span class="n">color_code</span><span class="p">)</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="n">color_code</span><span class="p">)</span>
+
+        <span class="c1"># Create a QPushButton but use a QWidget wrapper to hold square + label</span>
+        <span class="n">button</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">()</span>
+        <span class="n">button</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+        <span class="n">button</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Policy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Policy</span><span class="o">.</span><span class="n">Fixed</span><span class="p">)</span>
+
+        <span class="c1"># Add widget and label to the layout inside the button</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">color_square</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+
+        <span class="c1"># Make the whole widget act like a button by forwarding clicks</span>
+        <span class="n">button</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_color_button_click</span><span class="p">(</span><span class="n">color_code</span><span class="p">))</span>
+
+        <span class="c1"># Our main layout for this widget is the button only</span>
+        <span class="n">main_layout</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">(</span><span class="n">color_widget</span><span class="p">)</span>
+        <span class="n">main_layout</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">main_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">button</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">color_widget</span></div>
+
+
+<div class="viewcode-block" id="ModifySVGInputDialog._svg_preview_widget">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifysvginputdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifySVGInputDialog._svg_preview_widget">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_svg_preview_widget</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QWidget</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create widget showing the SVG preview (300x300).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">widget</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="n">widget</span><span class="o">.</span><span class="n">setFixedSize</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">300</span><span class="p">)</span>
+
+        <span class="c1"># Create a custom paint event</span>
+        <span class="c1">#</span>
+        <span class="c1"># NOTE: QPainter MUST be explicitly ended via .end() at every</span>
+        <span class="c1"># exit point.  An unended painter left on its paint device</span>
+        <span class="c1"># corrupts Qt&#39;s C++ paint engine, causing SIGSEGV crashes</span>
+        <span class="c1"># after extended runtime (e.g. hours/days of use).</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">paintEvent</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="s2">&quot;QPaintEvent&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">painter</span> <span class="o">=</span> <span class="n">QPainter</span><span class="p">(</span><span class="n">widget</span><span class="p">)</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">setRenderHint</span><span class="p">(</span><span class="n">QPainter</span><span class="o">.</span><span class="n">RenderHint</span><span class="o">.</span><span class="n">Antialiasing</span><span class="p">)</span>
+
+            <span class="c1"># Clear background with light gray</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">fillRect</span><span class="p">(</span><span class="n">widget</span><span class="o">.</span><span class="n">rect</span><span class="p">(),</span> <span class="n">QColor</span><span class="p">(</span><span class="s2">&quot;#c0c0c0&quot;</span><span class="p">))</span>
+
+            <span class="c1"># Draw border</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QPen</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="s2">&quot;#cccccc&quot;</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">BrushStyle</span><span class="o">.</span><span class="n">NoBrush</span><span class="p">)</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">drawRect</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">296</span><span class="p">,</span> <span class="mi">296</span><span class="p">)</span>
+
+            <span class="c1"># Get SVG content to render</span>
+            <span class="n">svg_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_current_svg_content</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">svg_content</span><span class="p">:</span>
+                <span class="c1"># Draw placeholder</span>
+                <span class="n">painter</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QPen</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="s2">&quot;#ff0000&quot;</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span>
+                <span class="n">painter</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">QBrush</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="s2">&quot;#ffcccc&quot;</span><span class="p">)))</span>
+                <span class="n">painter</span><span class="o">.</span><span class="n">drawRect</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+                <span class="n">painter</span><span class="o">.</span><span class="n">drawText</span><span class="p">(</span><span class="n">QRectF</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span> <span class="n">Qt</span><span class="o">.</span><span class="n">AlignmentFlag</span><span class="o">.</span><span class="n">AlignCenter</span><span class="p">,</span> <span class="s2">&quot;No SVG content&quot;</span><span class="p">)</span>
+                <span class="n">painter</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+                <span class="k">return</span>
+
+            <span class="c1"># Create temporary renderer</span>
+            <span class="n">renderer</span> <span class="o">=</span> <span class="n">QtSvg</span><span class="o">.</span><span class="n">QSvgRenderer</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">renderer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QByteArray</span><span class="p">(</span><span class="n">svg_content</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))):</span>
+                <span class="c1"># Draw error placeholder</span>
+                <span class="n">painter</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QPen</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="s2">&quot;#ff0000&quot;</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span>
+                <span class="n">painter</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">QBrush</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="s2">&quot;#ffcccc&quot;</span><span class="p">)))</span>
+                <span class="n">painter</span><span class="o">.</span><span class="n">drawRect</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+                <span class="n">painter</span><span class="o">.</span><span class="n">drawText</span><span class="p">(</span><span class="n">QRectF</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span> <span class="n">Qt</span><span class="o">.</span><span class="n">AlignmentFlag</span><span class="o">.</span><span class="n">AlignCenter</span><span class="p">,</span> <span class="s2">&quot;Invalid SVG&quot;</span><span class="p">)</span>
+                <span class="n">painter</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+                <span class="k">return</span>
+
+            <span class="c1"># Calculate scaling to fit within 280x280 area (with 10px margin)</span>
+            <span class="n">svg_size</span> <span class="o">=</span> <span class="n">renderer</span><span class="o">.</span><span class="n">defaultSize</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">svg_size</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">svg_size</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">target_size</span> <span class="o">=</span> <span class="mi">280</span>
+                <span class="n">scale</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">target_size</span> <span class="o">/</span> <span class="n">svg_size</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="n">target_size</span> <span class="o">/</span> <span class="n">svg_size</span><span class="o">.</span><span class="n">height</span><span class="p">())</span>
+                <span class="n">scaled_width</span> <span class="o">=</span> <span class="n">svg_size</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">*</span> <span class="n">scale</span>
+                <span class="n">scaled_height</span> <span class="o">=</span> <span class="n">svg_size</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">*</span> <span class="n">scale</span>
+                <span class="n">x_offset</span> <span class="o">=</span> <span class="p">(</span><span class="mi">300</span> <span class="o">-</span> <span class="n">scaled_width</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+                <span class="n">y_offset</span> <span class="o">=</span> <span class="p">(</span><span class="mi">300</span> <span class="o">-</span> <span class="n">scaled_height</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+
+                <span class="c1"># Render the SVG</span>
+                <span class="n">renderer</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">painter</span><span class="p">,</span> <span class="n">QRectF</span><span class="p">(</span><span class="n">x_offset</span><span class="p">,</span> <span class="n">y_offset</span><span class="p">,</span> <span class="n">scaled_width</span><span class="p">,</span> <span class="n">scaled_height</span><span class="p">))</span>
+
+            <span class="c1"># Required at every exit path (see note at top of paintEvent)</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
+        <span class="n">widget</span><span class="o">.</span><span class="n">paintEvent</span> <span class="o">=</span> <span class="n">paintEvent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preview_widget</span> <span class="o">=</span> <span class="n">widget</span>
+        <span class="k">return</span> <span class="n">widget</span></div>
+
+
+<div class="viewcode-block" id="ModifySVGInputDialog._get_current_svg_content">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifysvginputdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifySVGInputDialog._get_current_svg_content">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_current_svg_content</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get current SVG content with modifications applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get original content</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">svg_object</span><span class="o">.</span><span class="n">get_svg_content</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">content</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># Apply modifications if any</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">modified_color</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_color</span>
+        <span class="n">thickness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">modified_thickness</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">preview_applied</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_thickness</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">color</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">thickness</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">content</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Parse XML</span>
+            <span class="n">root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+
+            <span class="c1"># Define namespace</span>
+            <span class="n">ns</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;svg&quot;</span><span class="p">:</span> <span class="s2">&quot;http://www.w3.org/2000/svg&quot;</span><span class="p">}</span>
+
+            <span class="c1"># Find all shape elements</span>
+            <span class="n">elements</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">,</span> <span class="s2">&quot;rect&quot;</span><span class="p">,</span> <span class="s2">&quot;circle&quot;</span><span class="p">,</span> <span class="s2">&quot;ellipse&quot;</span><span class="p">,</span> <span class="s2">&quot;line&quot;</span><span class="p">,</span> <span class="s2">&quot;polyline&quot;</span><span class="p">,</span> <span class="s2">&quot;polygon&quot;</span><span class="p">,</span> <span class="s2">&quot;g&quot;</span><span class="p">]:</span>
+                <span class="n">elements</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;.//svg:</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ns</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[])</span>
+
+            <span class="c1"># Also include root element for color</span>
+            <span class="n">elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">elements</span><span class="p">:</span>
+                <span class="c1"># Apply color if specified</span>
+                <span class="k">if</span> <span class="n">color</span><span class="p">:</span>
+                    <span class="n">color_hex</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;#</span><span class="si">{</span><span class="n">color</span><span class="si">}</span><span class="s2">&quot;</span>
+
+                    <span class="c1"># Update stroke attribute</span>
+                    <span class="n">stroke</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stroke&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">stroke</span> <span class="ow">and</span> <span class="n">stroke</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;transparent&quot;</span><span class="p">):</span>
+                        <span class="n">elem</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;stroke&quot;</span><span class="p">,</span> <span class="n">color_hex</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="s2">&quot;stroke&quot;</span> <span class="ow">in</span> <span class="n">elem</span><span class="o">.</span><span class="n">attrib</span> <span class="ow">and</span> <span class="n">elem</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stroke&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
+                        <span class="k">pass</span>  <span class="c1"># Keep as &quot;none&quot;</span>
+                    <span class="k">elif</span> <span class="p">(</span>
+                        <span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">)</span>
+                        <span class="ow">or</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;rect&quot;</span><span class="p">)</span>
+                        <span class="ow">or</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;circle&quot;</span><span class="p">)</span>
+                        <span class="ow">or</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;ellipse&quot;</span><span class="p">)</span>
+                        <span class="ow">or</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;line&quot;</span><span class="p">)</span>
+                        <span class="ow">or</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;polyline&quot;</span><span class="p">)</span>
+                        <span class="ow">or</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;polygon&quot;</span><span class="p">)</span>
+                    <span class="p">):</span>
+                        <span class="n">elem</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;stroke&quot;</span><span class="p">,</span> <span class="n">color_hex</span><span class="p">)</span>
+
+                    <span class="c1"># Update fill attribute</span>
+                    <span class="n">fill</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fill&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">fill</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">fill</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;transparent&quot;</span><span class="p">):</span>
+                        <span class="n">elem</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;fill&quot;</span><span class="p">,</span> <span class="n">color_hex</span><span class="p">)</span>
+
+                <span class="c1"># Apply thickness if specified and preview is applied</span>
+                <span class="k">if</span> <span class="n">thickness</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">preview_applied</span> <span class="ow">and</span> <span class="n">elem</span> <span class="o">!=</span> <span class="n">root</span><span class="p">:</span>
+                    <span class="n">elem</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;stroke-width&quot;</span><span class="p">,</span> <span class="n">thickness</span><span class="p">)</span>
+
+            <span class="c1"># Convert back to string</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">ET</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error modifying SVG content: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">content</span></div>
+
+
+<div class="viewcode-block" id="ModifySVGInputDialog._update_preview">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifysvginputdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifySVGInputDialog._update_preview">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_preview</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the preview widget.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">preview_widget</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">preview_widget</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ModifySVGInputDialog._apply_preview">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifysvginputdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifySVGInputDialog._apply_preview">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_preview</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply thickness changes to preview.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">thickness_input</span><span class="p">:</span>
+            <span class="n">thickness_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">thickness_input</span><span class="o">.</span><span class="n">text</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">thickness_text</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">thickness</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">thickness_text</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">thickness</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">modified_thickness</span> <span class="o">=</span> <span class="n">thickness_text</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">preview_applied</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_update_preview</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="k">pass</span>  <span class="c1"># Invalid thickness</span></div>
+
+
+<div class="viewcode-block" id="ModifySVGInputDialog._reset_to_original">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifysvginputdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifySVGInputDialog._reset_to_original">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reset_to_original</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset to original values.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modified_color</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modified_thickness</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preview_applied</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shape_color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_color</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_COLOR</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">thickness_input</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">thickness_input</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_thickness</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_THICKNESS</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_preview</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ModifySVGInputDialog._modify_svg_file">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifysvginputdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifySVGInputDialog._modify_svg_file">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_modify_svg_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">thickness</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create modified SVG in cache.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Cache hash of modified SVG</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get SVG content</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">svg_object</span><span class="o">.</span><span class="n">get_svg_content</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">content</span><span class="p">:</span>
+            <span class="c1"># Fallback: create simple SVG</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="s1">&#39;&lt;svg width=&quot;200&quot; height=&quot;200&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;&gt;&lt;circle cx=&quot;100&quot; cy=&quot;100&quot; r=&quot;70&quot; stroke=&quot;black&quot; stroke-width=&quot;8&quot; fill=&quot;none&quot;/&gt;&lt;/svg&gt;&#39;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Parse XML</span>
+            <span class="n">root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+
+            <span class="c1"># Define namespace</span>
+            <span class="n">ns</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;svg&quot;</span><span class="p">:</span> <span class="s2">&quot;http://www.w3.org/2000/svg&quot;</span><span class="p">}</span>
+
+            <span class="c1"># Find all shape elements</span>
+            <span class="n">elements</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">,</span> <span class="s2">&quot;rect&quot;</span><span class="p">,</span> <span class="s2">&quot;circle&quot;</span><span class="p">,</span> <span class="s2">&quot;ellipse&quot;</span><span class="p">,</span> <span class="s2">&quot;line&quot;</span><span class="p">,</span> <span class="s2">&quot;polyline&quot;</span><span class="p">,</span> <span class="s2">&quot;polygon&quot;</span><span class="p">,</span> <span class="s2">&quot;g&quot;</span><span class="p">]:</span>
+                <span class="n">elements</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;.//svg:</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ns</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[])</span>
+
+            <span class="c1"># Also include root element for color</span>
+            <span class="n">elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">elements</span><span class="p">:</span>
+                <span class="c1"># Apply color if specified</span>
+                <span class="k">if</span> <span class="n">color</span><span class="p">:</span>
+                    <span class="n">color_hex</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;#</span><span class="si">{</span><span class="n">color</span><span class="si">}</span><span class="s2">&quot;</span>
+
+                    <span class="c1"># Update stroke attribute</span>
+                    <span class="n">stroke</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stroke&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">stroke</span> <span class="ow">and</span> <span class="n">stroke</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;transparent&quot;</span><span class="p">):</span>
+                        <span class="n">elem</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;stroke&quot;</span><span class="p">,</span> <span class="n">color_hex</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="s2">&quot;stroke&quot;</span> <span class="ow">in</span> <span class="n">elem</span><span class="o">.</span><span class="n">attrib</span> <span class="ow">and</span> <span class="n">elem</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stroke&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
+                        <span class="k">pass</span>  <span class="c1"># Keep as &quot;none&quot;</span>
+                    <span class="k">elif</span> <span class="p">(</span>
+                        <span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">)</span>
+                        <span class="ow">or</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;rect&quot;</span><span class="p">)</span>
+                        <span class="ow">or</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;circle&quot;</span><span class="p">)</span>
+                        <span class="ow">or</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;ellipse&quot;</span><span class="p">)</span>
+                        <span class="ow">or</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;line&quot;</span><span class="p">)</span>
+                        <span class="ow">or</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;polyline&quot;</span><span class="p">)</span>
+                        <span class="ow">or</span> <span class="n">elem</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;polygon&quot;</span><span class="p">)</span>
+                    <span class="p">):</span>
+                        <span class="n">elem</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;stroke&quot;</span><span class="p">,</span> <span class="n">color_hex</span><span class="p">)</span>
+
+                    <span class="c1"># Update fill attribute</span>
+                    <span class="n">fill</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fill&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">fill</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">fill</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;transparent&quot;</span><span class="p">):</span>
+                        <span class="n">elem</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;fill&quot;</span><span class="p">,</span> <span class="n">color_hex</span><span class="p">)</span>
+
+                <span class="c1"># Apply thickness if specified</span>
+                <span class="k">if</span> <span class="n">thickness</span> <span class="ow">and</span> <span class="n">elem</span> <span class="o">!=</span> <span class="n">root</span><span class="p">:</span>
+                    <span class="n">elem</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;stroke-width&quot;</span><span class="p">,</span> <span class="n">thickness</span><span class="p">)</span>
+
+            <span class="c1"># Convert back to string and store in cache</span>
+            <span class="n">svg_content</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+            <span class="n">cache_hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_svg_cache</span><span class="o">.</span><span class="n">store_svg</span><span class="p">(</span><span class="n">svg_content</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">cache_hash</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error creating modified SVG: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+            <span class="c1"># Fallback: store original content in cache</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_svg_cache</span><span class="o">.</span><span class="n">store_svg</span><span class="p">(</span><span class="n">content</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ModifySVGInputDialog._main_dialog">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifysvginputdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifySVGInputDialog._main_dialog">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_main_dialog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QDialog</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create and configure the main dialog window.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dialog</span> <span class="o">=</span> <span class="n">QDialog</span><span class="p">()</span>
+        <span class="n">dialog</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s2">&quot;Modify SVG&quot;</span><span class="p">)</span>
+        <span class="n">dialog</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">600</span><span class="p">)</span>
+
+        <span class="c1"># Create main layout</span>
+        <span class="n">main_layout</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">(</span><span class="n">dialog</span><span class="p">)</span>
+
+        <span class="c1"># Left side: SVG preview</span>
+        <span class="n">left_layout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="n">left_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;SVG Preview:&quot;</span><span class="p">))</span>
+
+        <span class="n">preview_widget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_svg_preview_widget</span><span class="p">()</span>
+        <span class="n">left_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">preview_widget</span><span class="p">)</span>
+        <span class="n">left_layout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+
+        <span class="c1"># Right side: controls</span>
+        <span class="n">right_layout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="n">right_layout</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Color history</span>
+        <span class="n">right_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Color History:&quot;</span><span class="p">))</span>
+
+        <span class="n">color_scroll</span> <span class="o">=</span> <span class="n">QScrollArea</span><span class="p">()</span>
+        <span class="n">color_scroll</span><span class="o">.</span><span class="n">setWidgetResizable</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">color_scroll</span><span class="o">.</span><span class="n">setHorizontalScrollBarPolicy</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">ScrollBarPolicy</span><span class="o">.</span><span class="n">ScrollBarAsNeeded</span><span class="p">)</span>
+        <span class="n">color_scroll</span><span class="o">.</span><span class="n">setVerticalScrollBarPolicy</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">ScrollBarPolicy</span><span class="o">.</span><span class="n">ScrollBarAsNeeded</span><span class="p">)</span>
+        <span class="n">color_scroll</span><span class="o">.</span><span class="n">setFrameShape</span><span class="p">(</span><span class="n">QFrame</span><span class="o">.</span><span class="n">Shape</span><span class="o">.</span><span class="n">NoFrame</span><span class="p">)</span>
+
+        <span class="n">color_container</span> <span class="o">=</span> <span class="n">QWidget</span><span class="p">()</span>
+        <span class="n">color_grid</span> <span class="o">=</span> <span class="n">QGridLayout</span><span class="p">(</span><span class="n">color_container</span><span class="p">)</span>
+        <span class="n">color_grid</span><span class="o">.</span><span class="n">setSpacing</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+        <span class="c1"># Add color buttons in 2 columns</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">code</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">color_codes</span><span class="p">):</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="n">i</span> <span class="o">//</span> <span class="mi">2</span>
+            <span class="n">col</span> <span class="o">=</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span>
+            <span class="n">btn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_color_button</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+            <span class="n">btn</span><span class="o">.</span><span class="n">setFixedWidth</span><span class="p">(</span><span class="mi">140</span><span class="p">)</span>
+            <span class="n">color_grid</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">btn</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span>
+
+        <span class="n">color_scroll</span><span class="o">.</span><span class="n">setWidget</span><span class="p">(</span><span class="n">color_container</span><span class="p">)</span>
+        <span class="n">right_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">color_scroll</span><span class="p">)</span>
+
+        <span class="c1"># Color input</span>
+        <span class="n">right_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Color (hex without #):&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">custom_color_input</span> <span class="o">=</span> <span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">custom_color_input</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape_color</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">custom_color_input</span><span class="o">.</span><span class="n">textChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">text</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_color_button_click</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()))</span>
+        <span class="n">right_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">custom_color_input</span><span class="p">)</span>
+
+        <span class="c1"># Thickness input</span>
+        <span class="n">right_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Stroke Thickness:&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thickness_input</span> <span class="o">=</span> <span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thickness_input</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_thickness</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_THICKNESS</span><span class="p">)</span>
+        <span class="n">right_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thickness_input</span><span class="p">)</span>
+
+        <span class="c1"># Apply/Reset buttons</span>
+        <span class="n">button_layout</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">apply_btn</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;Apply Preview&quot;</span><span class="p">)</span>
+        <span class="n">apply_btn</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_apply_preview</span><span class="p">)</span>
+        <span class="n">button_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">apply_btn</span><span class="p">)</span>
+
+        <span class="n">reset_btn</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;Reset&quot;</span><span class="p">)</span>
+        <span class="n">reset_btn</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reset_to_original</span><span class="p">)</span>
+        <span class="n">button_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">reset_btn</span><span class="p">)</span>
+
+        <span class="n">right_layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">button_layout</span><span class="p">)</span>
+
+        <span class="c1"># OK/Cancel buttons</span>
+        <span class="n">buttons</span> <span class="o">=</span> <span class="n">QDialogButtonBox</span><span class="p">(</span><span class="n">QDialogButtonBox</span><span class="o">.</span><span class="n">StandardButton</span><span class="o">.</span><span class="n">Ok</span> <span class="o">|</span> <span class="n">QDialogButtonBox</span><span class="o">.</span><span class="n">StandardButton</span><span class="o">.</span><span class="n">Cancel</span><span class="p">,</span> <span class="n">dialog</span><span class="p">)</span>
+        <span class="n">buttons</span><span class="o">.</span><span class="n">accepted</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dialog</span><span class="o">.</span><span class="n">accept</span><span class="p">)</span>
+        <span class="n">buttons</span><span class="o">.</span><span class="n">rejected</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dialog</span><span class="o">.</span><span class="n">reject</span><span class="p">)</span>
+        <span class="n">right_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">buttons</span><span class="p">)</span>
+
+        <span class="n">right_layout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+
+        <span class="c1"># Add layouts to main layout</span>
+        <span class="n">main_layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">left_layout</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># 2 parts for preview</span>
+        <span class="n">main_layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">right_layout</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># 1 part for controls</span>
+
+        <span class="n">QShortcut</span><span class="p">(</span><span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+Return&quot;</span><span class="p">),</span> <span class="n">dialog</span><span class="p">,</span> <span class="n">dialog</span><span class="o">.</span><span class="n">accept</span><span class="p">)</span>
+        <span class="n">QShortcut</span><span class="p">(</span><span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+Enter&quot;</span><span class="p">),</span> <span class="n">dialog</span><span class="p">,</span> <span class="n">dialog</span><span class="o">.</span><span class="n">accept</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">dialog</span></div>
+
+
+<div class="viewcode-block" id="ModifySVGInputDialog._run_dialog">
+<a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifysvginputdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifySVGInputDialog._run_dialog">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_run_dialog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DialogResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the dialog and return result.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (ok, cache_hash) where:</span>
+<span class="sd">            - ok: True if accepted, False if cancelled</span>
+<span class="sd">            - cache_hash: New cache hash if modified, None if no changes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Validate source (show warning if needed)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_svg_source</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
+
+        <span class="c1"># For non-cache files, use defaults</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_cache_file</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_tmp_file</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_COLOR</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_thickness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_THICKNESS</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">shape_color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_COLOR</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">modified_color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_COLOR</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">modified_thickness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_THICKNESS</span>
+
+        <span class="c1"># Create and show dialog</span>
+        <span class="n">dialog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_main_dialog</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">dialog</span><span class="o">.</span><span class="n">exec</span><span class="p">()</span> <span class="o">==</span> <span class="n">QDialog</span><span class="o">.</span><span class="n">DialogCode</span><span class="o">.</span><span class="n">Accepted</span><span class="p">:</span>
+            <span class="c1"># Determine final color</span>
+            <span class="n">final_color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">modified_color</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_color</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_COLOR</span>
+
+            <span class="c1"># Determine final thickness</span>
+            <span class="n">final_thickness</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">thickness_input</span><span class="p">:</span>
+                <span class="n">thickness_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">thickness_input</span><span class="o">.</span><span class="n">text</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">thickness_text</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">thickness</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">thickness_text</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">thickness</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">final_thickness</span> <span class="o">=</span> <span class="n">thickness_text</span>
+                    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                        <span class="k">pass</span>
+
+            <span class="c1"># Check if any changes were made</span>
+            <span class="n">color_changed</span> <span class="o">=</span> <span class="n">final_color</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_color</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_COLOR</span><span class="p">)</span>
+            <span class="n">thickness_changed</span> <span class="o">=</span> <span class="n">final_thickness</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_thickness</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_THICKNESS</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">color_changed</span> <span class="ow">or</span> <span class="n">thickness_changed</span><span class="p">:</span>
+                <span class="c1"># Create modified SVG in cache</span>
+                <span class="n">cache_hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modify_svg_file</span><span class="p">(</span><span class="n">final_color</span><span class="p">,</span> <span class="n">final_thickness</span><span class="p">)</span>
+
+                <span class="c1"># Update color history</span>
+                <span class="k">if</span> <span class="n">final_color</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">color_codes</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">color_codes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">final_color</span><span class="p">)</span>
+                    <span class="c1"># Save color list</span>
+                    <span class="k">if</span> <span class="s2">&quot;APPDATA&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+                        <span class="n">color_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;APPDATA&quot;</span><span class="p">],</span> <span class="s2">&quot;zooui&quot;</span><span class="p">,</span> <span class="s2">&quot;colorstore&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">color_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">),</span> <span class="s2">&quot;.zooui&quot;</span><span class="p">,</span> <span class="s2">&quot;colorstore&quot;</span><span class="p">)</span>
+
+                    <span class="n">color_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">color_dir</span><span class="p">,</span> <span class="s2">&quot;color_list.txt&quot;</span><span class="p">)</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">color_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">color_codes</span><span class="p">:</span>
+                            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">code</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">cache_hash</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># No changes made</span>
+                <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># User cancelled</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span></div>
+</div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">ZooUI</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html">ZooUI installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/userinterface.html">User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/svgfeatures.html">SVG Features</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/configsystem.html">Configuration System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/objectsystem.html">Object System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/windowsystem.html">Window System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/backup.html">Backup System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testingdocumentation/unittest.html">Unit Testing Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testingdocumentation/integrationtest.html">Integration Testing Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../benchmarksdocumentation/qzuibenchmark.html">QZUI Benchmark Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../benchmarksdocumentation/converterbenchmark.html">Converter Benchmark Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributionguidelines/codestyle.html">Code Style Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../zooui.html">zooui package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, David Roberts, Andrea Silvestri.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

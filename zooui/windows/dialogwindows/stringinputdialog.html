@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>zooui.windows.dialogwindows.stringinputdialog module &#8212; ZooUI 0.5.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=cc7d0dec" />
+    <script src="../../../_static/documentation_options.js?v=8e576371"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="zooui.windows.dialogwindows.svgpickerinputdialog module" href="svgpickerinputdialog.html" />
+    <link rel="prev" title="zooui.windows.dialogwindows.modifytiledmediaobjectdialog module" href="modifytiledmediaobjectdialog.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-zooui.windows.dialogwindows.stringinputdialog">
+<span id="zooui-windows-dialogwindows-stringinputdialog-module"></span><h1>zooui.windows.dialogwindows.stringinputdialog module<a class="headerlink" href="#module-zooui.windows.dialogwindows.stringinputdialog" title="Link to this heading">¶</a></h1>
+<p>String input dialog with color selection.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.stringinputdialog.OpenNewStringInputDialog">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zooui.windows.dialogwindows.stringinputdialog.</span></span><span class="sig-name descname"><span class="pre">OpenNewStringInputDialog</span></span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/stringinputdialog.html#OpenNewStringInputDialog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.stringinputdialog.OpenNewStringInputDialog" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="simple">
+<dt>Constructor :</dt><dd><p>OpenNewStringInputDialog()</p>
+</dd>
+<dt>Parameters :</dt><dd><p>None</p>
+</dd>
+</dl>
+<p>OpenNewStringInputDialog() –&gt; None</p>
+<p>Gather the string through a dialog and let select the color.
+Also gives a selection column of the last 20 used colors.</p>
+<dl class="simple">
+<dt>Constructor :</dt><dd><p>OpenNewStringInputDialog()</p>
+</dd>
+<dt>Parameters :</dt><dd><p>None</p>
+</dd>
+</dl>
+<p>OpenNewStringInputDialog() –&gt; None</p>
+<p>Create a new OpenNewStringInputDialog for gathering string input with color selection.</p>
+<p>Initializes the dialog with empty string color, loads previously used colors
+from the color store file, or creates default colors (red, green, blue) if
+no color history exists.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.stringinputdialog.OpenNewStringInputDialog.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/stringinputdialog.html#OpenNewStringInputDialog.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.stringinputdialog.OpenNewStringInputDialog.__init__" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Constructor :</dt><dd><p>OpenNewStringInputDialog()</p>
+</dd>
+<dt>Parameters :</dt><dd><p>None</p>
+</dd>
+</dl>
+<p>OpenNewStringInputDialog() –&gt; None</p>
+<p>Create a new OpenNewStringInputDialog for gathering string input with color selection.</p>
+<p>Initializes the dialog with empty string color, loads previously used colors
+from the color store file, or creates default colors (red, green, blue) if
+no color history exists.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.stringinputdialog.OpenNewStringInputDialog._color_square">
+<span class="sig-name descname"><span class="pre">_color_square</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color_code</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/stringinputdialog.html#OpenNewStringInputDialog._color_square"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.stringinputdialog.OpenNewStringInputDialog._color_square" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Method :</dt><dd><p>OpenNewStringInputDialog._color_square(color_code)</p>
+</dd>
+<dt>Parameters :</dt><dd><p>color_code : str</p>
+</dd>
+</dl>
+<p>OpenNewStringInputDialog._color_square(color_code) –&gt; QWidget</p>
+<p>Creates a colored square widget.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.stringinputdialog.OpenNewStringInputDialog._color_button_click">
+<span class="sig-name descname"><span class="pre">_color_button_click</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/stringinputdialog.html#OpenNewStringInputDialog._color_button_click"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.stringinputdialog.OpenNewStringInputDialog._color_button_click" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Method :</dt><dd><p>OpenNewStringInputDialog._color_button_click(color)</p>
+</dd>
+<dt>Parameters :</dt><dd><p>color : str</p>
+</dd>
+</dl>
+<p>OpenNewStringInputDialog._color_button_click(color) –&gt; None</p>
+<p>Handles color button click event.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.stringinputdialog.OpenNewStringInputDialog._color_button">
+<span class="sig-name descname"><span class="pre">_color_button</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color_code</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/stringinputdialog.html#OpenNewStringInputDialog._color_button"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.stringinputdialog.OpenNewStringInputDialog._color_button" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Method :</dt><dd><p>OpenNewStringInputDialog._color_button(color_code)</p>
+</dd>
+<dt>Parameters :</dt><dd><p>color_code : str</p>
+</dd>
+</dl>
+<p>OpenNewStringInputDialog._color_button(color_code) –&gt; QWidget</p>
+<p>Creates a color selection button.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.stringinputdialog.OpenNewStringInputDialog._main_dialog">
+<span class="sig-name descname"><span class="pre">_main_dialog</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/stringinputdialog.html#OpenNewStringInputDialog._main_dialog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.stringinputdialog.OpenNewStringInputDialog._main_dialog" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Method :</dt><dd><p>OpenNewStringInputDialog._main_dialog()</p>
+</dd>
+<dt>Parameters :</dt><dd><p>None</p>
+</dd>
+</dl>
+<p>OpenNewStringInputDialog._main_dialog() –&gt; QDialog</p>
+<p>Creates and configures the main dialog window.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.stringinputdialog.OpenNewStringInputDialog._run_dialog">
+<span class="sig-name descname"><span class="pre">_run_dialog</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/stringinputdialog.html#OpenNewStringInputDialog._run_dialog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.stringinputdialog.OpenNewStringInputDialog._run_dialog" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Method :</dt><dd><p>OpenNewStringInputDialog._run_dialog()</p>
+</dd>
+<dt>Parameters :</dt><dd><p>None</p>
+</dd>
+</dl>
+<p>OpenNewStringInputDialog._run_dialog() –&gt; Tuple[bool, str]</p>
+<p>Runs the dialog and returns the result.
+Returns (ok, uri) where ok is True if accepted, uri is the formatted string.</p>
+</dd></dl>
+
+</dd></dl>
+
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><span class="xref std std-doc">zooui/objects/mediaobjects/stringmediaobject</span> - StringMediaObject class</p></li>
+<li><p><span class="xref std std-doc">zooui/windows/dialogwindows/modifystringdialog</span> - String modification dialog</p></li>
+<li><p><span class="xref std std-doc">zooui/windows/dialogwindows/dialogwindows</span> - Dialog window base classes</p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">ZooUI</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html">ZooUI installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usageinstructions/userinterface.html">User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usageinstructions/svgfeatures.html">SVG Features</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/configsystem.html">Configuration System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/objectsystem.html">Object System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/windowsystem.html">Window System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/backup.html">Backup System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../testingdocumentation/unittest.html">Unit Testing Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../testingdocumentation/integrationtest.html">Integration Testing Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../benchmarksdocumentation/qzuibenchmark.html">QZUI Benchmark Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../benchmarksdocumentation/converterbenchmark.html">Converter Benchmark Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributionguidelines/codestyle.html">Code Style Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../zooui.html">zooui package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../backup.html">backup package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../converters.html">converters package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../objects.html">objects package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tilesystem.html">tilesystem package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../windows.html">windows package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../config.html">zooui.config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../logger.html">zooui.logger module</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../zooui.html">zooui package</a><ul>
+  <li><a href="../../windows.html">windows package</a><ul>
+      <li>Previous: <a href="modifytiledmediaobjectdialog.html" title="previous chapter">zooui.windows.dialogwindows.modifytiledmediaobjectdialog module</a></li>
+      <li>Next: <a href="svgpickerinputdialog.html" title="next chapter">zooui.windows.dialogwindows.svgpickerinputdialog module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, David Roberts, Andrea Silvestri.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../../../_sources/zooui/windows/dialogwindows/stringinputdialog.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

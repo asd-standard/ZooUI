@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Program Configuration &#8212; PyZui 0.5.2 documentation</title>
+    <title>Program Configuration &#8212; ZooUI 0.5.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cc7d0dec" />
@@ -35,26 +35,26 @@
             
   <section id="program-configuration">
 <h1>Program Configuration<a class="headerlink" href="#program-configuration" title="Link to this heading">¶</a></h1>
-<p>PyZUI uses a single source of truth configuration system with <cite>~/.pyzui/config.json</cite>
+<p>ZooUI uses a single source of truth configuration system with <cite>~/.zooui/config.json</cite>
 as the primary configuration file. Configuration options can be overridden via:</p>
 <p>Configuration Hierarchy:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>1. User Configuration File (~/.pyzui/config.json) - Primary source
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>1. User Configuration File (~/.zooui/config.json) - Primary source
           ↓
-2. Temporary Configuration File (--config pyzui.json) - Session override
+2. Temporary Configuration File (--config zooui.json) - Session override
           ↓
 3. Command-Line Arguments - Highest priority (temporary)
 </pre></div>
 </div>
 <p>This design provides a consistent configuration experience where user preferences
-are stored in <cite>~/.pyzui/config.json</cite> and can be temporarily overridden for testing
+are stored in <cite>~/.zooui/config.json</cite> and can be temporarily overridden for testing
 or debugging via command-line arguments.</p>
 <section id="configuration-categories">
 <h2>Configuration Categories<a class="headerlink" href="#configuration-categories" title="Link to this heading">¶</a></h2>
 <dl>
-<dt><strong>Logging Configuration</strong></dt><dd><p>Controls how PyZUI logs information during execution.</p>
+<dt><strong>Logging Configuration</strong></dt><dd><p>Controls how ZooUI logs information during execution.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>By default, PyZUI logs only to file (not to console) for silent operation.
+<p>By default, ZooUI logs only to file (not to console) for silent operation.
 Use <code class="docutils literal notranslate"><span class="pre">--console</span></code> to enable console output.</p>
 </div>
 <ul class="simple">
@@ -99,7 +99,7 @@ Use <code class="docutils literal notranslate"><span class="pre">--console</span
 <li><p><code class="docutils literal notranslate"><span class="pre">enabled</span></code> (bool): Enable autosave functionality (default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">interval</span></code> (int): Autosave interval in seconds (default: 300 = 5 minutes)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">max_backups</span></code> (int): Maximum number of backups to keep per scene (default: 20)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">backup_dir</span></code> (str): Root directory for per-scene backup directories (default: <code class="docutils literal notranslate"><span class="pre">~/.pyzui/backups</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">backup_dir</span></code> (str): Root directory for per-scene backup directories (default: <code class="docutils literal notranslate"><span class="pre">~/.zooui/backups</span></code>)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">expire_days</span></code> (int): Days of inactivity before a scene’s backup directory is deleted (default: 7)</p></li>
 </ul>
 </dd>
@@ -140,9 +140,9 @@ Smaller on Top (Ctrl+R)</strong>.</p>
 </section>
 <section id="using-configuration-files">
 <h2>Using Configuration Files<a class="headerlink" href="#using-configuration-files" title="Link to this heading">¶</a></h2>
-<p>PyZUI uses <cite>~/.pyzui/config.json</cite> as its primary configuration file. This file is
+<p>ZooUI uses <cite>~/.zooui/config.json</cite> as its primary configuration file. This file is
 automatically created with default values if it doesn’t exist.</p>
-<p>You can also create a temporary configuration file (e.g., <code class="docutils literal notranslate"><span class="pre">pyzui_config.json</span></code>) with
+<p>You can also create a temporary configuration file (e.g., <code class="docutils literal notranslate"><span class="pre">zooui_config.json</span></code>) with
 your preferred settings for testing or specific sessions:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;logging&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -178,7 +178,7 @@ your preferred settings for testing or specific sessions:</p>
 <span class="w">        </span><span class="nt">&quot;enabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
 <span class="w">        </span><span class="nt">&quot;interval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">300</span><span class="p">,</span>
 <span class="w">        </span><span class="nt">&quot;max_backups&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;backup_dir&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;~/.pyzui/backups&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;backup_dir&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;~/.zooui/backups&quot;</span><span class="p">,</span>
 <span class="w">        </span><span class="nt">&quot;expire_days&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">7</span>
 <span class="w">    </span><span class="p">},</span>
 <span class="w">    </span><span class="nt">&quot;zoom_limits&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -191,15 +191,15 @@ your preferred settings for testing or specific sessions:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Then launch PyZUI with the temporary configuration file:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>main.py<span class="w"> </span>--config<span class="w"> </span>pyzui_config.json
+<p>Then launch ZooUI with the temporary configuration file:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>main.py<span class="w"> </span>--config<span class="w"> </span>zooui_config.json
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">--config</span></code> file provides temporary overrides for the current session only.
-Settings from this file are not saved to <cite>~/.pyzui/config.json</cite>. To make permanent
-changes, edit <cite>~/.pyzui/config.json</cite> directly.</p>
+Settings from this file are not saved to <cite>~/.zooui/config.json</cite>. To make permanent
+changes, edit <cite>~/.zooui/config.json</cite> directly.</p>
 </div>
 </section>
 <section id="command-line-arguments">
@@ -243,16 +243,16 @@ python<span class="w"> </span>main.py<span class="w"> </span>--debug<span class=
 <span class="c1"># - DEBUG level console output</span>
 <span class="c1"># - DEBUG level file logging</span>
 <span class="c1"># - Colored console output</span>
-<span class="c1"># - File logging to ./logs/pyzui.log</span>
+<span class="c1"># - File logging to ./logs/zooui.log</span>
 </pre></div>
 </div>
 <p><strong>Example 2: Production Mode with Custom Log Directory</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run with default settings (file only) to custom directory</span>
-python<span class="w"> </span>main.py<span class="w"> </span>--log-dir<span class="w"> </span>/var/log/pyzui
+python<span class="w"> </span>main.py<span class="w"> </span>--log-dir<span class="w"> </span>/var/log/zooui
 
 <span class="c1"># This enables:</span>
 <span class="c1"># - No console output (default)</span>
-<span class="c1"># - Full logging to /var/log/pyzui/pyzui.log</span>
+<span class="c1"># - Full logging to /var/log/zooui/zooui.log</span>
 <span class="c1"># - Default tilestore cleanup</span>
 </pre></div>
 </div>
@@ -272,7 +272,7 @@ python<span class="w"> </span>main.py<span class="w"> </span>--cleanup-age<span 
 <span class="w">    </span><span class="nt">&quot;logging&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="nt">&quot;verbose&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
 <span class="w">        </span><span class="nt">&quot;log_to_console&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;log_dir&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/var/log/pyzui&quot;</span>
+<span class="w">        </span><span class="nt">&quot;log_dir&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/var/log/zooui&quot;</span>
 <span class="w">    </span><span class="p">},</span>
 <span class="w">    </span><span class="nt">&quot;tilestore&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="nt">&quot;max_age_days&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span>
@@ -295,7 +295,7 @@ python<span class="w"> </span>main.py<span class="w"> </span>--verbose<span clas
 </div>
 <p><strong>Example 7: Custom Log Directory Structure</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Organize logs by date in a custom location</span>
-python<span class="w"> </span>main.py<span class="w"> </span>--log-dir<span class="w"> </span>~/pyzui-logs/<span class="k">$(</span>date<span class="w"> </span>+%Y-%m-%d<span class="k">)</span>
+python<span class="w"> </span>main.py<span class="w"> </span>--log-dir<span class="w"> </span>~/zooui-logs/<span class="k">$(</span>date<span class="w"> </span>+%Y-%m-%d<span class="k">)</span>
 </pre></div>
 </div>
 <p><strong>Example 8: Configure Autosave Behavior</strong></p>
@@ -306,7 +306,7 @@ python<span class="w"> </span>main.py<span class="w"> </span>--autosave-interval
 python<span class="w"> </span>main.py<span class="w"> </span>--no-autosave
 
 <span class="c1"># Configure via JSON file</span>
-python<span class="w"> </span>main.py<span class="w"> </span>--config<span class="w"> </span>pyzui_config_example.json
+python<span class="w"> </span>main.py<span class="w"> </span>--config<span class="w"> </span>zooui_config_example.json
 
 <span class="c1"># Set backup expiration to 30 days</span>
 python<span class="w"> </span>main.py<span class="w"> </span>--backup-expire-days<span class="w"> </span><span class="m">30</span>
@@ -323,7 +323,7 @@ python<span class="w"> </span>main.py<span class="w"> </span>--min-zoom<span cla
 python<span class="w"> </span>main.py
 
 <span class="c1"># Configure via JSON file</span>
-python<span class="w"> </span>main.py<span class="w"> </span>--config<span class="w"> </span>pyzui_config_example.json
+python<span class="w"> </span>main.py<span class="w"> </span>--config<span class="w"> </span>zooui_config_example.json
 
 <span class="c1"># Default: zoom limits -10 to +12 for StringMediaObject compatibility</span>
 python<span class="w"> </span>main.py
@@ -332,7 +332,7 @@ python<span class="w"> </span>main.py
 </section>
 <section id="default-configuration">
 <h2>Default Configuration<a class="headerlink" href="#default-configuration" title="Link to this heading">¶</a></h2>
-<p>When PyZUI starts for the first time (or when <cite>~/.pyzui/config.json</cite> doesn’t exist),
+<p>When ZooUI starts for the first time (or when <cite>~/.zooui/config.json</cite> doesn’t exist),
 it creates the configuration file with these default values:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s1">&#39;logging&#39;</span><span class="p">:</span> <span class="p">{</span>
@@ -368,7 +368,7 @@ it creates the configuration file with these default values:</p>
         <span class="s1">&#39;enabled&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
         <span class="s1">&#39;interval&#39;</span><span class="p">:</span> <span class="mi">300</span><span class="p">,</span>
         <span class="s1">&#39;max_backups&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
-        <span class="s1">&#39;backup_dir&#39;</span><span class="p">:</span> <span class="s1">&#39;~/.pyzui/backups&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;backup_dir&#39;</span><span class="p">:</span> <span class="s1">&#39;~/.zooui/backups&#39;</span><span class="p">,</span>
         <span class="s1">&#39;expire_days&#39;</span><span class="p">:</span> <span class="mi">7</span>
     <span class="p">}</span>
 <span class="p">}</span>
@@ -377,7 +377,7 @@ it creates the configuration file with these default values:</p>
 <dl class="simple">
 <dt>This results in:</dt><dd><ul class="simple">
 <li><p>No console logging (silent operation)</p></li>
-<li><p>File logging at INFO level to ./logs/pyzui.log</p></li>
+<li><p>File logging at INFO level to ./logs/zooui.log</p></li>
 <li><p>Automatic tilestore cleanup on startup</p></li>
 <li><p>Tiles older than 3 days are removed</p></li>
 <li><p>Parallel rendering enabled for performance</p></li>
@@ -389,7 +389,7 @@ it creates the configuration file with these default values:</p>
 </section>
 <section id="configuration-validation">
 <h2>Configuration Validation<a class="headerlink" href="#configuration-validation" title="Link to this heading">¶</a></h2>
-<p>PyZUI validates all configuration values when loading configuration files. Invalid
+<p>ZooUI validates all configuration values when loading configuration files. Invalid
 values are rejected with clear error messages. The validation rules include:</p>
 <ul class="simple">
 <li><p><strong>Type checking</strong>: All configuration values must be of the correct type (boolean,
@@ -403,42 +403,42 @@ must satisfy <code class="docutils literal notranslate"><span class="pre">low</s
 the values are automatically swapped to maintain logical consistency.</p></li>
 <li><p><strong>Unknown keys</strong>: Unknown configuration sections or keys are rejected.</p></li>
 </ul>
-<p>If PyZUI fails to start with a configuration error, check your configuration file
+<p>If ZooUI fails to start with a configuration error, check your configuration file
 for invalid values or syntax errors.</p>
 </section>
 <section id="viewing-current-configuration">
 <h2>Viewing Current Configuration<a class="headerlink" href="#viewing-current-configuration" title="Link to this heading">¶</a></h2>
-<p>PyZUI logs its active configuration when starting. To view this information, either enable
+<p>ZooUI logs its active configuration when starting. To view this information, either enable
 console output with <code class="docutils literal notranslate"><span class="pre">--console</span></code> or check the log file:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># View configuration on console</span>
 python<span class="w"> </span>main.py<span class="w"> </span>--console
 
 <span class="c1"># Or check the log file</span>
-tail<span class="w"> </span>-f<span class="w"> </span>logs/pyzui.log
+tail<span class="w"> </span>-f<span class="w"> </span>logs/zooui.log
 </pre></div>
 </div>
 <p>Look for output like:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>[INFO    ] pyzui.LoggerConfig       | ============================================================
-[INFO    ] pyzui.LoggerConfig       | PyZUI Logging System Initialized
-[INFO    ] pyzui.LoggerConfig       | Debug Mode: False
-[INFO    ] pyzui.LoggerConfig       | Console Level: OFF
-[INFO    ] pyzui.LoggerConfig       | File Level: INFO
-[INFO    ] pyzui.LoggerConfig       | Log File: /path/to/logs/pyzui.log
-[INFO    ] pyzui.LoggerConfig       | ============================================================
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>[INFO    ] zooui.LoggerConfig       | ============================================================
+[INFO    ] zooui.LoggerConfig       | ZooUI Logging System Initialized
+[INFO    ] zooui.LoggerConfig       | Debug Mode: False
+[INFO    ] zooui.LoggerConfig       | Console Level: OFF
+[INFO    ] zooui.LoggerConfig       | File Level: INFO
+[INFO    ] zooui.LoggerConfig       | Log File: /path/to/logs/zooui.log
+[INFO    ] zooui.LoggerConfig       | ============================================================
 </pre></div>
 </div>
 </section>
 <section id="log-file-management">
 <h2>Log File Management<a class="headerlink" href="#log-file-management" title="Link to this heading">¶</a></h2>
-<p>PyZUI uses rotating log files to prevent unlimited disk usage:</p>
+<p>ZooUI uses rotating log files to prevent unlimited disk usage:</p>
 <ul class="simple">
 <li><p><strong>Maximum file size</strong>: 10 MB per log file</p></li>
 <li><p><strong>Backup count</strong>: 5 rotated files kept</p></li>
 <li><p><strong>Total maximum size</strong>: ~50 MB (current + 5 backups)</p></li>
 <li><dl class="simple">
 <dt><strong>File naming</strong>:</dt><dd><ul>
-<li><p>Current log: <code class="docutils literal notranslate"><span class="pre">pyzui.log</span></code></p></li>
-<li><p>Rotated logs: <code class="docutils literal notranslate"><span class="pre">pyzui.log.1</span></code>, <code class="docutils literal notranslate"><span class="pre">pyzui.log.2</span></code>, etc.</p></li>
+<li><p>Current log: <code class="docutils literal notranslate"><span class="pre">zooui.log</span></code></p></li>
+<li><p>Rotated logs: <code class="docutils literal notranslate"><span class="pre">zooui.log.1</span></code>, <code class="docutils literal notranslate"><span class="pre">zooui.log.2</span></code>, etc.</p></li>
 </ul>
 </dd>
 </dl>
@@ -446,12 +446,12 @@ tail<span class="w"> </span>-f<span class="w"> </span>logs/pyzui.log
 </ul>
 <p>When the current log reaches 10 MB, it’s rotated automatically:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>logs/
-├── pyzui.log       # Current log (newest)
-├── pyzui.log.1     # Previous rotation
-├── pyzui.log.2     # Older rotation
-├── pyzui.log.3     # Even older
-├── pyzui.log.4     # Getting old
-└── pyzui.log.5     # Oldest (will be deleted on next rotation)
+├── zooui.log       # Current log (newest)
+├── zooui.log.1     # Previous rotation
+├── zooui.log.2     # Older rotation
+├── zooui.log.3     # Even older
+├── zooui.log.4     # Getting old
+└── zooui.log.5     # Oldest (will be deleted on next rotation)
 </pre></div>
 </div>
 </section>
@@ -464,7 +464,7 @@ tail<span class="w"> </span>-f<span class="w"> </span>logs/pyzui.log
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../index.html">PyZui</a></h1>
+<h1 class="logo"><a href="../index.html">ZooUI</a></h1>
 
 
 
@@ -476,9 +476,9 @@ tail<span class="w"> </span>-f<span class="w"> </span>logs/pyzui.log
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html">PyZui installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html">ZooUI installation instructions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#dependencies">Dependencies</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#running-pyzui">Running PyZUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
@@ -519,7 +519,7 @@ tail<span class="w"> </span>-f<span class="w"> </span>logs/pyzui.log
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../pyzui.html">pyzui package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zooui.html">zooui package</a></li>
 </ul>
 
 <div class="relations">

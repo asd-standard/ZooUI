@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Unit Testing Guide &#8212; PyZui 0.5.2 documentation</title>
+    <title>Unit Testing Guide &#8212; ZooUI 0.5.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cc7d0dec" />
@@ -35,13 +35,13 @@
             
   <section id="unit-testing-guide">
 <h1>Unit Testing Guide<a class="headerlink" href="#unit-testing-guide" title="Link to this heading">¶</a></h1>
-<p>This document provides a comprehensive guide to unit testing PyZUI during development,
+<p>This document provides a comprehensive guide to unit testing ZooUI during development,
 including testing patterns, best practices, and guidelines for writing new tests.
-The PyZUI test suite uses pytest with BDD-style documentation and comprehensive coverage
+The ZooUI test suite uses pytest with BDD-style documentation and comprehensive coverage
 of all major components.</p>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
-<p>The PyZUI unit test suite is designed to:</p>
+<p>The ZooUI unit test suite is designed to:</p>
 <ol class="arabic simple">
 <li><p>Validate core functionality of all components</p></li>
 <li><p>Prevent regressions during development</p></li>
@@ -106,19 +106,19 @@ of all major components.</p>
 <p>Located at <code class="docutils literal notranslate"><span class="pre">test/unittest/conftest.py</span></code>, this file configures pytest for the test suite:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Pytest configuration file for unittest directory.</span>
-<span class="sd">Sets up Python path so tests can import from pyzui package.</span>
+<span class="sd">Sets up Python path so tests can import from zooui package.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
-<span class="c1"># Add pyzui root to Python path</span>
-<span class="n">pyzui_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+<span class="c1"># Add zooui root to Python path</span>
+<span class="n">zooui_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
     <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;../..&#39;</span><span class="p">))</span>
-<span class="k">if</span> <span class="n">pyzui_root</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">pyzui_root</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">zooui_root</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">zooui_root</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This ensures all tests can import from the <code class="docutils literal notranslate"><span class="pre">pyzui</span></code> package regardless of
+<p>This ensures all tests can import from the <code class="docutils literal notranslate"><span class="pre">zooui</span></code> package regardless of
 the current working directory.</p>
 </section>
 </section>
@@ -167,7 +167,7 @@ pytest
 </pre></div>
 </div>
 <p><strong>Generate HTML coverage report:</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>--cov<span class="o">=</span>pyzui<span class="w"> </span>--cov-report<span class="o">=</span>html
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>--cov<span class="o">=</span>zooui<span class="w"> </span>--cov-report<span class="o">=</span>html
 <span class="c1"># Open htmlcov/index.html in browser</span>
 </pre></div>
 </div>
@@ -188,7 +188,7 @@ pytest
 <p>Every test module should follow this structure:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">unittest.mock</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mock</span><span class="p">,</span> <span class="n">patch</span><span class="p">,</span> <span class="n">MagicMock</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassToTest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zooui.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassToTest</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">TestClassName</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -426,14 +426,14 @@ pytest
 <h3>Step-by-Step Guide<a class="headerlink" href="#step-by-step-guide" title="Link to this heading">¶</a></h3>
 <p><strong>1. Create Test File</strong></p>
 <p>Match the structure of the source code:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Source: pyzui/tilesystem/tilecache.py
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Source: zooui/tilesystem/tilecache.py
 Test:   test/unittest/tilesystem/test_tilecache.py
 </pre></div>
 </div>
 <p><strong>2. Import Dependencies</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">unittest.mock</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mock</span><span class="p">,</span> <span class="n">patch</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassToTest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zooui.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassToTest</span>
 </pre></div>
 </div>
 <p><strong>3. Create Test Class</strong></p>
@@ -500,7 +500,7 @@ Test:   test/unittest/tilesystem/test_tilecache.py
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">unittest.mock</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mock</span><span class="p">,</span> <span class="n">patch</span><span class="p">,</span> <span class="n">MagicMock</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassName</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zooui.module</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassName</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">TestClassName</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -990,16 +990,16 @@ Test:   test/unittest/tilesystem/test_tilecache.py
 <section id="generating-coverage-reports">
 <h3>Generating Coverage Reports<a class="headerlink" href="#generating-coverage-reports" title="Link to this heading">¶</a></h3>
 <p><strong>HTML Report:</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>--cov<span class="o">=</span>pyzui<span class="w"> </span>--cov-report<span class="o">=</span>html
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>--cov<span class="o">=</span>zooui<span class="w"> </span>--cov-report<span class="o">=</span>html
 open<span class="w"> </span>htmlcov/index.html
 </pre></div>
 </div>
 <p><strong>Terminal Report:</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>--cov<span class="o">=</span>pyzui<span class="w"> </span>--cov-report<span class="o">=</span>term-missing
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>--cov<span class="o">=</span>zooui<span class="w"> </span>--cov-report<span class="o">=</span>term-missing
 </pre></div>
 </div>
 <p><strong>Coverage for Specific Module:</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>--cov<span class="o">=</span>pyzui.tilesystem<span class="w"> </span>--cov-report<span class="o">=</span>term
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>--cov<span class="o">=</span>zooui.tilesystem<span class="w"> </span>--cov-report<span class="o">=</span>term
 </pre></div>
 </div>
 </section>
@@ -1051,7 +1051,7 @@ open<span class="w"> </span>htmlcov/index.html
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Run tests</span>
 <span class="w">      </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
 <span class="w">        </span><span class="no">cd test/unittest</span>
-<span class="w">        </span><span class="no">pytest --cov=pyzui --cov-report=xml</span>
+<span class="w">        </span><span class="no">pytest --cov=zooui --cov-report=xml</span>
 
 <span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Upload coverage</span>
 <span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">codecov/codecov-action@v2</span>
@@ -1085,7 +1085,7 @@ pytest<span class="w"> </span>-x
 pytest
 
 <span class="c1"># Or set PYTHONPATH</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">PYTHONPATH</span><span class="o">=</span>/path/to/pyzui:<span class="nv">$PYTHONPATH</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PYTHONPATH</span><span class="o">=</span>/path/to/zooui:<span class="nv">$PYTHONPATH</span>
 pytest
 </pre></div>
 </div>
@@ -1149,7 +1149,7 @@ real (unmockable) Python stdlib resources.</p>
 <p>Tests that call <code class="docutils literal notranslate"><span class="pre">tilemanager.init(auto_cleanup=True)</span></code> register a real
 <code class="docutils literal notranslate"><span class="pre">atexit</span></code> handler (<code class="docutils literal notranslate"><span class="pre">atexit.register</span></code> is stdlib and cannot be mocked).
 After all <code class="docutils literal notranslate"><span class="pre">&#64;patch</span></code> decorators are undone, that handler fires on the
-<strong>real</strong> <code class="docutils literal notranslate"><span class="pre">~/.pyzui/tilestore/</span></code> directory, which can contain tens of
+<strong>real</strong> <code class="docutils literal notranslate"><span class="pre">~/.zooui/tilestore/</span></code> directory, which can contain tens of
 thousands of files (over 80,000 in a heavily-used installation).
 Walking and <code class="docutils literal notranslate"><span class="pre">stat</span></code>-ing every file can take several minutes, which
 masquerades as a hang.</p>
@@ -1166,20 +1166,20 @@ commented-out <code class="docutils literal notranslate"><span class="pre">'fork
 <p>Both causes are handled by hooks in <code class="docutils literal notranslate"><span class="pre">test/unittest/conftest.py</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">pytest_sessionstart</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Disable tilemanager atexit so tests never register real handlers.&quot;&quot;&quot;</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.tilesystem</span><span class="w"> </span><span class="kn">import</span> <span class="n">tilemanager</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">zooui.tilesystem</span><span class="w"> </span><span class="kn">import</span> <span class="n">tilemanager</span>
     <span class="n">tilemanager</span><span class="o">.</span><span class="n">__cleanup_enabled</span> <span class="o">=</span> <span class="kc">False</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">pytest_sessionfinish</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">exitstatus</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Prevent expensive cleanup from blocking pytest exit.&quot;&quot;&quot;</span>
     <span class="c1"># TileManager: mark cleanup as already executed</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.tilesystem</span><span class="w"> </span><span class="kn">import</span> <span class="n">tilemanager</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">zooui.tilesystem</span><span class="w"> </span><span class="kn">import</span> <span class="n">tilemanager</span>
     <span class="n">tilemanager</span><span class="o">.</span><span class="n">__cleanup_executed</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">tilemanager</span><span class="o">.</span><span class="n">__cleanup_enabled</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="c1"># ConverterRunner / TilerRunner: prevent atexit from firing</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.converters</span><span class="w"> </span><span class="kn">import</span> <span class="n">converterrunner</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">zooui.converters</span><span class="w"> </span><span class="kn">import</span> <span class="n">converterrunner</span>
     <span class="n">converterrunner</span><span class="o">.</span><span class="n">_atexit_registered</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.tilesystem.tiler</span><span class="w"> </span><span class="kn">import</span> <span class="n">tilerrunner</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">zooui.tilesystem.tiler</span><span class="w"> </span><span class="kn">import</span> <span class="n">tilerrunner</span>
     <span class="n">tilerrunner</span><span class="o">.</span><span class="n">_atexit_registered</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="c1"># Force-clean the multiprocessing resource tracker</span>
@@ -1211,7 +1211,7 @@ run should exit cleanly within a few seconds of the summary line:</p>
 pytest
 
 <span class="c1"># Run with coverage</span>
-pytest<span class="w"> </span>--cov<span class="o">=</span>pyzui
+pytest<span class="w"> </span>--cov<span class="o">=</span>zooui
 
 <span class="c1"># Run specific file</span>
 pytest<span class="w"> </span>test_file.py
@@ -1282,8 +1282,8 @@ pytest<span class="w"> </span>--html<span class="o">=</span>report.html
 <li><p><strong>Coverage.py</strong>: <a class="reference external" href="https://coverage.readthedocs.io/">https://coverage.readthedocs.io/</a></p></li>
 </ul>
 </section>
-<section id="pyzui-specific">
-<h3>PyZUI-Specific<a class="headerlink" href="#pyzui-specific" title="Link to this heading">¶</a></h3>
+<section id="zooui-specific">
+<h3>ZooUI-Specific<a class="headerlink" href="#zooui-specific" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="../technicaldocumentation/objectsystem.html"><span class="doc">Object System</span></a> - Understanding object architecture</p></li>
 <li><p><a class="reference internal" href="../technicaldocumentation/tilingsystem.html"><span class="doc">Tiling System</span></a> - Understanding tile system</p></li>
@@ -1304,7 +1304,7 @@ pytest<span class="w"> </span>--html<span class="o">=</span>report.html
 </section>
 <section id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading">¶</a></h2>
-<p>The PyZUI test suite provides comprehensive coverage of all major components using pytest
+<p>The ZooUI test suite provides comprehensive coverage of all major components using pytest
 and BDD-style documentation. When adding new features:</p>
 <ol class="arabic simple">
 <li><p>Write tests first (TDD) or alongside implementation</p></li>
@@ -1328,7 +1328,7 @@ executable documentation of expected behavior.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../index.html">PyZui</a></h1>
+<h1 class="logo"><a href="../index.html">ZooUI</a></h1>
 
 
 
@@ -1340,9 +1340,9 @@ executable documentation of expected behavior.</p>
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html">PyZui installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html">ZooUI installation instructions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#dependencies">Dependencies</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#running-pyzui">Running PyZUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
@@ -1383,7 +1383,7 @@ executable documentation of expected behavior.</p>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../pyzui.html">pyzui package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zooui.html">zooui package</a></li>
 </ul>
 
 <div class="relations">

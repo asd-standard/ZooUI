@@ -4,7 +4,7 @@ String Media Object Ecosystem
 ==============================
 
 This document provides a comprehensive overview of the parallel text rendering
-pipeline in PyZUI, explaining how ``StringMediaObject`` renders text using a
+pipeline in ZooUI, explaining how ``StringMediaObject`` renders text using a
 hybrid dual-mode approach, viewport-aware priority batching, and thread-pool-based
 layout pre-calculation to maintain sharp rendering during zoom and high quality
 when stationary.
@@ -589,7 +589,7 @@ Synchronous Layout Calculation (Debugging)
 
 .. code-block:: python
 
-    from pyzui.objects.mediaobjects.mediaobjectsutils.string.parallellayout import (
+    from zooui.objects.mediaobjects.mediaobjectsutils.string.parallellayout import (
         ParallelLayoutCalculator,
     )
 
@@ -606,7 +606,7 @@ See Also
 - :doc:`objectsystem` — Object system architecture with StringMediaObject details
 - :doc:`configsystem` — Configuration system (parallel_rendering section)
 - :doc:`windowsystem` — Window system rendering integration
-- :doc:`../pyzui/prioritybatcher` — PriorityBatcher API reference
-- :doc:`../pyzui/parallellayout` — ParallelLayoutCalculator API reference
-- :doc:`../pyzui/textlayout` — TextLayoutData API reference
-- :doc:`../pyzui/stringmediaobject` — StringMediaObject API reference
+- :doc:`../zooui/prioritybatcher` — PriorityBatcher API reference
+- :doc:`../zooui/parallellayout` — ParallelLayoutCalculator API reference
+- :doc:`../zooui/textlayout` — TextLayoutData API reference
+- :doc:`../zooui/stringmediaobject` — StringMediaObject API reference

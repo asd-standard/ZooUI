@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>zooui.windows.dialogwindows.modifysvginputdialog module &#8212; ZooUI 0.5.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=cc7d0dec" />
+    <script src="../../../_static/documentation_options.js?v=8e576371"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="zooui.windows.dialogwindows.modifytiledmediaobjectdialog module" href="modifytiledmediaobjectdialog.html" />
+    <link rel="prev" title="zooui.windows.dialogwindows.modifystringdialog module" href="modifystringdialog.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-zooui.windows.dialogwindows.modifysvginputdialog">
+<span id="zooui-windows-dialogwindows-modifysvginputdialog-module"></span><h1>zooui.windows.dialogwindows.modifysvginputdialog module<a class="headerlink" href="#module-zooui.windows.dialogwindows.modifysvginputdialog" title="Link to this heading">¶</a></h1>
+<p>SVG modification dialog for changing color and thickness of SVG objects.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zooui.windows.dialogwindows.modifysvginputdialog.</span></span><span class="sig-name descname"><span class="pre">ModifySVGInputDialog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svg_media_object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/modifysvginputdialog.html#ModifySVGInputDialog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="simple">
+<dt>Constructor :</dt><dd><p>ModifySVGInputDialog(svg_media_object)</p>
+</dd>
+<dt>Parameters :</dt><dd><p>svg_media_object : SVGMediaObject</p>
+</dd>
+</dl>
+<p>ModifySVGInputDialog(svg_media_object) –&gt; None</p>
+<p>Dialog for modifying color and thickness of existing SVG objects.
+Designed for simple shapes (arrows, triangles, circles, squares)
+that were added via svgpickerinputdialog.py.</p>
+<dl class="simple">
+<dt>Constructor :</dt><dd><p>ModifySVGInputDialog(svg_media_object)</p>
+</dd>
+<dt>Parameters :</dt><dd><p>svg_media_object : SVGMediaObject</p>
+</dd>
+</dl>
+<p>ModifySVGInputDialog(svg_media_object) –&gt; None</p>
+<p>Initialize dialog for modifying an existing SVG object.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog.DEFAULT_COLOR">
+<span class="sig-name descname"><span class="pre">DEFAULT_COLOR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'000000'</span></em><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog.DEFAULT_COLOR" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog.DEFAULT_THICKNESS">
+<span class="sig-name descname"><span class="pre">DEFAULT_THICKNESS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'10'</span></em><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog.DEFAULT_THICKNESS" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svg_media_object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/modifysvginputdialog.html#ModifySVGInputDialog.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog.__init__" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Constructor :</dt><dd><p>ModifySVGInputDialog(svg_media_object)</p>
+</dd>
+<dt>Parameters :</dt><dd><p>svg_media_object : SVGMediaObject</p>
+</dd>
+</dl>
+<p>ModifySVGInputDialog(svg_media_object) –&gt; None</p>
+<p>Initialize dialog for modifying an existing SVG object.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog.modified_color">
+<span class="sig-name descname"><span class="pre">modified_color</span></span><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog.modified_color" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog.modified_thickness">
+<span class="sig-name descname"><span class="pre">modified_thickness</span></span><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog.modified_thickness" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog.color_codes">
+<span class="sig-name descname"><span class="pre">color_codes</span></span><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog.color_codes" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog.custom_color_input">
+<span class="sig-name descname"><span class="pre">custom_color_input</span></span><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog.custom_color_input" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog.thickness_input">
+<span class="sig-name descname"><span class="pre">thickness_input</span></span><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog.thickness_input" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog.preview_widget">
+<span class="sig-name descname"><span class="pre">preview_widget</span></span><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog.preview_widget" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._load_color_history">
+<span class="sig-name descname"><span class="pre">_load_color_history</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/modifysvginputdialog.html#ModifySVGInputDialog._load_color_history"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._load_color_history" title="Link to this definition">¶</a></dt>
+<dd><p>Load color history from color store file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._validate_svg_source">
+<span class="sig-name descname"><span class="pre">_validate_svg_source</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/modifysvginputdialog.html#ModifySVGInputDialog._validate_svg_source"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._validate_svg_source" title="Link to this definition">¶</a></dt>
+<dd><p>Check if SVG is from safe source (<code class="docutils literal notranslate"><span class="pre">/tmp/zooui_svg_</span></code>).
+Show warning dialog for other sources.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if safe or user confirms, False if user cancels</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._show_source_warning_dialog">
+<span class="sig-name descname"><span class="pre">_show_source_warning_dialog</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/modifysvginputdialog.html#ModifySVGInputDialog._show_source_warning_dialog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._show_source_warning_dialog" title="Link to this definition">¶</a></dt>
+<dd><p>Warning: This SVG was not added via SVG Picker dialog.
+The modify dialog is designed for simple shapes from data/SVG/.</p>
+<p>Default values will be used: color=black, stroke-width=10
+Continue anyway?</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._color_name_to_hex">
+<span class="sig-name descname"><span class="pre">_color_name_to_hex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/modifysvginputdialog.html#ModifySVGInputDialog._color_name_to_hex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._color_name_to_hex" title="Link to this definition">¶</a></dt>
+<dd><p>Convert color name to hex code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>color_name</strong> – Color name (e.g., ‘black’, ‘red’) or hex code</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Hex color without # (e.g., ‘000000’)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._extract_current_color">
+<span class="sig-name descname"><span class="pre">_extract_current_color</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/modifysvginputdialog.html#ModifySVGInputDialog._extract_current_color"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._extract_current_color" title="Link to this definition">¶</a></dt>
+<dd><p>Extract color from SVG content.
+For simple shapes, look for stroke or fill attributes.
+Returns hex color without # (e.g., ‘000000’ for black).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._extract_current_thickness">
+<span class="sig-name descname"><span class="pre">_extract_current_thickness</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/modifysvginputdialog.html#ModifySVGInputDialog._extract_current_thickness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._extract_current_thickness" title="Link to this definition">¶</a></dt>
+<dd><p>Extract stroke-width from SVG content.
+Returns string value (e.g., ‘8’).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._color_square">
+<span class="sig-name descname"><span class="pre">_color_square</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color_code</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/modifysvginputdialog.html#ModifySVGInputDialog._color_square"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._color_square" title="Link to this definition">¶</a></dt>
+<dd><p>Create a colored square widget.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._color_button_click">
+<span class="sig-name descname"><span class="pre">_color_button_click</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/modifysvginputdialog.html#ModifySVGInputDialog._color_button_click"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._color_button_click" title="Link to this definition">¶</a></dt>
+<dd><p>Handle color button click event.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._color_button">
+<span class="sig-name descname"><span class="pre">_color_button</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color_code</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/modifysvginputdialog.html#ModifySVGInputDialog._color_button"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._color_button" title="Link to this definition">¶</a></dt>
+<dd><p>Create a color selection button.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._svg_preview_widget">
+<span class="sig-name descname"><span class="pre">_svg_preview_widget</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/modifysvginputdialog.html#ModifySVGInputDialog._svg_preview_widget"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._svg_preview_widget" title="Link to this definition">¶</a></dt>
+<dd><p>Create widget showing the SVG preview (300x300).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._get_current_svg_content">
+<span class="sig-name descname"><span class="pre">_get_current_svg_content</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/modifysvginputdialog.html#ModifySVGInputDialog._get_current_svg_content"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._get_current_svg_content" title="Link to this definition">¶</a></dt>
+<dd><p>Get current SVG content with modifications applied.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._update_preview">
+<span class="sig-name descname"><span class="pre">_update_preview</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/modifysvginputdialog.html#ModifySVGInputDialog._update_preview"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._update_preview" title="Link to this definition">¶</a></dt>
+<dd><p>Update the preview widget.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._apply_preview">
+<span class="sig-name descname"><span class="pre">_apply_preview</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/modifysvginputdialog.html#ModifySVGInputDialog._apply_preview"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._apply_preview" title="Link to this definition">¶</a></dt>
+<dd><p>Apply thickness changes to preview.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._reset_to_original">
+<span class="sig-name descname"><span class="pre">_reset_to_original</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/modifysvginputdialog.html#ModifySVGInputDialog._reset_to_original"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._reset_to_original" title="Link to this definition">¶</a></dt>
+<dd><p>Reset to original values.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._modify_svg_file">
+<span class="sig-name descname"><span class="pre">_modify_svg_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thickness</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/modifysvginputdialog.html#ModifySVGInputDialog._modify_svg_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._modify_svg_file" title="Link to this definition">¶</a></dt>
+<dd><p>Create modified SVG in cache.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Cache hash of modified SVG</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._main_dialog">
+<span class="sig-name descname"><span class="pre">_main_dialog</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/modifysvginputdialog.html#ModifySVGInputDialog._main_dialog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._main_dialog" title="Link to this definition">¶</a></dt>
+<dd><p>Create and configure the main dialog window.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._run_dialog">
+<span class="sig-name descname"><span class="pre">_run_dialog</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/modifysvginputdialog.html#ModifySVGInputDialog._run_dialog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._run_dialog" title="Link to this definition">¶</a></dt>
+<dd><p>Run the dialog and return result.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>ok: True if accepted, False if cancelled</p></li>
+<li><p>cache_hash: New cache hash if modified, None if no changes</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>(ok, cache_hash) where</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><span class="xref std std-doc">zooui/objects/mediaobjects/svgmediaobject</span> - SVGMediaObject class for rendering SVG objects</p></li>
+<li><p><span class="xref std std-doc">zooui/windows/dialogwindows/svgpickerinputdialog</span> - Dialog for selecting new SVG objects</p></li>
+<li><p><span class="xref std std-doc">../../usageinstructions/svgfeatures</span> - User guide for SVG features</p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">ZooUI</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html">ZooUI installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usageinstructions/userinterface.html">User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usageinstructions/svgfeatures.html">SVG Features</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/configsystem.html">Configuration System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/objectsystem.html">Object System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/windowsystem.html">Window System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/backup.html">Backup System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../testingdocumentation/unittest.html">Unit Testing Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../testingdocumentation/integrationtest.html">Integration Testing Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../benchmarksdocumentation/qzuibenchmark.html">QZUI Benchmark Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../benchmarksdocumentation/converterbenchmark.html">Converter Benchmark Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributionguidelines/codestyle.html">Code Style Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../zooui.html">zooui package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../backup.html">backup package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../converters.html">converters package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../objects.html">objects package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tilesystem.html">tilesystem package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../windows.html">windows package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../config.html">zooui.config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../logger.html">zooui.logger module</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../zooui.html">zooui package</a><ul>
+  <li><a href="../../windows.html">windows package</a><ul>
+      <li>Previous: <a href="modifystringdialog.html" title="previous chapter">zooui.windows.dialogwindows.modifystringdialog module</a></li>
+      <li>Next: <a href="modifytiledmediaobjectdialog.html" title="next chapter">zooui.windows.dialogwindows.modifytiledmediaobjectdialog module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, David Roberts, Andrea Silvestri.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../../../_sources/zooui/windows/dialogwindows/modifysvginputdialog.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

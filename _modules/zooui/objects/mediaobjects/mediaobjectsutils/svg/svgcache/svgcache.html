@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache &#8212; ZooUI 0.5.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../_static/custom.css?v=cc7d0dec" />
+    <script src="../../../../../../../_static/documentation_options.js?v=8e576371"></script>
+    <script src="../../../../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache</h1><div class="highlight"><pre>
+<span></span><span class="c1">## ZooUI - Zooming User Interface</span>
+<span class="c1">## Copyright (C) 2009 David Roberts &lt;d@vidr.cc&gt;</span>
+<span class="c1">##</span>
+<span class="c1">## This program is free software; you can redistribute it and/or</span>
+<span class="c1">## modify it under the terms of the GNU General Public License</span>
+<span class="c1">## as published by the Free Software Foundation; either version 3</span>
+<span class="c1">## of the License, or (at your option) any later version.</span>
+<span class="c1">##</span>
+<span class="c1">## This program is distributed in the hope that it will be useful,</span>
+<span class="c1">## but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1">## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1">## GNU General Public License for more details.</span>
+<span class="c1">##</span>
+<span class="c1">## You should have received a copy of the GNU General Public License</span>
+<span class="c1">## along with this program; if not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
+
+<span class="sd">&quot;&quot;&quot;SVG cache management with hashed storage.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">contextlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">zooui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+
+
+<div class="viewcode-block" id="SVGCache">
+<a class="viewcode-back" href="../../../../../../../zooui/objects/mediaobjects/mediaobjectsutils/svg/svgcache/svgcache.html#zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache.SVGCache">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SVGCache</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Manages hashed SVG cache with ``svg_`` prefix and flat directory structure.</span>
+
+<span class="sd">    Hash format: ``svg_{8_char_sha1}``</span>
+<span class="sd">    Directory: ``/tmp/zooui_svg_/`` (flat, no subdirectories)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cache_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;/tmp/zooui_svg_&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize SVG cache.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cache_root: Root directory for cache (default: ``/tmp/zooui_svg_``)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">cache_root</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_root</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;SVGCache&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Initialized SVG cache at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_root</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SVGCache._compute_hash">
+<a class="viewcode-back" href="../../../../../../../zooui/objects/mediaobjects/mediaobjectsutils/svg/svgcache/svgcache.html#zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache.SVGCache._compute_hash">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_compute_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">svg_content</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute 8-character SHA1 hash with ``svg_`` prefix.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            svg_content: SVG XML content as UTF-8 string</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Hash in format: ``svg_{8_char_hex}``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">content_hash</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="n">svg_content</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()[:</span><span class="mi">8</span><span class="p">]</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;svg_</span><span class="si">{</span><span class="n">content_hash</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+<div class="viewcode-block" id="SVGCache.store_svg">
+<a class="viewcode-back" href="../../../../../../../zooui/objects/mediaobjects/mediaobjectsutils/svg/svgcache/svgcache.html#zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache.SVGCache.store_svg">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">store_svg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">svg_content</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Store SVG content in cache with retry logic on write failure.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            svg_content: SVG XML content as UTF-8 string</span>
+<span class="sd">            max_retries: Maximum number of retry attempts (default: 3)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Cache hash (``svg_{8_char_hex}``)</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If svg_content is empty or invalid</span>
+<span class="sd">            Exception: If cache write fails after all retry attempts</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Validate input</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">svg_content</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">svg_content</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid SVG content: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">svg_content</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">svg_content</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Empty SVG content&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">svg_content</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;&lt;&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SVG content doesn&#39;t start with &#39;&lt;&#39;: </span><span class="si">{</span><span class="n">svg_content</span><span class="p">[:</span><span class="mi">100</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+
+        <span class="n">original_content</span> <span class="o">=</span> <span class="n">svg_content</span>
+
+        <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_retries</span><span class="p">):</span>
+            <span class="c1"># Compute hash for current content</span>
+            <span class="n">content_hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_hash</span><span class="p">(</span><span class="n">svg_content</span><span class="p">)</span>
+            <span class="n">cache_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_root</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">content_hash</span><span class="si">}</span><span class="s2">.svg&quot;</span>
+
+            <span class="c1"># Check if already exists (content-based deduplication)</span>
+            <span class="k">if</span> <span class="n">cache_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="c1"># Verify file is not empty/corrupted</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">cache_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cache file exists but is empty: </span><span class="si">{</span><span class="n">content_hash</span><span class="si">}</span><span class="s2">, overwriting&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cache hit for hash: </span><span class="si">{</span><span class="n">content_hash</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="n">content_hash</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error checking cache file </span><span class="si">{</span><span class="n">content_hash</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">, overwriting&quot;</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Write to cache</span>
+                <span class="n">cache_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">svg_content</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+                <span class="c1"># Verify write succeeded</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">cache_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">or</span> <span class="n">cache_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="s2">&quot;Cache file write failed: file empty or doesn&#39;t exist&quot;</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stored SVG to cache: </span><span class="si">{</span><span class="n">content_hash</span><span class="si">}</span><span class="s2"> (attempt </span><span class="si">{</span><span class="n">attempt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">content_hash</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">attempt</span> <span class="o">&lt;</span> <span class="n">max_retries</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="c1"># Retry with new hash by modifying content slightly</span>
+                    <span class="n">svg_content</span> <span class="o">=</span> <span class="n">original_content</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;&lt;!-- retry_</span><span class="si">{</span><span class="n">attempt</span><span class="si">}</span><span class="s2"> --&gt;&quot;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cache write failed, retrying with new hash: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cache write failed after </span><span class="si">{</span><span class="n">max_retries</span><span class="si">}</span><span class="s2"> attempts: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span>
+
+        <span class="c1"># Should never reach here due to raise in loop</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Cache write failed unexpectedly&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SVGCache.get_cache_path">
+<a class="viewcode-back" href="../../../../../../../zooui/objects/mediaobjects/mediaobjectsutils/svg/svgcache/svgcache.html#zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache.SVGCache.get_cache_path">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_cache_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">content_hash</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get file path for given cache hash.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            content_hash: Cache hash in format svg_{8_char_hex}</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Path to cached SVG file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_root</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">content_hash</span><span class="si">}</span><span class="s2">.svg&quot;</span></div>
+
+
+<div class="viewcode-block" id="SVGCache.has_hash">
+<a class="viewcode-back" href="../../../../../../../zooui/objects/mediaobjects/mediaobjectsutils/svg/svgcache/svgcache.html#zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache.SVGCache.has_hash">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">content_hash</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if hash exists in cache.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            content_hash: Cache hash to check</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if hash exists in cache</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span><span class="n">content_hash</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SVGCache.get_svg_content">
+<a class="viewcode-back" href="../../../../../../../zooui/objects/mediaobjects/mediaobjectsutils/svg/svgcache/svgcache.html#zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache.SVGCache.get_svg_content">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_svg_content</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">content_hash</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get SVG content from cache.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            content_hash: Cache hash to retrieve</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            SVG content as string, or None if not found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cache_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span><span class="n">content_hash</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cache_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cache miss for hash: </span><span class="si">{</span><span class="n">content_hash</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="n">cache_path</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Retrieved SVG from cache: </span><span class="si">{</span><span class="n">content_hash</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">content</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to read cache file </span><span class="si">{</span><span class="n">content_hash</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="SVGCache.cleanup_old_files">
+<a class="viewcode-back" href="../../../../../../../zooui/objects/mediaobjects/mediaobjectsutils/svg/svgcache/svgcache.html#zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache.SVGCache.cleanup_old_files">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cleanup_old_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_age_days</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">14</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove cache files older than specified days.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            max_age_days: Maximum age in days (default: 14)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple of (files_removed, bytes_freed)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cutoff_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="p">(</span><span class="n">max_age_days</span> <span class="o">*</span> <span class="mi">86400</span><span class="p">)</span>
+        <span class="n">files_removed</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">bytes_freed</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cleaning up cache files older than </span><span class="si">{</span><span class="n">max_age_days</span><span class="si">}</span><span class="s2"> days&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_root</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.svg&quot;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">file_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span> <span class="o">&lt;</span> <span class="n">cutoff_time</span><span class="p">:</span>
+                    <span class="n">file_size</span> <span class="o">=</span> <span class="n">file_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span>
+                    <span class="n">file_path</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+                    <span class="n">files_removed</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">bytes_freed</span> <span class="o">+=</span> <span class="n">file_size</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Removed old cache file: </span><span class="si">{</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to remove cache file </span><span class="si">{</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Record cleanup time</span>
+        <span class="n">timestamp_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_root</span> <span class="o">/</span> <span class="s2">&quot;cleanup_timestamp.txt&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">timestamp_file</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to write cleanup timestamp: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cache cleanup: removed </span><span class="si">{</span><span class="n">files_removed</span><span class="si">}</span><span class="s2"> files, freed </span><span class="si">{</span><span class="n">bytes_freed</span><span class="si">}</span><span class="s2"> bytes&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">files_removed</span><span class="p">,</span> <span class="n">bytes_freed</span></div>
+
+
+<div class="viewcode-block" id="SVGCache.cleanup_on_exit">
+<a class="viewcode-back" href="../../../../../../../zooui/objects/mediaobjects/mediaobjectsutils/svg/svgcache/svgcache.html#zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache.SVGCache.cleanup_on_exit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cleanup_on_exit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform cleanup on program exit.</span>
+
+<span class="sd">        Currently removes all cache files. Could be modified to keep</span>
+<span class="sd">        recent files if needed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Performing exit cleanup&quot;</span><span class="p">)</span>
+
+        <span class="n">files_removed</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_root</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.svg&quot;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">file_path</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+                <span class="n">files_removed</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Removed cache file on exit: </span><span class="si">{</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to remove cache file on exit </span><span class="si">{</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Try to remove cleanup timestamp file</span>
+        <span class="n">timestamp_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_root</span> <span class="o">/</span> <span class="s2">&quot;cleanup_timestamp.txt&quot;</span>
+        <span class="k">if</span> <span class="n">timestamp_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">suppress</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+                <span class="n">timestamp_file</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exit cleanup: removed </span><span class="si">{</span><span class="n">files_removed</span><span class="si">}</span><span class="s2"> cache files&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SVGCache.get_cache_stats">
+<a class="viewcode-back" href="../../../../../../../zooui/objects/mediaobjects/mediaobjectsutils/svg/svgcache/svgcache.html#zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache.SVGCache.get_cache_stats">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_cache_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get cache statistics.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dictionary with cache statistics</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">svg_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_root</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.svg&quot;</span><span class="p">))</span>
+        <span class="n">total_size</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">svg_files</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">exists</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;cache_root&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_root</span><span class="p">),</span>
+            <span class="s2">&quot;file_count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">svg_files</span><span class="p">),</span>
+            <span class="s2">&quot;total_size_bytes&quot;</span><span class="p">:</span> <span class="n">total_size</span><span class="p">,</span>
+            <span class="s2">&quot;total_size_mb&quot;</span><span class="p">:</span> <span class="n">total_size</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">),</span>
+        <span class="p">}</span></div>
+</div>
+
+
+
+<span class="c1"># Global cache instance for easy access</span>
+<span class="n">_svg_cache_instance</span><span class="p">:</span> <span class="n">SVGCache</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="get_svg_cache">
+<a class="viewcode-back" href="../../../../../../../zooui/objects/mediaobjects/mediaobjectsutils/svg/svgcache/svgcache.html#zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache.get_svg_cache">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_svg_cache</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">SVGCache</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get global SVG cache instance (singleton pattern).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Global SVGCache instance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_svg_cache_instance</span>
+    <span class="k">if</span> <span class="n">_svg_cache_instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_svg_cache_instance</span> <span class="o">=</span> <span class="n">SVGCache</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">_svg_cache_instance</span></div>
+
+
+
+<div class="viewcode-block" id="compute_svg_hash">
+<a class="viewcode-back" href="../../../../../../../zooui/objects/mediaobjects/mediaobjectsutils/svg/svgcache/svgcache.html#zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache.compute_svg_hash">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_svg_hash</span><span class="p">(</span><span class="n">svg_content</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute SVG hash without storing in cache.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        svg_content: SVG XML content as UTF-8 string</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Hash in format: ``svg_{8_char_hex}``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;svg_</span><span class="si">{</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="n">svg_content</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()[:</span><span class="mi">8</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../../../../index.html">ZooUI</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../gettingstarted/installation.html">ZooUI installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../usageinstructions/userinterface.html">User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../usageinstructions/svgfeatures.html">SVG Features</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../technicaldocumentation/configsystem.html">Configuration System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../technicaldocumentation/objectsystem.html">Object System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../technicaldocumentation/windowsystem.html">Window System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../technicaldocumentation/backup.html">Backup System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../testingdocumentation/unittest.html">Unit Testing Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../testingdocumentation/integrationtest.html">Integration Testing Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../benchmarksdocumentation/qzuibenchmark.html">QZUI Benchmark Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../benchmarksdocumentation/converterbenchmark.html">Converter Benchmark Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../contributionguidelines/codestyle.html">Code Style Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../zooui.html">zooui package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, David Roberts, Andrea Silvestri.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

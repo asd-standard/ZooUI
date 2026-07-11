@@ -3,7 +3,7 @@
 Converter System
 ================
 
-This document provides a comprehensive overview of the converter system architecture in PyZUI,
+This document provides a comprehensive overview of the converter system architecture in ZooUI,
 explaining how various media formats (PDF, images) are converted to PPM format for tiling and
 display in the Zooming User Interface. The converter system is a crucial preprocessing step
 that normalizes different input formats into a common format suitable for tile generation.
@@ -204,7 +204,7 @@ Converters inherit from :class:`threading.Thread`, which allows direct use:
 .. note::
 
    For normal use via :class:`TiledMediaObject`, conversions are submitted
-   through :doc:`../pyzui/converterrunner` which runs converters in separate
+   through :doc:`../zooui/converterrunner` which runs converters in separate
    **processes**. This avoids
    threading conflicts between pyvips (which uses its own internal thread
    pool) and TileManager's background threads. The thread-based approach
@@ -527,7 +527,7 @@ enabling parallel conversions without threading conflicts.
 
 .. code-block:: python
 
-    from pyzui.converters import converterrunner
+    from zooui.converters import converterrunner
 
     # Initialize process pool (optional, auto-initialized on first use)
     converterrunner.init(max_workers=2)
@@ -556,7 +556,7 @@ The module uses Python's ``'spawn'`` multiprocessing context by default.
 The ``'spawn'`` method creates a fresh Python interpreter for each subprocess,
 avoiding deadlocks from C-level mutexes (fontconfig, malloc arenas, libvips
 internal thread pools) that can occur when forking a process that has threading
-state. This is the safe default because PyZUI's main process always has threads
+state. This is the safe default because ZooUI's main process always has threads
 running (Qt event loop, TileProvider threads, etc.).
 
 **PYZUI_MP_CONTEXT (Environment Variable):**
@@ -574,7 +574,7 @@ Users can override the multiprocessing start method by setting the
 
 .. warning::
 
-   Using ``fork`` when other threads are active (the normal state in PyZUI)
+   Using ``fork`` when other threads are active (the normal state in ZooUI)
    is unsafe and may cause deadlocks. Only use ``fork`` if you have paused
    all TileManager threads and understand the risks on your platform.
 
@@ -624,7 +624,7 @@ with the thread-based ``Converter`` class:
 
 .. code-block:: python
 
-    from pyzui.converters.converterrunner import ConversionHandle
+    from zooui.converters.converterrunner import ConversionHandle
 
     # Create handle from future
     handle = ConversionHandle(future, infile, outfile)
@@ -673,7 +673,7 @@ Format Detection and Converter Selection
 .. code-block:: python
 
     # In TiledMediaObject.__init__()
-    from pyzui.converters import converterrunner
+    from zooui.converters import converterrunner
 
     if self._media_id.lower().endswith('.pdf'):
         # Use process-based PDF conversion
@@ -790,7 +790,7 @@ Converters run in separate processes via ``ProcessPoolExecutor``, providing comp
 
 .. code-block:: python
 
-    from pyzui.converters import converterrunner
+    from zooui.converters import converterrunner
 
     # Submit conversion to process pool
     future = converterrunner.submit_vips_conversion(infile, outfile)
@@ -838,7 +838,7 @@ initialized or has active threads (Qt, TileProviders, etc.).
 **Why not ``'fork'``?**
 
 The ``'fork'`` start method is unsafe in any process that has or may later
-create threads — which describes the PyZUI main process at all times
+create threads — which describes the ZooUI main process at all times
 (Qt event loop, TileProvider threads, etc.). Forking after threads exist can
 cause deadlocks from:
 
@@ -859,7 +859,7 @@ TileManager includes pause/resume functionality that can be used if needed:
 
 .. code-block:: python
 
-    from pyzui.tilesystem import tilemanager
+    from zooui.tilesystem import tilemanager
 
     # Pause all tile provider threads
     tilemanager.pause()
@@ -876,7 +876,7 @@ this is typically not needed since converters run in separate processes.
 Logging and Debugging
 ---------------------
 
-All converters integrate with PyZUI's logging system:
+All converters integrate with ZooUI's logging system:
 
 .. code-block:: python
 
@@ -1042,7 +1042,7 @@ conversions can execute truly in parallel:
 
 .. code-block:: python
 
-    from pyzui.converters import converterrunner
+    from zooui.converters import converterrunner
 
     # Submit multiple conversions to the process pool
     f1 = converterrunner.submit_pdf_conversion('doc1.pdf', 'out1.ppm')
@@ -1072,7 +1072,7 @@ Process-Based Conversion (Recommended)
 
 .. code-block:: python
 
-    from pyzui.converters import converterrunner
+    from zooui.converters import converterrunner
 
     # Initialize pool (auto-initialized on first submit, but explicit is fine)
     converterrunner.init(max_workers=2)
@@ -1110,7 +1110,7 @@ Direct Conversion (Thread-based, Legacy)
 
 .. code-block:: python
 
-    from pyzui.converters import PDFConverter, VipsConverter
+    from zooui.converters import PDFConverter, VipsConverter
 
     # Convert PDF
     pdf_conv = PDFConverter('document.pdf', 'output_pdf.ppm')
@@ -1133,7 +1133,7 @@ Progress Monitoring (Process-Based)
 
 .. code-block:: python
 
-    from pyzui.converters import converterrunner
+    from zooui.converters import converterrunner
 
     future = converterrunner.submit_pdf_conversion(
         'large_document.pdf', 'output.ppm')
@@ -1160,7 +1160,7 @@ Custom Resolution PDF Conversion
 
 .. code-block:: python
 
-    from pyzui.converters import converterrunner
+    from zooui.converters import converterrunner
 
     # High-resolution conversion for printing
     future = converterrunner.submit_pdf_conversion('document.pdf', 'high_res.ppm')
@@ -1187,7 +1187,7 @@ Image Conversion with Transformations
 
 .. code-block:: python
 
-    from pyzui.converters import converterrunner
+    from zooui.converters import converterrunner
 
     # Convert with rotation
     future = converterrunner.submit_vips_conversion(
@@ -1215,7 +1215,7 @@ Handling Multiple Formats
 
 .. code-block:: python
 
-    from pyzui.converters import converterrunner
+    from zooui.converters import converterrunner
 
     def convert_to_ppm(input_file, output_file):
         """Convert any supported format to PPM using process pool."""
@@ -1320,15 +1320,15 @@ VipsConverter
 Key Classes
 ~~~~~~~~~~~
 
-- :class:`pyzui.converters.converterrunner` - Process-based conversion execution
-- :class:`pyzui.converters.converter.Converter` - Abstract base class
-- :class:`pyzui.converters.pdfconverter.PDFConverter` - PDF converter
-- :class:`pyzui.converters.vipsconverter.VipsConverter` - Image converter
+- :class:`zooui.converters.converterrunner` - Process-based conversion execution
+- :class:`zooui.converters.converter.Converter` - Abstract base class
+- :class:`zooui.converters.pdfconverter.PDFConverter` - PDF converter
+- :class:`zooui.converters.vipsconverter.VipsConverter` - Image converter
 
 See Also
 --------
 
 - :doc:`tilingsystem` - Tile generation from PPM files
-- :doc:`pyzui/objects/mediaobjects/tiledmediaobject` - Integration with TiledMediaObject
+- :doc:`zooui/objects/mediaobjects/tiledmediaobject` - Integration with TiledMediaObject
 - :doc:`objectsystem` - Overall object system architecture
 - :doc:`projectstructure` - Project organization

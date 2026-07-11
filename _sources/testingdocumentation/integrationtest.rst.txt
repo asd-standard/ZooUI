@@ -3,7 +3,7 @@
 Integration Testing Guide
 ==========================
 
-This document provides a comprehensive guide to integration testing PyZUI during development,
+This document provides a comprehensive guide to integration testing ZooUI during development,
 covering end-to-end pipeline testing, thread safety validation, component interaction testing,
 and full GUI integration verification. Integration tests validate that components work correctly
 together as a complete system.
@@ -11,7 +11,7 @@ together as a complete system.
 Overview
 --------
 
-The PyZUI integration test suite is designed to:
+The ZooUI integration test suite is designed to:
 
 1. Validate complete workflows from input to output
 2. Test component interactions and interfaces
@@ -61,7 +61,7 @@ Directory Organization
     │   │   └── ... (43 modules total)
     │   └── GUI_INTEGRATION.md           #   GUI test documentation
     └── logs/                            # Test execution logs
-        └── pyzui.log
+        └── zooui.log
 
 Test Categories
 ~~~~~~~~~~~~~~~
@@ -180,7 +180,7 @@ Integration Test Options
 
 .. code-block:: bash
 
-    pytest --cov=pyzui --cov-report=term
+    pytest --cov=zooui --cov-report=term
 
 **Parallel execution (use with caution):**
 
@@ -196,7 +196,7 @@ Integration tests produce detailed logs. View them with:
 
 .. code-block:: bash
 
-    tail -f logs/pyzui.log
+    tail -f logs/zooui.log
 
 GUI Integration Tests
 ~~~~~~~~~~~~~~~~~~~~~
@@ -276,7 +276,7 @@ Provides isolated temporary tile storage:
         Yields:
             str: Path to temporary tilestore directory.
         """
-        from pyzui.tilesystem.tilestore import tilestore as ts_module
+        from zooui.tilesystem.tilestore import tilestore as ts_module
 
         original_tile_dir = ts_module.tile_dir
         temp_dir = str(tmp_path / "tilestore")
@@ -706,7 +706,7 @@ can occur. By running conversions in separate processes:
     def test_multiple_converters_run_concurrently_via_processes(
             self, sample_images, tmp_path):
         """Test parallel conversion using processes."""
-        from pyzui.converters import converterrunner
+        from zooui.converters import converterrunner
         from concurrent.futures import wait
 
         futures = []
@@ -1338,7 +1338,7 @@ The GUI test creates temporary resources:
 
 .. code-block:: text
 
-    /tmp/pytest-of-{user}/pytest-{n}/pyzui_gui_test0/
+    /tmp/pytest-of-{user}/pytest-{n}/zooui_gui_test0/
     ├── media_directory/
     │   ├── 01_red_stripes.png
     │   ├── 02_green_gradient.png
@@ -1437,7 +1437,7 @@ Test Structure Guidelines
         assert tiler.error is None
 
     # Avoid - mocking defeats integration testing purpose
-    @patch('pyzui.tilesystem.tiler.Tiler')
+    @patch('zooui.tilesystem.tiler.Tiler')
     def test_with_mock(self, mock_tiler):
         # This is a unit test, not integration test
         pass
@@ -1788,7 +1788,7 @@ Running Tests
     pytest -v -s
 
     # With coverage
-    pytest --cov=pyzui
+    pytest --cov=zooui
 
     # GUI tests (manual)
     python test/integrationtest/guiintegration/main.py
@@ -1824,7 +1824,7 @@ Documentation
 - **Threading**: https://docs.python.org/3/library/threading.html
 - **PIL/Pillow**: https://pillow.readthedocs.io/
 
-PyZUI-Specific
+ZooUI-Specific
 ~~~~~~~~~~~~~~
 
 - :doc:`unittest` - Unit testing guide
@@ -1847,7 +1847,7 @@ Reference these for patterns:
 Conclusion
 ----------
 
-Integration tests validate that PyZUI components work correctly together as a complete system.
+Integration tests validate that ZooUI components work correctly together as a complete system.
 When adding new features:
 
 1. Write integration tests for complete workflows

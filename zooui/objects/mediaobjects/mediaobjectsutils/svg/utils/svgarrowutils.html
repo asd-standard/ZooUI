@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils module &#8212; ZooUI 0.5.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/custom.css?v=cc7d0dec" />
+    <script src="../../../../../../_static/documentation_options.js?v=8e576371"></script>
+    <script src="../../../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" />
+    <link rel="next" title="zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgcircleutils module" href="svgcircleutils.html" />
+    <link rel="prev" title="zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache module" href="../svgcache/svgcache.html" />
+   
+  <link rel="stylesheet" href="../../../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils">
+<span id="zooui-objects-mediaobjects-mediaobjectsutils-svg-utils-svgarrowutils-module"></span><h1>zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils module<a class="headerlink" href="#module-zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils" title="Link to this heading">¶</a></h1>
+<p>SVG arrow detection and elongation utilities.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils._load_svg_tree">
+<span class="sig-prename descclassname"><span class="pre">zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils.</span></span><span class="sig-name descname"><span class="pre">_load_svg_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svg_input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../../_modules/zooui/objects/mediaobjects/mediaobjectsutils/svg/utils/svgarrowutils.html#_load_svg_tree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils._load_svg_tree" title="Link to this definition">¶</a></dt>
+<dd><p>Load SVG XML tree from either file path or cache hash.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>svg_input</strong> – Either a file path or cache hash (starting with <code class="docutils literal notranslate"><span class="pre">'svg_'</span></code>)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>ElementTree object</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>FileNotFoundError</strong> – If file doesn’t exist</p></li>
+<li><p><strong>ValueError</strong> – If cache hash not found</p></li>
+<li><p><strong>ET.ParseError</strong> – If XML parsing fails</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils.is_straight_arrow_svg">
+<span class="sig-prename descclassname"><span class="pre">zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils.</span></span><span class="sig-name descname"><span class="pre">is_straight_arrow_svg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svg_input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../../_modules/zooui/objects/mediaobjects/mediaobjectsutils/svg/utils/svgarrowutils.html#is_straight_arrow_svg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils.is_straight_arrow_svg" title="Link to this definition">¶</a></dt>
+<dd><p>Check if SVG is a straight arrow (up, down, left, right).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>svg_input</strong> – Either a file path or cache hash (starting with <code class="docutils literal notranslate"><span class="pre">'svg_'</span></code>)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if SVG matches straight arrow pattern, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils.get_arrow_direction">
+<span class="sig-prename descclassname"><span class="pre">zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils.</span></span><span class="sig-name descname"><span class="pre">get_arrow_direction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svg_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../../_modules/zooui/objects/mediaobjects/mediaobjectsutils/svg/utils/svgarrowutils.html#get_arrow_direction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils.get_arrow_direction" title="Link to this definition">¶</a></dt>
+<dd><p>Determine arrow direction: ‘right’, ‘left’, ‘up’, or ‘down’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Direction string or None if not a straight arrow</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils.is_diagonal_arrow_svg">
+<span class="sig-prename descclassname"><span class="pre">zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils.</span></span><span class="sig-name descname"><span class="pre">is_diagonal_arrow_svg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svg_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../../_modules/zooui/objects/mediaobjects/mediaobjectsutils/svg/utils/svgarrowutils.html#is_diagonal_arrow_svg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils.is_diagonal_arrow_svg" title="Link to this definition">¶</a></dt>
+<dd><p>Check if SVG is a 45° diagonal arrow (upright, upleft, downright, downleft).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if SVG matches 45° diagonal arrow pattern, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils.get_diagonal_arrow_direction">
+<span class="sig-prename descclassname"><span class="pre">zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils.</span></span><span class="sig-name descname"><span class="pre">get_diagonal_arrow_direction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svg_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../../_modules/zooui/objects/mediaobjects/mediaobjectsutils/svg/utils/svgarrowutils.html#get_diagonal_arrow_direction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils.get_diagonal_arrow_direction" title="Link to this definition">¶</a></dt>
+<dd><p>Determine diagonal arrow direction: ‘upright’, ‘upleft’, ‘downright’, or ‘downleft’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Direction string or None if not a 45° diagonal arrow</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils.is_arrow_svg">
+<span class="sig-prename descclassname"><span class="pre">zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils.</span></span><span class="sig-name descname"><span class="pre">is_arrow_svg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svg_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../../_modules/zooui/objects/mediaobjects/mediaobjectsutils/svg/utils/svgarrowutils.html#is_arrow_svg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils.is_arrow_svg" title="Link to this definition">¶</a></dt>
+<dd><p>Check if SVG is any arrow (straight or 45° diagonal).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if SVG matches any arrow pattern, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils._create_backup">
+<span class="sig-prename descclassname"><span class="pre">zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils.</span></span><span class="sig-name descname"><span class="pre">_create_backup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svg_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../../_modules/zooui/objects/mediaobjects/mediaobjectsutils/svg/utils/svgarrowutils.html#_create_backup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils._create_backup" title="Link to this definition">¶</a></dt>
+<dd><p>Create a backup copy of the SVG file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path to backup file or None on failure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils._restore_from_backup">
+<span class="sig-prename descclassname"><span class="pre">zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils.</span></span><span class="sig-name descname"><span class="pre">_restore_from_backup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svg_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backup_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../../_modules/zooui/objects/mediaobjects/mediaobjectsutils/svg/utils/svgarrowutils.html#_restore_from_backup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils._restore_from_backup" title="Link to this definition">¶</a></dt>
+<dd><p>Restore SVG file from backup.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if successful, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils._cleanup_backup">
+<span class="sig-prename descclassname"><span class="pre">zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils.</span></span><span class="sig-name descname"><span class="pre">_cleanup_backup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backup_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../../_modules/zooui/objects/mediaobjects/mediaobjectsutils/svg/utils/svgarrowutils.html#_cleanup_backup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils._cleanup_backup" title="Link to this definition">¶</a></dt>
+<dd><p>Remove backup file if it exists.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils.elongate_straight_arrow">
+<span class="sig-prename descclassname"><span class="pre">zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils.</span></span><span class="sig-name descname"><span class="pre">elongate_straight_arrow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svg_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../../_modules/zooui/objects/mediaobjects/mediaobjectsutils/svg/utils/svgarrowutils.html#elongate_straight_arrow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils.elongate_straight_arrow" title="Link to this definition">¶</a></dt>
+<dd><p>Elongate straight arrow SVG.</p>
+<p>Stores modified SVG in cache and returns cache hash.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>svg_path</strong> – Path to SVG file (will be read but not modified)</p></li>
+<li><p><strong>scale_factor</strong> – Multiplier for arrow length (minimum 0.2)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>svg_{8_char_hex})</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Cache hash of modified SVG (format</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If scale_factor &lt; 0.2</p></li>
+<li><p><strong>Exception</strong> – If SVG parsing or modification fails</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils.elongate_diagonal_arrow">
+<span class="sig-prename descclassname"><span class="pre">zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils.</span></span><span class="sig-name descname"><span class="pre">elongate_diagonal_arrow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svg_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../../_modules/zooui/objects/mediaobjects/mediaobjectsutils/svg/utils/svgarrowutils.html#elongate_diagonal_arrow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgarrowutils.elongate_diagonal_arrow" title="Link to this definition">¶</a></dt>
+<dd><p>Elongate 45° diagonal arrow SVG.</p>
+<p>Stores modified SVG in cache and returns cache hash.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>svg_path</strong> – Path to SVG file (will be read but not modified)</p></li>
+<li><p><strong>scale_factor</strong> – Multiplier for arrow length (minimum 0.2)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>svg_{8_char_hex})</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Cache hash of modified SVG (format</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If scale_factor &lt; 0.2</p></li>
+<li><p><strong>Exception</strong> – If SVG parsing or modification fails</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><span class="xref std std-doc">zooui/objects/mediaobjects/svgmediaobject</span> - SVGMediaObject class</p></li>
+<li><p><span class="xref std std-doc">zooui/objects/mediaobjects/mediaobjectsutils/svg/svgcache/svgcache</span> - SVG caching system</p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../../../index.html">ZooUI</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../gettingstarted/installation.html">ZooUI installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../usageinstructions/userinterface.html">User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../usageinstructions/svgfeatures.html">SVG Features</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../technicaldocumentation/configsystem.html">Configuration System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../technicaldocumentation/objectsystem.html">Object System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../technicaldocumentation/windowsystem.html">Window System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../technicaldocumentation/backup.html">Backup System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../testingdocumentation/unittest.html">Unit Testing Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../testingdocumentation/integrationtest.html">Integration Testing Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../benchmarksdocumentation/qzuibenchmark.html">QZUI Benchmark Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../benchmarksdocumentation/converterbenchmark.html">Converter Benchmark Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../contributionguidelines/codestyle.html">Code Style Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../../zooui.html">zooui package</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../backup.html">backup package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../converters.html">converters package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../objects.html">objects package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../tilesystem.html">tilesystem package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../windows.html">windows package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../config.html">zooui.config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../logger.html">zooui.logger module</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../../../zooui.html">zooui package</a><ul>
+  <li><a href="../../../../../objects.html">objects package</a><ul>
+      <li>Previous: <a href="../svgcache/svgcache.html" title="previous chapter">zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache module</a></li>
+      <li>Next: <a href="svgcircleutils.html" title="next chapter">zooui.objects.mediaobjects.mediaobjectsutils.svg.utils.svgcircleutils module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, David Roberts, Andrea Silvestri.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../../../../../../_sources/zooui/objects/mediaobjects/mediaobjectsutils/svg/utils/svgarrowutils.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

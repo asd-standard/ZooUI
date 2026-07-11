@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Contribution Guidelines &#8212; PyZui 0.5.2 documentation</title>
+    <title>Contribution Guidelines &#8212; ZooUI 0.5.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cc7d0dec" />
@@ -39,7 +39,7 @@
 <a class="reference internal" href="codestyle.html"><span class="doc">Code Style Guidelines</span></a> first, which covers coding conventions,
 naming rules, type hints, docstring format, and code quality checks that all
 contributions must follow.</p>
-<p>Welcome to the PyZUI contribution guidelines! We appreciate your interest in
+<p>Welcome to the ZooUI contribution guidelines! We appreciate your interest in
 contributing to this project.</p>
 <section id="project-expectations">
 <h2>Project Expectations<a class="headerlink" href="#project-expectations" title="Link to this heading">¶</a></h2>
@@ -63,16 +63,16 @@ is encouraged for any purpose that respect the GNU General Public License v3 ter
 <h2>Getting Started with Contributing<a class="headerlink" href="#getting-started-with-contributing" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
 <li><p><strong>Fork the Repository</strong></p>
-<p>Start by forking the PyZUI repository on GitHub to your own account.</p>
+<p>Start by forking the ZooUI repository on GitHub to your own account.</p>
 </li>
 <li><p><strong>Clone Your Fork</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/YOUR_USERNAME/pyzui.git
-<span class="nb">cd</span><span class="w"> </span>pyzui
+<span class="nb">cd</span><span class="w"> </span>zooui
 </pre></div>
 </div>
 </li>
 <li><p><strong>Set Up the Development Environment</strong></p>
-<p>Follow the installation instructions in the <a class="reference internal" href="../gettingstarted/installation.html"><span class="doc">PyZui installation instructions</span></a> section:</p>
+<p>Follow the installation instructions in the <a class="reference internal" href="../gettingstarted/installation.html"><span class="doc">ZooUI installation instructions</span></a> section:</p>
 <ul>
 <li><p>Install Miniconda and create a Python 3.12.12 environment:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>&lt;env-name&gt;<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.12.12
@@ -260,7 +260,7 @@ output</p></td>
 </tbody>
 </table>
 <p><strong>Scenario C: Creating a Completely New Module</strong></p>
-<p>When creating a new <code class="docutils literal notranslate"><span class="pre">.py</span></code> module (e.g., <code class="docutils literal notranslate"><span class="pre">pyzui/tilesystem/tileoptimizer.py</span></code>):</p>
+<p>When creating a new <code class="docutils literal notranslate"><span class="pre">.py</span></code> module (e.g., <code class="docutils literal notranslate"><span class="pre">zooui/tilesystem/tileoptimizer.py</span></code>):</p>
 <ul class="simple">
 <li><p>Create a corresponding test file mirroring the source structure</p></li>
 <li><p>Include all necessary imports and fixtures</p></li>
@@ -281,7 +281,7 @@ output</p></td>
 <span class="kn">from</span><span class="w"> </span><span class="nn">unittest.mock</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mock</span><span class="p">,</span> <span class="n">patch</span><span class="p">,</span> <span class="n">MagicMock</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyzui.tilesystem.tileoptimizer</span><span class="w"> </span><span class="kn">import</span> <span class="n">TileOptimizer</span><span class="p">,</span> <span class="n">OptimizationResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zooui.tilesystem.tileoptimizer</span><span class="w"> </span><span class="kn">import</span> <span class="n">TileOptimizer</span><span class="p">,</span> <span class="n">OptimizationResult</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">TestTileOptimizer</span><span class="p">:</span>
@@ -359,7 +359,7 @@ output</p></td>
 </div>
 <p><em>Checklist for new test modules:</em></p>
 <ul class="simple">
-<li><p>[ ] File path mirrors source path (<code class="docutils literal notranslate"><span class="pre">pyzui/x/y.py</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">test/unittest/x/test_y.py</span></code>)</p></li>
+<li><p>[ ] File path mirrors source path (<code class="docutils literal notranslate"><span class="pre">zooui/x/y.py</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">test/unittest/x/test_y.py</span></code>)</p></li>
 <li><p>[ ] Module docstring describes what is being tested</p></li>
 <li><p>[ ] All necessary imports are included</p></li>
 <li><p>[ ] Test class for each public class in the source module</p></li>
@@ -525,7 +525,7 @@ pytest<span class="w"> </span>-k<span class="w"> </span><span class="s2">&quot;t
 </ul>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">unittest.mock</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mock</span><span class="p">,</span> <span class="n">patch</span><span class="p">,</span> <span class="n">MagicMock</span>
 
-<span class="nd">@patch</span><span class="p">(</span><span class="s1">&#39;pyzui.tilesystem.tileproviders.statictileprovider.Image.open&#39;</span><span class="p">)</span>
+<span class="nd">@patch</span><span class="p">(</span><span class="s1">&#39;zooui.tilesystem.tileproviders.statictileprovider.Image.open&#39;</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">test_load_success</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mock_open</span><span class="p">):</span>
     <span class="o">...</span>
 </pre></div>
@@ -571,7 +571,7 @@ pytest<span class="w"> </span>-k<span class="w"> </span><span class="s2">&quot;t
 <li><p><strong>Mirror the Source Structure:</strong></p>
 <p>Place tests in a location that mirrors the source code structure:</p>
 <ul class="simple">
-<li><p>Source: <code class="docutils literal notranslate"><span class="pre">pyzui/tilesystem/tile.py</span></code></p></li>
+<li><p>Source: <code class="docutils literal notranslate"><span class="pre">zooui/tilesystem/tile.py</span></code></p></li>
 <li><p>Test: <code class="docutils literal notranslate"><span class="pre">test/unittest/tilesystem/test_tile.py</span></code></p></li>
 </ul>
 </li>
@@ -622,8 +622,8 @@ interactions:</p>
 </section>
 <section id="versioning-and-release-workflow">
 <h2>Versioning and Release Workflow<a class="headerlink" href="#versioning-and-release-workflow" title="Link to this heading">¶</a></h2>
-<p>PyZUI uses <strong>Semantic Versioning</strong> (SemVer) in <code class="docutils literal notranslate"><span class="pre">MAJOR.MINOR.PATCH</span></code> format.
-The single source of truth for the version is <code class="docutils literal notranslate"><span class="pre">pyzui/__init__.py</span></code> →
+<p>ZooUI uses <strong>Semantic Versioning</strong> (SemVer) in <code class="docutils literal notranslate"><span class="pre">MAJOR.MINOR.PATCH</span></code> format.
+The single source of truth for the version is <code class="docutils literal notranslate"><span class="pre">zooui/__init__.py</span></code> →
 <code class="docutils literal notranslate"><span class="pre">__version__</span></code>.</p>
 <p><strong>Version bump criteria:</strong></p>
 <table class="docutils align-default">
@@ -662,7 +662,7 @@ or public API.</p>
 heading with the release date</p></li>
 <li><p>Run the bump script. This updates <strong>three</strong> locations automatically:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">pyzui/__init__.py</span></code> — the canonical <code class="docutils literal notranslate"><span class="pre">__version__</span></code> string</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zooui/__init__.py</span></code> — the canonical <code class="docutils literal notranslate"><span class="pre">__version__</span></code> string</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">data/home.pzs</span></code> — the version text displayed in the default scene</p></li>
 </ul>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>scripts/bump_version.py<span class="w"> </span>patch<span class="w">   </span><span class="c1"># for fixes</span>
@@ -699,11 +699,11 @@ ensures the changelog is ready when it is time to cut a release.</p>
 <li><p>Create a pull request with a clear description of your changes</p></li>
 <li><p>Be responsive to feedback during the review process</p></li>
 </ol>
-<p>Thank you for contributing to PyZUI!</p>
+<p>Thank you for contributing to ZooUI!</p>
 </section>
 <section id="contributing-to-documentation">
 <h2>Contributing to Documentation<a class="headerlink" href="#contributing-to-documentation" title="Link to this heading">¶</a></h2>
-<p>Documentation is a critical part of PyZUI that helps users understand and
+<p>Documentation is a critical part of ZooUI that helps users understand and
 effectively use the software. This section covers guidelines for contributing
 to the Sphinx-based documentation in the <code class="docutils literal notranslate"><span class="pre">./docs/</span></code> directory.</p>
 <p><strong>Documentation Structure:</strong></p>
@@ -714,7 +714,7 @@ to the Sphinx-based documentation in the <code class="docutils literal notransla
 <li><p><strong>Auto-generated API docs</strong>: Created from Python docstrings using Sphinx extensions</p></li>
 </ul>
 <p><strong>Sphinx Extensions Used:</strong></p>
-<p>PyZUI documentation uses the following Sphinx extensions:</p>
+<p>ZooUI documentation uses the following Sphinx extensions:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">sphinx.ext.autodoc</span></code>: Automatically documents Python docstrings</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">sphinx.ext.autosummary</span></code>: Creates summary tables for modules</p></li>
@@ -734,7 +734,7 @@ following the formats described in the <a class="reference internal" href="codes
 </ul>
 <p><strong>Examples and Use Cases:</strong></p>
 <ul class="simple">
-<li><p>Provide real-world examples from the PyZUI codebase</p></li>
+<li><p>Provide real-world examples from the ZooUI codebase</p></li>
 <li><p>Include complete, tested code snippets</p></li>
 <li><p>Document edge cases and common pitfalls</p></li>
 <li><p>Show before/after comparisons when demonstrating improvements</p></li>
@@ -864,7 +864,7 @@ contributions (fork, branch, pull request). Ensure your documentation:</p>
 <li><p>Maintains consistency with existing documentation</p></li>
 <li><p>Includes appropriate examples and cross-references</p></li>
 </ul>
-<p>Thank you for contributing to PyZUI!</p>
+<p>Thank you for contributing to ZooUI!</p>
 </section>
 </section>
 </section>
@@ -876,7 +876,7 @@ contributions (fork, branch, pull request). Ensure your documentation:</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../index.html">PyZui</a></h1>
+<h1 class="logo"><a href="../index.html">ZooUI</a></h1>
 
 
 
@@ -888,9 +888,9 @@ contributions (fork, branch, pull request). Ensure your documentation:</p>
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html">PyZui installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html">ZooUI installation instructions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#dependencies">Dependencies</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#running-pyzui">Running PyZUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
@@ -931,7 +931,7 @@ contributions (fork, branch, pull request). Ensure your documentation:</p>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../pyzui.html">pyzui package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zooui.html">zooui package</a></li>
 </ul>
 
 <div class="relations">

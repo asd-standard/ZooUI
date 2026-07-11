@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>zooui.objects.mediaobjects.stringmediaobject &#8212; ZooUI 0.5.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=cc7d0dec" />
+    <script src="../../../../_static/documentation_options.js?v=8e576371"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for zooui.objects.mediaobjects.stringmediaobject</h1><div class="highlight"><pre>
+<span></span><span class="c1">## ZooUI - Zooming User Interface</span>
+<span class="c1">## Copyright (C) 2009 David Roberts &lt;d@vidr.cc&gt;</span>
+<span class="c1">##</span>
+<span class="c1">## This program is free software; you can redistribute it and/or</span>
+<span class="c1">## modify it under the terms of the GNU General Public License</span>
+<span class="c1">## as published by the Free Software Foundation; either version 3</span>
+<span class="c1">## of the License, or (at your option) any later version.</span>
+<span class="c1">##</span>
+<span class="c1">## This program is distributed in the hope that it will be useful,</span>
+<span class="c1">## but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1">## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1">## GNU General Public License for more details.</span>
+<span class="c1">##</span>
+<span class="c1">## You should have received a copy of the GNU General Public License</span>
+<span class="c1">## along with this program; if not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
+
+<span class="sd">&quot;&quot;&quot;Strings to be displayed in the ZUI.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">PySide6</span><span class="w"> </span><span class="kn">import</span> <span class="n">QtCore</span><span class="p">,</span> <span class="n">QtGui</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PySide6.QtCore</span><span class="w"> </span><span class="kn">import</span> <span class="n">QThread</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">zooui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.mediaobject</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoadError</span><span class="p">,</span> <span class="n">MediaObject</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.mediaobjectsutils.string.textlayout</span><span class="w"> </span><span class="kn">import</span> <span class="n">TextLayoutData</span>
+
+
+<div class="viewcode-block" id="StringMediaObject">
+<a class="viewcode-back" href="../../../../zooui/objects/mediaobjects/stringmediaobject.html#zooui.objects.mediaobjects.stringmediaobject.StringMediaObject">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">StringMediaObject</span><span class="p">(</span><span class="n">MediaObject</span><span class="p">):</span>  <span class="c1"># , Thread</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Constructor :</span>
+<span class="sd">        StringMediaObject(media_id, scene)</span>
+<span class="sd">    Parameters :</span>
+<span class="sd">        media_id : str</span>
+<span class="sd">        scene : Scene</span>
+
+<span class="sd">    StringMediaObject(media_id, scene) --&gt; None</span>
+
+<span class="sd">    StringMediaObject implements a hybrid rendering system for</span>
+<span class="sd">    text displayin the ZUI.</span>
+
+<span class="sd">    `StringMediaObject.media_id` should be of the form &#39;string:rrggbb:foobar&#39;,</span>
+<span class="sd">    where &#39;rrggbb&#39; is a string of three two-digit hexadecimal numbers</span>
+<span class="sd">    representing the colour of the text, and &#39;foobar&#39; is the string to be</span>
+<span class="sd">    displayed.</span>
+
+<span class="sd">    Overview:</span>
+
+<span class="sd">       - render Dual-mode triggered by scene.vzmoving (zoom velocity)</span>
+<span class="sd">       - moving mode: Direct QPainter.drawText() rendering for smooth zoom/pan operations</span>
+<span class="sd">       - static mode: Cached QImage rendering for optimal quality when stationary</span>
+<span class="sd">       - Automatic cache invalidation when movement starts to ensure fresh rendering</span>
+
+<span class="sd">    From &quot;foobar&quot; string QImage gets generated, from form &#39;string:rrggbb:foobar&#39; hash get&#39;s</span>
+<span class="sd">    generated for cache invalidation in case string color of text content changes.</span>
+<span class="sd">    Also Qfont, QFontMetrics, text dimension (width, height), and scale are cached.</span>
+
+<span class="sd">    QImage cached image gets invalidated if relative_scale_diff &gt; 1% or if</span>
+<span class="sd">    self__scene_vzmoving returns True</span>
+
+<span class="sd">    For direct text rendering :</span>
+<span class="sd">       - longest line index gets Pre-calculated for efficient multi-line rendering</span>
+<span class="sd">       - Font creation only when point size ≥ 1 (visible text)</span>
+<span class="sd">       - Visibility culling based on viewport size ratios</span>
+<span class="sd">       - Automatic cache validation with comprehensive invalidation triggers</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">media_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">scene</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a new StringMediaObject from the media identified by media_id,</span>
+<span class="sd">        and the parent Scene referenced by scene.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">MediaObject</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">media_id</span><span class="p">,</span> <span class="n">scene</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;StringMediaObject&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Get color code &#39;rrggbb&#39; from media_id string and assign it to hexcol variable</span>
+        <span class="n">hexcol</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;string:&quot;</span><span class="p">)</span> <span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="s2">&quot;string:rrggbb&quot;</span><span class="p">)]</span>
+
+        <span class="c1"># Initialize and assign QtGui.QColor which can then be passed to QtPainter.setPen</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__color</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QColor</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QColor</span><span class="p">(</span><span class="s2">&quot;#&quot;</span> <span class="o">+</span> <span class="n">hexcol</span><span class="p">)</span>
+
+        <span class="c1"># Check if color is valid to QtGui.QColor() and if not an error is raised</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__color</span><span class="o">.</span><span class="n">isValid</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">LoadError</span><span class="p">(</span><span class="s2">&quot;the supplied colour is invalid&quot;</span><span class="p">)</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets to be displayed text `foobar` from media_id string and assign it</span>
+<span class="sd">        to self.__str variable.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Extract the text portion from media_id by slicing from position after &#39;string:rrggbb:&#39;</span>
+        <span class="c1"># Example: &#39;string:FF0000:Hello World&#39; -&gt; &#39;Hello World&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__str</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;string:rrggbb:&quot;</span><span class="p">)</span> <span class="p">:]</span>
+
+        <span class="c1"># Returns a list of strings, e.g., &#39;Hello\nWorld&#39; -&gt; [&#39;Hello&#39;, &#39;World&#39;]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Pre-calculate which line is longest to avoid sorting on every render</span>
+        <span class="c1"># max() finds the maximum value from range(len(self.__lines)) using a custom key function</span>
+        <span class="c1"># range(len(self.__lines)) generates indices: 0, 1, 2, ... for each line</span>
+        <span class="c1"># key=lambda i: len(self.__lines[i]) tells max() to compare lines by their length</span>
+        <span class="c1"># Returns the INDEX of the longest line, not the line itself</span>
+        <span class="c1"># Example: if lines = [&#39;Hi&#39;, &#39;Hello&#39;, &#39;Hey&#39;], this returns 1 (index of &#39;Hello&#39;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__longest_line_idx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">)),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+        <span class="c1"># Initialize private variables that will be used for caching optimizations</span>
+        <span class="c1"># These start as None and will store computed values when first accessed</span>
+
+        <span class="c1"># Stores the scale value (2^(scene.zoomlevel + object.zoomlevel))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Stores the QFont object to avoid recreating it on every render call</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_font</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QFont</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Stores the QFontMetrics object (calculates text dimensions)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_font_metrics</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QFontMetrics</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Stores the calculated (width, height) tuple for this string at current scale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_onscreen_size</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Text image caching variables</span>
+        <span class="c1"># Stores the rendered text as QImage for faster rendering at high zoom</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_text_image</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QImage</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Stores the scale at which the text image was rendered</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_image_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Stores the render mode used for the cached image</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_image_mode</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Stores hash of text content and color for cache invalidation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_text_hash</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Track if we were previously static to detect when movement starts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__was_static</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Parallel rendering support</span>
+        <span class="c1"># Stores pre-calculated layout data for parallel rendering</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__layout_data</span><span class="p">:</span> <span class="n">TextLayoutData</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Timestamp for layout cache invalidation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__layout_timestamp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="c1"># Whether parallel rendering is enabled for this object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__parallel_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Performance statistics for parallel rendering</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__parallel_stats</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;layout_calculations&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;cache_hits&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;render_time_ms&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;last_render_time&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="c1"># Class variable: indicates this media object supports transparency</span>
+    <span class="n">transparent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1"># Class variable: point size of the font when the scale is 100%</span>
+    <span class="n">base_pointsize</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">24.0</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__compute_text_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            StringMediaObject.__compute_text_hash()</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            None</span>
+
+<span class="sd">        StringMediaObject.__compute_text_hash() --&gt; int</span>
+
+<span class="sd">        Compute hash of text content and color for cache invalidation.</span>
+<span class="sd">        Returns a combined hash of all text lines and the color RGB value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Combine all lines into a single string for hashing</span>
+        <span class="n">text_content</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">)</span>
+        <span class="n">color_rgb</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__color</span><span class="o">.</span><span class="n">rgb</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="n">text_content</span><span class="p">,</span> <span class="n">color_rgb</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__is_image_cache_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_scale</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            StringMediaObject.__is_image_cache_valid(current_scale, mode)</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            current_scale : float</span>
+<span class="sd">            mode : int</span>
+
+<span class="sd">        StringMediaObject.__is_image_cache_valid(current_scale, mode) --&gt; bool</span>
+
+<span class="sd">        Check if cached text image is valid for current scale and render mode.</span>
+<span class="sd">        Returns True if cache is valid, False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_text_image</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_image_scale</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_image_mode</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Check scale - text rendering is very sensitive to scale changes</span>
+        <span class="c1"># We need exact scale match for text rendering</span>
+        <span class="c1"># Use relative difference to handle floating point precision</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_image_scale</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">current_scale</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">relative_scale_diff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">current_scale</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_image_scale</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_image_scale</span>
+        <span class="k">if</span> <span class="n">relative_scale_diff</span> <span class="o">&gt;</span> <span class="mf">0.01</span><span class="p">:</span>  <span class="c1"># 1% tolerance</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Check render mode</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_image_mode</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Check text/color hasn&#39;t changed</span>
+        <span class="n">current_hash</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__compute_text_hash</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">current_hash</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_text_hash</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__render_text_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">painter</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            StringMediaObject.__render_text_direct(painter, x, y, mode)</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            painter : QPainter</span>
+<span class="sd">            x : float - x position to render at</span>
+<span class="sd">            y : float - y position to render at</span>
+<span class="sd">            mode : int</span>
+
+<span class="sd">        StringMediaObject.__render_text_direct(painter, x, y, mode) --&gt; None</span>
+
+<span class="sd">        Render text directly using QPainter.drawText().</span>
+<span class="sd">        This is the original rendering method used before caching was implemented.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get dimensions</span>
+        <span class="n">onscreen_w</span><span class="p">:</span> <span class="nb">float</span>
+        <span class="n">onscreen_h</span><span class="p">:</span> <span class="nb">float</span>
+        <span class="n">onscreen_w</span><span class="p">,</span> <span class="n">onscreen_h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">onscreen_size</span>
+        <span class="k">if</span> <span class="n">onscreen_w</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">onscreen_h</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Set pen color for text</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__color</span><span class="p">)</span>
+
+        <span class="c1"># Get font</span>
+        <span class="n">font</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QFont</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__font</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">font</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">painter</span><span class="o">.</span><span class="n">setFont</span><span class="p">(</span><span class="n">font</span><span class="p">)</span>
+
+        <span class="c1"># Get font metrics</span>
+        <span class="n">fontmetrics</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QFontMetrics</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_font_metrics</span>
+        <span class="k">if</span> <span class="n">fontmetrics</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">fontmetrics_nonnull</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QFontMetrics</span> <span class="o">=</span> <span class="n">fontmetrics</span>
+        <span class="n">hl</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">fontmetrics_nonnull</span><span class="o">.</span><span class="n">height</span><span class="p">()</span>
+
+        <span class="c1"># Render multiline or single line text</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">yr</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">y</span>
+            <span class="n">line</span><span class="p">:</span> <span class="nb">str</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">:</span>
+                <span class="n">rect</span><span class="p">:</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QRectF</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QRectF</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">yr</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">onscreen_w</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">hl</span><span class="p">))</span>
+                <span class="n">painter</span><span class="o">.</span><span class="n">drawText</span><span class="p">(</span><span class="n">rect</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+                <span class="n">yr</span> <span class="o">+=</span> <span class="n">hl</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rect</span><span class="p">:</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QRectF</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QRectF</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">onscreen_w</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">hl</span><span class="p">))</span>  <span class="c1"># type: ignore[no-redef]</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">drawText</span><span class="p">(</span><span class="n">rect</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__render_text_to_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QImage</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            StringMediaObject.__render_text_to_image(mode)</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            mode : int</span>
+
+<span class="sd">        StringMediaObject.__render_text_to_image(mode) --&gt; QImage</span>
+
+<span class="sd">        Render text to QImage for caching.</span>
+<span class="sd">        Creates a transparent image with the text rendered at current scale.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get dimensions</span>
+        <span class="n">onscreen_w</span><span class="p">:</span> <span class="nb">float</span>
+        <span class="n">onscreen_h</span><span class="p">:</span> <span class="nb">float</span>
+        <span class="n">onscreen_w</span><span class="p">,</span> <span class="n">onscreen_h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">onscreen_size</span>
+        <span class="k">if</span> <span class="n">onscreen_w</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">onscreen_h</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QImage</span><span class="p">()</span>
+
+        <span class="c1"># Create transparent image with appropriate size</span>
+        <span class="n">image</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QImage</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QImage</span><span class="p">(</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">onscreen_w</span><span class="p">),</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">onscreen_h</span><span class="p">),</span>
+            <span class="n">QtGui</span><span class="o">.</span><span class="n">QImage</span><span class="o">.</span><span class="n">Format</span><span class="o">.</span><span class="n">Format_ARGB8565_Premultiplied</span><span class="p">,</span>  <span class="c1"># Format_ARGB32_Premultiplied</span>
+        <span class="p">)</span>
+        <span class="n">image</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">GlobalColor</span><span class="o">.</span><span class="n">transparent</span><span class="p">)</span>
+
+        <span class="c1"># Create painter for image</span>
+        <span class="n">painter</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPainter</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPainter</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+        <span class="c1"># painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)</span>
+        <span class="c1"># painter.setRenderHint(QtGui.QPainter.RenderHint.TextAntialiasing)</span>
+
+        <span class="c1"># Render text to image using direct rendering logic at position (0, 0)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__render_text_direct</span><span class="p">(</span><span class="n">painter</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+
+        <span class="n">painter</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">image</span>
+
+<div class="viewcode-block" id="StringMediaObject.invalidate_cache">
+<a class="viewcode-back" href="../../../../zooui/objects/mediaobjects/stringmediaobject.html#zooui.objects.mediaobjects.stringmediaobject.StringMediaObject.invalidate_cache">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">invalidate_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            StringMediaObject.invalidate_cache()</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            None</span>
+
+<span class="sd">        StringMediaObject.invalidate_cache() --&gt; None</span>
+
+<span class="sd">        Invalidate text image cache.</span>
+<span class="sd">        Clears all cached image data to force re-rendering on next render call.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_text_image</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_image_scale</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_image_mode</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_text_hash</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_onscreen_size</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Also invalidate parallel rendering cache</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__layout_data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__layout_timestamp</span> <span class="o">=</span> <span class="mf">0.0</span></div>
+
+
+    <span class="c1"># Parallel rendering helper methods</span>
+<div class="viewcode-block" id="StringMediaObject._get_text">
+<a class="viewcode-back" href="../../../../zooui/objects/mediaobjects/stringmediaobject.html#zooui.objects.mediaobjects.stringmediaobject.StringMediaObject._get_text">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_text</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the text content for parallel rendering.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The text string to render</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__str</span></div>
+
+
+<div class="viewcode-block" id="StringMediaObject._get_font">
+<a class="viewcode-back" href="../../../../zooui/objects/mediaobjects/stringmediaobject.html#zooui.objects.mediaobjects.stringmediaobject.StringMediaObject._get_font">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_font</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the font properties for parallel rendering (thread-safe).</span>
+
+<span class="sd">        Returns plain Python data (dict) instead of a QFont object so</span>
+<span class="sd">        that this method can be safely called from any thread.</span>
+<span class="sd">        QtGui.QFont construction is deferred to TextLayoutData.to_qfont()</span>
+<span class="sd">        which runs on the main thread during rendering.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict with keys: family, pointsize, weight, italic</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pointsize</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_pointsize</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;family&quot;</span><span class="p">:</span> <span class="s2">&quot;Sans Serif&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;pointsize&quot;</span><span class="p">:</span> <span class="n">pointsize</span><span class="p">,</span>
+            <span class="s2">&quot;weight&quot;</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QFont</span><span class="o">.</span><span class="n">Normal</span><span class="p">,</span>
+            <span class="s2">&quot;italic&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="StringMediaObject._get_color">
+<a class="viewcode-back" href="../../../../zooui/objects/mediaobjects/stringmediaobject.html#zooui.objects.mediaobjects.stringmediaobject.StringMediaObject._get_color">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_color</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QColor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the text color for parallel rendering.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            QColor object for text color</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__color</span></div>
+
+
+<div class="viewcode-block" id="StringMediaObject.precalculate_layout">
+<a class="viewcode-back" href="../../../../zooui/objects/mediaobjects/stringmediaobject.html#zooui.objects.mediaobjects.stringmediaobject.StringMediaObject.precalculate_layout">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">precalculate_layout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viewport_rect</span><span class="p">:</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QRectF</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TextLayoutData</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pre-calculate layout data for parallel rendering.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            viewport_rect: Current viewport rectangle</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            TextLayoutData if successful, None otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+            <span class="c1"># Check if we have valid cached layout data</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__layout_data</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__layout_data</span><span class="o">.</span><span class="n">is_valid</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__layout_data</span><span class="o">.</span><span class="n">is_stale</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__parallel_stats</span><span class="p">[</span><span class="s2">&quot;cache_hits&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__layout_data</span>
+
+            <span class="c1"># Calculate new layout data</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__layout_data</span> <span class="o">=</span> <span class="n">TextLayoutData</span><span class="o">.</span><span class="n">from_string_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viewport_rect</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__layout_timestamp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__parallel_stats</span><span class="p">[</span><span class="s2">&quot;layout_calculations&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="n">processing_time</span> <span class="o">=</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__parallel_stats</span><span class="p">[</span><span class="s2">&quot;render_time_ms&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">processing_time</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__parallel_stats</span><span class="p">[</span><span class="s2">&quot;last_render_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">processing_time</span>
+
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__layout_data</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error precalculating layout: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="StringMediaObject.render_with_layout">
+<a class="viewcode-back" href="../../../../zooui/objects/mediaobjects/stringmediaobject.html#zooui.objects.mediaobjects.stringmediaobject.StringMediaObject.render_with_layout">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">render_with_layout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">painter</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPainter</span><span class="p">,</span> <span class="n">layout_data</span><span class="p">:</span> <span class="n">TextLayoutData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Render text using pre-calculated layout data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            painter: QPainter object to render with</span>
+<span class="sd">            layout_data: Pre-calculated TextLayoutData</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if rendering successful, False otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+            <span class="c1"># Render using layout data</span>
+            <span class="n">layout_data</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">painter</span><span class="p">)</span>
+
+            <span class="n">processing_time</span> <span class="o">=</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__parallel_stats</span><span class="p">[</span><span class="s2">&quot;render_time_ms&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">processing_time</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__parallel_stats</span><span class="p">[</span><span class="s2">&quot;last_render_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">processing_time</span>
+
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error rendering with layout: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="StringMediaObject.get_parallel_stats">
+<a class="viewcode-back" href="../../../../zooui/objects/mediaobjects/stringmediaobject.html#zooui.objects.mediaobjects.stringmediaobject.StringMediaObject.get_parallel_stats">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_parallel_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get parallel rendering statistics.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dictionary with parallel rendering statistics</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parallel_stats</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;has_layout_cache&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__layout_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;layout_cache_valid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__layout_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__layout_data</span><span class="o">.</span><span class="n">is_valid</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__layout_data</span><span class="o">.</span><span class="n">is_stale</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;parallel_enabled&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parallel_enabled</span>
+        <span class="k">return</span> <span class="n">stats</span></div>
+
+
+<div class="viewcode-block" id="StringMediaObject.enable_parallel_rendering">
+<a class="viewcode-back" href="../../../../zooui/objects/mediaobjects/stringmediaobject.html#zooui.objects.mediaobjects.stringmediaobject.StringMediaObject.enable_parallel_rendering">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">enable_parallel_rendering</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enable or disable parallel rendering for this object.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            enabled: Whether to enable parallel rendering</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__parallel_enabled</span> <span class="o">=</span> <span class="n">enabled</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">enabled</span><span class="p">:</span>
+            <span class="c1"># Clear layout cache when disabling</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__layout_data</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__layout_timestamp</span> <span class="o">=</span> <span class="mf">0.0</span></div>
+
+
+<div class="viewcode-block" id="StringMediaObject.render">
+<a class="viewcode-back" href="../../../../zooui/objects/mediaobjects/stringmediaobject.html#zooui.objects.mediaobjects.stringmediaobject.StringMediaObject.render">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">painter</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            StringMediaObject.render(painter, mode)</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            painter : QPainter</span>
+<span class="sd">            mode : int</span>
+
+<span class="sd">        StringMediaObject.render(painter, mode) --&gt; None</span>
+
+<span class="sd">        Given QPainter and Rendering mode renders the string calculating the</span>
+<span class="sd">        rendering rectangle and using QtPainter.drawText</span>
+
+<span class="sd">        Note: Size visibility is checked by the scene via is_size_visible().</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Get top-left corner position of the text object on scremoen</span>
+        <span class="n">x</span><span class="p">:</span> <span class="nb">float</span>
+        <span class="n">y</span><span class="p">:</span> <span class="nb">float</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">topleft</span>
+
+        <span class="c1"># Hybrid rendering: use parallel/direct rendering while scene is moving, cached images when static</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">vzmoving</span><span class="p">:</span>
+            <span class="c1"># Scene is zooming - use parallel or direct rendering for smoothness</span>
+            <span class="c1"># Invalidate cache when zooming starts to ensure fresh cache when movement stops</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__was_static</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">invalidate_cache</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__was_static</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="c1"># Try parallel rendering if enabled and layout data is available</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__parallel_enabled</span>
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__layout_data</span>
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__layout_data</span><span class="o">.</span><span class="n">is_valid</span>
+                <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__layout_data</span><span class="o">.</span><span class="n">is_stale</span><span class="p">()</span>
+            <span class="p">):</span>
+                <span class="c1"># Use pre-calculated layout for rendering</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">render_with_layout</span><span class="p">(</span><span class="n">painter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__layout_data</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Fall back to direct rendering</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__render_text_direct</span><span class="p">(</span><span class="n">painter</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Scene is static - use cached images for optimal rendering quality</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__was_static</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">current_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_image_cache_valid</span><span class="p">(</span><span class="n">current_scale</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+                <span class="c1"># Draw cached image</span>
+                <span class="n">painter</span><span class="o">.</span><span class="n">drawImage</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_text_image</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Render text to image, cache it, then draw</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__cached_text_image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__render_text_to_image</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__cached_image_scale</span> <span class="o">=</span> <span class="n">current_scale</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__cached_image_mode</span> <span class="o">=</span> <span class="n">mode</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__cached_text_hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__compute_text_hash</span><span class="p">()</span>
+
+                <span class="c1"># Draw the newly cached image</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_text_image</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_text_image</span><span class="o">.</span><span class="n">isNull</span><span class="p">():</span>
+                    <span class="n">painter</span><span class="o">.</span><span class="n">drawImage</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_text_image</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StringMediaObject.is_size_visible">
+<a class="viewcode-back" href="../../../../zooui/objects/mediaobjects/stringmediaobject.html#zooui.objects.mediaobjects.stringmediaobject.StringMediaObject.is_size_visible">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_size_visible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        String-specific size visibility check.</span>
+
+<span class="sd">        Returns False if text is too small or too large to be visible,</span>
+<span class="sd">        otherwise returns super().is_size_visible(mode).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">is_size_visible</span><span class="p">(</span><span class="n">mode</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">onscreen_size</span>
+        <span class="n">viewport_w</span><span class="p">,</span> <span class="n">viewport_h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">viewport_size</span>
+
+        <span class="c1"># String-specific thresholds (from current render() method)</span>
+        <span class="n">not_too_small</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">int</span><span class="p">((</span><span class="nb">min</span><span class="p">(</span><span class="n">viewport_w</span><span class="p">,</span> <span class="n">viewport_h</span><span class="p">))</span> <span class="o">/</span> <span class="mi">48</span><span class="p">)</span>
+        <span class="n">not_too_large</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">int</span><span class="p">((</span><span class="nb">max</span><span class="p">(</span><span class="n">viewport_w</span><span class="p">,</span> <span class="n">viewport_h</span><span class="p">))</span> <span class="o">/</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">not_too_small</span> <span class="ow">and</span> <span class="n">not_too_large</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__pointsize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Property :</span>
+<span class="sd">            __pointsize</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            None</span>
+
+<span class="sd">        __pointsize --&gt; float</span>
+
+<span class="sd">        Calculate and return the font point size based on the current scale.</span>
+
+<span class="sd">        Returns base_pointsize multiplied by the current scale factor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_pointsize</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__font</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QFont</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Property :</span>
+<span class="sd">            __font</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            None</span>
+
+<span class="sd">        __font --&gt; QFont or None</span>
+
+<span class="sd">        Create and return a QFont object with the appropriate point size</span>
+<span class="sd">        for the current scale.</span>
+
+<span class="sd">        Returns minimum font (1.0 point) if the point size is less than 1.</span>
+<span class="sd">        Otherwise returns a Sans Serif font with the calculated point size.</span>
+
+<span class="sd">        Uses caching to avoid recreating font objects on every access.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">current_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span>
+
+        <span class="c1"># Return cached font if scale hasn&#39;t changed</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_scale</span> <span class="o">==</span> <span class="n">current_scale</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_font</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_font</span>
+
+        <span class="c1"># Guard: QFont/QFontMetrics must only be constructed on the main thread.</span>
+        <span class="c1"># Constructing them from worker threads causes C++-level races in Qt&#39;s</span>
+        <span class="c1"># font database and glyph caches, leading to SIGSEGV crashes.</span>
+        <span class="n">app</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QCoreApplication</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">app</span> <span class="ow">and</span> <span class="n">app</span><span class="o">.</span><span class="n">thread</span><span class="p">()</span> <span class="o">!=</span> <span class="n">QThread</span><span class="o">.</span><span class="n">currentThread</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;__font accessed from non-main thread; QFont construction deferred to avoid crash&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_font</span>
+
+        <span class="n">pointsize</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pointsize</span>
+
+        <span class="c1"># Apply minimum font size (1.0 points) when too small</span>
+        <span class="k">if</span> <span class="n">pointsize</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">pointsize</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># Minimum visible font size</span>
+
+        <span class="n">font</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QFont</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QFont</span><span class="p">(</span><span class="s2">&quot;Sans Serif&quot;</span><span class="p">)</span>
+        <span class="n">font</span><span class="o">.</span><span class="n">setPointSizeF</span><span class="p">(</span><span class="n">pointsize</span><span class="p">)</span>
+
+        <span class="c1"># Cache the font and metrics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_scale</span> <span class="o">=</span> <span class="n">current_scale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_font</span> <span class="o">=</span> <span class="n">font</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_font_metrics</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QFontMetrics</span><span class="p">(</span><span class="n">font</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">font</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">onscreen_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Property :</span>
+<span class="sd">            StringMediaObject.onscreen_size</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            None</span>
+
+<span class="sd">        StringMediaObject.onscreen_size --&gt; Tuple[float, float]</span>
+
+<span class="sd">        Returns width and height of the MediaObject passed to the StringMediaObject Class.</span>
+
+<span class="sd">        Uses caching to avoid recalculating size on every access.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">current_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span>
+
+        <span class="c1"># Return cached size if scale hasn&#39;t changed</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_scale</span> <span class="o">==</span> <span class="n">current_scale</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_onscreen_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_onscreen_size</span>
+
+        <span class="n">font</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QFont</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__font</span>
+
+        <span class="k">if</span> <span class="n">font</span><span class="p">:</span>
+            <span class="c1"># Use cached font metrics instead of creating new ones</span>
+            <span class="n">fontmetrics</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QFontMetrics</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_font_metrics</span>
+
+            <span class="k">if</span> <span class="n">fontmetrics</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># Fallback to minimum size estimation</span>
+                <span class="n">w</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__str</span><span class="p">)</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">)</span>  <span class="c1"># Estimate 5px per char, min 10px</span>
+                <span class="n">h</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">)</span>  <span class="c1"># Estimate 10px per line, min 10px</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__cached_onscreen_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+
+            <span class="c1"># Type assertion: fontmetrics is not None after the check above</span>
+            <span class="n">fontmetrics_nonnull</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QFontMetrics</span> <span class="o">=</span> <span class="n">fontmetrics</span>
+
+            <span class="n">w</span><span class="p">:</span> <span class="nb">float</span>  <span class="c1"># type: ignore[no-redef]</span>
+            <span class="n">h</span><span class="p">:</span> <span class="nb">float</span>  <span class="c1"># type: ignore[no-redef]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># Use cached longest line index instead of sorting every time</span>
+                <span class="n">longest_line</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__longest_line_idx</span><span class="p">]</span>
+                <span class="n">w</span> <span class="o">=</span> <span class="n">fontmetrics_nonnull</span><span class="o">.</span><span class="n">horizontalAdvance</span><span class="p">(</span><span class="n">longest_line</span> <span class="o">+</span> <span class="s2">&quot;-------&quot;</span><span class="p">)</span>
+                <span class="n">h</span> <span class="o">=</span> <span class="n">fontmetrics_nonnull</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">w</span> <span class="o">=</span> <span class="n">fontmetrics_nonnull</span><span class="o">.</span><span class="n">horizontalAdvance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__str</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
+                <span class="n">h</span> <span class="o">=</span> <span class="n">fontmetrics_nonnull</span><span class="o">.</span><span class="n">height</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">__cached_onscreen_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__cached_onscreen_size</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">lines</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Property :</span>
+<span class="sd">            lines</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            None</span>
+
+<span class="sd">        lines --&gt; list[str]</span>
+
+<span class="sd">        Get the list of text lines.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lines</span>
+
+    <span class="nd">@lines</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">lines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_lines</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter :</span>
+<span class="sd">            lines</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            new_lines : list[str]</span>
+
+<span class="sd">        lines = new_lines --&gt; None</span>
+
+<span class="sd">        Set new text lines and update internal state.</span>
+<span class="sd">        Updates the longest line index and invalidates caches.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__lines</span> <span class="o">=</span> <span class="n">new_lines</span>
+        <span class="c1"># Update longest line index</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__longest_line_idx</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">)),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__lines</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__longest_line_idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># Invalidate caches since text content changed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">invalidate_cache</span><span class="p">()</span></div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">ZooUI</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html">ZooUI installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/userinterface.html">User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usageinstructions/svgfeatures.html">SVG Features</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/configsystem.html">Configuration System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/objectsystem.html">Object System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/windowsystem.html">Window System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/backup.html">Backup System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testingdocumentation/unittest.html">Unit Testing Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testingdocumentation/integrationtest.html">Integration Testing Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../benchmarksdocumentation/qzuibenchmark.html">QZUI Benchmark Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../benchmarksdocumentation/converterbenchmark.html">Converter Benchmark Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributionguidelines/codestyle.html">Code Style Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../zooui.html">zooui package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, David Roberts, Andrea Silvestri.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

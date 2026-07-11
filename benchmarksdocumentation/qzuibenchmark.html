@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>QZUI Benchmark Documentation &#8212; PyZui 0.5.2 documentation</title>
+    <title>QZUI Benchmark Documentation &#8212; ZooUI 0.5.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cc7d0dec" />
@@ -38,7 +38,7 @@
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
 <p>The QZUI Benchmark is a comprehensive performance testing tool for
-PyZUI that measures rendering performance and memory consumption under
+ZooUI that measures rendering performance and memory consumption under
 load. It continuously populates a scene with media objects while
 monitoring frame timing and resource usage.</p>
 <p>The benchmark includes <strong>cyclical zoom and pan operations</strong> that
@@ -80,7 +80,7 @@ by continuously changing which tiles are visible.</p>
 <section id="quick-start">
 <span id="id1"></span><h2>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h2>
 <p>Run a basic 30-second benchmark with zoom/pan movement:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>/path/to/pyzui
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>/path/to/zooui
 python<span class="w"> </span>test/benchmarks/stress_benchmark.py
 </pre></div>
 </div>
@@ -100,13 +100,13 @@ python<span class="w"> </span>test/benchmarks/stress_benchmark.py
 <span id="id3"></span><h3>Basic Usage<a class="headerlink" href="#basic-usage" title="Link to this heading">¶</a></h3>
 <p>The QZUI Benchmark can be run from the command line with default or
 custom settings:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># From the pyzui project root directory</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># From the zooui project root directory</span>
 python<span class="w"> </span>test/benchmarks/stress_benchmark.py
 </pre></div>
 </div>
 <p>This will:</p>
 <ol class="arabic simple">
-<li><p>Launch a PyZUI window (1280x720 by default)</p></li>
+<li><p>Launch a ZooUI window (1280x720 by default)</p></li>
 <li><p>Add 10 initial objects to the scene</p></li>
 <li><p>Run for 30 seconds, adding 5 objects per second</p></li>
 <li><p>Apply continuous zoom oscillation (10s cycle) and pan movement (8s cycle)</p></li>
@@ -249,7 +249,7 @@ python<span class="w"> </span>test/benchmarks/stress_benchmark.py
 <span id="id6"></span><h3>Output Interpretation<a class="headerlink" href="#output-interpretation" title="Link to this heading">¶</a></h3>
 <p>The benchmark produces output in three stages.</p>
 <p><strong>1. Configuration Summary</strong></p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>PyZUI QZUI Benchmark
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>ZooUI QZUI Benchmark
 ============================================================
 Configuration:
   Target FPS:        30
@@ -546,7 +546,7 @@ Final object count:  160
 </section>
 <section id="performance-optimizations">
 <span id="id14"></span><h3>Performance Optimizations<a class="headerlink" href="#performance-optimizations" title="Link to this heading">¶</a></h3>
-<p>PyZUI includes several performance optimizations for mathematical operations
+<p>ZooUI includes several performance optimizations for mathematical operations
 that are critical for rendering performance:</p>
 <dl class="simple">
 <dt><strong>Exponential Functions</strong></dt><dd><p>Replaced <code class="docutils literal notranslate"><span class="pre">2**x</span></code> with <code class="docutils literal notranslate"><span class="pre">math.exp2(x)</span></code> for floating-point exponents.
@@ -560,13 +560,13 @@ Bit shifting is significantly faster than exponentiation.</p>
 </dd>
 <dt><strong>Optimized Files</strong></dt><dd><p>These optimizations were applied to the following critical files:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">pyzui/objects/physicalobject.py</span></code> - Core zoom calculations</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">pyzui/objects/mediaobjects/tiledmediaobject.py</span></code> - Tile rendering</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">pyzui/tilesystem/tilemanager.py</span></code> - Tile management</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">pyzui/tilesystem/tiler/tiler.py</span></code> - Tile generation</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">pyzui/tilesystem/tileproviders/ferndynamictileprovider.py</span></code> - Dynamic tiles</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">pyzui/objects/scene/scene.py</span></code> - Scene zoom operations</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">pyzui/objects/mediaobjects/mediaobject.py</span></code> - Media object zoom</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zooui/objects/physicalobject.py</span></code> - Core zoom calculations</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zooui/objects/mediaobjects/tiledmediaobject.py</span></code> - Tile rendering</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zooui/tilesystem/tilemanager.py</span></code> - Tile management</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zooui/tilesystem/tiler/tiler.py</span></code> - Tile generation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zooui/tilesystem/tileproviders/ferndynamictileprovider.py</span></code> - Dynamic tiles</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zooui/objects/scene/scene.py</span></code> - Scene zoom operations</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zooui/objects/mediaobjects/mediaobject.py</span></code> - Media object zoom</p></li>
 </ul>
 </dd>
 <dt><strong>Benchmark Impact</strong></dt><dd><p>These optimizations improve overall rendering performance, particularly
@@ -665,7 +665,7 @@ improvements in frame timing and memory efficiency.</p>
 <hr class="docutils" />
 <section id="license">
 <h2>License<a class="headerlink" href="#license" title="Link to this heading">¶</a></h2>
-<p>This benchmark is part of PyZUI and licensed under GNU GPLv2.</p>
+<p>This benchmark is part of ZooUI and licensed under GNU GPLv2.</p>
 <p>Copyright (C) 2009
 David Roberts &lt;<a class="reference external" href="mailto:d&#37;&#52;&#48;vidr&#46;cc">d<span>&#64;</span>vidr<span>&#46;</span>cc</a>&gt;</p>
 </section>
@@ -678,7 +678,7 @@ David Roberts &lt;<a class="reference external" href="mailto:d&#37;&#52;&#48;vid
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../index.html">PyZui</a></h1>
+<h1 class="logo"><a href="../index.html">ZooUI</a></h1>
 
 
 
@@ -690,9 +690,9 @@ David Roberts &lt;<a class="reference external" href="mailto:d&#37;&#52;&#48;vid
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html">PyZui installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html">ZooUI installation instructions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#dependencies">Dependencies</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#running-pyzui">Running PyZUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
@@ -733,7 +733,7 @@ David Roberts &lt;<a class="reference external" href="mailto:d&#37;&#52;&#48;vid
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../pyzui.html">pyzui package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zooui.html">zooui package</a></li>
 </ul>
 
 <div class="relations">
