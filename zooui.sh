@@ -11,7 +11,7 @@ else
     fi
 fi
 
-CONDA_ENV="ZooUI-Wayland"
+CONDA_ENV="ZooUi-Wayland"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 exec 2>>"$SCRIPT_DIR/launcher.log"
 conda run -n "$CONDA_ENV" python "$SCRIPT_DIR/main.py" "$@"
