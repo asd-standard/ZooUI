@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.5.3] - 2026-07-17
 ### Added
 - Usage Instructions dialog under Help menu, automatically displaying content
   from `docs/source/usageinstructions/userinterface.rst` converted to HTML via
@@ -21,6 +23,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `da.vidr.cc/projects/pyzui/`) preserved as historical references.
 
 ### Fixed
+- **Segfault when loading the home scene after opening media files.** The
+  `DynamicTileProvider._load()` method called `QtGui.QImage(filename)` from a
+  background daemon thread (`TileProvider`), which is undefined behavior in Qt
+  and caused a segmentation fault when a `ProcessPoolExecutor` (from VIPS image
+  conversions) was active with its feeder/handler threads. Fixed by using
+  `PIL.Image.open()` instead, matching the `StaticTileProvider` pattern. The
+  PIL→QImage conversion now happens safely via `ImageQt.ImageQt()` (raw bytes,
+  thread-safe per Qt documentation) in `Tile.__init__`.
 - Home scene camera position drifting on first launch when window size differs
   from the scene default (1280×720). The `viewport_size` setter in `Scene` calls
   `zoom()` to scale content on resize, which corrupts the `.pzs` file's

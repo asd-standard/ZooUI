@@ -18,15 +18,15 @@
 filesystem (abstract base class)."""
 
 import os
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
-from PySide6 import QtGui
+from PIL import Image as PILImage
 
 from .. import tilestore as TileStore
 from .tileprovider import TileProvider
 
 if TYPE_CHECKING:
-    from PySide6.QtGui import QImage
+    pass
 
 TileID = tuple[str, int, int, int]  # type: ignore[misc]
 
@@ -52,7 +52,7 @@ class DynamicTileProvider(TileProvider):
         - Inherits from TileProvider base class
         - Provides default values for filext, tilesize, and aspect_ratio
         - _load() checks if tile exists locally before calling _load_dynamic()
-        - Uses QImage for loading tiles after they are created
+        - Uses PIL for loading tiles after they are created
         - Derived classes should override _load_dynamic() to implement
           specific tile generation or retrieval logic
 
@@ -127,26 +127,26 @@ class DynamicTileProvider(TileProvider):
         """
         pass
 
-    def _load(self, tile_id: TileID) -> Optional["QImage"]:
+    def _load(self, tile_id: TileID) -> PILImage.Image | None:
         """
         Method :
             DynamicTileProvider._load(tile_id)
         Parameters :
             tile_id : Tuple[str, int, int, int]
 
-        DynamicTileProvider._load(tile_id) --> QImage or None
+        DynamicTileProvider._load(tile_id) --> PIL Image or None
 
         Load a tile, generating it dynamically if it doesn't exist locally.
 
         The tile_id tuple contains (media_id, tilelevel, row, col). This method
         first checks if the tile exists in the local tilestore. If not, it calls
         _load_dynamic() to generate or retrieve the tile. Finally, it loads the
-        tile as a QImage and returns it.
+        tile as a PIL Image and returns it.
 
         Implementation Notes:
             - Gets tile path from TileStore with create=True flag
             - Only calls _load_dynamic() if tile file doesn't exist
-            - Uses QImage to load the tile after creation
+            - Uses PIL to load the tile after creation (safe in non-GUI threads)
             - Returns None if tile loading fails (logs exception)
             - Assumes tile is unavailable if any exception occurs
         """
@@ -157,7 +157,7 @@ class DynamicTileProvider(TileProvider):
             self._load_dynamic(tile_id, filename)
 
         try:
-            return QtGui.QImage(filename)
+            return PILImage.open(filename)
         except Exception:
             self._logger.exception("error loading tile, assuming it is unavailable")
             return None
