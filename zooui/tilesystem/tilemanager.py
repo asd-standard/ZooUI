@@ -95,6 +95,11 @@ def init(
     global __tilecache, __temptilecache, __tp_static, __tp_dynamic, __logger
     global __cleanup_enabled, __cleanup_max_age_days, __cleanup_executed
 
+    # Shut down any previous threads before re-initializing to prevent
+    # thread leaks when init() is called multiple times (e.g. in tests).
+    if __tilecache is not None or __tp_static is not None:
+        _shutdown_threads()
+
     # Store cleanup parameters for shutdown execution
     __cleanup_enabled = auto_cleanup
     __cleanup_max_age_days = cleanup_max_age_days
