@@ -16,6 +16,7 @@
 
 """QWidget for displaying the ZUI."""
 
+import time
 from typing import Any
 
 from PySide6 import QtCore, QtGui, QtWidgets
@@ -109,6 +110,10 @@ class QZUI(QtWidgets.QWidget):
         # Deferred zoom animation for when widget hasn't been sized yet
         self.__scene_animation_pending: bool = False
 
+        # Home point: saved (origin, zoomlevel) for quick navigation
+        self._home_point: tuple[tuple[float, float], float] | None = None
+        self._home_point_timestamp: float = 0.0
+
         self.__timer: QtCore.QBasicTimer = QtCore.QBasicTimer()
         self.__framerate: int
 
@@ -165,6 +170,37 @@ class QZUI(QtWidgets.QWidget):
         self.__active_object.aim("x", self.width() / 2 - self.__mousepos[0])
         self.__active_object.aim("y", self.height() / 2 - self.__mousepos[1])
 
+    def set_home_point(self) -> None:
+        """
+        Method :
+            set_home_point()
+        Parameters :
+            None
+
+        set_home_point() --> None
+
+        Save the current view position and zoom level as the home point.
+        """
+        self._home_point = (self.scene.origin, self.scene.zoomlevel)
+        self._home_point_timestamp = time.time()
+
+    def go_to_home_point(self) -> None:
+        """
+        Method :
+            go_to_home_point()
+        Parameters :
+            None
+
+        go_to_home_point() --> None
+
+        Restore the view to the saved home point position and zoom level.
+        """
+        if self._home_point is None:
+            return
+        origin, zoomlevel = self._home_point
+        self.scene.zoomlevel = zoomlevel
+        self.scene.origin = origin
+
     def paintEvent(self, event: QtGui.QPaintEvent) -> None:
         """
         Method :
@@ -204,6 +240,22 @@ class QZUI(QtWidgets.QWidget):
             ## Draw selection rectangle if currently drawing
             if self.__drawing_rect and self.__rect_start and self.__rect_end:
                 self.scene.action_draw_rect(self.__rect_start, self.__rect_end, painter, QtCore.Qt.green)
+
+            ## Draw home point marker pulse
+            if self._home_point is not None:
+                elapsed = time.time() - self._home_point_timestamp
+                if elapsed < 0.8:
+                    alpha = max(0.0, 1.0 - (elapsed / 0.8))
+                    color = QtGui.QColor(0, 200, 255, int(alpha * 255))
+                    pen = QtGui.QPen(color, 2)
+                    painter.setPen(pen)
+                    cx = self.width() / 2
+                    cy = self.height() / 2
+                    size = 20.0 * (1.0 + elapsed * 2)
+                    painter.drawLine(QtCore.QPointF(cx - size, cy), QtCore.QPointF(cx + size, cy))
+                    painter.drawLine(QtCore.QPointF(cx, cy - size), QtCore.QPointF(cx, cy + size))
+                    painter.drawEllipse(QtCore.QPointF(cx, cy), size, size)
+                    self.update()
 
         finally:
             painter.end()
@@ -872,6 +924,10 @@ class QZUI(QtWidgets.QWidget):
             self.__control_held = True
         elif key == QtCore.Qt.Key_Space:
             self.__centre()
+        elif key == QtCore.Qt.Key_Home and (event.modifiers() & QtCore.Qt.ShiftModifier):
+            self.set_home_point()
+        elif key == QtCore.Qt.Key_Home:
+            self.go_to_home_point()
         elif key == QtCore.Qt.Key_Delete:
             if self.scene.selection:
                 self.scene.remove(self.scene.selection)
@@ -1108,6 +1164,10 @@ class QZUI(QtWidgets.QWidget):
         self.__drawing_rect = False
         self.__rect_start = None
         self.__rect_end = None
+
+        # Reset home point
+        self._home_point = None
+        self._home_point_timestamp = 0.0
 
         # Apply zoom animation only for loaded scenes (not new scenes)
         # New scenes should use the default_zoomlevel from config

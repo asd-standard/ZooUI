@@ -934,6 +934,32 @@ class MainWindow(QtWidgets.QMainWindow):
 
         zui.scene.paste((scene_x, scene_y))
 
+    def __action_set_home_point(self) -> None:
+        """
+        Method :
+            MainWindow.__action_set_home_point()
+        Parameters :
+            None
+
+        MainWindow.__action_set_home_point() --> None
+
+        Handle Set Home Point menu action.
+        """
+        self.current_zui.set_home_point()
+
+    def __action_go_to_home_point(self) -> None:
+        """
+        Method :
+            MainWindow.__action_go_to_home_point()
+        Parameters :
+            None
+
+        MainWindow.__action_go_to_home_point() --> None
+
+        Handle Go to Home Point menu action.
+        """
+        self.current_zui.go_to_home_point()
+
     def __action_autosave_settings(self) -> None:
         """
         Method :
@@ -1060,6 +1086,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.__create_action("copy", "Copy &SVG", self.__action_copy, "Ctrl+C")
         self.__create_action("paste", "Paste &SVG", self.__action_paste, "Ctrl+V")
+        self.__create_action("set_home_point", "Set &Home Point", self.__action_set_home_point, "Ctrl+Shift+H")
+        self.__create_action("go_to_home_point", "&Go to Home Point", self.__action_go_to_home_point, "Ctrl+J")
 
         self.__create_action("autosave_settings", "&Autosave Settings", self.__action_autosave_settings)
         self.__create_action("zoom_settings", "&Zoom Settings", self.__action_zoom_settings)
@@ -1108,6 +1136,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.__menu["actions"] = self.menuBar().addMenu("&Actions")
         self.__menu["actions"].addAction(self.__action["copy"])
         self.__menu["actions"].addAction(self.__action["paste"])
+        self.__menu["actions"].addSeparator()
+        self.__menu["actions"].addAction(self.__action["set_home_point"])
+        self.__menu["actions"].addAction(self.__action["go_to_home_point"])
 
         self.__menu["settings"] = self.menuBar().addMenu("&Settings")
         self.__menu["settings"].addAction(self.__action["autosave_settings"])

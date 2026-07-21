@@ -987,7 +987,6 @@ class Scene(PhysicalObject):
             :meth:`Scene.render`
 
         """
-        media_id: str | bool
         # Error list to be filled with MediaObject.LoadError.
         errors = []
 
@@ -1106,29 +1105,13 @@ class Scene(PhysicalObject):
                 for i in range(len(self.__objects)):
                     if self.__objects[i]._media_id[14:] == right_selection_obj._media_id[14:]:
                         dialog = DialogWindows.modify_string_input_dialog(self.__objects[i]._media_id)
-                        try:
-                            ok, media_id, string_color, edited_text = dialog._run_dialog()
-
-                        except Exception:
-                            ok = False
-                            media_id = ""
-                            string_color = ""
-                            edited_text = ""
-
-                        if ok and media_id:
-                            # Get lines from input string
-                            lines: list[str] = edited_text.split("\n")
-                            # Update object props
-                            self.__objects[i].lines = lines  # type: ignore[attr-defined]
-                            self.__objects[i]._media_id = media_id
-                            self.__objects[i]._StringMediaObject__str = edited_text  # type: ignore[attr-defined]
-                            self.__objects[i]._StringMediaObject__color = QColor("#" + string_color)  # type: ignore[attr-defined]
-
-                            # Invalidate text image cache after text modification
-                            if hasattr(self.__objects[i], "invalidate_cache"):
-                                self.__objects[i].invalidate_cache()  # type: ignore[attr-defined]
-                            # print(self.__objects[i].__dict__)
+                        scene_obj = self
+                        obj_index = i
                         self.right_selection = None
+                        QtCore.QTimer.singleShot(
+                            0,
+                            lambda d=dialog, s=scene_obj, idx=obj_index: s._open_string_dialog(d, idx),
+                        )
                         break
 
             if type(self.right_selection).__name__ == "TiledMediaObject":
@@ -1137,20 +1120,8 @@ class Scene(PhysicalObject):
                 for i in range(len(self.__objects)):
                     if self.__objects[i]._media_id == right_selection_obj._media_id:
                         dialog = DialogWindows.modify_tiled_media_object_dialog(self.__objects[i])  # type: ignore[assignment,arg-type]
-                        try:
-                            ok, media_id = dialog._run_dialog()  # type: ignore[misc]
-
-                        except Exception as e:
-                            print(f"Error opening TiledMediaObject dialog: {e}")
-                            ok = False
-                            media_id = ""
-
-                        if ok and media_id:
-                            # Dialog already handles transformations (rotations, invert, grayscale)
-                            # media_id is the path to transformed image (if any)
-                            pass
-
                         self.right_selection = None
+                        QtCore.QTimer.singleShot(0, lambda d=dialog: d._run_dialog())  # type: ignore[misc]
                         break
 
             if type(self.right_selection).__name__ == "SVGMediaObject":
@@ -1159,53 +1130,86 @@ class Scene(PhysicalObject):
                 for i in range(len(self.__objects)):
                     if self.__objects[i]._media_id == right_selection_obj._media_id:
                         dialog = DialogWindows.modify_svg_input_dialog(self.__objects[i])  # type: ignore[assignment,arg-type]
-                        try:
-                            ok, cache_hash = dialog._run_dialog()  # type: ignore[misc]
-                        except Exception as e:
-                            print(f"Error opening SVG dialog: {e}")
-                            ok = False
-                            cache_hash = None
-
-                        if ok and cache_hash:
-                            # Update object with new cache hash
-                            svg_obj = self.__objects[i]
-                            svg_obj._media_id = cache_hash
-                            # Mark as modified for embedding
-                            svg_obj.mark_as_modified()  # type: ignore[attr-defined]
-
-                            # Force SVG renderer to reload from cache
-                            from zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
-
-                            cache_path = get_svg_cache().get_cache_path(cache_hash)
-
-                            # Reload the renderer with new cache file
-                            if svg_obj._SVGMediaObject__renderer.load(str(cache_path)):  # type: ignore[attr-defined]
-                                # Update SVG dimensions from reloaded renderer
-                                size = svg_obj._SVGMediaObject__renderer.defaultSize()  # type: ignore[attr-defined]
-                                svg_obj._SVGMediaObject__width = size.width()  # type: ignore[attr-defined]
-                                svg_obj._SVGMediaObject__height = size.height()  # type: ignore[attr-defined]
-
-                                # Clear size cache to force recalculation
-                                svg_obj._SVGMediaObject__cached_scale = None  # type: ignore[attr-defined]
-                                svg_obj._SVGMediaObject__cached_onscreen_size = None  # type: ignore[attr-defined]
-
-                                # Clear content cache
-                                svg_obj._SVGMediaObject__cached_svg_content = None  # type: ignore[attr-defined]
-
-                                # Set flag to indicate a repaint is needed
-                                self._needs_repaint = True
-
-                                print(
-                                    f"SVG modified successfully, cache hash: {cache_hash}, dimensions: {size.width()}x{size.height()}"
-                                )
-                            else:
-                                print(f"Failed to reload SVG renderer for cache hash: {cache_hash}")
-
+                        scene_obj = self
+                        obj_index = i
                         self.right_selection = None
+                        QtCore.QTimer.singleShot(
+                            0,
+                            lambda d=dialog, s=scene_obj, idx=obj_index: s._open_svg_dialog(d, idx),
+                        )
                         break
 
         # returning MediaObject.LoadError
         return errors
+
+    def _open_string_dialog(
+        self,
+        dialog: Any,  # ModifyStringDialog instance
+        obj_index: int,
+    ) -> None:
+        """Open a string modification dialog deferred from render().
+
+        Must be called from the event loop (via QTimer.singleShot), not
+        during paintEvent, to avoid recursive repaint and nested painter
+        errors.
+        """
+        try:
+            ok, media_id, string_color, edited_text = dialog._run_dialog()
+        except Exception:
+            ok = False
+            media_id = ""
+            string_color = ""
+            edited_text = ""
+
+        if ok and media_id:
+            lines: list[str] = edited_text.split("\n")
+            self.__objects[obj_index].lines = lines  # type: ignore[attr-defined]
+            self.__objects[obj_index]._media_id = media_id
+            self.__objects[obj_index]._StringMediaObject__str = edited_text  # type: ignore[attr-defined]
+            self.__objects[obj_index]._StringMediaObject__color = QColor("#" + string_color)  # type: ignore[attr-defined]
+            if hasattr(self.__objects[obj_index], "invalidate_cache"):
+                self.__objects[obj_index].invalidate_cache()  # type: ignore[attr-defined]
+
+    def _open_svg_dialog(
+        self,
+        dialog: Any,  # ModifySvgInputDialog instance
+        obj_index: int,
+    ) -> None:
+        """Open an SVG modification dialog deferred from render().
+
+        Must be called from the event loop (via QTimer.singleShot), not
+        during paintEvent, to avoid recursive repaint and nested painter
+        errors.
+        """
+        try:
+            ok, cache_hash = dialog._run_dialog()  # type: ignore[misc]
+        except Exception as e:
+            print(f"Error opening SVG dialog: {e}")
+            ok = False
+            cache_hash = None
+
+        if ok and cache_hash:
+            svg_obj = self.__objects[obj_index]
+            svg_obj._media_id = cache_hash
+            svg_obj.mark_as_modified()  # type: ignore[attr-defined]
+
+            from zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
+
+            cache_path = get_svg_cache().get_cache_path(cache_hash)
+
+            if svg_obj._SVGMediaObject__renderer.load(str(cache_path)):  # type: ignore[attr-defined]
+                size = svg_obj._SVGMediaObject__renderer.defaultSize()  # type: ignore[attr-defined]
+                svg_obj._SVGMediaObject__width = size.width()  # type: ignore[attr-defined]
+                svg_obj._SVGMediaObject__height = size.height()  # type: ignore[attr-defined]
+                svg_obj._SVGMediaObject__cached_scale = None  # type: ignore[attr-defined]
+                svg_obj._SVGMediaObject__cached_onscreen_size = None  # type: ignore[attr-defined]
+                svg_obj._SVGMediaObject__cached_svg_content = None  # type: ignore[attr-defined]
+                self._needs_repaint = True
+                print(
+                    f"SVG modified successfully, cache hash: {cache_hash}, dimensions: {size.width()}x{size.height()}"
+                )
+            else:
+                print(f"Failed to reload SVG renderer for cache hash: {cache_hash}")
 
     def step(self, t: float) -> None:
         """
