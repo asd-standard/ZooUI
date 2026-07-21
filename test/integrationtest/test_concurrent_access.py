@@ -203,7 +203,9 @@ def cache():
     Yields:
         TileCache: A fresh cache instance.
     """
-    return TileCache(maxsize=100, maxage=3600)
+    c = TileCache(maxsize=100, maxage=3600)
+    yield c
+    c.shutdown()
 
 
 class TestConcurrentTileRequests:

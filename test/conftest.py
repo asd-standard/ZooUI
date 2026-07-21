@@ -19,6 +19,8 @@
 Provides fixtures and hooks that apply to both unit and integration tests.
 """
 
+import threading
+
 import pytest
 
 
@@ -37,5 +39,34 @@ def _reset_converter_pool() -> None:
 
         if converterrunner._executor is not None:
             converterrunner.shutdown()
+    except Exception:
+        pass
+
+
+@pytest.fixture(autouse=True)
+def _stop_leaked_provider_threads() -> None:
+    """Stop any TileProvider threads not explicitly shut down by tests.
+
+    Tests that call provider.start() but not provider.stop() leak
+    daemon threads that accumulate across tests and eventually
+    exhaust system resources (thread stacks, fd table), causing
+    segmentation faults.
+    """
+    try:
+        from zooui.tilesystem.tileproviders.tileprovider import TileProvider
+    except ImportError:
+        yield
+        return
+
+    before = {t for t in threading.enumerate() if isinstance(t, TileProvider)}
+    yield
+    try:
+        after = {t for t in threading.enumerate() if isinstance(t, TileProvider)}
+        leaked = after - before
+        for provider in leaked:
+            provider.stop()
+        for provider in leaked:
+            if provider.is_alive():
+                provider.join(timeout=2.0)
     except Exception:
         pass

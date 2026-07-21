@@ -180,7 +180,9 @@ def cache():
     Yields:
         TileCache: A fresh cache instance.
     """
-    return TileCache(maxsize=100, maxage=3600)
+    c = TileCache(maxsize=100, maxage=3600)
+    yield c
+    c.shutdown()
 
 
 @pytest.fixture
@@ -193,7 +195,9 @@ def small_cache():
     Yields:
         TileCache: A cache limited to 5 tiles.
     """
-    return TileCache(maxsize=5, maxage=3600)
+    c = TileCache(maxsize=5, maxage=3600)
+    yield c
+    c.shutdown()
 
 
 @pytest.fixture

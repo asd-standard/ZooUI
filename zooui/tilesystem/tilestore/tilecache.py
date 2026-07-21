@@ -82,8 +82,10 @@ class TileCache:
         self.__periodic_clean_thread.start()
 
     def shutdown(self) -> None:
-        """Signal the periodic clean thread to stop."""
+        """Signal the periodic clean thread to stop and wait for it."""
         self.__shutdown_event.set()
+        if self.__periodic_clean_thread.is_alive():
+            self.__periodic_clean_thread.join(timeout=2.0)
 
     def insert(self, tile_id: TileID, tile: "Tile", maxaccesses: int = 0) -> None:
         """
