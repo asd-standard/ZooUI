@@ -1,0 +1,14 @@
+2026-07-14 12:27:15 | [INFO    ] | pyzui.LoggerConfig        | initialize           | ============================================================
+2026-07-14 12:27:15 | [INFO    ] | pyzui.LoggerConfig        | initialize           | PyZUI Logging System Initialized
+2026-07-14 12:27:15 | [INFO    ] | pyzui.LoggerConfig        | initialize           | Debug Mode: False
+2026-07-14 12:27:15 | [INFO    ] | pyzui.LoggerConfig        | initialize           | Console Level: WARNING
+2026-07-14 12:27:15 | [INFO    ] | pyzui.LoggerConfig        | initialize           | File Level: INFO
+2026-07-14 12:27:15 | [INFO    ] | pyzui.LoggerConfig        | initialize           | Log File: /home/asd/Projects/zooui/logs/pyzui.log
+2026-07-14 12:27:15 | [INFO    ] | pyzui.LoggerConfig        | initialize           | ============================================================
+2026-07-14 12:27:15 | [INFO    ] | pyzui.TileStore           | auto_cleanup         | Running automatic tilestore cleanup (fast mode)
+2026-07-14 12:27:15 | [INFO    ] | pyzui.TileStore           | cleanup_old_tiles    | Starting tilestore cleanup (max_age: 3 days, dry_run: False)
+2026-07-14 12:27:15 | [INFO    ] | pyzui.TileStore           | cleanup_old_tiles    | Found 1 media directories to check
+2026-07-14 12:27:15 | [INFO    ] | pyzui.TileStore           | cleanup_old_tiles    | Deleting old media: 46317d1e3ca386789dac372309f53d23e05cd3ce (age: 7.0 days, size: 0.60 MB)
+2026-07-14 12:27:15 | [INFO    ] | pyzui.TileStore           | cleanup_old_tiles    | Cleanup complete: Deleted 1 media directories, freed 0.60 MB. 0 directories kept.
+2026-07-14 12:27:15 | [INFO    ] | pyzui.SVGCache            | cleanup_on_exit      | Exit cleanup: removed 0 cache files
+2026-07-14 12:27:15 | [INFO    ] | pyzui.main                | main                 | Application exiting with code 0
