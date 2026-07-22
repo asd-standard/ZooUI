@@ -14,7 +14,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program; if not, see <https://www.gnu.org/licenses/>.
 
-"""Step: Actions Menu - Set/Go to Home Point."""
+"""Step: Actions Menu - Set/Go to Home Point.
+
+Tests the full home point round-trip:
+  Phase 1 — Zoom in to a distinct area, set home point (Ctrl+Shift+H)
+  Phase 2 — Zoom way out + pan far away, go home (Ctrl+J), verify snap-back
+  Phase 3 — Home / Shift+Home keys; home point cleared on new scene
+"""
 
 from __future__ import annotations
 
@@ -29,6 +35,11 @@ if TYPE_CHECKING:
     from guiintegration.main import GUITestContext
 
 
+ZOOM_IN_STEPS = 20
+ZOOM_OUT_STEPS = 25
+PAN_STEPS_AWAY = 30
+
+
 def run(ctx: GUITestContext) -> None:
     ctx.log.section("ACTIONS MENU - HOME POINT")
     ensure_test_scene_loaded(ctx)
@@ -36,64 +47,81 @@ def run(ctx: GUITestContext) -> None:
     zui = ctx.window.zui
     centre = QPoint(zui.width() // 2, zui.height() // 2)
 
-    ctx.log.action("Navigating to a specific view position for home point")
-    for _ in range(5):
+    # ============================================================
+    # Phase 1 — Set home point at a visually distinct position
+    # ============================================================
+    ctx.log.action("PHASE 1 — Zooming in to a distinct view area")
+    for _ in range(ZOOM_IN_STEPS):
         simulate_wheel(ctx, centre, 120)
         wait(ctx, ZOOM_STEP_DELAY_MS)
     for _ in range(10):
         simulate_key(ctx, Qt.Key_Right)
         wait(ctx, MOVE_STEP_DELAY_MS)
-    wait(ctx, SHORT_DELAY_MS, "Observe: current zoomed and panned view")
-
-    ctx.log.action("Setting home point via menu (Ctrl+Shift+H)")
-    trigger_action(ctx, "set_home_point")
-    wait(ctx, DEFAULT_DELAY_MS, "Observe: Cyan crosshair pulse marker at viewport centre")
-    ctx.log.success("Home point set - pulse marker confirmed")
-
-    ctx.log.action("Navigating to a completely different view")
     for _ in range(8):
+        simulate_key(ctx, Qt.Key_Down)
+        wait(ctx, MOVE_STEP_DELAY_MS)
+    wait(ctx, SHORT_DELAY_MS, "Observe: zoomed in on a specific area. REMEMBER this view — this will be your home point.")
+
+    ctx.log.action("Setting home point (Ctrl+Shift+H)")
+    trigger_action(ctx, "set_home_point")
+    wait(ctx, DEFAULT_DELAY_MS, "Observe: Cyan crosshair pulse marker appears at viewport centre")
+    ctx.log.success("Home point saved — pulse marker confirmed")
+
+    # ============================================================
+    # Phase 2 — Navigate far away, then Ctrl+J back
+    # ============================================================
+    ctx.log.action("PHASE 2 — Navigating FAR away from the home point")
+    for _ in range(ZOOM_OUT_STEPS):
+        simulate_wheel(ctx, centre, -120)
+        wait(ctx, ZOOM_STEP_DELAY_MS)
+    for _ in range(PAN_STEPS_AWAY):
+        simulate_key(ctx, Qt.Key_Left)
+        wait(ctx, MOVE_STEP_DELAY_MS)
+    for _ in range(PAN_STEPS_AWAY):
+        simulate_key(ctx, Qt.Key_Up)
+        wait(ctx, MOVE_STEP_DELAY_MS)
+    wait(ctx, SHORT_DELAY_MS, "Observe: view is COMPLETELY different. The home point is nowhere in sight.")
+
+    ctx.log.action("Going to home point (Ctrl+J)")
+    trigger_action(ctx, "go_to_home_point")
+    wait(ctx, DEFAULT_DELAY_MS, "Observe: View SNAPS back to the EXACT home point position from Phase 1")
+    ctx.log.success("Ctrl+J restored the view to the saved home point")
+
+    # ============================================================
+    # Phase 3 — Keyboard shortcuts and edge cases
+    # ============================================================
+    ctx.log.action("PHASE 3 — Testing bare Home key")
+    for _ in range(ZOOM_OUT_STEPS):
         simulate_wheel(ctx, centre, -120)
         wait(ctx, ZOOM_STEP_DELAY_MS)
     for _ in range(15):
-        simulate_key(ctx, Qt.Key_Left)
+        simulate_key(ctx, Qt.Key_Right)
         wait(ctx, MOVE_STEP_DELAY_MS)
-    for _ in range(10):
-        simulate_key(ctx, Qt.Key_Up)
-        wait(ctx, MOVE_STEP_DELAY_MS)
-    wait(ctx, SHORT_DELAY_MS, "Observe: view is now at a completely different position")
-
-    ctx.log.action("Going to home point via menu (Ctrl+J)")
-    trigger_action(ctx, "go_to_home_point")
-    wait(ctx, DEFAULT_DELAY_MS, "Observe: View SNAPS back to home point position")
-    ctx.log.success("Returned to home point via menu action")
-
-    ctx.log.action("Navigating away again")
-    for _ in range(5):
-        simulate_wheel(ctx, centre, 120)
-        wait(ctx, ZOOM_STEP_DELAY_MS)
     wait(ctx, SHORT_DELAY_MS, "Observe: navigated away from home point")
 
-    ctx.log.action("Testing Home key (no modifier) to go to home point")
     simulate_key(ctx, Qt.Key_Home)
-    wait(ctx, DEFAULT_DELAY_MS, "Observe: Should return to home point via Home key")
-    ctx.log.success("Home key restores home point")
+    wait(ctx, DEFAULT_DELAY_MS, "Observe: View SNAPS back to home point via the Home key")
+    ctx.log.success("Home key (no modifier) restores home point")
 
-    ctx.log.action("Testing Shift+Home to set a new home point")
-    for _ in range(5):
-        simulate_key(ctx, Qt.Key_Left)
+    ctx.log.action("Testing Shift+Home to set a NEW home point")
+    for _ in range(10):
+        simulate_wheel(ctx, centre, 120)
+        wait(ctx, ZOOM_STEP_DELAY_MS)
+    for _ in range(15):
+        simulate_key(ctx, Qt.Key_Right)
         wait(ctx, MOVE_STEP_DELAY_MS)
-    wait(ctx, SHORT_DELAY_MS, "Observe: view shifted left")
+    wait(ctx, SHORT_DELAY_MS, "Observe: new distinct view position")
 
     simulate_key(ctx, Qt.Key_Home, Qt.ShiftModifier)
-    wait(ctx, DEFAULT_DELAY_MS, "Observe: Cyan crosshair pulse at new position")
+    wait(ctx, DEFAULT_DELAY_MS, "Observe: Cyan crosshair pulse confirms new home point was set")
     ctx.log.success("Shift+Home sets new home point with pulse marker")
 
     ctx.log.action("Testing home point cleared on new scene")
     trigger_action(ctx, "new_scene")
-    wait(ctx, SHORT_DELAY_MS, "Observe: Blank scene loaded")
+    wait(ctx, SHORT_DELAY_MS, "Observe: blank scene loaded")
     ctx.scene_loaded = False
 
-    ctx.log.action("Triggering go_to_home_point on fresh scene (should be no-op)")
+    ctx.log.action("Triggering go_to_home_point on fresh scene — expect no-op")
     trigger_action(ctx, "go_to_home_point")
     wait(ctx, DEFAULT_DELAY_MS, "Observe: No crash, no movement (home point was cleared)")
-    ctx.log.success("Home point correctly cleared on new scene - no crash")
+    ctx.log.success("Home point correctly cleared on new scene — no crash, no-op")

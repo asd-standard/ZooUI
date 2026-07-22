@@ -623,15 +623,22 @@ The single source of truth for the version is ``zooui/__init__.py`` →
    * - **PATCH** (0.4.0 → 0.4.1)
      - **MINOR** (0.4.0 → 0.5.0)
    * - Bug fixes
-     - Major new features
+     - Major new features (new modules)
+   * - Minor new features (no new modules)
+     - New capabilities (new modules)
    * - Internal refactors
-     - New capabilities
-   * - Type annotations and code quality
      - New architectures (e.g. process pools)
-   * - Documentation improvements
+   * - Type annotations and code quality
      - New subsystems
+   * - Documentation improvements
+     -
    * - Minor UI elements and enhancements
      -
+
+A **minor feature** extends behaviour within existing modules (e.g. adding
+methods to an existing class, new menu items, keyboard shortcuts). A **major
+feature** introduces new Python modules or packages under ``zooui/`` and
+requires significant new infrastructure.
 
 **MAJOR** (0.x.y → 1.0.0): Breaking changes to config format, data file format,
 or public API.

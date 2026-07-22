@@ -288,7 +288,10 @@ MainWindow manages multiple scenes through a ``QTabWidget``:
 
     Actions
     ├── Copy SVG                    (Ctrl+C)
-    └── Paste SVG                   (Ctrl+V)
+    ├── Paste SVG                   (Ctrl+V)
+    ├── ─────────────────────────
+    ├── Set Home Point              (Ctrl+Shift+H)
+    └── Go to Home Point            (Ctrl+J)
 
     Settings
     ├── Autosave Settings
@@ -843,6 +846,117 @@ Keyboard Event Handling
         Delete          - Remove selected object
         Ctrl+C          - Copy SVG
         Ctrl+V          - Paste SVG
+
+    Home Point Navigation:
+        Home            - Jump to saved home point
+        Shift+Home      - Set current view as home point
+        Ctrl+Shift+H    - Set home point (menu action)
+        Ctrl+J          - Go to home point (menu action)
+
+Home Point Navigation
+^^^^^^^^^^^^^^^^^^^^^
+
+The QZUI widget provides a home point feature for quickly saving and
+restoring the current view state. The home point stores the scene
+origin and zoom level as a two-element tuple.
+
+**Internal State:**
+
+The home point is stored in two attributes on the QZUI widget:
+
+.. code-block:: python
+
+    self._home_point: tuple[tuple[float, float], float] | None = None
+    self._home_point_timestamp: float = 0.0
+
+- ``_home_point`` — ``((origin_x, origin_y), zoomlevel)`` or ``None``
+- ``_home_point_timestamp`` — ``time.time()`` snapshot used for the
+  visual pulse animation
+
+**Saving the Home Point:**
+
+.. code-block:: python
+
+    def set_home_point(self) -> None:
+        """Save the current view position and zoom level."""
+        self._home_point = (self.scene.origin, self.scene.zoomlevel)
+        self._home_point_timestamp = time.time()
+
+**Restoring the Home Point:**
+
+.. code-block:: python
+
+    def go_to_home_point(self) -> None:
+        """Restore the view to the saved home point."""
+        if self._home_point is None:
+            return
+        origin, zoomlevel = self._home_point
+        self.scene.zoomlevel = zoomlevel
+        self.scene.origin = origin
+
+If no home point has been set (``_home_point is None``), the method
+returns immediately without side effects.
+
+**Visual Pulse Animation:**
+
+When ``set_home_point()`` is called, the current timestamp is captured.
+For the next 0.8 seconds, the ``paintEvent()`` draws an expanding cyan
+crosshair and circle at the viewport center with fading alpha:
+
+.. code-block:: python
+
+    ## paintEvent() — pulse marker rendering
+    elapsed = time.time() - self._home_point_timestamp
+    if elapsed < 0.8:
+        alpha = max(0.0, 1.0 - (elapsed / 0.8))
+        color = QtGui.QColor(0, 200, 255, int(alpha * 255))
+        pen = QtGui.QPen(color, 2)
+        painter.setPen(pen)
+        cx = self.width() / 2
+        cy = self.height() / 2
+        size = 20.0 * (1.0 + elapsed * 2)
+        painter.drawLine(QtCore.QPointF(cx - size, cy),
+                         QtCore.QPointF(cx + size, cy))
+        painter.drawLine(QtCore.QPointF(cx, cy - size),
+                         QtCore.QPointF(cx, cy + size))
+        painter.drawEllipse(QtCore.QPointF(cx, cy), size, size)
+        self.update()  # Schedule next frame
+
+The ``self.update()`` call schedules continuous repaints until the
+animation expires, producing smooth fade-out motion.
+
+**Keyboard Bindings:**
+
+The home point keys are handled in ``keyPressEvent()`` alongside the
+other navigation controls:
+
+.. code-block:: python
+
+    elif key == QtCore.Qt.Key_Home and (
+        event.modifiers() & QtCore.Qt.ShiftModifier
+    ):
+        self.set_home_point()
+    elif key == QtCore.Qt.Key_Home:
+        self.go_to_home_point()
+
+Additionally, the menu actions ``Ctrl+Shift+H`` (set) and ``Ctrl+J``
+(go) are registered as QActions in the MainWindow's Actions menu,
+delegating to the current QZUI instance via ``self.current_zui``.
+
+**Reset on Scene Change:**
+
+When a new scene is loaded through the ``scene`` property setter
+(``__set_scene()``), the home point is cleared:
+
+.. code-block:: python
+
+    self._home_point = None
+    self._home_point_timestamp = 0.0
+
+**See Also:**
+
+- :doc:`../usageinstructions/userinterface` — User-facing keyboard and menu reference
+- :doc:`../zooui/objects/scene/qzui` — QZUI class API reference
 
 Dialog System
 -------------

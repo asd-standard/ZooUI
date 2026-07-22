@@ -207,9 +207,9 @@ class TestQZUIHomePoint:
         qzui._home_point_timestamp = time.time()
         qzui.resize(800, 600)
         mock_painter = MagicMock()
-        with patch("zooui.objects.scene.qzui.QtGui.QPainter", return_value=mock_painter):
-            with patch.object(qzui, "update"):
-                qzui.paintEvent(QtGui.QPaintEvent(qzui.rect()))
+        with patch("zooui.objects.scene.qzui.QtGui.QPainter", return_value=mock_painter), \
+             patch.object(qzui, "update"):
+            qzui.paintEvent(QtGui.QPaintEvent(qzui.rect()))
         assert mock_painter.drawLine.call_count >= 1
         assert mock_painter.drawEllipse.call_count >= 1
 

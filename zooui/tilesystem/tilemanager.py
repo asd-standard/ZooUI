@@ -153,23 +153,23 @@ def _shutdown_threads() -> None:
     global __tp_static, __tp_dynamic, __tilecache, __temptilecache, __logger
 
     # Signal all TileProvider threads to stop
-    if __tp_static and __tp_static.is_alive():
+    if __tp_static and getattr(__tp_static, "is_alive", lambda: False)():
         __tp_static.stop()
     for tp in list(__tp_dynamic.values()):
-        if tp and tp.is_alive():
+        if tp and getattr(tp, "is_alive", lambda: False)():
             tp.stop()
 
     # Signal TileCache periodic clean threads to stop
     if __tilecache:
-        __tilecache.shutdown()
+        getattr(__tilecache, "shutdown", lambda: None)()
     if __temptilecache:
-        __temptilecache.shutdown()
+        getattr(__temptilecache, "shutdown", lambda: None)()
 
     # Wait for TileProvider threads to finish (with timeout)
-    if __tp_static and __tp_static.is_alive():
+    if __tp_static and getattr(__tp_static, "is_alive", lambda: False)():
         __tp_static.join(timeout=2.0)
     for tp in list(__tp_dynamic.values()):
-        if tp and tp.is_alive():
+        if tp and getattr(tp, "is_alive", lambda: False)():
             tp.join(timeout=2.0)
 
     if __logger:

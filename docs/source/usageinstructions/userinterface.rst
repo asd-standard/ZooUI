@@ -70,6 +70,13 @@ Actions menu:
   clipboard
 - **Paste SVG (Ctrl+V)** Paste the copied SVG at the current mouse
   position (or center of the viewport)
+- **Set Home Point (Ctrl+Shift+H)** Save the current view position
+  and zoom level as a *home point*. A cyan crosshair pulse appears at
+  the viewport center as visual confirmation. The home point is per-tab
+  and is cleared when a new scene is loaded.
+- **Go to Home Point (Ctrl+J)** Restore the view to the saved home
+  point position and zoom level. Has no effect if no home point has
+  been set.
 
 Help menu:
 ~~~~~~~~~~
@@ -154,6 +161,18 @@ Mouse/Keyboard actions:
 
 - **Ctrl+Enter** When inside an input dialog (new string, modify string, SVG picker,
   or modify SVG), accepts the dialog — equivalent to clicking the OK button.
+
+- **Home** Jump to the saved home point, restoring the saved view position
+  and zoom level. Has no effect if no home point has been set.
+
+- **Shift+Home** Save the current view position and zoom level as the
+  home point. A cyan crosshair pulse is displayed at the viewport center
+  to confirm the action. The home point is cleared when a new scene is loaded.
+
+.. note::
+   The *Home Point* feature (saving/restoring the current view) is distinct
+   from the *Open Home Scene* :kbd:`Ctrl+Home` menu item, which loads the
+   default :file:`data/home.pzs` scene file.
 
 - **Scrollwheel + modifiers on an SVG shape** Elongate (resize) the selected
   SVG object. Only works when a single SVG object is selected:

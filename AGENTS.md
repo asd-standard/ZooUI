@@ -477,11 +477,17 @@ The single source of truth is `zooui/__init__.py` → `__version__`.
 
 | PATCH (0.4.0 → 0.4.1) | MINOR (0.4.0 → 0.5.0) |
 |---|---|
-| Bug fixes | Major new features |
-| Internal refactors | New capabilities |
-| Type annotations and code quality | New architectures (e.g., process pools) |
-| Documentation improvements | New subsystems |
+| Bug fixes | Major new features (new modules) |
+| Minor new features (no new modules) | New capabilities (new modules) |
+| Internal refactors | New architectures (e.g., process pools) |
+| Type annotations and code quality | New subsystems |
+| Documentation improvements | |
 | Minor UI elements and enhancements | |
+
+A **minor feature** extends behaviour within existing modules (e.g. adding
+methods to an existing class, new menu items, keyboard shortcuts). A **major
+feature** introduces new Python modules or packages under ``zooui/`` and
+requires significant new infrastructure.
 
 **MAJOR** (0.x.y → 1.0.0): Breaking changes to config format, data file format,
 or public API.
@@ -491,8 +497,8 @@ or public API.
 1. **Update CHANGELOG.md**: Move entries from `[Unreleased]` to a new version heading
 2. **Bump version** (updates `zooui/__init__.py`, `pyproject.toml`, and `data/home.pzs` automatically):
    ```bash
-   python scripts/bump_version.py patch    # bug fixes, refactors, docs, minor UI
-   python scripts/bump_version.py minor    # major features, new capabilities, new architectures
+   python scripts/bump_version.py patch    # fixes, minor features, refactors, docs, minor UI
+   python scripts/bump_version.py minor    # major features (new modules), new architectures
    python scripts/bump_version.py major    # breaking changes
    python scripts/bump_version.py patch -b # decrement patch backwards
    python scripts/bump_version.py minor -b # decrement minor backwards

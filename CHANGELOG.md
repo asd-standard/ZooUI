@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.4] - 2026-07-22
+### Added
+- **Home Point feature** — quick-save and restore the current scene view
+  position and zoom level. Two new Actions menu items: *Set Home Point*
+  (`Ctrl+Shift+H`) and *Go to Home Point* (`Ctrl+J`), plus direct keyboard
+  shortcuts `Home` (go) and `Shift+Home` (set). A cyan expanding crosshair
+  pulse animation at the viewport centre confirms when a home point is saved.
+  The home point is per-tab and is cleared when a new scene is loaded.
+- Home Point documentation in the user interface reference and the window system
+  technical documentation.
+- Tests for the home point feature: 9 unit tests (QZUI), 4 integration tests
+  (Scene round‑trip), and 1 GUI integration step.
+
+### Changed
+- About dialog: project URL updated to `https://asd-standard.github.io/ZooUI/`;
+  original URL moved under the copyright line as a historical reference.
+
+### Fixed
+- `TileManager._shutdown_threads()` now uses `getattr` guards so it is safe
+  when cache objects are mocked as plain `dict` in unit tests. All 40
+  tilemanager tests pass again.
+
 ## [0.5.3] - 2026-07-17
 ### Added
 - Usage Instructions dialog under Help menu, automatically displaying content

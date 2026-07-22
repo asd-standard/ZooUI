@@ -26,8 +26,8 @@ from PySide6 import QtWidgets
 
 from zooui.objects.objectsutils import ZoomManager
 from zooui.objects.physicalobject import PhysicalObject
-from zooui.objects.scene.qzui import QZUI
 from zooui.objects.scene import scene as Scene
+from zooui.objects.scene.qzui import QZUI
 
 
 @pytest.fixture(scope="session")

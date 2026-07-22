@@ -16,11 +16,11 @@
 
 """
 ZooUI is a Zooming User Interface for Python.
-<http://da.vidr.cc/projects/pyzui/>
+https://asd-standard.github.io/ZooUI/
 """
 
 __author__ = "David Roberts, Andrea Silvestri"
-__copyright__ = "Copyright (C) 2009  David Roberts <d@vidr.cc>"
+__copyright__ = "Copyright (C) 2009  David Roberts <d@vidr.cc>\n<http://da.vidr.cc/projects/pyzui/>"
 __copyright_notice__ = """
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -37,7 +37,7 @@ along with this program; if not, see <https://www.gnu.org/licenses/>.
 """
 __credits__ = ["David Roberts, Andrea Silvestri"]
 __license__ = "GPLv3"
-__version__ = "0.5.3"
+__version__ = "0.5.4"
 __maintainer__ = "Andrea Silvestri"
 __email__ = "asd.standard@gmail.com"
 
