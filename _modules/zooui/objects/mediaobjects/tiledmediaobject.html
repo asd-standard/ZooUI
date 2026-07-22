@@ -101,22 +101,27 @@
 <span class="sd">    The converter returns a ppm image file on which we can run the tiler on.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">media_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">scene</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">autofit</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">media_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">scene</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">autofit</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">deferred</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor :</span>
-<span class="sd">            TiledMediaObject(media_id, scene, autofit)</span>
+<span class="sd">            TiledMediaObject(media_id, scene, autofit, deferred)</span>
 <span class="sd">        Parameters :</span>
 <span class="sd">            media_id : str</span>
 <span class="sd">            scene : Scene</span>
 <span class="sd">            autofit : bool (default=True)</span>
+<span class="sd">            deferred : bool (default=False)</span>
 
-<span class="sd">        TiledMediaObject(media_id, scene, autofit) --&gt; None</span>
+<span class="sd">        TiledMediaObject(media_id, scene, autofit, deferred) --&gt; None</span>
 
 <span class="sd">        Initialize a new TiledMediaObject from the media identified by media_id,</span>
 <span class="sd">        the parent Scene referenced by scene, and optionally autofit behavior.</span>
 
 <span class="sd">        If autofit is True, once the media has loaded it will be fitted to</span>
 <span class="sd">        the area occupied by the placeholder.</span>
+
+<span class="sd">        If deferred is True, conversion and tiling setup is skipped — the caller</span>
+<span class="sd">        is responsible for initiating those operations. This is used by</span>
+<span class="sd">        PdfMediaObject to manage multi-page PDFs.</span>
 
 <span class="sd">        Sets up conversion and tiling infrastructure based on the media file type.</span>
 <span class="sd">        Initializes caching variables for tileblocks and rendering optimization.</span>
@@ -130,8 +135,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__autofit</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">autofit</span>
 
         <span class="c1"># Flag indicating whether the tile data has been fully loaded from TileManager</span>
-        <span class="c1"># Starts as False; set to True in __try_load() once the (0,0,0) tile is available</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__loaded</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># Starts as False; set to True in _try_load() once the (0,0,0) tile is available</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="c1"># Path to the temporary PPM file created during conversion</span>
         <span class="c1"># Set to None initially; assigned a tempfile path if conversion is needed</span>
@@ -179,6 +184,9 @@
         <span class="c1"># Number of render cycles since the tileblock was last re-rendered</span>
         <span class="c1"># Compared against self.tempcache to decide when to refresh non-final tileblocks</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__tileblock_age</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="n">deferred</span><span class="p">:</span>
+            <span class="k">return</span>
 
         <span class="c1"># Check if TileManager already has tiles for this media_id</span>
         <span class="c1"># TileManager.tiled() returns True if the media has already been tiled and stored</span>
@@ -242,6 +250,41 @@
     <span class="c1"># Class variable: number of render cycles before non-final tileblocks are refreshed</span>
     <span class="c1"># After this many cycles, temporary (lower quality) tiles will be re-rendered</span>
     <span class="n">tempcache</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span>
+
+<div class="viewcode-block" id="TiledMediaObject._reset_for_page">
+<a class="viewcode-back" href="../../../../zooui/objects/mediaobjects/tiledmediaobject.html#zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject._reset_for_page">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reset_for_page</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_media_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method :</span>
+<span class="sd">            _reset_for_page(new_media_id)</span>
+<span class="sd">        Parameters :</span>
+<span class="sd">            new_media_id : str</span>
+
+<span class="sd">        _reset_for_page(new_media_id) --&gt; None</span>
+
+<span class="sd">        Reset internal state and switch to a different media_id for page</span>
+<span class="sd">        navigation. Invalidates all cached tileblocks, then starts loading</span>
+<span class="sd">        the root tile for the new media_id.</span>
+
+<span class="sd">        Dimension data (width, height, aspect_ratio, maxtilelevel) is kept</span>
+<span class="sd">        from the previous page so that the bounding box for autofit is</span>
+<span class="sd">        computed correctly during the transition.</span>
+
+<span class="sd">        Used by PdfMediaObject when changing pages.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span> <span class="o">=</span> <span class="n">new_media_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__tileblock</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__tileblock_id</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__tileblock_final</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__tileblock_age</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__converter</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__tiler</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;TiledMediaObject.</span><span class="si">{</span><span class="n">new_media_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">TileManager</span><span class="o">.</span><span class="n">tiled</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">):</span>
+            <span class="n">TileManager</span><span class="o">.</span><span class="n">load_tile</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span></div>
+
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">__progress</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -635,14 +678,16 @@
                 <span class="c1"># Draw &quot;loading...&quot; centered in the placeholder rectangle</span>
                 <span class="n">painter</span><span class="o">.</span><span class="n">drawText</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">AlignCenter</span><span class="p">,</span> <span class="s2">&quot;loading...&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__try_load</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="TiledMediaObject._try_load">
+<a class="viewcode-back" href="../../../../zooui/objects/mediaobjects/tiledmediaobject.html#zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject._try_load">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_try_load</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
-<span class="sd">            __try_load()</span>
+<span class="sd">            _try_load()</span>
 <span class="sd">        Parameters :</span>
 <span class="sd">            None</span>
 
-<span class="sd">        __try_load() --&gt; None</span>
+<span class="sd">        _try_load() --&gt; None</span>
 
 <span class="sd">        Try to load the (0,0,0) tile from the TileManager.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -662,7 +707,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Root tile loaded successfully; media is ready for rendering</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;media loaded&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__loaded</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="o">=</span> <span class="kc">True</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tiler</span><span class="p">:</span>
                 <span class="c1">## destroy tiler to close tmpfile (required to unlink on Windows)</span>
@@ -713,7 +758,8 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">((</span><span class="n">old_x1</span><span class="p">,</span> <span class="n">old_y1</span><span class="p">,</span> <span class="n">old_x2</span><span class="p">,</span> <span class="n">old_y2</span><span class="p">))</span>
 
                 <span class="c1"># Restore the centre position to keep the object centered where it was</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">centre</span> <span class="o">=</span> <span class="n">old_centre</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">centre</span> <span class="o">=</span> <span class="n">old_centre</span></div>
+
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__run_tiler</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -782,7 +828,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># If the media is fully loaded, render the actual tiled image</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__loaded</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__render_media</span><span class="p">(</span><span class="n">painter</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tiler</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tiler</span><span class="o">.</span><span class="n">error</span><span class="p">:</span>
@@ -791,12 +837,12 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;an error ocurred during the tiling process: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__tiler</span><span class="o">.</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># Check if TileManager now has tiles available for this media</span>
-        <span class="c1"># Uses &#39;if&#39; instead of &#39;elif&#39; to allow loading even after the __loaded check above</span>
+        <span class="c1"># Uses &#39;if&#39; instead of &#39;elif&#39; to allow loading even after the _loaded check above</span>
         <span class="k">if</span> <span class="n">TileManager</span><span class="o">.</span><span class="n">tiled</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">):</span>
             <span class="c1"># Attempt to load the root tile and update media dimensions</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__try_load</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_try_load</span><span class="p">()</span>
 
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__loaded</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span><span class="p">:</span>
                 <span class="c1"># Loading succeeded; render the actual media content</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__render_media</span><span class="p">(</span><span class="n">painter</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -925,6 +971,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/pdfmediaobject.html">PDF media object</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/windowsystem.html">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/logging.html">Logging System</a></li>

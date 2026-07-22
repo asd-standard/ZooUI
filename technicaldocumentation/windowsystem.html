@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Window System &#8212; ZooUI 0.5.4 documentation</title>
+    <title>Window System &#8212; ZooUI 0.6.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cc7d0dec" />
-    <script src="../_static/documentation_options.js?v=e1a677a5"></script>
+    <script src="../_static/documentation_options.js?v=8fa8b3e9"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -413,7 +413,7 @@ editing text content and color</p></li>
 <span class="c1"># Supported file extensions for media opening</span>
 <span class="n">SUPPORTED_EXTENSIONS</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;.svg&#39;</span><span class="p">,</span>                         <span class="c1"># SVGMediaObject</span>
-    <span class="s1">&#39;.pdf&#39;</span><span class="p">,</span>                         <span class="c1"># PDFConverter</span>
+    <span class="s1">&#39;.pdf&#39;</span><span class="p">,</span>                         <span class="c1"># PdfMediaObject</span>
     <span class="s1">&#39;.ppm&#39;</span><span class="p">,</span>                         <span class="c1"># Direct PPM support</span>
     <span class="s1">&#39;.jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;.jpeg&#39;</span><span class="p">,</span>                <span class="c1"># VipsConverter - JPEG</span>
     <span class="s1">&#39;.png&#39;</span><span class="p">,</span>                         <span class="c1"># VipsConverter - PNG</span>
@@ -426,14 +426,12 @@ editing text content and color</p></li>
     <span class="s1">&#39;.jxl&#39;</span><span class="p">,</span>                         <span class="c1"># VipsConverter - JPEG XL</span>
 <span class="p">}</span>
 
-<span class="c1"># Maximum file size for PDF files (2 MB)</span>
-<span class="n">MAX_PDF_SIZE_BYTES</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>
-
 <span class="k">def</span><span class="w"> </span><span class="nf">__action_open_media_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Open supported media files from directory in grid layout.</span>
 
 <span class="sd">    Only files with extensions in SUPPORTED_EXTENSIONS are opened.</span>
-<span class="sd">    PDF files larger than MAX_PDF_SIZE_BYTES (2 MB) are skipped.</span>
+<span class="sd">    PDFs of any size are accepted; large ones (&gt;2 MB) trigger a</span>
+<span class="sd">    page selection dialog.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">directory</span> <span class="o">=</span> <span class="n">QFileDialog</span><span class="o">.</span><span class="n">getExistingDirectory</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Open media directory&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__prev_dir</span><span class="p">)</span>
@@ -443,12 +441,8 @@ editing text content and color</p></li>
         <span class="n">media</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-                <span class="c1"># Check if file has a supported extension</span>
                 <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">ext</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUPPORTED_EXTENSIONS</span><span class="p">:</span>
-                    <span class="k">continue</span>
-                <span class="c1"># Skip PDF files larger than 2 MB</span>
-                <span class="k">if</span> <span class="n">ext</span> <span class="o">==</span> <span class="s1">&#39;.pdf&#39;</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAX_PDF_SIZE_BYTES</span><span class="p">:</span>
                     <span class="k">continue</span>
                 <span class="n">mediaobject</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__open_media</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">add</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">mediaobject</span><span class="p">:</span>
@@ -1723,7 +1717,6 @@ Instead, Qt’s event loop handles all updates:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MainWindow</span><span class="p">(</span><span class="n">QMainWindow</span><span class="p">):</span>
     <span class="c1"># Class constants for media directory import</span>
     <span class="n">SUPPORTED_EXTENSIONS</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>  <span class="c1"># Supported file extensions</span>
-    <span class="n">MAX_PDF_SIZE_BYTES</span><span class="p">:</span> <span class="nb">int</span>         <span class="c1"># Maximum PDF file size (2 MB)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">framerate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span>
                  <span class="n">zoom_sensitivity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
@@ -1749,8 +1742,6 @@ Instead, Qt’s event loop handles all updates:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">SUPPORTED_EXTENSIONS</span></code>: Set of supported file extensions for “Open Media Directory”
 (<code class="docutils literal notranslate"><span class="pre">.svg</span></code>, <code class="docutils literal notranslate"><span class="pre">.pdf</span></code>, <code class="docutils literal notranslate"><span class="pre">.ppm</span></code>, <code class="docutils literal notranslate"><span class="pre">.jpg</span></code>, <code class="docutils literal notranslate"><span class="pre">.jpeg</span></code>, <code class="docutils literal notranslate"><span class="pre">.png</span></code>, <code class="docutils literal notranslate"><span class="pre">.gif</span></code>, <code class="docutils literal notranslate"><span class="pre">.tif</span></code>,
 <code class="docutils literal notranslate"><span class="pre">.tiff</span></code>, <code class="docutils literal notranslate"><span class="pre">.webp</span></code>, <code class="docutils literal notranslate"><span class="pre">.bmp</span></code>, <code class="docutils literal notranslate"><span class="pre">.heic</span></code>, <code class="docutils literal notranslate"><span class="pre">.heif</span></code>, <code class="docutils literal notranslate"><span class="pre">.avif</span></code>, <code class="docutils literal notranslate"><span class="pre">.jxl</span></code>)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">MAX_PDF_SIZE_BYTES</span></code>: Maximum file size for PDF files when opening from directory
-(default: 2 MB = 2,097,152 bytes). Larger PDFs are skipped.</p></li>
 </ul>
 </section>
 <section id="qzui">
@@ -1891,6 +1882,7 @@ Instead, Qt’s event loop handles all updates:</p>
 <li class="toctree-l1"><a class="reference internal" href="stringecosystem.html">String Media Object Ecosystem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="svgecosystem.html">SVG Utility Ecosystem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pdfmediaobject.html">PDF media object</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tilingsystem.html">Tiling System</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="logging.html">Logging System</a></li>

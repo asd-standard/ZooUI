@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Converter System &#8212; ZooUI 0.5.4 documentation</title>
+    <title>Converter System &#8212; ZooUI 0.6.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cc7d0dec" />
-    <script src="../_static/documentation_options.js?v=e1a677a5"></script>
+    <script src="../_static/documentation_options.js?v=8fa8b3e9"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -246,23 +246,29 @@ remains available for direct API usage.</p>
 </section>
 <section id="pdfconverter">
 <h3>PDFConverter<a class="headerlink" href="#pdfconverter" title="Link to this heading">¶</a></h3>
-<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">PDFConverter</span></code> class converts PDF documents to PPM format using the
-<code class="docutils literal notranslate"><span class="pre">pdftoppm</span></code> command-line tool from Poppler or Xpdf.</p>
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">PDFConverter</span></code> class converts PDF documents to individual per-page
+PPM files using the <code class="docutils literal notranslate"><span class="pre">pdftoppm</span></code> command-line tool from Poppler or Xpdf. Each
+page is stored as a separate PPM file in a user-specified output directory,
+enabling page-by-page navigation via <code class="xref py py-class docutils literal notranslate"><span class="pre">PdfMediaObject</span></code>.</p>
 <p><strong>Class Definition:</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">PDFConverter</span><span class="p">(</span><span class="n">Converter</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">outfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">Converter</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infile</span><span class="p">,</span> <span class="n">outfile</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">outdir</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">Converter</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infile</span><span class="p">,</span> <span class="n">outdir</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span> <span class="o">=</span> <span class="mi">300</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">page_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">page_paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 </pre></div>
 </div>
 <p><strong>Key Attributes:</strong></p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">resolution</span></code>: DPI resolution for rasterization (default: 300)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">page_count</span></code>: Number of pages discovered after conversion (0 before <code class="docutils literal notranslate"><span class="pre">run()</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">page_paths</span></code>: List of absolute paths to per-page PPM files, ordered by page number</p></li>
 </ul>
 <p><strong>Conversion Process:</strong></p>
 <p>The PDF conversion follows these steps:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>1. Create temporary directory
-   ├─ Used to store individual page PPM files
+   ├─ Used to store raw pdftoppm output
    └─ Cleaned up after conversion
 
 2. Call pdftoppm
@@ -270,62 +276,46 @@ remains available for direct API usage.</p>
    ├─ Generates: page-0001.ppm, page-0002.ppm, ...
    └─ Each file contains one page of the PDF
 
-3. Read page headers
-   ├─ Parse PPM header from each page file
-   ├─ Extract width and height
-   └─ Calculate total height (sum of all pages)
+3. Organize per-page PPMs
+   ├─ Rename/copy page files to predictable names
+   ├─ Output: outdir/page_0000.ppm, outdir/page_0001.ppm, ...
+   └─ Store paths in self.page_paths, count in self.page_count
 
-4. Merge pages
-   ├─ Create output PPM header (width, total_height)
-   ├─ Concatenate pixel data from all pages vertically
-   └─ Result: Single PPM with all pages stacked
-
-5. Clean up
-   ├─ Close all file handles
-   ├─ Delete temporary directory
+4. Clean up
+   ├─ Remove temporary directory
    └─ Set progress to 1.0
 </pre></div>
 </div>
-<p><strong>Multi-Page Handling:</strong></p>
-<p>PDF documents can have multiple pages. PDFConverter handles this by:</p>
-<ol class="arabic simple">
-<li><p>Rasterizing each page separately with <code class="docutils literal notranslate"><span class="pre">pdftoppm</span></code></p></li>
-<li><p>Determining page order from filenames (e.g., <code class="docutils literal notranslate"><span class="pre">page-0001.ppm</span></code>)</p></li>
-<li><p>Reading each page’s dimensions from PPM headers</p></li>
-<li><p>Creating a single tall PPM by vertically concatenating all pages</p></li>
-<li><p>Preserving page order in the output</p></li>
-</ol>
-<p><strong>PPM Page Merging Algorithm:</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Simplified merge logic</span>
-<span class="n">total_height</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">page_heights</span><span class="p">)</span>
-
-<span class="c1"># Write combined header</span>
-<span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;P6</span><span class="se">\n</span><span class="si">{</span><span class="n">width</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">total_height</span><span class="si">}</span><span class="se">\n</span><span class="s2">255</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-
-<span class="c1"># Concatenate pixel data</span>
-<span class="k">for</span> <span class="n">page_file</span> <span class="ow">in</span> <span class="n">page_files_in_order</span><span class="p">:</span>
-    <span class="n">shutil</span><span class="o">.</span><span class="n">copyfileobj</span><span class="p">(</span><span class="n">page_file</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+<p><strong>Per-Page Output:</strong></p>
+<p>Each page of the PDF becomes an independent PPM file with a zero-padded
+numeric suffix:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>outdir/
+├── page_0000.ppm   (Page 1)
+├── page_0001.ppm   (Page 2)
+├── page_0002.ppm   (Page 3)
+└── ...
 </pre></div>
 </div>
+<p>This replaces the previous behaviour of vertically concatenating all pages
+into a single PPM file. Individual per-page PPMs can be tiled independently,
+enabling multi-page PDF support with page-by-page navigation.</p>
 <p><strong>Progress Tracking:</strong></p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">0.0</span></code>: Conversion not started</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">0.5</span></code>: <code class="docutils literal notranslate"><span class="pre">pdftoppm</span></code> finished, starting page merge</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">0.5</span></code>: <code class="docutils literal notranslate"><span class="pre">pdftoppm</span></code> finished, organizing per-page PPMs</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">1.0</span></code>: Conversion complete</p></li>
 </ul>
 <p><strong>Error Handling:</strong></p>
 <p>Errors can occur at several stages:</p>
 <ul class="simple">
 <li><p><strong>pdftoppm failure</strong>: Invalid PDF, missing tool, insufficient memory</p></li>
-<li><p><strong>Page header parsing</strong>: Corrupted PPM output</p></li>
-<li><p><strong>File I/O errors</strong>: Disk full, permission denied</p></li>
+<li><p><strong>File organization errors</strong>: Permission denied in output directory</p></li>
 </ul>
 <p>When errors occur:</p>
 <ol class="arabic simple">
 <li><p>Error message stored in <code class="docutils literal notranslate"><span class="pre">self.error</span></code></p></li>
 <li><p>Logged via <code class="docutils literal notranslate"><span class="pre">self._logger.error()</span></code></p></li>
 <li><p>Temporary files cleaned up</p></li>
-<li><p>Output file deleted (if partially written)</p></li>
 <li><p>Progress set to 1.0 (indicates completion, check error)</p></li>
 </ol>
 <p><strong>Dependencies:</strong></p>
@@ -336,17 +326,16 @@ remains available for direct API usage.</p>
 <li><p><strong>Windows</strong>: Download Poppler for Windows</p></li>
 </ul>
 <p><strong>Example PDF Conversion:</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">converter</span> <span class="o">=</span> <span class="n">PDFConverter</span><span class="p">(</span><span class="s1">&#39;document.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;output.ppm&#39;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">converter</span> <span class="o">=</span> <span class="n">PDFConverter</span><span class="p">(</span><span class="s1">&#39;document.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;/tmp/pdf_output&#39;</span><span class="p">)</span>
 <span class="n">converter</span><span class="o">.</span><span class="n">resolution</span> <span class="o">=</span> <span class="mi">150</span>  <span class="c1"># Lower resolution for faster conversion</span>
-<span class="n">converter</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-
-<span class="c1"># Wait for completion</span>
-<span class="n">converter</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+<span class="n">converter</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 
 <span class="k">if</span> <span class="n">converter</span><span class="o">.</span><span class="n">error</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Conversion failed: </span><span class="si">{</span><span class="n">converter</span><span class="o">.</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Converted PDF to PPM: </span><span class="si">{</span><span class="n">converter</span><span class="o">.</span><span class="n">_outfile</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Converted </span><span class="si">{</span><span class="n">converter</span><span class="o">.</span><span class="n">page_count</span><span class="si">}</span><span class="s2"> pages&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">converter</span><span class="o">.</span><span class="n">page_paths</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -523,7 +512,7 @@ enabling parallel conversions without threading conflicts.</p>
 <span class="c1"># Submit PDF conversion</span>
 <span class="n">future</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">submit_pdf_conversion</span><span class="p">(</span>
     <span class="n">infile</span><span class="o">=</span><span class="s1">&#39;document.pdf&#39;</span><span class="p">,</span>
-    <span class="n">outfile</span><span class="o">=</span><span class="s1">&#39;output.ppm&#39;</span>
+    <span class="n">outdir</span><span class="o">=</span><span class="s1">&#39;output_pages&#39;</span>
 <span class="p">)</span>
 
 <span class="c1"># Shutdown pool when done</span>
@@ -585,9 +574,10 @@ on any remaining child processes, with a 1-second join timeout</p></li>
 Instantiates <code class="docutils literal notranslate"><span class="pre">VipsConverter</span></code> and calls <code class="docutils literal notranslate"><span class="pre">run()</span></code> in the subprocess. Errors
 are raised as exceptions so they propagate through the <code class="docutils literal notranslate"><span class="pre">Future</span></code> to the
 <code class="docutils literal notranslate"><span class="pre">ConversionHandle</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">_run_pdf_conversion(infile,</span> <span class="pre">outfile)</span></code>:
+<li><p><code class="docutils literal notranslate"><span class="pre">_run_pdf_conversion(infile,</span> <span class="pre">outdir)</span></code>:
 Instantiates <code class="docutils literal notranslate"><span class="pre">PDFConverter</span></code> and calls <code class="docutils literal notranslate"><span class="pre">run()</span></code> in the subprocess with
-the same error propagation pattern.</p></li>
+the same error propagation pattern. <code class="docutils literal notranslate"><span class="pre">outdir</span></code> is the directory where
+per-page PPM files (<code class="docutils literal notranslate"><span class="pre">page_0000.ppm</span></code>, …) will be written.</p></li>
 </ul>
 <p><strong>ConversionHandle Class:</strong></p>
 <p>The <code class="docutils literal notranslate"><span class="pre">ConversionHandle</span></code> wraps a <code class="docutils literal notranslate"><span class="pre">Future</span></code> and provides a compatible interface
@@ -635,28 +625,18 @@ which automatically selects and uses the appropriate converter via <code class="
 <section id="format-detection-and-converter-selection">
 <h3>Format Detection and Converter Selection<a class="headerlink" href="#format-detection-and-converter-selection" title="Link to this heading">¶</a></h3>
 <p><code class="xref py py-class docutils literal notranslate"><span class="pre">TiledMediaObject</span></code> submits conversions to the process pool based on file extension:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># In TiledMediaObject.__init__()</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># In PdfMediaObject.__init__() (multi-page PDF support)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">zooui.converters</span><span class="w"> </span><span class="kn">import</span> <span class="n">converterrunner</span>
 
-<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.pdf&#39;</span><span class="p">):</span>
-    <span class="c1"># Use process-based PDF conversion</span>
-    <span class="n">future</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">submit_pdf_conversion</span><span class="p">(</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tmpfile</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">__converter</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">ConversionHandle</span><span class="p">(</span>
-        <span class="n">future</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tmpfile</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">__ppmfile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tmpfile</span>
+<span class="c1"># For PDFs, per-page PPMs go to a temp directory</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">_outdir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;zooui_pdf_&quot;</span><span class="p">)</span>
+<span class="n">future</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">submit_pdf_conversion</span><span class="p">(</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_pdf_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outdir</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">__pdf_converter</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">ConversionHandle</span><span class="p">(</span>
+    <span class="n">future</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pdf_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outdir</span><span class="p">)</span>
 
-<span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.ppm&#39;</span><span class="p">):</span>
-    <span class="c1"># PPM files need no conversion</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">__logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;assuming media is a local PPM file&quot;</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">__ppmfile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span>
-
-<span class="k">else</span><span class="p">:</span>
-    <span class="c1"># Use process-based Vips conversion</span>
-    <span class="n">future</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">submit_vips_conversion</span><span class="p">(</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tmpfile</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">__converter</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">ConversionHandle</span><span class="p">(</span>
-        <span class="n">future</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_media_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tmpfile</span><span class="p">)</span>
+<span class="c1"># After conversion, page_0000.ppm, page_0001.ppm, etc.</span>
+<span class="c1"># are discovered and tiled independently via PdfMediaObject.</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">__ppmfile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tmpfile</span>
 </pre></div>
 </div>
@@ -966,12 +946,12 @@ conversions can execute truly in parallel:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">zooui.converters</span><span class="w"> </span><span class="kn">import</span> <span class="n">converterrunner</span>
 
 <span class="c1"># Submit multiple conversions to the process pool</span>
-<span class="n">f1</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">submit_pdf_conversion</span><span class="p">(</span><span class="s1">&#39;doc1.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;out1.ppm&#39;</span><span class="p">)</span>
+<span class="n">f1</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">submit_pdf_conversion</span><span class="p">(</span><span class="s1">&#39;doc1.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;out1_dir&#39;</span><span class="p">)</span>
 <span class="n">f2</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">submit_vips_conversion</span><span class="p">(</span><span class="s1">&#39;img1.jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;out2.ppm&#39;</span><span class="p">)</span>
 <span class="n">f3</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">submit_vips_conversion</span><span class="p">(</span><span class="s1">&#39;img2.png&#39;</span><span class="p">,</span> <span class="s1">&#39;out3.ppm&#39;</span><span class="p">)</span>
 
 <span class="c1"># Create handles and wait</span>
-<span class="n">h1</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">ConversionHandle</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="s1">&#39;doc1.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;out1.ppm&#39;</span><span class="p">)</span>
+<span class="n">h1</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">ConversionHandle</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="s1">&#39;doc1.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;out1_dir&#39;</span><span class="p">)</span>
 <span class="n">h2</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">ConversionHandle</span><span class="p">(</span><span class="n">f2</span><span class="p">,</span> <span class="s1">&#39;img1.jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;out2.ppm&#39;</span><span class="p">)</span>
 <span class="n">h3</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">ConversionHandle</span><span class="p">(</span><span class="n">f3</span><span class="p">,</span> <span class="s1">&#39;img2.png&#39;</span><span class="p">,</span> <span class="s1">&#39;out3.ppm&#39;</span><span class="p">)</span>
 
@@ -998,15 +978,15 @@ conversions can execute truly in parallel:</p>
 
 <span class="c1"># Submit PDF conversion</span>
 <span class="n">pdf_future</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">submit_pdf_conversion</span><span class="p">(</span>
-    <span class="s1">&#39;document.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;output_pdf.ppm&#39;</span><span class="p">)</span>
+    <span class="s1">&#39;document.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;pdf_output_dir&#39;</span><span class="p">)</span>
 <span class="n">pdf_handle</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">ConversionHandle</span><span class="p">(</span>
-    <span class="n">pdf_future</span><span class="p">,</span> <span class="s1">&#39;document.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;output_pdf.ppm&#39;</span><span class="p">)</span>
+    <span class="n">pdf_future</span><span class="p">,</span> <span class="s1">&#39;document.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;pdf_output_dir&#39;</span><span class="p">)</span>
 <span class="n">pdf_handle</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
 
 <span class="k">if</span> <span class="n">pdf_handle</span><span class="o">.</span><span class="n">error</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PDF conversion failed: </span><span class="si">{</span><span class="n">pdf_handle</span><span class="o">.</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;PDF converted successfully!&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PDF converted: </span><span class="si">{</span><span class="n">pdf_handle</span><span class="o">.</span><span class="n">page_count</span><span class="si">}</span><span class="s2"> pages&quot;</span><span class="p">)</span>
 
 <span class="c1"># Submit image conversion with transformations</span>
 <span class="n">img_future</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">submit_vips_conversion</span><span class="p">(</span>
@@ -1053,9 +1033,9 @@ conversions can execute truly in parallel:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">zooui.converters</span><span class="w"> </span><span class="kn">import</span> <span class="n">converterrunner</span>
 
 <span class="n">future</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">submit_pdf_conversion</span><span class="p">(</span>
-    <span class="s1">&#39;large_document.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;output.ppm&#39;</span><span class="p">)</span>
+    <span class="s1">&#39;large_document.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;pdf_output&#39;</span><span class="p">)</span>
 <span class="n">handle</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">ConversionHandle</span><span class="p">(</span>
-    <span class="n">future</span><span class="p">,</span> <span class="s1">&#39;large_document.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;output.ppm&#39;</span><span class="p">)</span>
+    <span class="n">future</span><span class="p">,</span> <span class="s1">&#39;large_document.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;pdf_output&#39;</span><span class="p">)</span>
 
 <span class="c1"># Wait for completion with timeout</span>
 <span class="n">handle</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
@@ -1079,17 +1059,17 @@ Thread-based converters (direct use) can report intermediate progress
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">zooui.converters</span><span class="w"> </span><span class="kn">import</span> <span class="n">converterrunner</span>
 
 <span class="c1"># High-resolution conversion for printing</span>
-<span class="n">future</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">submit_pdf_conversion</span><span class="p">(</span><span class="s1">&#39;document.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;high_res.ppm&#39;</span><span class="p">)</span>
-<span class="n">handle</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">ConversionHandle</span><span class="p">(</span><span class="n">future</span><span class="p">,</span> <span class="s1">&#39;document.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;high_res.ppm&#39;</span><span class="p">)</span>
+<span class="n">future</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">submit_pdf_conversion</span><span class="p">(</span><span class="s1">&#39;document.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;high_res_pages&#39;</span><span class="p">)</span>
+<span class="n">handle</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">ConversionHandle</span><span class="p">(</span><span class="n">future</span><span class="p">,</span> <span class="s1">&#39;document.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;high_res_pages&#39;</span><span class="p">)</span>
 <span class="n">handle</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
 
 <span class="c1"># Low-resolution conversion for preview</span>
-<span class="n">future</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">submit_pdf_conversion</span><span class="p">(</span><span class="s1">&#39;document.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;low_res.ppm&#39;</span><span class="p">)</span>
-<span class="n">handle</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">ConversionHandle</span><span class="p">(</span><span class="n">future</span><span class="p">,</span> <span class="s1">&#39;document.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;low_res.ppm&#39;</span><span class="p">)</span>
+<span class="n">future</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">submit_pdf_conversion</span><span class="p">(</span><span class="s1">&#39;document.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;low_res_pages&#39;</span><span class="p">)</span>
+<span class="n">handle</span> <span class="o">=</span> <span class="n">converterrunner</span><span class="o">.</span><span class="n">ConversionHandle</span><span class="p">(</span><span class="n">future</span><span class="p">,</span> <span class="s1">&#39;document.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;low_res_pages&#39;</span><span class="p">)</span>
 <span class="n">handle</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
 
 <span class="k">if</span> <span class="ow">not</span> <span class="n">handle</span><span class="o">.</span><span class="n">error</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;PDF converted successfully!&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PDF converted: </span><span class="si">{</span><span class="n">handle</span><span class="o">.</span><span class="n">page_count</span><span class="si">}</span><span class="s2"> pages&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -1169,16 +1149,18 @@ cannot be changed through converterrunner directly; use the thread-based
 <span class="k">def</span><span class="w"> </span><span class="nf">shutdown</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">submit_vips_conversion</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                            <span class="n">invert_colors</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">black_and_white</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Future</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">submit_pdf_conversion</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span> <span class="n">outfile</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Future</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">submit_pdf_conversion</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span> <span class="n">outdir</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Future</span>
 
 <span class="c1"># ConversionHandle class</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ConversionHandle</span><span class="p">:</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">future</span><span class="p">:</span> <span class="n">Future</span><span class="p">,</span> <span class="n">infile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">outfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">future</span><span class="p">:</span> <span class="n">Future</span><span class="p">,</span> <span class="n">infile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">outpath</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">progress</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span>  <span class="c1"># 0.0 or 1.0</span>
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">page_count</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span>  <span class="c1"># Number of pages (PDF only)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">is_alive</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
@@ -1290,6 +1272,7 @@ cannot be changed through converterrunner directly; use the thread-based
 <li class="toctree-l1"><a class="reference internal" href="stringecosystem.html">String Media Object Ecosystem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="svgecosystem.html">SVG Utility Ecosystem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pdfmediaobject.html">PDF media object</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tilingsystem.html">Tiling System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="windowsystem.html">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="logging.html">Logging System</a></li>

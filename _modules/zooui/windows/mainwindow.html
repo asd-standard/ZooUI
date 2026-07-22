@@ -51,6 +51,7 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">Logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
@@ -60,6 +61,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">zooui</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ZooUI</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">zooui.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigManager</span><span class="p">,</span> <span class="n">ValidationError</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">zooui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zooui.objects.mediaobjects.pdfmediaobject</span><span class="w"> </span><span class="kn">import</span> <span class="n">PdfMediaObject</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">zooui.objects.mediaobjects.stringmediaobject</span><span class="w"> </span><span class="kn">import</span> <span class="n">StringMediaObject</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">zooui.objects.mediaobjects.svgmediaobject</span><span class="w"> </span><span class="kn">import</span> <span class="n">SVGMediaObject</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">zooui.objects.mediaobjects.tiledmediaobject</span><span class="w"> </span><span class="kn">import</span> <span class="n">TiledMediaObject</span>
@@ -566,6 +568,48 @@
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__show_error</span><span class="p">(</span><span class="s2">&quot;Unable to save screenshot ERROR in mainwindow.__action_save_screenshot&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 
+<div class="viewcode-block" id="MainWindow._get_pdf_page_count">
+<a class="viewcode-back" href="../../../zooui/windows/mainwindow.html#zooui.windows.mainwindow.MainWindow._get_pdf_page_count">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_pdf_page_count</span><span class="p">(</span><span class="n">pdf_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get page count from a PDF file using pdfinfo.</span>
+
+<span class="sd">        ``pdfinfo`` is part of the Poppler suite and is typically installed</span>
+<span class="sd">        alongside ``pdftoppm``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+                <span class="p">[</span><span class="s2">&quot;pdfinfo&quot;</span><span class="p">,</span> <span class="n">pdf_path</span><span class="p">],</span>
+                <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Pages:&quot;</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__show_pdf_page_dialog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdf_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">page_count</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Show a dialog asking which page to open for a large PDF.</span>
+
+<span class="sd">        Returns the 0-indexed page number, or None if cancelled.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">pdf_path</span><span class="p">)</span>
+        <span class="n">page_num</span><span class="p">,</span> <span class="n">ok</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QInputDialog</span><span class="o">.</span><span class="n">getInt</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="s2">&quot;Open PDF&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&#39;</span><span class="se">\n</span><span class="s2">This PDF contains </span><span class="si">{</span><span class="n">page_count</span><span class="si">}</span><span class="s2"> pages.</span><span class="se">\n</span><span class="s2">Which page would you like to open?&quot;</span><span class="p">,</span>
+            <span class="mi">1</span><span class="p">,</span>
+            <span class="mi">1</span><span class="p">,</span>
+            <span class="n">page_count</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">ok</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">page_num</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">__open_media</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">media_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">add</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># type: ignore[return]</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
@@ -580,6 +624,9 @@
 
 <span class="sd">        If add is True then the media will be fit to the screen and added to</span>
 <span class="sd">        the scene. Otherwise it will be returned.</span>
+
+<span class="sd">        For PDF files larger than 2 MB, a page selection dialog is shown</span>
+<span class="sd">        allowing the user to choose which page to open at.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">zui</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_zui</span>
         <span class="k">try</span><span class="p">:</span>
@@ -587,6 +634,16 @@
                 <span class="n">mediaobject</span> <span class="o">=</span> <span class="n">StringMediaObject</span><span class="p">(</span><span class="n">media_id</span><span class="p">,</span> <span class="n">zui</span><span class="o">.</span><span class="n">scene</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">media_id</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.svg&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">media_id</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;svg_&quot;</span><span class="p">):</span>
                 <span class="n">mediaobject</span> <span class="o">=</span> <span class="n">SVGMediaObject</span><span class="p">(</span><span class="n">media_id</span><span class="p">,</span> <span class="n">zui</span><span class="o">.</span><span class="n">scene</span><span class="p">)</span>  <span class="c1"># type: ignore[assignment]</span>
+            <span class="k">elif</span> <span class="n">media_id</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.pdf&quot;</span><span class="p">):</span>
+                <span class="n">start_page</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">pdf_size</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">media_id</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">pdf_size</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">:</span>
+                    <span class="n">page_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_pdf_page_count</span><span class="p">(</span><span class="n">media_id</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">page_count</span> <span class="ow">and</span> <span class="n">page_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">start_page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__show_pdf_page_dialog</span><span class="p">(</span><span class="n">media_id</span><span class="p">,</span> <span class="n">page_count</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">start_page</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="k">return</span> <span class="kc">None</span>
+                <span class="n">mediaobject</span> <span class="o">=</span> <span class="n">PdfMediaObject</span><span class="p">(</span><span class="n">media_id</span><span class="p">,</span> <span class="n">zui</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">start_page</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">mediaobject</span> <span class="o">=</span> <span class="n">TiledMediaObject</span><span class="p">(</span><span class="n">media_id</span><span class="p">,</span> <span class="n">zui</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>  <span class="c1"># type: ignore[assignment]</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
@@ -686,9 +743,6 @@
         <span class="s2">&quot;.jxl&quot;</span><span class="p">,</span>  <span class="c1"># VipsConverter - JPEG XL</span>
     <span class="p">}</span>
 
-    <span class="c1"># Maximum file size for PDF files (2 MB)</span>
-    <span class="n">MAX_PDF_SIZE_BYTES</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>
-
     <span class="k">def</span><span class="w"> </span><span class="nf">__action_open_media_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method :</span>
@@ -700,7 +754,6 @@
 
 <span class="sd">        Open media from the directory chosen by the user in a file</span>
 <span class="sd">        selection dialog. Only files with supported extensions are opened.</span>
-<span class="sd">        PDF files larger than MAX_PDF_SIZE_BYTES are skipped.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">directory</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getExistingDirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Open media directory&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__prev_dir</span><span class="p">))</span>
 
@@ -714,9 +767,6 @@
                     <span class="c1"># Check if file has a supported extension</span>
                     <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
                     <span class="k">if</span> <span class="n">ext</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUPPORTED_EXTENSIONS</span><span class="p">:</span>
-                        <span class="k">continue</span>
-                    <span class="c1"># Skip PDF files larger than 2 MB</span>
-                    <span class="k">if</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">&quot;.pdf&quot;</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAX_PDF_SIZE_BYTES</span><span class="p">:</span>
                         <span class="k">continue</span>
                     <span class="n">mediaobject</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__open_media</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">mediaobject</span><span class="p">:</span>
@@ -1260,6 +1310,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/pdfmediaobject.html">PDF media object</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/windowsystem.html">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/logging.html">Logging System</a></li>

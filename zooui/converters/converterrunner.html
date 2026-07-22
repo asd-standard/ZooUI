@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>zooui.converters.converterrunner module &#8212; ZooUI 0.5.4 documentation</title>
+    <title>zooui.converters.converterrunner module &#8212; ZooUI 0.6.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=cc7d0dec" />
-    <script src="../../_static/documentation_options.js?v=e1a677a5"></script>
+    <script src="../../_static/documentation_options.js?v=8fa8b3e9"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -85,13 +85,13 @@ with spawn-based pools.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="zooui.converters.converterrunner._run_pdf_conversion">
-<span class="sig-prename descclassname"><span class="pre">zooui.converters.converterrunner.</span></span><span class="sig-name descname"><span class="pre">_run_pdf_conversion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">infile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outfile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/zooui/converters/converterrunner.html#_run_pdf_conversion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.converters.converterrunner._run_pdf_conversion" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">zooui.converters.converterrunner.</span></span><span class="sig-name descname"><span class="pre">_run_pdf_conversion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">infile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/zooui/converters/converterrunner.html#_run_pdf_conversion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.converters.converterrunner._run_pdf_conversion" title="Link to this definition">¶</a></dt>
 <dd><p>Run PDFConverter in a separate process.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>infile</strong> – Path to the source PDF file</p></li>
-<li><p><strong>outfile</strong> – Path where the rasterized PPM will be written</p></li>
+<li><p><strong>outdir</strong> – Directory where per-page PPM files will be written</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -181,13 +181,13 @@ init() -&gt; shutdown() -&gt; init() chain that may occur during context changes
 
 <dl class="py function">
 <dt class="sig sig-object py" id="zooui.converters.converterrunner.submit_pdf_conversion">
-<span class="sig-prename descclassname"><span class="pre">zooui.converters.converterrunner.</span></span><span class="sig-name descname"><span class="pre">submit_pdf_conversion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">infile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outfile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/zooui/converters/converterrunner.html#submit_pdf_conversion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.converters.converterrunner.submit_pdf_conversion" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">zooui.converters.converterrunner.</span></span><span class="sig-name descname"><span class="pre">submit_pdf_conversion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">infile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/zooui/converters/converterrunner.html#submit_pdf_conversion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.converters.converterrunner.submit_pdf_conversion" title="Link to this definition">¶</a></dt>
 <dd><p>Submit a PDFConverter job to run in a separate process.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>infile</strong> – Path to the source PDF file</p></li>
-<li><p><strong>outfile</strong> – Path where the rasterized PPM will be written</p></li>
+<li><p><strong>outdir</strong> – Directory where per-page PPM files will be written</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -198,7 +198,7 @@ init() -&gt; shutdown() -&gt; init() chain that may occur during context changes
 
 <dl class="py class">
 <dt class="sig sig-object py" id="zooui.converters.converterrunner.ConversionHandle">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zooui.converters.converterrunner.</span></span><span class="sig-name descname"><span class="pre">ConversionHandle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">future</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">infile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outfile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/zooui/converters/converterrunner.html#ConversionHandle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.converters.converterrunner.ConversionHandle" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zooui.converters.converterrunner.</span></span><span class="sig-name descname"><span class="pre">ConversionHandle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">future</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">infile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outpath</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/zooui/converters/converterrunner.html#ConversionHandle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.converters.converterrunner.ConversionHandle" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A handle to a running or completed conversion process.</p>
 <p>This class wraps a Future and provides a similar interface to the
@@ -209,7 +209,7 @@ thread-based Converter class, with progress and error properties.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>future</strong> – The Future object from the process pool</p></li>
 <li><p><strong>infile</strong> – Path to the source file</p></li>
-<li><p><strong>outfile</strong> – Path to the output file</p></li>
+<li><p><strong>outpath</strong> – Path to the output directory (for PDF) or output file</p></li>
 </ul>
 </dd>
 </dl>
@@ -225,6 +225,20 @@ this returns 0.0 while running and 1.0 when done.</p>
 <dt class="sig sig-object py" id="zooui.converters.converterrunner.ConversionHandle.error">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">error</span></span><a class="headerlink" href="#zooui.converters.converterrunner.ConversionHandle.error" title="Link to this definition">¶</a></dt>
 <dd><p>Return the error message if conversion failed, None otherwise.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="zooui.converters.converterrunner.ConversionHandle.page_count">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">page_count</span></span><a class="headerlink" href="#zooui.converters.converterrunner.ConversionHandle.page_count" title="Link to this definition">¶</a></dt>
+<dd><p>Return the number of pages in the converted PDF.</p>
+<p>Only available after conversion completes. Returns 0 if the page
+count could not be determined.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.converters.converterrunner.ConversionHandle._count_page_files">
+<span class="sig-name descname"><span class="pre">_count_page_files</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/zooui/converters/converterrunner.html#ConversionHandle._count_page_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.converters.converterrunner.ConversionHandle._count_page_files" title="Link to this definition">¶</a></dt>
+<dd><p>Count page_*.ppm files in the output directory.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -289,6 +303,7 @@ this returns 0.0 while running and 1.0 when done.</p>
 <li class="toctree-l1"><a class="reference internal" href="../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../technicaldocumentation/pdfmediaobject.html">PDF media object</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../technicaldocumentation/windowsystem.html">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../technicaldocumentation/logging.html">Logging System</a></li>

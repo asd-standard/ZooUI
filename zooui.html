@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>zooui package &#8212; ZooUI 0.5.4 documentation</title>
+    <title>zooui package &#8212; ZooUI 0.6.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=cc7d0dec" />
-    <script src="_static/documentation_options.js?v=e1a677a5"></script>
+    <script src="_static/documentation_options.js?v=8fa8b3e9"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -67,6 +67,8 @@
 <li class="toctree-l3"><a class="reference internal" href="zooui/converters/converterrunner.html#zooui.converters.converterrunner.ConversionHandle"><code class="docutils literal notranslate"><span class="pre">ConversionHandle</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="zooui/converters/converterrunner.html#zooui.converters.converterrunner.ConversionHandle.progress"><code class="docutils literal notranslate"><span class="pre">ConversionHandle.progress</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/converters/converterrunner.html#zooui.converters.converterrunner.ConversionHandle.error"><code class="docutils literal notranslate"><span class="pre">ConversionHandle.error</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="zooui/converters/converterrunner.html#zooui.converters.converterrunner.ConversionHandle.page_count"><code class="docutils literal notranslate"><span class="pre">ConversionHandle.page_count</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="zooui/converters/converterrunner.html#zooui.converters.converterrunner.ConversionHandle._count_page_files"><code class="docutils literal notranslate"><span class="pre">ConversionHandle._count_page_files()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/converters/converterrunner.html#zooui.converters.converterrunner.ConversionHandle._check_result"><code class="docutils literal notranslate"><span class="pre">ConversionHandle._check_result()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/converters/converterrunner.html#zooui.converters.converterrunner.ConversionHandle.is_alive"><code class="docutils literal notranslate"><span class="pre">ConversionHandle.is_alive()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/converters/converterrunner.html#zooui.converters.converterrunner.ConversionHandle.join"><code class="docutils literal notranslate"><span class="pre">ConversionHandle.join()</span></code></a></li>
@@ -76,7 +78,6 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="zooui/converters/pdfconverter.html">zooui.converters.pdfconverter module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="zooui/converters/pdfconverter.html#zooui.converters.pdfconverter.PDFConverter"><code class="docutils literal notranslate"><span class="pre">PDFConverter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="zooui/converters/pdfconverter.html#zooui.converters.pdfconverter.PDFConverter.__merge"><code class="docutils literal notranslate"><span class="pre">PDFConverter.__merge()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/converters/pdfconverter.html#zooui.converters.pdfconverter.PDFConverter.run"><code class="docutils literal notranslate"><span class="pre">PDFConverter.run()</span></code></a></li>
 </ul>
 </li>
@@ -154,17 +155,43 @@
 <li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/tiledmediaobject.html#zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject.transparent"><code class="docutils literal notranslate"><span class="pre">TiledMediaObject.transparent</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/tiledmediaobject.html#zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject.default_size"><code class="docutils literal notranslate"><span class="pre">TiledMediaObject.default_size</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/tiledmediaobject.html#zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject.tempcache"><code class="docutils literal notranslate"><span class="pre">TiledMediaObject.tempcache</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/tiledmediaobject.html#zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject._reset_for_page"><code class="docutils literal notranslate"><span class="pre">TiledMediaObject._reset_for_page()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/tiledmediaobject.html#zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject.__progress"><code class="docutils literal notranslate"><span class="pre">TiledMediaObject.__progress</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/tiledmediaobject.html#zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject.__pixpos2rowcol"><code class="docutils literal notranslate"><span class="pre">TiledMediaObject.__pixpos2rowcol()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/tiledmediaobject.html#zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject.__rowcol_bound"><code class="docutils literal notranslate"><span class="pre">TiledMediaObject.__rowcol_bound()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/tiledmediaobject.html#zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject.__render_tileblock"><code class="docutils literal notranslate"><span class="pre">TiledMediaObject.__render_tileblock()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/tiledmediaobject.html#zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject.__render_media"><code class="docutils literal notranslate"><span class="pre">TiledMediaObject.__render_media()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/tiledmediaobject.html#zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject.__render_placeholder"><code class="docutils literal notranslate"><span class="pre">TiledMediaObject.__render_placeholder()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/tiledmediaobject.html#zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject.__try_load"><code class="docutils literal notranslate"><span class="pre">TiledMediaObject.__try_load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/tiledmediaobject.html#zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject._try_load"><code class="docutils literal notranslate"><span class="pre">TiledMediaObject._try_load()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/tiledmediaobject.html#zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject.__run_tiler"><code class="docutils literal notranslate"><span class="pre">TiledMediaObject.__run_tiler()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/tiledmediaobject.html#zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject.render"><code class="docutils literal notranslate"><span class="pre">TiledMediaObject.render()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/tiledmediaobject.html#zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject.is_size_visible"><code class="docutils literal notranslate"><span class="pre">TiledMediaObject.is_size_visible()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/tiledmediaobject.html#zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject.onscreen_size"><code class="docutils literal notranslate"><span class="pre">TiledMediaObject.onscreen_size</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="zooui/objects/mediaobjects/pdfmediaobject.html">zooui.objects.mediaobjects.pdfmediaobject module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="zooui/objects/mediaobjects/pdfmediaobject.html#zooui.objects.mediaobjects.pdfmediaobject._BlockingConverter"><code class="docutils literal notranslate"><span class="pre">_BlockingConverter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/pdfmediaobject.html#zooui.objects.mediaobjects.pdfmediaobject._BlockingConverter.progress"><code class="docutils literal notranslate"><span class="pre">_BlockingConverter.progress</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="zooui/objects/mediaobjects/pdfmediaobject.html#zooui.objects.mediaobjects.pdfmediaobject.PdfMediaObject"><code class="docutils literal notranslate"><span class="pre">PdfMediaObject</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/pdfmediaobject.html#zooui.objects.mediaobjects.pdfmediaobject.PdfMediaObject.current_page"><code class="docutils literal notranslate"><span class="pre">PdfMediaObject.current_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/pdfmediaobject.html#zooui.objects.mediaobjects.pdfmediaobject.PdfMediaObject.page_count"><code class="docutils literal notranslate"><span class="pre">PdfMediaObject.page_count</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/pdfmediaobject.html#zooui.objects.mediaobjects.pdfmediaobject.PdfMediaObject.current_page_label"><code class="docutils literal notranslate"><span class="pre">PdfMediaObject.current_page_label</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/pdfmediaobject.html#zooui.objects.mediaobjects.pdfmediaobject.PdfMediaObject.change_page"><code class="docutils literal notranslate"><span class="pre">PdfMediaObject.change_page()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/pdfmediaobject.html#zooui.objects.mediaobjects.pdfmediaobject.PdfMediaObject._try_load"><code class="docutils literal notranslate"><span class="pre">PdfMediaObject._try_load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/pdfmediaobject.html#zooui.objects.mediaobjects.pdfmediaobject.PdfMediaObject.go_to_page"><code class="docutils literal notranslate"><span class="pre">PdfMediaObject.go_to_page()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/pdfmediaobject.html#zooui.objects.mediaobjects.pdfmediaobject.PdfMediaObject.handle_key"><code class="docutils literal notranslate"><span class="pre">PdfMediaObject.handle_key()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/pdfmediaobject.html#zooui.objects.mediaobjects.pdfmediaobject.PdfMediaObject.render"><code class="docutils literal notranslate"><span class="pre">PdfMediaObject.render()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/pdfmediaobject.html#zooui.objects.mediaobjects.pdfmediaobject.PdfMediaObject._on_conversion_complete"><code class="docutils literal notranslate"><span class="pre">PdfMediaObject._on_conversion_complete()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/pdfmediaobject.html#zooui.objects.mediaobjects.pdfmediaobject.PdfMediaObject._check_conversion_complete"><code class="docutils literal notranslate"><span class="pre">PdfMediaObject._check_conversion_complete()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/pdfmediaobject.html#zooui.objects.mediaobjects.pdfmediaobject.PdfMediaObject._check_page_tiling"><code class="docutils literal notranslate"><span class="pre">PdfMediaObject._check_page_tiling()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/pdfmediaobject.html#zooui.objects.mediaobjects.pdfmediaobject.PdfMediaObject._ensure_page_tiling"><code class="docutils literal notranslate"><span class="pre">PdfMediaObject._ensure_page_tiling()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/pdfmediaobject.html#zooui.objects.mediaobjects.pdfmediaobject.PdfMediaObject._maintain_buffer"><code class="docutils literal notranslate"><span class="pre">PdfMediaObject._maintain_buffer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/pdfmediaobject.html#zooui.objects.mediaobjects.pdfmediaobject.PdfMediaObject._start_tiling_page"><code class="docutils literal notranslate"><span class="pre">PdfMediaObject._start_tiling_page()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="zooui/objects/mediaobjects/pdfmediaobject.html#zooui.objects.mediaobjects.pdfmediaobject.PdfMediaObject._show_go_to_page_dialog"><code class="docutils literal notranslate"><span class="pre">PdfMediaObject._show_go_to_page_dialog()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -443,6 +470,7 @@
 <li class="toctree-l4"><a class="reference internal" href="zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI.mouseReleaseEvent"><code class="docutils literal notranslate"><span class="pre">QZUI.mouseReleaseEvent()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI.keyPressEvent"><code class="docutils literal notranslate"><span class="pre">QZUI.keyPressEvent()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI.keyReleaseEvent"><code class="docutils literal notranslate"><span class="pre">QZUI.keyReleaseEvent()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI._dispatch_pdf_page_nav"><code class="docutils literal notranslate"><span class="pre">QZUI._dispatch_pdf_page_nav()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI.resizeEvent"><code class="docutils literal notranslate"><span class="pre">QZUI.resizeEvent()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI._run_pending_animation"><code class="docutils literal notranslate"><span class="pre">QZUI._run_pending_animation()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI.focusOutEvent"><code class="docutils literal notranslate"><span class="pre">QZUI.focusOutEvent()</span></code></a></li>
@@ -754,12 +782,13 @@
 <li class="toctree-l4"><a class="reference internal" href="zooui/windows/mainwindow.html#zooui.windows.mainwindow.MainWindow.__action_import_scene"><code class="docutils literal notranslate"><span class="pre">MainWindow.__action_import_scene()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/windows/mainwindow.html#zooui.windows.mainwindow.MainWindow.__action_save_scene"><code class="docutils literal notranslate"><span class="pre">MainWindow.__action_save_scene()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/windows/mainwindow.html#zooui.windows.mainwindow.MainWindow.__action_save_screenshot"><code class="docutils literal notranslate"><span class="pre">MainWindow.__action_save_screenshot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="zooui/windows/mainwindow.html#zooui.windows.mainwindow.MainWindow._get_pdf_page_count"><code class="docutils literal notranslate"><span class="pre">MainWindow._get_pdf_page_count()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="zooui/windows/mainwindow.html#zooui.windows.mainwindow.MainWindow.__show_pdf_page_dialog"><code class="docutils literal notranslate"><span class="pre">MainWindow.__show_pdf_page_dialog()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/windows/mainwindow.html#zooui.windows.mainwindow.MainWindow.__open_media"><code class="docutils literal notranslate"><span class="pre">MainWindow.__open_media()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/windows/mainwindow.html#zooui.windows.mainwindow.MainWindow.__action_open_media_local"><code class="docutils literal notranslate"><span class="pre">MainWindow.__action_open_media_local()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/windows/mainwindow.html#zooui.windows.mainwindow.MainWindow.__action_open_media_string"><code class="docutils literal notranslate"><span class="pre">MainWindow.__action_open_media_string()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/windows/mainwindow.html#zooui.windows.mainwindow.MainWindow.__action_open_svg_pick"><code class="docutils literal notranslate"><span class="pre">MainWindow.__action_open_svg_pick()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/windows/mainwindow.html#zooui.windows.mainwindow.MainWindow.SUPPORTED_EXTENSIONS"><code class="docutils literal notranslate"><span class="pre">MainWindow.SUPPORTED_EXTENSIONS</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="zooui/windows/mainwindow.html#zooui.windows.mainwindow.MainWindow.MAX_PDF_SIZE_BYTES"><code class="docutils literal notranslate"><span class="pre">MainWindow.MAX_PDF_SIZE_BYTES</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/windows/mainwindow.html#zooui.windows.mainwindow.MainWindow.__action_open_media_dir"><code class="docutils literal notranslate"><span class="pre">MainWindow.__action_open_media_dir()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/windows/mainwindow.html#zooui.windows.mainwindow.MainWindow.__action_set_fps"><code class="docutils literal notranslate"><span class="pre">MainWindow.__action_set_fps()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="zooui/windows/mainwindow.html#zooui.windows.mainwindow.MainWindow.__action_fullscreen"><code class="docutils literal notranslate"><span class="pre">MainWindow.__action_fullscreen()</span></code></a></li>
@@ -1135,6 +1164,7 @@
 <li class="toctree-l1"><a class="reference internal" href="technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="technicaldocumentation/pdfmediaobject.html">PDF media object</a></li>
 <li class="toctree-l1"><a class="reference internal" href="technicaldocumentation/tilingsystem.html">Tiling System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="technicaldocumentation/windowsystem.html">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="technicaldocumentation/logging.html">Logging System</a></li>

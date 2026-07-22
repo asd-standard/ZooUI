@@ -128,13 +128,13 @@
 
 <div class="viewcode-block" id="_run_pdf_conversion">
 <a class="viewcode-back" href="../../../zooui/converters/converterrunner.html#zooui.converters.converterrunner._run_pdf_conversion">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">_run_pdf_conversion</span><span class="p">(</span><span class="n">infile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">outfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_run_pdf_conversion</span><span class="p">(</span><span class="n">infile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">outdir</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Run PDFConverter in a separate process.</span>
 
 <span class="sd">    Parameters:</span>
 <span class="sd">        infile: Path to the source PDF file</span>
-<span class="sd">        outfile: Path where the rasterized PPM will be written</span>
+<span class="sd">        outdir: Directory where per-page PPM files will be written</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        None on success, error message string on failure</span>
@@ -142,7 +142,7 @@
     <span class="c1"># Import here to avoid issues with multiprocessing</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">zooui.converters.pdfconverter</span><span class="w"> </span><span class="kn">import</span> <span class="n">PDFConverter</span>
 
-    <span class="n">converter</span> <span class="o">=</span> <span class="n">PDFConverter</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span> <span class="n">outfile</span><span class="p">)</span>
+    <span class="n">converter</span> <span class="o">=</span> <span class="n">PDFConverter</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span> <span class="n">outdir</span><span class="p">)</span>
     <span class="n">converter</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">converter</span><span class="o">.</span><span class="n">error</span></div>
 
@@ -301,19 +301,19 @@
 
 <div class="viewcode-block" id="submit_pdf_conversion">
 <a class="viewcode-back" href="../../../zooui/converters/converterrunner.html#zooui.converters.converterrunner.submit_pdf_conversion">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">submit_pdf_conversion</span><span class="p">(</span><span class="n">infile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">outfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Future</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">submit_pdf_conversion</span><span class="p">(</span><span class="n">infile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">outdir</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Future</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Submit a PDFConverter job to run in a separate process.</span>
 
 <span class="sd">    Parameters:</span>
 <span class="sd">        infile: Path to the source PDF file</span>
-<span class="sd">        outfile: Path where the rasterized PPM will be written</span>
+<span class="sd">        outdir: Directory where per-page PPM files will be written</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A Future object that will contain the conversion result</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">executor</span> <span class="o">=</span> <span class="n">_get_executor</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">_run_pdf_conversion</span><span class="p">,</span> <span class="n">infile</span><span class="p">,</span> <span class="n">outfile</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">_run_pdf_conversion</span><span class="p">,</span> <span class="n">infile</span><span class="p">,</span> <span class="n">outdir</span><span class="p">)</span></div>
 
 
 
@@ -327,20 +327,21 @@
 <span class="sd">    thread-based Converter class, with progress and error properties.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">future</span><span class="p">:</span> <span class="n">Future</span><span class="p">,</span> <span class="n">infile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">outfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">future</span><span class="p">:</span> <span class="n">Future</span><span class="p">,</span> <span class="n">infile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">outpath</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a new ConversionHandle.</span>
 
 <span class="sd">        Parameters:</span>
 <span class="sd">            future: The Future object from the process pool</span>
 <span class="sd">            infile: Path to the source file</span>
-<span class="sd">            outfile: Path to the output file</span>
+<span class="sd">            outpath: Path to the output directory (for PDF) or output file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_future</span> <span class="o">=</span> <span class="n">future</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_infile</span> <span class="o">=</span> <span class="n">infile</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_outfile</span> <span class="o">=</span> <span class="n">outfile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_outpath</span> <span class="o">=</span> <span class="n">outpath</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_error</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_checked</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_page_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">progress</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -361,6 +362,34 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_future</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_check_result</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">page_count</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the number of pages in the converted PDF.</span>
+
+<span class="sd">        Only available after conversion completes. Returns 0 if the page</span>
+<span class="sd">        count could not be determined.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_future</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_result</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_page_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_page_count</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_page_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count_page_files</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_page_count</span> <span class="ow">or</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="ConversionHandle._count_page_files">
+<a class="viewcode-back" href="../../../zooui/converters/converterrunner.html#zooui.converters.converterrunner.ConversionHandle._count_page_files">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_count_page_files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Count page_*.ppm files in the output directory.&quot;&quot;&quot;</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">glob</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_glob</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="n">_glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_outpath</span><span class="p">,</span> <span class="s2">&quot;page_*.ppm&quot;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span></div>
+
 
 <div class="viewcode-block" id="ConversionHandle._check_result">
 <a class="viewcode-back" href="../../../zooui/converters/converterrunner.html#zooui.converters.converterrunner.ConversionHandle._check_result">[docs]</a>
@@ -434,6 +463,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/pdfmediaobject.html">PDF media object</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/windowsystem.html">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/logging.html">Logging System</a></li>

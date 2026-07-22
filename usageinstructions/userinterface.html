@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>User Interface &#8212; ZooUI 0.5.4 documentation</title>
+    <title>User Interface &#8212; ZooUI 0.6.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cc7d0dec" />
-    <script src="../_static/documentation_options.js?v=e1a677a5"></script>
+    <script src="../_static/documentation_options.js?v=8fa8b3e9"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -219,9 +219,20 @@ mouse position (or center of the viewport)</p></li>
 or modify SVG), accepts the dialog — equivalent to clicking the OK button.</p></li>
 <li><p><strong>Home</strong> Jump to the saved home point, restoring the saved view position
 and zoom level. Has no effect if no home point has been set.</p></li>
-<li><p><strong>Shift+Home</strong> Save the current view position and zoom level as the
-home point. A cyan crosshair pulse is displayed at the viewport center
-to confirm the action. The home point is cleared when a new scene is loaded.</p></li>
+<li><dl class="simple">
+<dt><strong>Shift+Home</strong> Save the current view position and zoom level as the</dt><dd><p>home point. A cyan crosshair pulse is displayed at the viewport center
+to confirm the action. The home point is cleared when a new scene is loaded.</p>
+</dd>
+</dl>
+</li>
+<li><p><strong>Ctrl+↑</strong> Within a PDF document, navigate to the <em>previous</em> page.
+The bottom-right corner of the new page aligns with the bottom-right
+of the viewport.</p></li>
+<li><p><strong>Ctrl+↓</strong> Within a PDF document, navigate to the <em>next</em> page.
+The top-left corner of the new page aligns with the top-left
+of the viewport, letting you continue reading from the top.</p></li>
+<li><p><strong>Ctrl+Alt+G</strong> Within a PDF document, open a <em>Go to Page</em> dialog
+allowing you to jump directly to a specific page number.</p></li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -286,6 +297,7 @@ only</p></li>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/pdfmediaobject.html">PDF media object</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/windowsystem.html">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/logging.html">Logging System</a></li>

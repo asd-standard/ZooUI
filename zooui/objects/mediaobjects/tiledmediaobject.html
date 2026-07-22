@@ -5,16 +5,16 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>zooui.objects.mediaobjects.tiledmediaobject module &#8212; ZooUI 0.5.4 documentation</title>
+    <title>zooui.objects.mediaobjects.tiledmediaobject module &#8212; ZooUI 0.6.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=cc7d0dec" />
-    <script src="../../../_static/documentation_options.js?v=e1a677a5"></script>
+    <script src="../../../_static/documentation_options.js?v=8fa8b3e9"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="zooui.objects.mediaobjects.stringmediaobject module" href="stringmediaobject.html" />
+    <link rel="next" title="zooui.objects.mediaobjects.pdfmediaobject module" href="pdfmediaobject.html" />
     <link rel="prev" title="zooui.objects.mediaobjects.mediaobject module" href="mediaobject.html" />
    
   <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
@@ -38,7 +38,7 @@
 <p>Tiled media to be displayed in the ZUI.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zooui.objects.mediaobjects.tiledmediaobject.</span></span><span class="sig-name descname"><span class="pre">TiledMediaObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">media_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scene</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">autofit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/objects/mediaobjects/tiledmediaobject.html#TiledMediaObject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zooui.objects.mediaobjects.tiledmediaobject.</span></span><span class="sig-name descname"><span class="pre">TiledMediaObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">media_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scene</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">autofit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deferred</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/objects/mediaobjects/tiledmediaobject.html#TiledMediaObject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="mediaobject.html#zooui.objects.mediaobjects.mediaobject.MediaObject" title="zooui.objects.mediaobjects.mediaobject.MediaObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">MediaObject</span></code></a></p>
 <dl class="simple">
 <dt>Constructor :</dt><dd><p>TiledMediaObject(media_id, scene, autofit)</p>
@@ -61,18 +61,22 @@ the area occupied by the placeholder.</p>
 <p>For any acceptable filetype the adequate converter gets called.
 The converter returns a ppm image file on which we can run the tiler on.</p>
 <dl class="simple">
-<dt>Constructor :</dt><dd><p>TiledMediaObject(media_id, scene, autofit)</p>
+<dt>Constructor :</dt><dd><p>TiledMediaObject(media_id, scene, autofit, deferred)</p>
 </dd>
 <dt>Parameters :</dt><dd><p>media_id : str
 scene : Scene
-autofit : bool (default=True)</p>
+autofit : bool (default=True)
+deferred : bool (default=False)</p>
 </dd>
 </dl>
-<p>TiledMediaObject(media_id, scene, autofit) –&gt; None</p>
+<p>TiledMediaObject(media_id, scene, autofit, deferred) –&gt; None</p>
 <p>Initialize a new TiledMediaObject from the media identified by media_id,
 the parent Scene referenced by scene, and optionally autofit behavior.</p>
 <p>If autofit is True, once the media has loaded it will be fitted to
 the area occupied by the placeholder.</p>
+<p>If deferred is True, conversion and tiling setup is skipped — the caller
+is responsible for initiating those operations. This is used by
+PdfMediaObject to manage multi-page PDFs.</p>
 <p>Sets up conversion and tiling infrastructure based on the media file type.
 Initializes caching variables for tileblocks and rendering optimization.</p>
 <dl class="py attribute">
@@ -155,6 +159,25 @@ position it’s relative to Scene reference frame.</p>
 <dt class="sig sig-object py" id="zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject.tempcache">
 <span class="sig-name descname"><span class="pre">tempcache</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject.tempcache" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject._reset_for_page">
+<span class="sig-name descname"><span class="pre">_reset_for_page</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_media_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/objects/mediaobjects/tiledmediaobject.html#TiledMediaObject._reset_for_page"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject._reset_for_page" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Method :</dt><dd><p>_reset_for_page(new_media_id)</p>
+</dd>
+<dt>Parameters :</dt><dd><p>new_media_id : str</p>
+</dd>
+</dl>
+<p>_reset_for_page(new_media_id) –&gt; None</p>
+<p>Reset internal state and switch to a different media_id for page
+navigation. Invalidates all cached tileblocks, then starts loading
+the root tile for the new media_id.</p>
+<p>Dimension data (width, height, aspect_ratio, maxtilelevel) is kept
+from the previous page so that the bounding box for autofit is
+computed correctly during the transition.</p>
+<p>Used by PdfMediaObject when changing pages.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject.__progress">
@@ -250,15 +273,15 @@ using the given painter.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject.__try_load">
-<span class="sig-name descname"><span class="pre">__try_load</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject.__try_load" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject._try_load">
+<span class="sig-name descname"><span class="pre">_try_load</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/objects/mediaobjects/tiledmediaobject.html#TiledMediaObject._try_load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.objects.mediaobjects.tiledmediaobject.TiledMediaObject._try_load" title="Link to this definition">¶</a></dt>
 <dd><dl class="simple">
-<dt>Method :</dt><dd><p>__try_load()</p>
+<dt>Method :</dt><dd><p>_try_load()</p>
 </dd>
 <dt>Parameters :</dt><dd><p>None</p>
 </dd>
 </dl>
-<p>__try_load() –&gt; None</p>
+<p>_try_load() –&gt; None</p>
 <p>Try to load the (0,0,0) tile from the TileManager.</p>
 </dd></dl>
 
@@ -364,6 +387,7 @@ otherwise uses the actual width and height scaled by zoom levels.</p>
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/pdfmediaobject.html">PDF media object</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/windowsystem.html">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/logging.html">Logging System</a></li>
@@ -405,7 +429,7 @@ otherwise uses the actual width and height scaled by zoom levels.</p>
   <li><a href="../../../zooui.html">zooui package</a><ul>
   <li><a href="../../objects.html">objects package</a><ul>
       <li>Previous: <a href="mediaobject.html" title="previous chapter">zooui.objects.mediaobjects.mediaobject module</a></li>
-      <li>Next: <a href="stringmediaobject.html" title="next chapter">zooui.objects.mediaobjects.stringmediaobject module</a></li>
+      <li>Next: <a href="pdfmediaobject.html" title="next chapter">zooui.objects.mediaobjects.pdfmediaobject module</a></li>
   </ul></li>
   </ul></li>
   </ul></li>

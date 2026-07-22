@@ -166,8 +166,19 @@ Mouse/Keyboard actions:
   and zoom level. Has no effect if no home point has been set.
 
 - **Shift+Home** Save the current view position and zoom level as the
-  home point. A cyan crosshair pulse is displayed at the viewport center
-  to confirm the action. The home point is cleared when a new scene is loaded.
+   home point. A cyan crosshair pulse is displayed at the viewport center
+   to confirm the action. The home point is cleared when a new scene is loaded.
+
+- **Ctrl+↑** Within a PDF document, navigate to the *previous* page.
+  The bottom-right corner of the new page aligns with the bottom-right
+  of the viewport.
+
+- **Ctrl+↓** Within a PDF document, navigate to the *next* page.
+  The top-left corner of the new page aligns with the top-left
+  of the viewport, letting you continue reading from the top.
+
+- **Ctrl+Alt+G** Within a PDF document, open a *Go to Page* dialog
+  allowing you to jump directly to a specific page number.
 
 .. note::
    The *Home Point* feature (saving/restoring the current view) is distinct
