@@ -185,16 +185,26 @@ def _capture_home_screenshot() -> None:
     for _ in range(60):
         app.processEvents(QtCore.QEventLoop.AllEvents, 50)
 
-    # Poll for fern root tile (timeout ~6 s)
+    # Load the fern root tile and wait for async generation
+    # Avoid calling get_tile() in a loop — each call fires another
+    # load_tile(), flooding the provider queue.  load_tile once, then
+    # sleep+processEvents, and finally get_tile to check the result.
+    import time
+
     FERN_TILE_ID: tuple[str, int, int, int] = ("dynamic:fern", 0, 0, 0)
+    TileManager.load_tile(FERN_TILE_ID)
+    time.sleep(0.2)
+
     tile_ready = False
-    for _ in range(60):
+    for _ in range(120):
+        app.processEvents(QtCore.QEventLoop.AllEvents, 100)
+        time.sleep(0.1)
         try:
             TileManager.get_tile(FERN_TILE_ID)
             tile_ready = True
             break
         except (TileManager.TileNotLoaded, TileManager.TileNotAvailable):
-            app.processEvents(QtCore.QEventLoop.AllEvents, 100)
+            pass
     if tile_ready:
         print("Fern root tile loaded.")
     else:
