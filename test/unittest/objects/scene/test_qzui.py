@@ -228,3 +228,93 @@ class TestQZUIHomePoint:
             qzui.paintEvent(QtGui.QPaintEvent(qzui.rect()))
         mock_painter.drawLine.assert_not_called()
         mock_painter.drawEllipse.assert_not_called()
+
+
+class TestDispatchPdfPageNav:
+    """
+    Feature: PDF Page Navigation Key Dispatch
+
+    When Ctrl+Up/Down/G is pressed, QZUI dispatches the event to the
+    active PdfMediaObject's handle_key method if one is selected.
+    """
+
+    @pytest.fixture(scope="class")
+    def qapp(self):
+        app = QtWidgets.QApplication.instance()
+        if app is None:
+            app = QtWidgets.QApplication([])
+        yield app
+
+    @pytest.fixture
+    def mock_scene(self):
+        scene = MagicMock()
+        scene.origin = (0.0, 0.0)
+        scene.zoomlevel = 0.0
+        scene.selection = None
+        scene.render.return_value = []
+        scene.check_and_clear_repaint_flag.return_value = False
+        return scene
+
+    @pytest.fixture
+    def qzui(self, qapp, mock_scene):
+        with patch("zooui.objects.scene.scene.new", return_value=mock_scene):
+            zui = QZUI(framerate=0)
+            return zui
+
+    def test_dispatch_forwards_to_handle_key(self, qzui, mock_scene):
+        """
+        Scenario: Key dispatch calls handle_key on active PdfMediaObject
+
+        Given a QZUI with a selected object that has handle_key
+        When a Ctrl+Up key event is dispatched
+        Then the object's handle_key should be called with key and modifiers
+        """
+        mock_obj = MagicMock()
+        mock_obj.handle_key.return_value = True
+        mock_scene.selection = mock_obj
+
+        qzui._dispatch_pdf_page_nav(QtCore.Qt.Key_Up, QtCore.Qt.ControlModifier)
+        mock_obj.handle_key.assert_called_once_with(
+            QtCore.Qt.Key_Up, QtCore.Qt.ControlModifier
+        )
+
+    def test_dispatch_ignores_when_active_is_scene(self, qzui, mock_scene):
+        """
+        Scenario: Key dispatch does nothing when active object is the scene
+
+        Given a QZUI with no selection
+        When _dispatch_pdf_page_nav is called
+        Then no objects should be queried
+        """
+        mock_scene.selection = None
+        qzui._dispatch_pdf_page_nav(QtCore.Qt.Key_Down, QtCore.Qt.ControlModifier)
+
+    def test_dispatch_ignores_objects_without_handle_key(self, qzui, mock_scene):
+        """
+        Scenario: Key dispatch ignores selected objects missing handle_key
+
+        Given a QZUI with a selected object without handle_key
+        When _dispatch_pdf_page_nav is called
+        Then no error occurs and the key is not consumed
+        """
+        mock_obj = MagicMock(spec=[])
+        mock_scene.selection = mock_obj
+
+        qzui._dispatch_pdf_page_nav(QtCore.Qt.Key_Up, QtCore.Qt.ControlModifier)
+
+    def test_dispatch_handles_multi_selection(self, qzui, mock_scene):
+        """
+        Scenario: Key dispatch iterates through multi-selection
+
+        Given a QZUI with two selected objects
+        And the second has handle_key returning True
+        When _dispatch_pdf_page_nav is called
+        Then handle_key is called on the second object
+        """
+        mock_a = MagicMock(spec=[])
+        mock_b = MagicMock()
+        mock_b.handle_key.return_value = True
+        mock_scene.selection = [mock_a, mock_b]
+
+        qzui._dispatch_pdf_page_nav(QtCore.Qt.Key_Down, QtCore.Qt.ControlModifier)
+        mock_b.handle_key.assert_called_once()

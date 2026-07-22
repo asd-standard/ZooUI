@@ -18,6 +18,7 @@
 
 import math
 import os
+import subprocess
 from logging import Logger
 from typing import Any
 
@@ -27,6 +28,7 @@ from PySide6.QtWidgets import QDialog, QDialogButtonBox, QLabel, QPushButton, QV
 import zooui as ZooUI
 from zooui.config import ConfigManager, ValidationError
 from zooui.logger import get_logger
+from zooui.objects.mediaobjects.pdfmediaobject import PdfMediaObject
 from zooui.objects.mediaobjects.stringmediaobject import StringMediaObject
 from zooui.objects.mediaobjects.svgmediaobject import SVGMediaObject
 from zooui.objects.mediaobjects.tiledmediaobject import TiledMediaObject
@@ -513,6 +515,45 @@ class MainWindow(QtWidgets.QMainWindow):
             except Exception as e:
                 self.__show_error("Unable to save screenshot ERROR in mainwindow.__action_save_screenshot", e)
 
+    @staticmethod
+    def _get_pdf_page_count(pdf_path: str) -> int | None:
+        """Get page count from a PDF file using pdfinfo.
+
+        ``pdfinfo`` is part of the Poppler suite and is typically installed
+        alongside ``pdftoppm``.
+        """
+        try:
+            result = subprocess.run(
+                ["pdfinfo", pdf_path],
+                capture_output=True,
+                text=True,
+                timeout=10,
+            )
+            for line in result.stdout.splitlines():
+                if line.startswith("Pages:"):
+                    return int(line.split(":", 1)[1].strip())
+        except Exception:
+            pass
+        return None
+
+    def __show_pdf_page_dialog(self, pdf_path: str, page_count: int) -> int | None:
+        """Show a dialog asking which page to open for a large PDF.
+
+        Returns the 0-indexed page number, or None if cancelled.
+        """
+        filename = os.path.basename(pdf_path)
+        page_num, ok = QtWidgets.QInputDialog.getInt(
+            self,
+            "Open PDF",
+            f"'{filename}'\nThis PDF contains {page_count} pages.\nWhich page would you like to open?",
+            1,
+            1,
+            page_count,
+        )
+        if ok:
+            return max(0, int(page_num) - 1)
+        return None
+
     def __open_media(self, media_id: str, add: bool = True) -> Any | None:  # type: ignore[return]
         """
         Method :
@@ -527,6 +568,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         If add is True then the media will be fit to the screen and added to
         the scene. Otherwise it will be returned.
+
+        For PDF files larger than 2 MB, a page selection dialog is shown
+        allowing the user to choose which page to open at.
         """
         zui = self.current_zui
         try:
@@ -534,6 +578,16 @@ class MainWindow(QtWidgets.QMainWindow):
                 mediaobject = StringMediaObject(media_id, zui.scene)
             elif media_id.lower().endswith(".svg") or media_id.startswith("svg_"):
                 mediaobject = SVGMediaObject(media_id, zui.scene)  # type: ignore[assignment]
+            elif media_id.lower().endswith(".pdf"):
+                start_page: int | None = 0
+                pdf_size = os.path.getsize(media_id)
+                if pdf_size > 2 * 1024 * 1024:
+                    page_count = self._get_pdf_page_count(media_id)
+                    if page_count and page_count > 0:
+                        start_page = self.__show_pdf_page_dialog(media_id, page_count)
+                        if start_page is None:
+                            return None
+                mediaobject = PdfMediaObject(media_id, zui.scene, True, start_page or 0)
             else:
                 mediaobject = TiledMediaObject(media_id, zui.scene, True)  # type: ignore[assignment]
         except Exception as e:
@@ -633,9 +687,6 @@ class MainWindow(QtWidgets.QMainWindow):
         ".jxl",  # VipsConverter - JPEG XL
     }
 
-    # Maximum file size for PDF files (2 MB)
-    MAX_PDF_SIZE_BYTES = 2 * 1024 * 1024
-
     def __action_open_media_dir(self) -> None:
         """
         Method :
@@ -647,7 +698,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         Open media from the directory chosen by the user in a file
         selection dialog. Only files with supported extensions are opened.
-        PDF files larger than MAX_PDF_SIZE_BYTES are skipped.
         """
         directory = str(QtWidgets.QFileDialog.getExistingDirectory(self, "Open media directory", self.__prev_dir))
 
@@ -661,9 +711,6 @@ class MainWindow(QtWidgets.QMainWindow):
                     # Check if file has a supported extension
                     ext = os.path.splitext(filename)[1].lower()
                     if ext not in self.SUPPORTED_EXTENSIONS:
-                        continue
-                    # Skip PDF files larger than 2 MB
-                    if ext == ".pdf" and os.path.getsize(filename) > self.MAX_PDF_SIZE_BYTES:
                         continue
                     mediaobject = self.__open_media(filename, False)
                     if mediaobject:

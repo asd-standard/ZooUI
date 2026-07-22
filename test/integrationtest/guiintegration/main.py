@@ -115,6 +115,7 @@ from guiintegration.test import (  # noqa: E402
     open_svg,
     open_svg_shift_enter,
     paste_svg,
+    pdf_page_navigation,
     reload_test_scene,
     render_order,
     right_click_image,
@@ -223,6 +224,7 @@ class GUIIntegrationTest:
             (45, "Mouse Right-Click - String Modification Dialog", right_click_string.run),
             (48, "Mouse Right-Click - String Modification (Ctrl+Enter Accept)", right_click_string_shift_enter.run),
             (46, "Mouse Right-Click - Image Modification Dialog", right_click_image.run),
+            (52, "PDF - Page Navigation (forward/backward/go-to)", pdf_page_navigation.run),
             (90, "Complete Workflow", workflow.run),
             (99, "File Menu - Quit", quit_test.run),
         ]

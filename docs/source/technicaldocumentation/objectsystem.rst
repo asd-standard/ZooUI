@@ -52,12 +52,20 @@ The object system consists of the following class hierarchy:
     │   │   • Serialization: to_dict() / from_dict()
     │   │
     │   ├── TiledMediaObject
-    │   │       • Large image support via tile pyramid
-    │   │       • Tile grid management
-    │   │       • Progressive loading with placeholders
-    │   │       • Process-based parallel conversion
-    │   │       • Converter support (PDF, images)
-    │   │       • Efficient for huge images
+    │   │   ├── Large image support via tile pyramid
+    │   │   ├── Tile grid management
+    │   │   ├── Progressive loading with placeholders
+    │   │   ├── Process-based parallel conversion
+    │   │   ├── Converter support (PDF, images)
+    │   │   └── Efficient for huge images
+    │   │
+    │   ├── PdfMediaObject (extends TiledMediaObject)
+    │   │   ├── Multi-page PDF with per-page tiling
+    │   │   ├── Page navigation (Ctrl+↑/↓)
+    │   │   ├── Smart alignment (forward: top-left, backward: bottom-right)
+    │   │   ├── Lazy 2-page tiling buffer
+    │   │   ├── Go-to-page dialog (Ctrl+Alt+G)
+    │   │   └── Large PDF (>2 MB) page selection dialog
     │   │
     │   ├── StringMediaObject
     │   │       • Hybrid rendering: moving (direct) vs static (cached)

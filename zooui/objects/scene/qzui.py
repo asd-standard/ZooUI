@@ -902,12 +902,20 @@ class QZUI(QtWidgets.QWidget):
             move_amount = 16
 
         key = event.key()
+        modifiers = event.modifiers()
+
         if key == QtCore.Qt.Key_Escape:
             self.scene.selection = None
         elif key == QtCore.Qt.Key_PageUp:
             self.__zoom(1.0)
         elif key == QtCore.Qt.Key_PageDown:
             self.__zoom(-1.0)
+        elif key in (
+            QtCore.Qt.Key_Up,
+            QtCore.Qt.Key_Down,
+            QtCore.Qt.Key_G,
+        ) and (modifiers & QtCore.Qt.ControlModifier):
+            self._dispatch_pdf_page_nav(key, modifiers)
         elif key == QtCore.Qt.Key_Up:
             self.__active_object.aim("y", -move_amount)
         elif key == QtCore.Qt.Key_Down:
@@ -987,6 +995,18 @@ class QZUI(QtWidgets.QWidget):
             self.__control_held = False
         else:
             QtWidgets.QWidget.keyPressEvent(self, event)
+
+    def _dispatch_pdf_page_nav(self, key: int, modifiers: QtCore.Qt.KeyboardModifier) -> None:
+        """
+        Dispatch page navigation keys to the active PdfMediaObject, if any.
+        """
+        active = self.__active_object
+        if active is self.scene:
+            return
+        objects = active if isinstance(active, list) else [active]
+        for obj in objects:
+            if hasattr(obj, "handle_key") and obj.handle_key(key, modifiers):
+                break
 
     def resizeEvent(self, event: QtGui.QResizeEvent) -> None:
         """

@@ -7,6 +7,7 @@ objects package
    objects/physicalobject
    objects/mediaobjects/mediaobject
    objects/mediaobjects/tiledmediaobject
+   objects/mediaobjects/pdfmediaobject
    objects/mediaobjects/stringmediaobject
    objects/mediaobjects/svgmediaobject
    objects/mediaobjects/mediaobjectsutils/svg/svgcache/svgcache

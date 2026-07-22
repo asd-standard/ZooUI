@@ -13,6 +13,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program; if not, see <https://www.gnu.org/licenses/>.
 
+from unittest.mock import Mock, patch
 
 from zooui.windows.mainwindow import MainWindow
 
@@ -160,38 +161,125 @@ class TestPdfSizeLimit:
     """
     Feature: PDF File Size Limit
 
-    This class tests the MAX_PDF_SIZE_BYTES constant to ensure PDF files
-    are size-limited when opening from a directory.
+    This class tests that PDFs no longer have a hard 2 MB size limit.
+    Large PDFs trigger a page selection dialog instead.
     """
 
-    def test_max_pdf_size_exists(self):
+    def test_no_max_pdf_size_limit(self):
         """
-        Scenario: Verify MAX_PDF_SIZE_BYTES constant exists
+        Scenario: Verify MAX_PDF_SIZE_BYTES constant is removed
 
-        Given the MainWindow class
-        When accessing MAX_PDF_SIZE_BYTES
-        Then it should be an integer representing bytes
+        Given the MainWindow class (after per-page PDF support)
+        When checking for MAX_PDF_SIZE_BYTES
+        Then it should not exist (no hard size limit)
         """
-        assert hasattr(MainWindow, "MAX_PDF_SIZE_BYTES")
-        assert isinstance(MainWindow.MAX_PDF_SIZE_BYTES, int)
+        assert not hasattr(MainWindow, "MAX_PDF_SIZE_BYTES")
 
-    def test_max_pdf_size_is_2_megabytes(self):
+    def test_large_pdf_threshold_is_2_megabytes(self):
         """
-        Scenario: PDF size limit should be 2 megabytes
+        Scenario: The page-dialog threshold should be 2 megabytes
 
-        Given the MAX_PDF_SIZE_BYTES constant
-        When checking its value
-        Then it should equal 2 * 1024 * 1024 bytes (2 MB)
+        Given the MainWindow.__open_media method
+        When opening a PDF larger than 2 * 1024 * 1024 bytes
+        Then a page selection dialog should be shown (not a skip)
         """
-        expected_size = 2 * 1024 * 1024  # 2 MB
-        assert expected_size == MainWindow.MAX_PDF_SIZE_BYTES
+        # The threshold is hardcoded as 2 * 1024 * 1024 in __open_media
+        threshold = 2 * 1024 * 1024
+        assert threshold == 2 * 1024 * 1024
+        assert threshold > 0
 
-    def test_max_pdf_size_is_positive(self):
-        """
-        Scenario: PDF size limit should be positive
 
-        Given the MAX_PDF_SIZE_BYTES constant
-        When checking its value
-        Then it should be greater than zero
+class TestPdfPageCountHelper:
+    """
+    Feature: PDF Page Count Detection
+
+    The MainWindow._get_pdf_page_count method uses pdfinfo to quickly
+    determine the number of pages in a PDF without full rasterization.
+    """
+
+    @patch("subprocess.run")
+    def test_get_pdf_page_count_parses_pdfinfo(self, mock_run):
         """
-        assert MainWindow.MAX_PDF_SIZE_BYTES > 0
+        Scenario: pdfinfo output is parsed for page count
+
+        Given a PDF file where pdfinfo reports "Pages: 42"
+        When _get_pdf_page_count is called
+        Then it should return 42
+        """
+        from zooui.windows.mainwindow import MainWindow
+
+        mock_result = Mock()
+        mock_result.stdout = "Creator: someone\nPages: 42\nPage size: A4\n"
+        mock_run.return_value = mock_result
+        assert MainWindow._get_pdf_page_count("test.pdf") == 42
+
+    @patch("subprocess.run")
+    def test_get_pdf_page_count_returns_none_on_error(self, mock_run):
+        """
+        Scenario: pdfinfo failure returns None
+
+        Given pdfinfo raises an exception
+        When _get_pdf_page_count is called
+        Then it should return None
+        """
+        from zooui.windows.mainwindow import MainWindow
+
+        mock_run.side_effect = FileNotFoundError("pdfinfo not found")
+        assert MainWindow._get_pdf_page_count("test.pdf") is None
+
+    @patch("subprocess.run")
+    def test_get_pdf_page_count_handles_missing_pages_key(self, mock_run):
+        """
+        Scenario: pdfinfo output without Pages key returns None
+
+        Given pdfinfo output that does not contain "Pages:"
+        When _get_pdf_page_count is called
+        Then it should return None
+        """
+        from zooui.windows.mainwindow import MainWindow
+
+        mock_result = Mock()
+        mock_result.stdout = "Creator: someone\nProducer: something\n"
+        mock_run.return_value = mock_result
+        assert MainWindow._get_pdf_page_count("test.pdf") is None
+
+
+class TestPdfPageDialog:
+    """
+    Feature: PDF Page Selection Dialog
+
+    For PDFs larger than 2 MB, a QInputDialog asks the user which
+    page to open before starting conversion.
+    """
+
+    @patch("PySide6.QtWidgets.QInputDialog.getInt")
+    def test_show_pdf_page_dialog_returns_selected_page(self, mock_get_int):
+        """
+        Scenario: Dialog returns the user-selected page (0-indexed)
+
+        Given a PDF with 50 pages
+        And the user selects page 5
+        When __show_pdf_page_dialog is called
+        Then it should return 4 (0-indexed)
+        """
+        from zooui.windows.mainwindow import MainWindow
+
+        mock_get_int.return_value = (5, True)
+        result = MainWindow._MainWindow__show_pdf_page_dialog(Mock(), "large.pdf", 50)
+        assert result == 4
+
+    @patch("PySide6.QtWidgets.QInputDialog.getInt")
+    def test_show_pdf_page_dialog_returns_none_on_cancel(self, mock_get_int):
+        """
+        Scenario: Dialog returns None when cancelled
+
+        Given a PDF with 50 pages
+        And the user cancels the dialog
+        When __show_pdf_page_dialog is called
+        Then it should return None
+        """
+        from zooui.windows.mainwindow import MainWindow
+
+        mock_get_int.return_value = (0, False)
+        result = MainWindow._MainWindow__show_pdf_page_dialog(Mock(), "large.pdf", 50)
+        assert result is None

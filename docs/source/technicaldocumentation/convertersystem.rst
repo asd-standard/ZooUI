@@ -232,21 +232,27 @@ Converters inherit from :class:`threading.Thread`, which allows direct use:
 PDFConverter
 ~~~~~~~~~~~~
 
-The :class:`PDFConverter` class converts PDF documents to PPM format using the
-``pdftoppm`` command-line tool from Poppler or Xpdf.
+The :class:`PDFConverter` class converts PDF documents to individual per-page
+PPM files using the ``pdftoppm`` command-line tool from Poppler or Xpdf. Each
+page is stored as a separate PPM file in a user-specified output directory,
+enabling page-by-page navigation via :class:`PdfMediaObject`.
 
 **Class Definition:**
 
 .. code-block:: python
 
     class PDFConverter(Converter):
-        def __init__(self, infile: str, outfile: str) -> None:
-            Converter.__init__(self, infile, outfile)
+        def __init__(self, infile: str, outdir: str) -> None:
+            Converter.__init__(self, infile, outdir)
             self.resolution = 300
+            self.page_count = 0
+            self.page_paths: list[str] = []
 
 **Key Attributes:**
 
 - ``resolution``: DPI resolution for rasterization (default: 300)
+- ``page_count``: Number of pages discovered after conversion (0 before ``run()``)
+- ``page_paths``: List of absolute paths to per-page PPM files, ordered by page number
 
 **Conversion Process:**
 
@@ -255,7 +261,7 @@ The PDF conversion follows these steps:
 .. code-block:: text
 
     1. Create temporary directory
-       ├─ Used to store individual page PPM files
+       ├─ Used to store raw pdftoppm output
        └─ Cleaned up after conversion
 
     2. Call pdftoppm
@@ -263,49 +269,34 @@ The PDF conversion follows these steps:
        ├─ Generates: page-0001.ppm, page-0002.ppm, ...
        └─ Each file contains one page of the PDF
 
-    3. Read page headers
-       ├─ Parse PPM header from each page file
-       ├─ Extract width and height
-       └─ Calculate total height (sum of all pages)
+    3. Organize per-page PPMs
+       ├─ Rename/copy page files to predictable names
+       ├─ Output: outdir/page_0000.ppm, outdir/page_0001.ppm, ...
+       └─ Store paths in self.page_paths, count in self.page_count
 
-    4. Merge pages
-       ├─ Create output PPM header (width, total_height)
-       ├─ Concatenate pixel data from all pages vertically
-       └─ Result: Single PPM with all pages stacked
-
-    5. Clean up
-       ├─ Close all file handles
-       ├─ Delete temporary directory
+    4. Clean up
+       ├─ Remove temporary directory
        └─ Set progress to 1.0
 
-**Multi-Page Handling:**
+**Per-Page Output:**
 
-PDF documents can have multiple pages. PDFConverter handles this by:
+Each page of the PDF becomes an independent PPM file with a zero-padded
+numeric suffix::
 
-1. Rasterizing each page separately with ``pdftoppm``
-2. Determining page order from filenames (e.g., ``page-0001.ppm``)
-3. Reading each page's dimensions from PPM headers
-4. Creating a single tall PPM by vertically concatenating all pages
-5. Preserving page order in the output
+    outdir/
+    ├── page_0000.ppm   (Page 1)
+    ├── page_0001.ppm   (Page 2)
+    ├── page_0002.ppm   (Page 3)
+    └── ...
 
-**PPM Page Merging Algorithm:**
-
-.. code-block:: python
-
-    # Simplified merge logic
-    total_height = sum(page_heights)
-
-    # Write combined header
-    output.write(f"P6\n{width} {total_height}\n255\n")
-
-    # Concatenate pixel data
-    for page_file in page_files_in_order:
-        shutil.copyfileobj(page_file, output)
+This replaces the previous behaviour of vertically concatenating all pages
+into a single PPM file. Individual per-page PPMs can be tiled independently,
+enabling multi-page PDF support with page-by-page navigation.
 
 **Progress Tracking:**
 
 - ``0.0``: Conversion not started
-- ``0.5``: ``pdftoppm`` finished, starting page merge
+- ``0.5``: ``pdftoppm`` finished, organizing per-page PPMs
 - ``1.0``: Conversion complete
 
 **Error Handling:**
@@ -313,16 +304,14 @@ PDF documents can have multiple pages. PDFConverter handles this by:
 Errors can occur at several stages:
 
 - **pdftoppm failure**: Invalid PDF, missing tool, insufficient memory
-- **Page header parsing**: Corrupted PPM output
-- **File I/O errors**: Disk full, permission denied
+- **File organization errors**: Permission denied in output directory
 
 When errors occur:
 
 1. Error message stored in ``self.error``
 2. Logged via ``self._logger.error()``
 3. Temporary files cleaned up
-4. Output file deleted (if partially written)
-5. Progress set to 1.0 (indicates completion, check error)
+4. Progress set to 1.0 (indicates completion, check error)
 
 **Dependencies:**
 
@@ -336,17 +325,16 @@ Requires ``pdftoppm`` command-line tool:
 
 .. code-block:: python
 
-    converter = PDFConverter('document.pdf', 'output.ppm')
+    converter = PDFConverter('document.pdf', '/tmp/pdf_output')
     converter.resolution = 150  # Lower resolution for faster conversion
-    converter.start()
-
-    # Wait for completion
-    converter.join()
+    converter.run()
 
     if converter.error:
         print(f"Conversion failed: {converter.error}")
     else:
-        print(f"Converted PDF to PPM: {converter._outfile}")
+        print(f"Converted {converter.page_count} pages")
+        for path in converter.page_paths:
+            print(f"  {path}")
 
 VipsConverter
 ~~~~~~~~~~~~~
@@ -544,7 +532,7 @@ enabling parallel conversions without threading conflicts.
     # Submit PDF conversion
     future = converterrunner.submit_pdf_conversion(
         infile='document.pdf',
-        outfile='output.ppm'
+        outdir='output_pages'
     )
 
     # Shutdown pool when done
@@ -613,9 +601,10 @@ Two module-level functions are executed in subprocesses by the pool:
   Instantiates ``VipsConverter`` and calls ``run()`` in the subprocess. Errors
   are raised as exceptions so they propagate through the ``Future`` to the
   ``ConversionHandle``.
-- ``_run_pdf_conversion(infile, outfile)``:
+- ``_run_pdf_conversion(infile, outdir)``:
   Instantiates ``PDFConverter`` and calls ``run()`` in the subprocess with
-  the same error propagation pattern.
+  the same error propagation pattern. ``outdir`` is the directory where
+  per-page PPM files (``page_0000.ppm``, …) will be written.
 
 **ConversionHandle Class:**
 
@@ -672,28 +661,18 @@ Format Detection and Converter Selection
 
 .. code-block:: python
 
-    # In TiledMediaObject.__init__()
+    # In PdfMediaObject.__init__() (multi-page PDF support)
     from zooui.converters import converterrunner
 
-    if self._media_id.lower().endswith('.pdf'):
-        # Use process-based PDF conversion
-        future = converterrunner.submit_pdf_conversion(
-            self._media_id, self.__tmpfile)
-        self.__converter = converterrunner.ConversionHandle(
-            future, self._media_id, self.__tmpfile)
-        self.__ppmfile = self.__tmpfile
+    # For PDFs, per-page PPMs go to a temp directory
+    self._outdir = tempfile.mkdtemp(prefix="zooui_pdf_")
+    future = converterrunner.submit_pdf_conversion(
+        self._pdf_path, self._outdir)
+    self.__pdf_converter = converterrunner.ConversionHandle(
+        future, self._pdf_path, self._outdir)
 
-    elif self._media_id.lower().endswith('.ppm'):
-        # PPM files need no conversion
-        self.__logger.info("assuming media is a local PPM file")
-        self.__ppmfile = self._media_id
-
-    else:
-        # Use process-based Vips conversion
-        future = converterrunner.submit_vips_conversion(
-            self._media_id, self.__tmpfile)
-        self.__converter = converterrunner.ConversionHandle(
-            future, self._media_id, self.__tmpfile)
+    # After conversion, page_0000.ppm, page_0001.ppm, etc.
+    # are discovered and tiled independently via PdfMediaObject.
         self.__ppmfile = self.__tmpfile
 
 Conversion Workflow
@@ -1045,12 +1024,12 @@ conversions can execute truly in parallel:
     from zooui.converters import converterrunner
 
     # Submit multiple conversions to the process pool
-    f1 = converterrunner.submit_pdf_conversion('doc1.pdf', 'out1.ppm')
+    f1 = converterrunner.submit_pdf_conversion('doc1.pdf', 'out1_dir')
     f2 = converterrunner.submit_vips_conversion('img1.jpg', 'out2.ppm')
     f3 = converterrunner.submit_vips_conversion('img2.png', 'out3.ppm')
 
     # Create handles and wait
-    h1 = converterrunner.ConversionHandle(f1, 'doc1.pdf', 'out1.ppm')
+    h1 = converterrunner.ConversionHandle(f1, 'doc1.pdf', 'out1_dir')
     h2 = converterrunner.ConversionHandle(f2, 'img1.jpg', 'out2.ppm')
     h3 = converterrunner.ConversionHandle(f3, 'img2.png', 'out3.ppm')
 
@@ -1079,15 +1058,15 @@ Process-Based Conversion (Recommended)
 
     # Submit PDF conversion
     pdf_future = converterrunner.submit_pdf_conversion(
-        'document.pdf', 'output_pdf.ppm')
+        'document.pdf', 'pdf_output_dir')
     pdf_handle = converterrunner.ConversionHandle(
-        pdf_future, 'document.pdf', 'output_pdf.ppm')
+        pdf_future, 'document.pdf', 'pdf_output_dir')
     pdf_handle.join()
 
     if pdf_handle.error:
         print(f"PDF conversion failed: {pdf_handle.error}")
     else:
-        print("PDF converted successfully!")
+        print(f"PDF converted: {pdf_handle.page_count} pages")
 
     # Submit image conversion with transformations
     img_future = converterrunner.submit_vips_conversion(
@@ -1136,9 +1115,9 @@ Progress Monitoring (Process-Based)
     from zooui.converters import converterrunner
 
     future = converterrunner.submit_pdf_conversion(
-        'large_document.pdf', 'output.ppm')
+        'large_document.pdf', 'pdf_output')
     handle = converterrunner.ConversionHandle(
-        future, 'large_document.pdf', 'output.ppm')
+        future, 'large_document.pdf', 'pdf_output')
 
     # Wait for completion with timeout
     handle.join(timeout=60)
@@ -1163,17 +1142,17 @@ Custom Resolution PDF Conversion
     from zooui.converters import converterrunner
 
     # High-resolution conversion for printing
-    future = converterrunner.submit_pdf_conversion('document.pdf', 'high_res.ppm')
-    handle = converterrunner.ConversionHandle(future, 'document.pdf', 'high_res.ppm')
+    future = converterrunner.submit_pdf_conversion('document.pdf', 'high_res_pages')
+    handle = converterrunner.ConversionHandle(future, 'document.pdf', 'high_res_pages')
     handle.join()
 
     # Low-resolution conversion for preview
-    future = converterrunner.submit_pdf_conversion('document.pdf', 'low_res.ppm')
-    handle = converterrunner.ConversionHandle(future, 'document.pdf', 'low_res.ppm')
+    future = converterrunner.submit_pdf_conversion('document.pdf', 'low_res_pages')
+    handle = converterrunner.ConversionHandle(future, 'document.pdf', 'low_res_pages')
     handle.join()
 
     if not handle.error:
-        print("PDF converted successfully!")
+        print(f"PDF converted: {handle.page_count} pages")
 
 .. note::
 
@@ -1256,16 +1235,18 @@ converterrunner Module
     def shutdown() -> None
     def submit_vips_conversion(infile, outfile, rotation=0,
                                invert_colors=False, black_and_white=False) -> Future
-    def submit_pdf_conversion(infile, outfile) -> Future
+    def submit_pdf_conversion(infile, outdir) -> Future
 
     # ConversionHandle class
     class ConversionHandle:
-        def __init__(self, future: Future, infile: str, outfile: str) -> None
+        def __init__(self, future: Future, infile: str, outpath: str) -> None
 
         @property
         def progress(self) -> float  # 0.0 or 1.0
         @property
         def error(self) -> Optional[str]
+        @property
+        def page_count(self) -> int  # Number of pages (PDF only)
 
         def is_alive(self) -> bool
         def join(self, timeout: Optional[float] = None) -> None

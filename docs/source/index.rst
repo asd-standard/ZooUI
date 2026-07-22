@@ -73,6 +73,7 @@ be under COPYING.txt on project root, otherwise visit `gnu.org <https://www.gnu.
    technicaldocumentation/stringecosystem
    technicaldocumentation/svgecosystem
    technicaldocumentation/tiledmediaobject
+   technicaldocumentation/pdfmediaobject
    technicaldocumentation/tilingsystem
    technicaldocumentation/windowsystem
    technicaldocumentation/logging

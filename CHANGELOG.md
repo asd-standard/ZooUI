@@ -7,6 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-07-22
+### Added
+- **Per-page PDF support** — PDFs are now rendered as individually tiled pages
+  instead of one merged vertical scroll. Each page is rasterized as a separate
+  PPM and tiled independently, enabling page-by-page navigation.
+- **`PdfMediaObject`** — new class extending `TiledMediaObject` that manages
+  multi-page PDFs. Supports page navigation with smart alignment: forward
+  (`Ctrl+↓`) aligns the new page's top-left to the viewport, backward
+  (`Ctrl+↑`) aligns the bottom‑right. Ctrl+Alt+G opens a go‑to‑page dialog.
+  A lazy 2‑page tiling buffer tiles the current page and the next page in
+  the background for instant forward navigation.
+- **Large PDF page selection dialog** — PDFs larger than 2 MB no longer get
+  silently skipped. A dialog shows the page count (via `pdfinfo`) and asks
+  which page to open first.
+- `TiledMediaObject` gains `deferred` init parameter and `_reset_for_page()`
+  method to support subclass-based page switching.
+- `ConversionHandle` gains `page_count` property for multi‑page converters.
+- `_BlockingConverter` dummy class prevents premature `__run_tiler()` calls
+  while `PdfMediaObject` manages page‑specific tiling externally.
+- GUI integration test step 52: PDF page navigation (forward, backward,
+  go‑to‑page dialog) with visual position marker.
+- `data/test_pdf.pdf` — minimal 3‑page PDF for integration testing.
+- PDF page navigation documentation in the user interface reference and
+  a new :doc:`pdfmediaobject` technical documentation page.
+
+### Changed
+- `PDFConverter` now outputs per‑page PPM files (`page_0000.ppm`,
+  `page_0001.ppm`, …) to an output directory instead of merging all pages
+  into a single vertical PPM. The old `__merge()` method has been removed.
+  The constructor's second argument is now an output **directory** (`outdir`).
+- `submit_pdf_conversion(infile, outdir)` updated: second argument is a
+  directory path, not a file path.
+- `MainWindow.__open_media()` routes `.pdf` files to `PdfMediaObject` instead
+  of `TiledMediaObject`.
+- Removed `MAX_PDF_SIZE_BYTES` (2 MB hard limit). Replaced by the >2 MB page
+  selection dialog.
+- `TiledMediaObject.__loaded` and `__try_load` renamed to `_loaded` and
+  `_try_load` (protected) for subclass access.
+- Updated unit and integration tests for all changed components (56 new
+  unit tests, 3 integration test fixes).
+- Documentation: `convertersystem.rst` updated for per‑page PPM output;
+  `windowsystem.rst` updated to remove `MAX_PDF_SIZE_BYTES`;
+  `objectsystem.rst` updated with `PdfMediaObject` in hierarchy tree.
+
 ## [0.5.4] - 2026-07-22
 ### Added
 - **Home Point feature** — quick-save and restore the current scene view

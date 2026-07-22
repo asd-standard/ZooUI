@@ -66,22 +66,27 @@ class TiledMediaObject(MediaObject):
     The converter returns a ppm image file on which we can run the tiler on.
     """
 
-    def __init__(self, media_id: str, scene: Any, autofit: bool = True) -> None:
+    def __init__(self, media_id: str, scene: Any, autofit: bool = True, deferred: bool = False) -> None:
         """
         Constructor :
-            TiledMediaObject(media_id, scene, autofit)
+            TiledMediaObject(media_id, scene, autofit, deferred)
         Parameters :
             media_id : str
             scene : Scene
             autofit : bool (default=True)
+            deferred : bool (default=False)
 
-        TiledMediaObject(media_id, scene, autofit) --> None
+        TiledMediaObject(media_id, scene, autofit, deferred) --> None
 
         Initialize a new TiledMediaObject from the media identified by media_id,
         the parent Scene referenced by scene, and optionally autofit behavior.
 
         If autofit is True, once the media has loaded it will be fitted to
         the area occupied by the placeholder.
+
+        If deferred is True, conversion and tiling setup is skipped — the caller
+        is responsible for initiating those operations. This is used by
+        PdfMediaObject to manage multi-page PDFs.
 
         Sets up conversion and tiling infrastructure based on the media file type.
         Initializes caching variables for tileblocks and rendering optimization.
@@ -95,8 +100,8 @@ class TiledMediaObject(MediaObject):
         self.__autofit: bool = autofit
 
         # Flag indicating whether the tile data has been fully loaded from TileManager
-        # Starts as False; set to True in __try_load() once the (0,0,0) tile is available
-        self.__loaded: bool = False
+        # Starts as False; set to True in _try_load() once the (0,0,0) tile is available
+        self._loaded: bool = False
 
         # Path to the temporary PPM file created during conversion
         # Set to None initially; assigned a tempfile path if conversion is needed
@@ -144,6 +149,9 @@ class TiledMediaObject(MediaObject):
         # Number of render cycles since the tileblock was last re-rendered
         # Compared against self.tempcache to decide when to refresh non-final tileblocks
         self.__tileblock_age: int = 0
+
+        if deferred:
+            return
 
         # Check if TileManager already has tiles for this media_id
         # TileManager.tiled() returns True if the media has already been tiled and stored
@@ -207,6 +215,38 @@ class TiledMediaObject(MediaObject):
     # Class variable: number of render cycles before non-final tileblocks are refreshed
     # After this many cycles, temporary (lower quality) tiles will be re-rendered
     tempcache: int = 5
+
+    def _reset_for_page(self, new_media_id: str) -> None:
+        """
+        Method :
+            _reset_for_page(new_media_id)
+        Parameters :
+            new_media_id : str
+
+        _reset_for_page(new_media_id) --> None
+
+        Reset internal state and switch to a different media_id for page
+        navigation. Invalidates all cached tileblocks, then starts loading
+        the root tile for the new media_id.
+
+        Dimension data (width, height, aspect_ratio, maxtilelevel) is kept
+        from the previous page so that the bounding box for autofit is
+        computed correctly during the transition.
+
+        Used by PdfMediaObject when changing pages.
+        """
+        self._media_id = new_media_id
+        self._loaded = False
+        self.__tileblock = None
+        self.__tileblock_id = None
+        self.__tileblock_final = False
+        self.__tileblock_age = 0
+        self.__converter = None
+        self.__tiler = None
+        self.__logger = get_logger(f"TiledMediaObject.{new_media_id}")
+
+        if TileManager.tiled(self._media_id):
+            TileManager.load_tile((self._media_id, 0, 0, 0))
 
     @property
     def __progress(self) -> float:
@@ -600,14 +640,14 @@ class TiledMediaObject(MediaObject):
                 # Draw "loading..." centered in the placeholder rectangle
                 painter.drawText(x, y, w, h, QtCore.Qt.AlignCenter, "loading...")
 
-    def __try_load(self) -> None:
+    def _try_load(self) -> None:
         """
         Method :
-            __try_load()
+            _try_load()
         Parameters :
             None
 
-        __try_load() --> None
+        _try_load() --> None
 
         Try to load the (0,0,0) tile from the TileManager.
         """
@@ -627,7 +667,7 @@ class TiledMediaObject(MediaObject):
         else:
             # Root tile loaded successfully; media is ready for rendering
             self.__logger.info("media loaded")
-            self.__loaded = True
+            self._loaded = True
 
             if self.__tiler:
                 ## destroy tiler to close tmpfile (required to unlink on Windows)
@@ -745,7 +785,7 @@ class TiledMediaObject(MediaObject):
         """
 
         # If the media is fully loaded, render the actual tiled image
-        if self.__loaded:
+        if self._loaded:
             self.__render_media(painter, mode)
 
         elif self.__tiler and self.__tiler.error:
@@ -754,12 +794,12 @@ class TiledMediaObject(MediaObject):
             self.__logger.exception(f"an error ocurred during the tiling process: {self.__tiler.error}")
 
         # Check if TileManager now has tiles available for this media
-        # Uses 'if' instead of 'elif' to allow loading even after the __loaded check above
+        # Uses 'if' instead of 'elif' to allow loading even after the _loaded check above
         if TileManager.tiled(self._media_id):
             # Attempt to load the root tile and update media dimensions
-            self.__try_load()
+            self._try_load()
 
-            if self.__loaded:
+            if self._loaded:
                 # Loading succeeded; render the actual media content
                 self.__render_media(painter, mode)
             else:

@@ -583,3 +583,46 @@ class TestConversionHandle:
         mock_future.done.return_value = True
 
         assert handle.is_alive() is False
+
+    @patch("glob.glob")
+    def test_page_count_property(self, mock_glob):
+        """
+        Scenario: page_count reflects number of per-page PPMs
+
+        Given a ConversionHandle whose conversion is done
+        And the output directory contains 3 page_*.ppm files
+        When page_count is accessed
+        Then it should return 3
+        And the result should be cached for subsequent accesses
+        """
+        mock_future = Mock(spec=Future)
+        mock_future.done.return_value = True
+        mock_future.result.return_value = None
+        mock_glob.return_value = [
+            "/tmp/out/page_0000.ppm",
+            "/tmp/out/page_0001.ppm",
+            "/tmp/out/page_0002.ppm",
+        ]
+        handle = converterrunner.ConversionHandle(mock_future, "input.pdf", "/tmp/out")
+        assert handle.page_count == 3
+        # Second access should use cached value, not re-count
+        mock_glob.reset_mock()
+        assert handle.page_count == 3
+        mock_glob.assert_not_called()
+
+    @patch("glob.glob")
+    def test_page_count_returns_zero_when_no_files(self, mock_glob):
+        """
+        Scenario: page_count returns 0 when no PPM files found
+
+        Given a ConversionHandle whose conversion finished
+        And the output directory has no page_*.ppm files
+        When page_count is accessed
+        Then it should return 0
+        """
+        mock_future = Mock(spec=Future)
+        mock_future.done.return_value = True
+        mock_future.result.return_value = None
+        mock_glob.return_value = []
+        handle = converterrunner.ConversionHandle(mock_future, "input.pdf", "/tmp/out")
+        assert handle.page_count == 0

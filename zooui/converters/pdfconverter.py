@@ -21,104 +21,51 @@ import shutil
 import subprocess
 import tempfile
 
-from zooui.tilesystem.tiler.ppm import read_ppm_header
-
 from .converter import Converter
 
 
 class PDFConverter(Converter):
     """
     Constructor :
-        PDFConverter(infile, outfile)
+        PDFConverter(infile, outdir)
     Parameters :
         infile : str
-        outfile : str
+        outdir : str
 
-    PDFConverter(infile, outfile) --> None
+    PDFConverter(infile, outdir) --> None
 
-    PDFConverter objects are used for rasterizing PDFs.
+    PDFConverter objects are used for rasterizing PDFs to per-page PPM files.
+
+    Each page is rasterized as a separate PPM file in the output directory:
+    ``outdir/page_0000.ppm``, ``outdir/page_0001.ppm``, etc.
 
     The output format will always be PPM irrespective of the file extension of
     the output file. If another output format is required then :class:`PDFConverter`
     should be used in conjunction with :class:`VipsConverter`.
     """
 
-    def __init__(self, infile: str, outfile: str) -> None:
+    def __init__(self, infile: str, outdir: str) -> None:
         """
         Constructor :
-            PDFConverter(infile, outfile)
+            PDFConverter(infile, outdir)
         Parameters :
             infile : str
-            outfile : str
+            outdir : str
 
-        PDFConverter(infile, outfile) --> None
+        PDFConverter(infile, outdir) --> None
 
         Create a new PDFConverter for rasterizing PDF files.
 
         The infile parameter is the path to the source PDF file.
-        The outfile parameter is the path where the rasterized PPM will be written.
-        The default resolution is 300 DPI.
+        The outdir parameter is the directory where per-page PPM files will
+        be written. The default resolution is 300 DPI.
         """
-        Converter.__init__(self, infile, outfile)
+        Converter.__init__(self, infile, outdir)
 
         self.resolution = 300
+        self.page_count = 0
+        self.page_paths: list[str] = []
 
-    def __merge(self, tmpdir: str) -> None:
-        """
-        Method :
-            PDFConverter.__merge(tmpdir)
-        Parameters :
-            tmpdir : str
-
-        PDFConverter.__merge(tmpdir) --> None
-
-        Merge the PPM pages located in tmpdir into a single PPM file.
-
-        Reads all PPM page files in the temporary directory, extracts their
-        headers to determine dimensions, and concatenates them vertically
-        into a single output PPM file.
-        """
-        self._logger.info("merging pages")
-        self._progress = 0.5
-
-        # total_width = 0
-        total_height = 0
-
-        page_filename = {}
-        for filename in os.listdir(tmpdir):
-            ## output files don't have a consistent format, so we need to
-            ## determine which files are for which page
-            ## filename[5:-4] extracts '1234' from 'page-1234.ppm'
-            page_filename[int(filename[5:-4])] = filename
-
-        num_pages = len(page_filename)
-        f = []
-
-        for i in range(num_pages):
-            ## open files and process headers
-            wip_file = os.path.join(tmpdir, page_filename[i + 1])
-
-            f.append(open(wip_file, "rb"))
-            try:
-                width, height = read_ppm_header(f[i])
-
-            except OSError as e:
-                self._logger.error(f"error loading PPM images produced by pdftoppm: {e}")
-                self._logger.warning("Truncating PDF")
-
-            total_height += height
-
-        fout = open(self._outfile, "wb")
-
-        fout.write(("P6\n" + str(width) + " " + str(total_height) + "\n255\n").encode("latin-1"))
-
-        for i in range(num_pages):
-            ## concatenate pixel data into output file
-            shutil.copyfileobj(f[i], fout)
-
-        fout.close()
-
-    #'-scale-to',str(1000),
     def run(self) -> None:
         """
         Method :
@@ -130,7 +77,7 @@ class PDFConverter(Converter):
 
         Run the PDF conversion using pdftoppm. Creates a temporary directory,
         calls pdftoppm to rasterize the PDF into individual PPM pages, then
-        merges the pages into a single PPM file.
+        copies each page to the output directory with predictable filenames.
 
         If any errors are encountered then :attr:`self.error` will be set to a
         string describing the error.
@@ -146,19 +93,40 @@ class PDFConverter(Converter):
 
         if process.returncode == 0:
             try:
-                self.__merge(tmpdir)
+                self._logger.info("organizing per-page PPMs")
+                self._progress = 0.5
+
+                outdir = self._outfile
+                os.makedirs(outdir, exist_ok=True)
+
+                page_files: dict[int, str] = {}
+                for filename in os.listdir(tmpdir):
+                    if not filename.startswith("page-"):
+                        continue
+                    try:
+                        page_num = int(filename[5:-4])
+                    except ValueError:
+                        continue
+                    page_files[page_num] = filename
+
+                num_pages = len(page_files)
+                self.page_paths = []
+
+                for i in range(num_pages):
+                    src = os.path.join(tmpdir, page_files[i + 1])
+                    dst = os.path.join(outdir, f"page_{i:04d}.ppm")
+                    shutil.copy2(src, dst)
+                    self.page_paths.append(dst)
+
+                self.page_count = num_pages
+                self._logger.info(f"converted {num_pages} pages")
 
             except Exception as e:
-                self.error = "Error in PDFConverter.__merge() \n" + str(e)  # type: ignore[assignment]
+                self.error = "Error organizing per-page PPMs\n" + str(e)
                 self._logger.error(self.error)
 
-                try:
-                    os.unlink(self._outfile)
-                except Exception:
-                    self._logger.exception(f"unable to unlink temporary file '{self._outfile}'")
-
         else:
-            self.error = f"conversion failed with return code {process.returncode}:\n{stdout!r}"  # type: ignore[assignment]
+            self.error = f"conversion failed with return code {process.returncode}:\n{stdout!r}"
             self._logger.error(self.error)
 
         shutil.rmtree(tmpdir, ignore_errors=True)

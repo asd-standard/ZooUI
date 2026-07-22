@@ -127,3 +127,104 @@ class TestTiledMediaObject:
             size = obj.onscreen_size
             assert isinstance(size, tuple)
             assert len(size) == 2
+
+    @patch("zooui.objects.mediaobjects.tiledmediaobject.TileManager.tiled")
+    def test_deferred_init_skips_tiling_setup(self, mock_tiled):
+        """
+        Scenario: Deferred initialization skips conversion and tiling setup
+
+        Given a media file "test.jpg" and deferred=True
+        When TiledMediaObject is created
+        Then no temp file or conversion should be created
+        And _loaded should remain False
+        """
+        mock_tiled.return_value = False
+
+        with patch("tempfile.mkstemp") as mock_mkstemp:
+            scene = Mock()
+            obj = TiledMediaObject("test.jpg", scene, deferred=True)
+            mock_mkstemp.assert_not_called()
+        assert not obj._loaded
+
+    @patch("zooui.objects.mediaobjects.tiledmediaobject.TileManager.tiled")
+    def test_deferred_init_with_autofit(self, mock_tiled):
+        """
+        Scenario: Deferred initialization preserves autofit parameter
+
+        Given a PDF file with autofit=True and deferred=True
+        When TiledMediaObject is created
+        Then it should initialize without errors
+        """
+        mock_tiled.return_value = False
+        scene = Mock()
+        obj = TiledMediaObject("doc.pdf", scene, autofit=True, deferred=True)
+        assert obj is not None
+
+    @patch("zooui.objects.mediaobjects.tiledmediaobject.TileManager.load_tile")
+    @patch("zooui.objects.mediaobjects.tiledmediaobject.TileManager.tiled")
+    def test_reset_for_page_changes_media_id(self, mock_tiled, mock_load):
+        """
+        Scenario: _reset_for_page changes media_id and resets caches
+
+        Given a TiledMediaObject with loaded state
+        When _reset_for_page("new:media:id") is called
+        Then _media_id should be "new:media:id"
+        And _loaded should be False
+        And tileblock cache should be cleared
+        """
+        mock_tiled.return_value = False
+        scene = Mock()
+        obj = TiledMediaObject("test.jpg", scene, deferred=True)
+        obj._loaded = True
+        obj._TiledMediaObject__tileblock = object()
+        obj._TiledMediaObject__tileblock_id = (0, 0, 0, 0, 0)
+
+        obj._reset_for_page("new:media:id")
+
+        assert obj._media_id == "new:media:id"
+        assert not obj._loaded
+        assert obj._TiledMediaObject__tileblock is None
+        assert obj._TiledMediaObject__tileblock_id is None
+
+    @patch("zooui.objects.mediaobjects.tiledmediaobject.TileManager.load_tile")
+    @patch("zooui.objects.mediaobjects.tiledmediaobject.TileManager.tiled")
+    def test_reset_for_page_keeps_dimensions(self, mock_tiled, mock_load):
+        """
+        Scenario: _reset_for_page does not reset dimensions
+
+        Given a TiledMediaObject with custom dimensions loaded
+        When _reset_for_page is called
+        Then dimensions should be preserved for autofit bounding box calculation
+        """
+        mock_tiled.return_value = False
+        scene = Mock()
+        obj = TiledMediaObject("test.jpg", scene, deferred=True)
+        obj._TiledMediaObject__width = 1000
+        obj._TiledMediaObject__height = 2000
+        obj._TiledMediaObject__aspect_ratio = 0.5
+        obj._TiledMediaObject__maxtilelevel = 5
+
+        obj._reset_for_page("new:media:id")
+
+        assert obj._TiledMediaObject__width == 1000
+        assert obj._TiledMediaObject__height == 2000
+        assert obj._TiledMediaObject__aspect_ratio == 0.5
+        assert obj._TiledMediaObject__maxtilelevel == 5
+
+    @patch("zooui.objects.mediaobjects.tiledmediaobject.TileManager.load_tile")
+    @patch("zooui.objects.mediaobjects.tiledmediaobject.TileManager.tiled")
+    def test_reset_for_page_loads_root_tile_if_tiled(self, mock_tiled, mock_load):
+        """
+        Scenario: _reset_for_page requests root tile when media is tiled
+
+        Given a new media_id that is already tiled in the tilestore
+        When _reset_for_page is called
+        Then load_tile should be called with (new_media_id, 0, 0, 0)
+        """
+        mock_tiled.return_value = True
+        scene = Mock()
+        obj = TiledMediaObject("test.jpg", scene, deferred=True)
+
+        obj._reset_for_page("already:tiled:media")
+
+        mock_load.assert_called_once_with(("already:tiled:media", 0, 0, 0))

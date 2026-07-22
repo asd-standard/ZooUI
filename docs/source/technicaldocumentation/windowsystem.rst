@@ -403,7 +403,7 @@ Media Import
     # Supported file extensions for media opening
     SUPPORTED_EXTENSIONS = {
         '.svg',                         # SVGMediaObject
-        '.pdf',                         # PDFConverter
+        '.pdf',                         # PdfMediaObject
         '.ppm',                         # Direct PPM support
         '.jpg', '.jpeg',                # VipsConverter - JPEG
         '.png',                         # VipsConverter - PNG
@@ -416,14 +416,12 @@ Media Import
         '.jxl',                         # VipsConverter - JPEG XL
     }
 
-    # Maximum file size for PDF files (2 MB)
-    MAX_PDF_SIZE_BYTES = 2 * 1024 * 1024
-
     def __action_open_media_dir(self) -> None:
         """Open supported media files from directory in grid layout.
 
         Only files with extensions in SUPPORTED_EXTENSIONS are opened.
-        PDF files larger than MAX_PDF_SIZE_BYTES (2 MB) are skipped.
+        PDFs of any size are accepted; large ones (>2 MB) trigger a
+        page selection dialog.
         """
         directory = QFileDialog.getExistingDirectory(
             self, "Open media directory", self.__prev_dir)
@@ -433,12 +431,8 @@ Media Import
             media = []
             for filename in os.listdir(directory):
                 if not os.path.isdir(filename):
-                    # Check if file has a supported extension
                     ext = os.path.splitext(filename)[1].lower()
                     if ext not in self.SUPPORTED_EXTENSIONS:
-                        continue
-                    # Skip PDF files larger than 2 MB
-                    if ext == '.pdf' and os.path.getsize(filename) > self.MAX_PDF_SIZE_BYTES:
                         continue
                     mediaobject = self.__open_media(filename, add=False)
                     if mediaobject:
@@ -1856,7 +1850,6 @@ MainWindow
     class MainWindow(QMainWindow):
         # Class constants for media directory import
         SUPPORTED_EXTENSIONS: set[str]  # Supported file extensions
-        MAX_PDF_SIZE_BYTES: int         # Maximum PDF file size (2 MB)
 
         def __init__(self, framerate: int = 20,
                      zoom_sensitivity: int = 50,
@@ -1881,8 +1874,6 @@ MainWindow
 - ``SUPPORTED_EXTENSIONS``: Set of supported file extensions for "Open Media Directory"
   (``.svg``, ``.pdf``, ``.ppm``, ``.jpg``, ``.jpeg``, ``.png``, ``.gif``, ``.tif``,
   ``.tiff``, ``.webp``, ``.bmp``, ``.heic``, ``.heif``, ``.avif``, ``.jxl``)
-- ``MAX_PDF_SIZE_BYTES``: Maximum file size for PDF files when opening from directory
-  (default: 2 MB = 2,097,152 bytes). Larger PDFs are skipped.
 
 QZUI
 ~~~~

@@ -433,33 +433,35 @@ class TestPDFConverterBasicOperations:
     Feature: PDFConverter Basic Operations
 
     PDFConverter rasterizes PDF documents using pdftoppm, converting
-    each page to a raster image and merging them into a single PPM file.
+    each page to a separate PPM file in an output directory.
     """
 
     @pytest.mark.skipif(not is_pdftoppm_available(), reason="pdftoppm not available")
     def test_convert_pdf_to_ppm(self, sample_pdf, tmp_path):
         """
-        Scenario: Convert PDF document to PPM format
+        Scenario: Convert PDF document to per-page PPMs
 
         Given a valid PDF file
         When PDFConverter processes it
-        Then a PPM file is created at the output path
+        Then per-page PPM files are created in the output directory
         And the output contains rasterized page content
         """
         if sample_pdf is None:
             pytest.skip("Could not create sample PDF")
 
-        outfile = str(tmp_path / "output.ppm")
-
-        converter = PDFConverter(sample_pdf, outfile)
+        outdir = str(tmp_path / "pdf_output")
+        converter = PDFConverter(sample_pdf, outdir)
         converter.run()
 
         assert converter.error is None, f"Conversion failed: {converter.error}"
         assert converter.progress == 1.0
-        assert os.path.exists(outfile)
+        assert converter.page_count >= 1
+        assert os.path.isdir(outdir)
 
-        # Verify output is readable
-        output_img = Image.open(outfile)
+        # Verify per-page output is readable
+        page0_path = os.path.join(outdir, "page_0000.ppm")
+        assert os.path.isfile(page0_path), f"Expected {page0_path}"
+        output_img = Image.open(page0_path)
         assert output_img.size[0] > 0
         assert output_img.size[1] > 0
 
@@ -475,22 +477,24 @@ class TestPDFConverterBasicOperations:
         if sample_pdf is None:
             pytest.skip("Could not create sample PDF")
 
-        outfile_low = str(tmp_path / "output_low.ppm")
-        outfile_high = str(tmp_path / "output_high.ppm")
+        outdir_low = str(tmp_path / "output_low")
+        outdir_high = str(tmp_path / "output_high")
 
         # Low resolution conversion
-        converter_low = PDFConverter(sample_pdf, outfile_low)
+        converter_low = PDFConverter(sample_pdf, outdir_low)
         converter_low.resolution = 72
         converter_low.run()
 
         # High resolution conversion
-        converter_high = PDFConverter(sample_pdf, outfile_high)
+        converter_high = PDFConverter(sample_pdf, outdir_high)
         converter_high.resolution = 300
         converter_high.run()
 
         if converter_low.error is None and converter_high.error is None:
-            img_low = Image.open(outfile_low)
-            img_high = Image.open(outfile_high)
+            page0_low = os.path.join(outdir_low, "page_0000.ppm")
+            page0_high = os.path.join(outdir_high, "page_0000.ppm")
+            img_low = Image.open(page0_low)
+            img_high = Image.open(page0_high)
 
             # Higher resolution should produce larger image
             assert img_high.size[0] > img_low.size[0]
@@ -515,9 +519,9 @@ class TestPDFConverterErrorHandling:
         Then an error is set on the converter
         """
         infile = str(tmp_path / "nonexistent.pdf")
-        outfile = str(tmp_path / "output.ppm")
+        outdir = str(tmp_path / "output")
 
-        converter = PDFConverter(infile, outfile)
+        converter = PDFConverter(infile, outdir)
         converter.run()
 
         assert converter.error is not None
@@ -535,9 +539,9 @@ class TestPDFConverterErrorHandling:
         with open(corrupted_path, "wb") as f:
             f.write(b"This is not a valid PDF file")
 
-        outfile = str(tmp_path / "output.ppm")
+        outdir = str(tmp_path / "output")
 
-        converter = PDFConverter(str(corrupted_path), outfile)
+        converter = PDFConverter(str(corrupted_path), outdir)
         converter.run()
 
         assert converter.error is not None
@@ -617,24 +621,25 @@ class TestConverterToTilerPipeline:
         Scenario: Convert PDF and create tile pyramid
 
         Given a PDF document
-        When rasterized to PPM and then tiled
-        Then tiles are created representing the document pages
+        When rasterized to per-page PPMs and then a page is tiled
+        Then tiles are created representing the first page
         """
         if sample_pdf is None:
             pytest.skip("Could not create sample PDF")
 
-        ppm_file = str(tmp_path / "pdf_converted.ppm")
+        outdir = str(tmp_path / "pdf_output")
         media_id = "pipeline_pdf"
 
-        # Convert PDF
-        converter = PDFConverter(sample_pdf, ppm_file)
+        # Convert PDF to per-page PPMs
+        converter = PDFConverter(sample_pdf, outdir)
         converter.run()
 
         if converter.error is not None:
             pytest.skip(f"PDF conversion failed: {converter.error}")
 
-        # Tile the result
-        tiler = ConcreteTiler(ppm_file, media_id=media_id, tilesize=256)
+        # Tile the first page's PPM
+        page0_path = os.path.join(outdir, "page_0000.ppm")
+        tiler = ConcreteTiler(page0_path, media_id=media_id, tilesize=256)
         tiler.run()
         assert tiler.error is None
 

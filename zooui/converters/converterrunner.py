@@ -87,13 +87,13 @@ def _run_vips_conversion(
     return converter.error
 
 
-def _run_pdf_conversion(infile: str, outfile: str) -> str | None:
+def _run_pdf_conversion(infile: str, outdir: str) -> str | None:
     """
     Run PDFConverter in a separate process.
 
     Parameters:
         infile: Path to the source PDF file
-        outfile: Path where the rasterized PPM will be written
+        outdir: Directory where per-page PPM files will be written
 
     Returns:
         None on success, error message string on failure
@@ -101,7 +101,7 @@ def _run_pdf_conversion(infile: str, outfile: str) -> str | None:
     # Import here to avoid issues with multiprocessing
     from zooui.converters.pdfconverter import PDFConverter
 
-    converter = PDFConverter(infile, outfile)
+    converter = PDFConverter(infile, outdir)
     converter.run()
     return converter.error
 
@@ -245,19 +245,19 @@ def submit_vips_conversion(
     return executor.submit(_run_vips_conversion, infile, outfile, rotation, invert_colors, black_and_white)
 
 
-def submit_pdf_conversion(infile: str, outfile: str) -> Future:
+def submit_pdf_conversion(infile: str, outdir: str) -> Future:
     """
     Submit a PDFConverter job to run in a separate process.
 
     Parameters:
         infile: Path to the source PDF file
-        outfile: Path where the rasterized PPM will be written
+        outdir: Directory where per-page PPM files will be written
 
     Returns:
         A Future object that will contain the conversion result
     """
     executor = _get_executor()
-    return executor.submit(_run_pdf_conversion, infile, outfile)
+    return executor.submit(_run_pdf_conversion, infile, outdir)
 
 
 class ConversionHandle:
@@ -268,20 +268,21 @@ class ConversionHandle:
     thread-based Converter class, with progress and error properties.
     """
 
-    def __init__(self, future: Future, infile: str, outfile: str):
+    def __init__(self, future: Future, infile: str, outpath: str):
         """
         Create a new ConversionHandle.
 
         Parameters:
             future: The Future object from the process pool
             infile: Path to the source file
-            outfile: Path to the output file
+            outpath: Path to the output directory (for PDF) or output file
         """
         self._future = future
         self._infile = infile
-        self._outfile = outfile
+        self._outpath = outpath
         self._error: str | None = None
         self._checked = False
+        self._page_count: int | None = None
 
     @property
     def progress(self) -> float:
@@ -302,6 +303,31 @@ class ConversionHandle:
         if self._future.done():
             self._check_result()
         return self._error
+
+    @property
+    def page_count(self) -> int:
+        """
+        Return the number of pages in the converted PDF.
+
+        Only available after conversion completes. Returns 0 if the page
+        count could not be determined.
+        """
+        if self._future.done():
+            self._check_result()
+            if self._page_count is not None:
+                return self._page_count
+            self._page_count = self._count_page_files()
+        return self._page_count or 0
+
+    def _count_page_files(self) -> int:
+        """Count page_*.ppm files in the output directory."""
+        import glob as _glob
+
+        try:
+            files = _glob.glob(os.path.join(self._outpath, "page_*.ppm"))
+            return len(files)
+        except Exception:
+            return 0
 
     def _check_result(self) -> None:
         """Check the future result and update error status."""
