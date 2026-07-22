@@ -44,29 +44,30 @@ def _reset_converter_pool() -> None:
 
 
 @pytest.fixture(autouse=True)
-def _stop_leaked_provider_threads() -> None:
-    """Stop any TileProvider threads not explicitly shut down by tests.
+def _stop_leaked_threads() -> None:
+    """Stop any daemon threads leaked by tests and force GC.
 
-    Tests that call provider.start() but not provider.stop() leak
-    daemon threads that accumulate across tests and eventually
-    exhaust system resources (thread stacks, fd table), causing
-    segmentation faults.
+    Tests that create threads without joining them (TileProvider.start(),
+    TileCache periodic_clean, ThreadPoolExecutor workers, etc.) leak
+    daemon threads that accumulate and exhaust system resources.
     """
-    try:
-        from zooui.tilesystem.tileproviders.tileprovider import TileProvider
-    except ImportError:
-        yield
-        return
-
-    before = {t for t in threading.enumerate() if isinstance(t, TileProvider)}
+    before_ids = {id(t) for t in threading.enumerate()}
     yield
     try:
-        after = {t for t in threading.enumerate() if isinstance(t, TileProvider)}
-        leaked = after - before
-        for provider in leaked:
-            provider.stop()
-        for provider in leaked:
-            if provider.is_alive():
-                provider.join(timeout=2.0)
+        import gc
+
+        gc.collect()
+        after = threading.enumerate()
+        leaked = [t for t in after if id(t) not in before_ids and t.daemon and t.is_alive()]
+        for thread in leaked:
+            for method in ("stop", "shutdown"):
+                if hasattr(thread, method):
+                    try:
+                        getattr(thread, method)()
+                    except Exception:
+                        pass
+        for thread in leaked:
+            if thread.is_alive():
+                thread.join(timeout=2.0)
     except Exception:
         pass
