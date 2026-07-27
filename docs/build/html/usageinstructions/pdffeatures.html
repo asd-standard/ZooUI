@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>PDF Features &#8212; ZooUI 0.6.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cc7d0dec" />
+    <script src="../_static/documentation_options.js?v=1c28bd9a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Reading Documentation" href="../technicaldocumentation/readingdocumentation.html" />
+    <link rel="prev" title="SVG Features" href="svgfeatures.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="pdf-features">
+<h1>PDF Features<a class="headerlink" href="#pdf-features" title="Link to this heading">¶</a></h1>
+<p>ZooUI provides support for multi‑page PDF documents, rendering each page as
+an independently tiled object in the zooming user interface. This document
+covers all PDF‑related features available to end users.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<p>PDF (Portable Document Format) files can be:</p>
+<ul class="simple">
+<li><p>Opened directly from the file system or file‑open dialog</p></li>
+<li><p>Rendered as individually tiled pages (one page visible at a time)</p></li>
+<li><p>Navigated with keyboard shortcuts</p></li>
+<li><p>Saved and restored across scene files</p></li>
+</ul>
+</section>
+<section id="key-features">
+<h2>Key Features<a class="headerlink" href="#key-features" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p><strong>Multi‑Page PDF Rendering</strong>: Each page rasterised at 300 DPI and tiled independently</p></li>
+<li><p><strong>Keyboard Page Navigation</strong>: Ctrl+Up/Down to flip pages, Ctrl+Alt+G to jump to a specific page</p></li>
+<li><p><strong>Scene Persistence</strong>: PDF objects survive save/load and keep their current page</p></li>
+<li><p><strong>Large PDF Page Selection</strong>: PDFs over 2 MB prompt for a start page before loading</p></li>
+<li><p><strong>Lazy Tiling Buffer</strong>: Only the current and next page are tiled, saving memory for large documents</p></li>
+<li><p><strong>Page Number Labels</strong>: Optional <code class="docutils literal notranslate"><span class="pre">N</span> <span class="pre">/</span> <span class="pre">total</span></code> watermark on each page</p></li>
+</ol>
+</section>
+<section id="opening-pdf-files">
+<h2>Opening PDF Files<a class="headerlink" href="#opening-pdf-files" title="Link to this heading">¶</a></h2>
+<p><strong>Method 1: File‑Open Dialog</strong></p>
+<ol class="arabic simple">
+<li><p>Open the File menu and choose Open, or press the Open toolbar button</p></li>
+<li><p>Navigate to a <code class="docutils literal notranslate"><span class="pre">.pdf</span></code> file and confirm</p></li>
+<li><p>The PDF opens at page 1 (or at the page you select, see below)</p></li>
+</ol>
+<p><strong>Method 2: Drag and Drop</strong></p>
+<p>Drag a <code class="docutils literal notranslate"><span class="pre">.pdf</span></code> file from your file manager into the ZooUI window.</p>
+<p><strong>Large PDF Page Selection</strong></p>
+<p>PDFs larger than 2 MB trigger a pre‑open dialog before conversion begins.
+A spinbox lets you choose which page to open first.</p>
+<p>The page count is obtained quickly from the file metadata via <code class="docutils literal notranslate"><span class="pre">pdfinfo</span></code>,
+so the conversion itself only starts after you confirm.</p>
+</section>
+<section id="page-navigation">
+<h2>Page Navigation<a class="headerlink" href="#page-navigation" title="Link to this heading">¶</a></h2>
+<p>When a PDF object is selected in the scene, three keyboard shortcuts are
+available:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Action</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Ctrl+↓</span></code></p></td>
+<td><p>Go to next page</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Ctrl+↑</span></code></p></td>
+<td><p>Go to previous page</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Ctrl+Alt+G</span></code></p></td>
+<td><p>Open go‑to‑page dialog</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Forward navigation (Ctrl+↓)</strong> aligns the <strong>top</strong> of the new page with the
+<strong>top</strong> of the viewport, so you start reading from the top.</p>
+<p><strong>Backward navigation (Ctrl+↑)</strong> aligns the <strong>bottom</strong> of the previous page
+with the <strong>bottom</strong> of the viewport, simulating having just scrolled past it.</p>
+<p>Both directions move only vertically — the horizontal view position stays
+the same, so the view does not jump sideways.</p>
+<section id="context-menu">
+<h3>Context Menu<a class="headerlink" href="#context-menu" title="Link to this heading">¶</a></h3>
+<p>When a PDF object is right‑clicked, the context menu shows:</p>
+<ul class="simple">
+<li><p><strong>Zoom In / Zoom Out</strong>: Resize the PDF preview</p></li>
+<li><p><strong>Modify</strong>: Opens the Modify Tiled Media Object dialog, where you can crop,
+resize, or adjust the object’s appearance</p></li>
+<li><p><strong>Remove</strong>: Delete the PDF object from the scene</p></li>
+<li><p><strong>Page</strong>: The current page number (read‑only, informational)</p></li>
+</ul>
+</section>
+</section>
+<section id="scene-persistence">
+<h2>Scene Persistence<a class="headerlink" href="#scene-persistence" title="Link to this heading">¶</a></h2>
+<p>PDF objects are <strong>saved inside ``.pzs`` scene files</strong>. When you save and
+reload a scene:</p>
+<ul class="simple">
+<li><p>The PDF object reappears at the <strong>same position and zoom level</strong></p></li>
+<li><p>The <strong>current page</strong> at save time is restored (the <code class="docutils literal notranslate"><span class="pre">:page:N</span></code> suffix in
+the media path remembers which page you were on)</p></li>
+<li><p>If the original PDF file has been moved or deleted, the object is
+silently skipped but the rest of the scene still loads</p></li>
+</ul>
+</section>
+<section id="performance">
+<h2>Performance<a class="headerlink" href="#performance" title="Link to this heading">¶</a></h2>
+<p>Large PDFs with many pages use a <strong>lazy tiling buffer</strong> to stay responsive:</p>
+<ul class="simple">
+<li><p>Only the <strong>current page</strong> and the <strong>next page</strong> are submitted for tiling</p></li>
+<li><p>Previously visited pages remain cached in the tilestore and are detected
+instantly on re‑visit</p></li>
+<li><p>Page‑switching feels instant in the forward direction because the next
+page’s tiles are already on disk</p></li>
+</ul>
+</section>
+<section id="page-number-labels">
+<h2>Page Number Labels<a class="headerlink" href="#page-number-labels" title="Link to this heading">¶</a></h2>
+<p>By default, ZooUI draws a small <code class="docutils literal notranslate"><span class="pre">&quot;N</span> <span class="pre">/</span> <span class="pre">total&quot;</span></code> label in the bottom‑right
+corner of every rasterised page. This is visible at all zoom levels and
+helps orientation inside multi‑page documents.</p>
+<p>The label has a semi‑transparent background so it never fully obscures the
+PDF content underneath.</p>
+<section id="customisation">
+<h3>Customisation<a class="headerlink" href="#customisation" title="Link to this heading">¶</a></h3>
+<p>Page numbering can be disabled in code when creating the PDF converter:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">converter</span> <span class="o">=</span> <span class="n">PDFConverter</span><span class="p">(</span><span class="n">pdf_path</span><span class="p">,</span> <span class="n">outdir</span><span class="p">,</span> <span class="n">page_numbering</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>There is currently no GUI setting to toggle page numbering — it is enabled
+by default.</p>
+</section>
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading">¶</a></h2>
+<p><strong>PDF Not Opening</strong></p>
+<ul class="simple">
+<li><p>Ensure <code class="docutils literal notranslate"><span class="pre">pdftoppm</span></code> (Poppler) and <code class="docutils literal notranslate"><span class="pre">pdfinfo</span></code> are installed on your system</p></li>
+<li><p>On Debian/Ubuntu: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt</span> <span class="pre">install</span> <span class="pre">poppler-utils</span></code></p></li>
+<li><p>On macOS: <code class="docutils literal notranslate"><span class="pre">brew</span> <span class="pre">install</span> <span class="pre">poppler</span></code></p></li>
+<li><p>On Windows: install <a class="reference external" href="https://github.com/oschwartz10612/poppler-windows/releases/">poppler for Windows</a> and add it to your <code class="docutils literal notranslate"><span class="pre">PATH</span></code></p></li>
+</ul>
+<p><strong>PDF Opens but No Pages Render</strong></p>
+<ul class="simple">
+<li><p>Wait a few seconds — the first page needs time to rasterise and tile</p></li>
+<li><p>Very large PDFs (100+ pages) take longer; the dialog shows progress</p></li>
+<li><p>Check the log file under <code class="docutils literal notranslate"><span class="pre">logs/</span></code> for conversion errors</p></li>
+</ul>
+<p><strong>Page Numbers Not Visible</strong></p>
+<ul class="simple">
+<li><p>Page numbering is applied during rasterisation. Re‑open the PDF to
+trigger a fresh conversion if you changed the setting.</p></li>
+</ul>
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="userinterface.html"><span class="doc">User Interface</span></a> — General keyboard shortcuts and UI overview</p></li>
+<li><p><a class="reference internal" href="../technicaldocumentation/pdfmediaobject.html"><span class="doc">PDF media object</span></a> — PdfMediaObject technical deep‑dive</p></li>
+<li><p><a class="reference internal" href="../technicaldocumentation/convertersystem.html"><span class="doc">Converter System</span></a> — PDF conversion pipeline details</p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">ZooUI</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html">ZooUI installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="userinterface.html">User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="programconfiguration.html">Program Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="svgfeatures.html">SVG Features</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">PDF Features</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/readingdocumentation.html">Reading Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/projectstructure.html">Project structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/configsystem.html">Configuration System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/objectsystem.html">Object System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/convertersystem.html">Converter System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/stringecosystem.html">String Media Object Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/svgecosystem.html">SVG Utility Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/tiledmediaobject.html">Tiled media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/pdfmediaobject.html">PDF media object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/tilingsystem.html">Tiling System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/windowsystem.html">Window System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/logging.html">Logging System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/backup.html">Backup System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../testingdocumentation/unittest.html">Unit Testing Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testingdocumentation/integrationtest.html">Integration Testing Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../benchmarksdocumentation/qzuibenchmark.html">QZUI Benchmark Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../benchmarksdocumentation/converterbenchmark.html">Converter Benchmark Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contribution Guidelines</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributionguidelines/contributionguidelines.html">Contribution Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributionguidelines/codestyle.html">Code Style Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../zooui.html">zooui package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="svgfeatures.html" title="previous chapter">SVG Features</a></li>
+      <li>Next: <a href="../technicaldocumentation/readingdocumentation.html" title="next chapter">Reading Documentation</a></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, David Roberts, Andrea Silvestri.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../_sources/usageinstructions/pdffeatures.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
