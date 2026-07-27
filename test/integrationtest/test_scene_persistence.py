@@ -378,3 +378,101 @@ class TestSceneSaveLoadRoundTrip:
         assert loaded_obj.zoomlevel == pytest.approx(original_zoomlevel, rel=1e-5), (
             f"Negative zoomlevel not preserved: expected {original_zoomlevel}, got {loaded_obj.zoomlevel}"
         )
+
+
+class TestPdfSaveLoadRoundTrip:
+    """
+    Feature: PdfMediaObject Save/Load Round-Trip
+
+    When a scene containing a PdfMediaObject is saved and loaded, the object
+    must be restored with its current page, position, and zoomlevel.
+    """
+
+    def test_save_load_preserves_pdf_page_and_position(self, tmp_path):
+        """
+        Scenario: Save/load preserves PdfMediaObject page and position
+
+        Given a PdfMediaObject with a known page, position, and zoomlevel
+        When the scene is saved and loaded
+        Then the loaded object must be a PdfMediaObject with the same
+        current page, position, and zoomlevel
+        """
+        import tempfile
+        from unittest.mock import MagicMock, Mock, patch
+
+        from zooui.objects.mediaobjects.pdfmediaobject import PdfMediaObject
+        from zooui.objects.scene.scene import Scene, load_scene
+
+        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as f:
+            pdf_path = f.name
+
+        try:
+            with patch("zooui.objects.mediaobjects.pdfmediaobject.tempfile.mkdtemp", return_value="/tmp/test_out"), \
+                 patch("zooui.objects.mediaobjects.pdfmediaobject.converterrunner.submit_pdf_conversion", return_value=Mock()), \
+                 patch("zooui.objects.mediaobjects.pdfmediaobject.converterrunner.ConversionHandle", return_value=Mock()):
+                pdf_obj = PdfMediaObject(pdf_path, MagicMock(), autofit=False, start_page=2)
+
+            # Set pre-converted state so the object is immediately usable
+            pdf_obj._page_count = 5
+            pdf_obj._current_page = 2
+            pdf_obj._page_ppm_paths = [f"/tmp/p{i}.ppm" for i in range(5)]
+            pdf_obj._pdf_path = pdf_path
+            pdf_obj._media_id = f"{pdf_path}:page:2"
+
+            original_zoomlevel = 3.0
+            original_pos = (500.0, 300.0)
+            pdf_obj.zoomlevel = original_zoomlevel
+            pdf_obj.pos = original_pos
+
+            scene = Scene()
+            scene.viewport_size = (1280, 720)
+            scene.origin = (0.0, 0.0)
+            scene.add(pdf_obj)
+
+            save_path = tmp_path / "test_pdf_scene.pzs"
+            scene.save(str(save_path))
+
+            # Verify the PZS file contains the PdfMediaObject line
+            saved_content = save_path.read_text()
+            assert "PdfMediaObject" in saved_content
+            assert ":page:2" in saved_content
+
+            # Load the scene — must use the same patch context so
+            # PdfMediaObject.__init__ can succeed during reconstruction
+            with patch("zooui.objects.mediaobjects.pdfmediaobject.tempfile.mkdtemp", return_value="/tmp/test_out2"), \
+                 patch("zooui.objects.mediaobjects.pdfmediaobject.converterrunner.submit_pdf_conversion", return_value=Mock()), \
+                 patch("zooui.objects.mediaobjects.pdfmediaobject.converterrunner.ConversionHandle", return_value=Mock()):
+                loaded_scene = load_scene(str(save_path))
+
+            loaded_scene.viewport_size = (1280, 720)
+
+            loaded_objects = loaded_scene._Scene__objects
+            assert len(loaded_objects) == 1, (
+                f"Should have exactly one object, got {len(loaded_objects)}"
+            )
+
+            loaded_obj = loaded_objects[0]
+            assert isinstance(loaded_obj, PdfMediaObject), (
+                f"Expected PdfMediaObject, got {type(loaded_obj).__name__}"
+            )
+
+            # _current_page is 0 until _on_conversion_complete runs;
+            # verify _start_page was correctly restored from the saved media_id.
+            assert loaded_obj._start_page == 2, (
+                f"Start page not preserved: expected 2, got {loaded_obj._start_page}"
+            )
+
+            assert loaded_obj.zoomlevel == pytest.approx(original_zoomlevel, rel=1e-5), (
+                f"Zoomlevel not preserved: expected {original_zoomlevel}, got {loaded_obj.zoomlevel}"
+            )
+
+            assert loaded_obj.pos[0] == pytest.approx(original_pos[0], rel=1e-5), (
+                f"Position X not preserved: expected {original_pos[0]}, got {loaded_obj.pos[0]}"
+            )
+
+            assert loaded_obj.pos[1] == pytest.approx(original_pos[1], rel=1e-5), (
+                f"Position Y not preserved: expected {original_pos[1]}, got {loaded_obj.pos[1]}"
+            )
+
+        finally:
+            os.unlink(pdf_path)

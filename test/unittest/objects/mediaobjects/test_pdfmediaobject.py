@@ -617,13 +617,13 @@ class TestPdfMediaObject:
         bc = _BlockingConverter()
         assert bc.progress == 0.0
 
-    def test_try_load_aligns_top_left_on_forward(self):
+    def test_try_load_aligns_top_on_forward(self):
         """
-        Scenario: _try_load aligns page top-left to viewport top-left on forward nav
+        Scenario: _try_load aligns page top to viewport top on forward nav
 
         Given _pending_nav_direction == 1 and topleft at (100, 200)
         When _try_load is called (page finishes loading)
-        Then move should be called with (-100, -200)
+        Then move should be called with (0, -200)
         And _pending_nav_direction should be cleared to None
         """
         obj = _make_pdf_with_pages(page_count=10, current_page=0)
@@ -636,16 +636,16 @@ class TestPdfMediaObject:
             mock_super_load.side_effect = _make_loaded(obj)
             obj._try_load()
 
-        mock_move.assert_called_once_with(-100.0, -200.0)
+        mock_move.assert_called_once_with(0, -200.0)
         assert obj._pending_nav_direction is None
 
-    def test_try_load_aligns_bottom_right_on_backward(self):
+    def test_try_load_aligns_bottom_on_backward(self):
         """
-        Scenario: _try_load aligns page bottom-right to viewport bottom-right on backward nav
+        Scenario: _try_load aligns page bottom to viewport bottom on backward nav
 
         Given _pending_nav_direction == -1, bottomright at (400, 500), viewport (800, 600)
         When _try_load is called
-        Then move should be called with (400, 100)
+        Then move should be called with (0, 100)
         And _pending_nav_direction should be cleared to None
         """
         obj = _make_pdf_with_pages(page_count=10, current_page=5)
@@ -658,7 +658,7 @@ class TestPdfMediaObject:
             mock_super_load.side_effect = _make_loaded(obj)
             obj._try_load()
 
-        mock_move.assert_called_once_with(400.0, 100.0)
+        mock_move.assert_called_once_with(0, 100.0)
         assert obj._pending_nav_direction is None
 
     def test_try_load_clears_pending_direction(self):

@@ -18,6 +18,7 @@
 
 import logging
 import math
+import os
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -462,6 +463,28 @@ class Scene(PhysicalObject):
                 if not media_active:
                     TileManager.purge(media_id)
 
+    @staticmethod
+    def _parse_pdf_media_id(media_id: str) -> tuple[str | None, int]:
+        """
+        Parse a PDF media_id of the form ``pdf_path:page:N``.
+
+        Returns:
+            (pdf_path, page_number) or (None, 0) if the path is missing or
+            the media_id cannot be parsed.
+        """
+        parts = media_id.rsplit(":page:", 1)
+        if len(parts) != 2:
+            return None, 0
+        pdf_path, page_str = parts
+        try:
+            page_number = int(page_str)
+        except ValueError:
+            return None, 0
+        if not os.path.exists(pdf_path):
+            logging.getLogger("Scene").warning("PDF file no longer exists, skipping PdfMediaObject: %s", pdf_path)
+            return None, 0
+        return pdf_path, page_number
+
     def _create_mediaobject_from_line(self, line: str) -> Optional["MediaObject.MediaObject"]:
         """
         Helper method to create a mediaobject from a PZS file line.
@@ -477,7 +500,12 @@ class Scene(PhysicalObject):
 
         # mediaobjects are sorted by their mediaobject type and
         # initialized by their appropriate classes
-        if class_name == "TiledMediaObject" or class_name == "StringMediaObject" or class_name == "SVGMediaObject":
+        if (
+            class_name == "TiledMediaObject"
+            or class_name == "StringMediaObject"
+            or class_name == "SVGMediaObject"
+            or class_name == "PdfMediaObject"
+        ):
             from zooui.objects.mediaobjects.stringmediaobject import StringMediaObject
 
             mediaobject: TiledMediaObject | StringMediaObject | SVGMediaObject
@@ -489,6 +517,13 @@ class Scene(PhysicalObject):
                 mediaobject = TiledMediaObject(media_id, self, autofit=False)
             elif class_name == "StringMediaObject":
                 mediaobject = StringMediaObject(media_id, self)
+            elif class_name == "PdfMediaObject":
+                pdf_path, page_number = self._parse_pdf_media_id(media_id)
+                if pdf_path is None:
+                    return None
+                from zooui.objects.mediaobjects.pdfmediaobject import PdfMediaObject
+
+                mediaobject = PdfMediaObject(pdf_path, self, autofit=False, start_page=page_number)
             elif class_name == "SVGMediaObject":
                 if media_id.startswith("embedded:"):
                     # Embedded SVG content

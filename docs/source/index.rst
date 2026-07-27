@@ -58,6 +58,7 @@ be under COPYING.txt on project root, otherwise visit `gnu.org <https://www.gnu.
    usageinstructions/userinterface
    usageinstructions/programconfiguration
    usageinstructions/svgfeatures
+   usageinstructions/pdffeatures
 
 .. toctree::
    :maxdepth: 2

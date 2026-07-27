@@ -1133,6 +1133,171 @@ TiledMediaObject\timage.jpg\t1.0\t0.0\t0.0
             assert float(parts[3]) == 0.0
             assert float(parts[4]) == 0.0
 
+    def test_parse_pdf_media_id_valid(self):
+        """
+        Scenario: Parse valid PDF media_id with existing file
+
+        Given a temporary PDF file at path /tmp/test.pdf
+        And a media_id of "/tmp/test.pdf:page:3"
+        When _parse_pdf_media_id is called
+        Then it should return (pdf_path, 3)
+        """
+        import os
+        import tempfile
+
+        from zooui.objects.scene.scene import Scene
+
+        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as f:
+            pdf_path = f.name
+
+        try:
+            media_id = f"{pdf_path}:page:3"
+            result = Scene._parse_pdf_media_id(media_id)
+            assert result == (pdf_path, 3)
+        finally:
+            os.unlink(pdf_path)
+
+    def test_parse_pdf_media_id_missing_file(self):
+        """
+        Scenario: Parse PDF media_id with nonexistent file
+
+        Given a media_id with a path that does not exist
+        When _parse_pdf_media_id is called
+        Then it should return (None, 0)
+        """
+        from zooui.objects.scene.scene import Scene
+
+        media_id = "/nonexistent/path/doc.pdf:page:5"
+        result = Scene._parse_pdf_media_id(media_id)
+        assert result == (None, 0)
+
+    def test_parse_pdf_media_id_no_delimiter(self):
+        """
+        Scenario: Parse media_id without :page: delimiter
+
+        Given a media_id that is just a plain file path
+        When _parse_pdf_media_id is called
+        Then it should return (None, 0)
+        """
+        from zooui.objects.scene.scene import Scene
+
+        media_id = "/path/to/doc.pdf"
+        result = Scene._parse_pdf_media_id(media_id)
+        assert result == (None, 0)
+
+    def test_parse_pdf_media_id_non_integer_page(self):
+        """
+        Scenario: Parse media_id with non-integer page number
+
+        Given a media_id with a non-integer page component
+        When _parse_pdf_media_id is called
+        Then it should return (None, 0)
+        """
+        import os
+        import tempfile
+
+        from zooui.objects.scene.scene import Scene
+
+        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as f:
+            pdf_path = f.name
+
+        try:
+            media_id = f"{pdf_path}:page:abc"
+            result = Scene._parse_pdf_media_id(media_id)
+            assert result == (None, 0)
+        finally:
+            os.unlink(pdf_path)
+
+    def test_parse_pdf_media_id_path_contains_colon_page(self):
+        """
+        Scenario: Parse media_id where the path itself contains :page:
+
+        Given a path like /tmp/test:page:doc.pdf
+        And a media_id of "/tmp/test:page:doc.pdf:page:5"
+        When _parse_pdf_media_id is called
+        Then it should split at the last :page: delimiter and return the correct path and page
+        """
+        import os
+        import tempfile
+
+        from zooui.objects.scene.scene import Scene
+
+        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as f:
+            pdf_path = f.name
+
+        # Create a file whose path itself contains ':page:'
+        dir_with_colon = tempfile.mkdtemp(prefix="zooui_test_")
+        pdf_path2 = os.path.join(dir_with_colon, "test:page:doc.pdf")
+        with open(pdf_path2, "w") as pf:
+            pf.write("dummy")
+
+        try:
+            media_id = f"{pdf_path2}:page:5"
+            result = Scene._parse_pdf_media_id(media_id)
+            assert result == (pdf_path2, 5)
+        finally:
+            os.unlink(pdf_path)
+            os.unlink(pdf_path2)
+            os.rmdir(dir_with_colon)
+
+    def test_create_mediaobject_from_line_pdf(self):
+        """
+        Scenario: Create PdfMediaObject from a valid PZS line
+
+        Given a PZS line with class_name "PdfMediaObject" and a valid temp PDF
+        When _create_mediaobject_from_line is called
+        Then it should return a PdfMediaObject with autofit=False, the saved
+        zoomlevel, page number, and position
+        """
+        import os
+        import tempfile
+        from unittest.mock import Mock, patch
+
+        from zooui.objects.scene.scene import Scene
+
+        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as f:
+            pdf_path = f.name
+
+        try:
+            scene = Scene()
+            scene.viewport_size = (800, 600)
+
+            media_id = f"{pdf_path}:page:3"
+            line = f"PdfMediaObject\t{media_id}\t2.5\t150.0\t250.0\n"
+
+            with patch("zooui.objects.mediaobjects.pdfmediaobject.tempfile.mkdtemp", return_value="/tmp/test_out"), \
+                 patch("zooui.objects.mediaobjects.pdfmediaobject.converterrunner.submit_pdf_conversion", return_value=Mock()), \
+                 patch("zooui.objects.mediaobjects.pdfmediaobject.converterrunner.ConversionHandle", return_value=Mock()):
+                obj = scene._create_mediaobject_from_line(line)
+
+            from zooui.objects.mediaobjects.pdfmediaobject import PdfMediaObject
+
+            assert obj is not None
+            assert isinstance(obj, PdfMediaObject)
+            assert obj.zoomlevel == 2.5
+            assert obj.pos == (150.0, 250.0)
+            assert obj._start_page == 3
+        finally:
+            os.unlink(pdf_path)
+
+    def test_create_mediaobject_from_line_pdf_missing_file(self):
+        """
+        Scenario: Create PdfMediaObject from line with missing PDF file
+
+        Given a PZS line with class_name "PdfMediaObject" but a nonexistent file
+        When _create_mediaobject_from_line is called
+        Then it should return None
+        """
+        from zooui.objects.scene.scene import Scene
+
+        scene = Scene()
+        scene.viewport_size = (800, 600)
+
+        line = "PdfMediaObject\t/nonexistent/doc.pdf:page:1\t1.0\t100.0\t100.0\n"
+        obj = scene._create_mediaobject_from_line(line)
+
+        assert obj is None
+
 
 class TestSceneShutdownThreads:
     """

@@ -21,17 +21,19 @@ is the currently selected object:
      - Alignment
    * - ``Ctrl+↓``
      - Next page
-     - Top-left of new page → top-left of viewport
+     - Top of new page → top of viewport (vertical only)
    * - ``Ctrl+↑``
      - Previous page
-     - Bottom-right of new page → bottom-right of viewport
+     - Bottom of new page → bottom of viewport (vertical only)
    * - ``Ctrl+Alt+G``
      - Go-to-page dialog
-     - Jumps to the specified page (top-left aligned)
+     - Jumps to the specified page (top aligned)
 
-The forward alignment (top-left) lets you read each page from the top.
-The backward alignment (bottom-right) shows the end of the previous page,
-simulating having just scrolled past it. The go-to-page dialog uses
+The forward alignment (top) lets you read each page from the top.
+The backward alignment (bottom) shows the bottom of the previous page,
+simulating having just scrolled past it. Both directions are **vertical‑only**
+— the horizontal position is kept unchanged (``move(0, dy)``), so the view
+does not jump sideways when navigating pages. The go-to-page dialog uses
 :class:`QInputDialog <PySide6.QtWidgets.QInputDialog>` with a spinbox
 ranged from 1 to the total page count.
 
@@ -87,8 +89,8 @@ rendering:
        ├─ _reset_for_page(new_media_id) resets tileblock caches,
        │  keeps dimensions from previous page for correct autofit bbox
        └─ _try_load() override applies smart alignment after autofit:
-          • Forward (delta>0): move(page_topleft → (0,0))
-          • Backward (delta<0): move(page_bottomright → viewport_bottomright)
+          • Forward (delta>0): move(0, -page_topleft.y) — top of page aligns to top of viewport
+          • Backward (delta<0): move(0, viewport_h - page_bottomright.y) — bottom of page aligns to bottom of viewport
 
 Lazy Tiling Buffer
 ------------------
@@ -177,11 +179,58 @@ switching:
 Scene Persistence
 -----------------
 
-Each page of a PDF is stored in the tilestore under a separate
-``media_id`` (derived from ``sha1("doc.pdf:page:N")``). When a scene file
-(``.pzs``) is saved, the ``PdfMediaObject`` serializes its reference to the
-original PDF path. On reload, the per‑page tiles are detected via
-``TileManager.tiled()`` and reused without re‑conversion.
+``PdfMediaObject`` participates in the full save/load round‑trip through
+``.pzs`` scene files. On save, it writes its class name and per‑page
+``media_id``::
+
+    PdfMediaObject    /path/to/doc.pdf:page:3    2.5    150.0    200.0
+
+The ``media_id`` carries both the **original PDF path** and the **current
+page number** (last seen before the save), using the format
+``"{pdf_path}:page:{current_page}"``.
+
+On scene load, :meth:`Scene._create_mediaobject_from_line` recognises the
+``PdfMediaObject`` class name and:
+
+1. Parses the ``media_id`` via :meth:`Scene._parse_pdf_media_id`, which
+   splits at the **last** ``:page:`` delimiter to extract the file path
+   and page number (using ``rsplit(":page:", 1)`` to handle paths that
+   themselves contain ``:page:``).
+2. Checks that the original PDF file still exists on disk.  If the file
+   is gone, the object is **silently dropped** with a warning log and the
+   rest of the scene still loads.
+3. Creates a new ``PdfMediaObject(pdf_path, scene, autofit=False,
+   start_page=page_number)``, preserving the saved zoomlevel, position,
+   and page.
+
+.. note::
+
+   ``autofit=False`` is critical during load.  It prevents the zoomlevel
+   from being recalculated when the actual image dimensions load,
+   preserving the saved value exactly — the same pattern used by
+   :class:`TiledMediaObject` scene persistence.
+
+The per‑page tiles themselves are stored in the tilestore under
+their ``media_id`` hashes (derived from ``sha1("pdf_path:page:N")``) and
+are detected by ``TileManager.tiled()`` on reload, avoiding
+re‑conversion. The PDF conversion pipeline re‑runs only if the tiles are
+not yet cached.
+
+PDF Page Numbering
+------------------
+
+When the PDFConverter rasterises a PDF, it can optionally draw a
+``"N / total"`` page‑number label onto each PPM image in the
+bottom‑right corner.  This is controlled by the ``page_numbering`` flag
+(default ``True``):
+
+.. code-block:: python
+
+    converter = PDFConverter(pdf_path, outdir, page_numbering=True)
+
+The label is rendered using PIL with a semi‑transparent background so
+it never obscures content but remains readable against any PDF page
+colour.
 
 See Also
 --------
@@ -189,6 +238,6 @@ See Also
 - :doc:`../technicaldocumentation/tiledmediaobject` — Parent class
 - :doc:`../technicaldocumentation/convertersystem` — PDF conversion pipeline
 - :doc:`../technicaldocumentation/objectsystem` — Object system hierarchy
-- :doc:`../zooui/pdfconverter` — PDFConverter API reference
+- :doc:`../zooui/converters/pdfconverter` — PDFConverter API reference
 - :doc:`../zooui/tilestore` — Persistent tile storage
 - :doc:`../usageinstructions/userinterface` — User interface keyboard shortcuts

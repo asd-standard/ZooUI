@@ -118,7 +118,7 @@ Converters
 ~~~~~~~~~~
 
 - :doc:`converter <../zooui/converter>`
-    - :doc:`pdfconverter <../zooui/pdfconverter>`
+    - :doc:`pdfconverter <../zooui/converters/pdfconverter>`
     - :doc:`vipsconverter <../zooui/vipsconverter>`
     - :doc:`converterrunner <../zooui/converterrunner>` — Process-based parallel conversion
 
