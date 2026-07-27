@@ -500,6 +500,64 @@ class TestPDFConverterBasicOperations:
             assert img_high.size[0] > img_low.size[0]
             assert img_high.size[1] > img_low.size[1]
 
+    @pytest.mark.skipif(not is_pdftoppm_available(), reason="pdftoppm not available")
+    def test_page_numbering_on_ppm_output(self, sample_pdf, tmp_path):
+        """
+        Scenario: Page numbers are drawn on PPM output by default
+
+        Given a valid multi-page PDF file
+        When PDFConverter processes it with page_numbering=True (default)
+        Then each page PPM should have non-white pixels in the bottom-right corner
+        (the dark box with page number label)
+        And page_numbering=False should skip the numbering
+        """
+        if sample_pdf is None:
+            pytest.skip("Could not create sample PDF")
+
+        # --- Numbering enabled (default) ---
+        outdir_numbered = str(tmp_path / "numbered")
+        converter = PDFConverter(sample_pdf, outdir_numbered, page_numbering=True)
+        converter.run()
+
+        if converter.error is not None:
+            pytest.skip(f"PDF conversion failed: {converter.error}")
+
+        page0_path = os.path.join(outdir_numbered, "page_0000.ppm")
+        assert os.path.isfile(page0_path)
+        img_numbered = Image.open(page0_path)
+        w, h = img_numbered.size
+
+        # Sample a region near the bottom-right corner — it should contain
+        # the dark box pixels, not the original white background
+        corner_pixels = []
+        for x in range(w - 100, w):
+            for y in range(h - 50, h):
+                corner_pixels.append(img_numbered.getpixel((x, y)))
+
+        # At least some pixels should be dark (the numbering box)
+        dark_pixels = [p for p in corner_pixels if sum(p) < 384]  # sum < 384 → dark
+        assert len(dark_pixels) > 0, "Page numbering box not found in bottom-right corner"
+
+        # --- Numbering disabled ---
+        outdir_clean = str(tmp_path / "clean")
+        converter2 = PDFConverter(sample_pdf, outdir_clean, page_numbering=False)
+        converter2.run()
+        img_clean = Image.open(os.path.join(outdir_clean, "page_0000.ppm"))
+        w2, h2 = img_clean.size
+
+        clean_corner = []
+        for x in range(w2 - 100, w2):
+            for y in range(h2 - 50, h2):
+                clean_corner.append(img_clean.getpixel((x, y)))
+
+        # With numbering disabled, the corner should match the original PDF content
+        # (not all dark as the numbering box would be)
+        dark_in_clean = [p for p in clean_corner if sum(p) < 384]
+        # The numbered version should have MORE dark pixels than the clean version
+        assert len(dark_pixels) > len(dark_in_clean), (
+            f"Numbered: {len(dark_pixels)} dark pixels, " f"Clean: {len(dark_in_clean)} — numbers not visible"
+        )
+
 
 class TestPDFConverterErrorHandling:
     """

@@ -25,6 +25,7 @@ from PySide6 import QtCore, QtSvg, QtWidgets
 from PySide6.QtCore import QRectF, Qt
 from PySide6.QtGui import QBrush, QColor, QKeySequence, QPainter, QPen, QShortcut
 from PySide6.QtWidgets import (
+    QColorDialog,
     QDialog,
     QDialogButtonBox,
     QFrame,
@@ -499,6 +500,17 @@ class ModifySVGInputDialog:
 
         self._update_preview()
 
+    def _pick_color_from_dialog(self) -> None:
+        """Open a QColorDialog to pick a custom color."""
+        color = QColorDialog.getColor()
+        if color.isValid():
+            hex_color = color.name()[1:]
+            self.shape_color = hex_color
+            self.modified_color = hex_color
+            if self.custom_color_input:
+                self.custom_color_input.setText(hex_color)
+            self._update_preview()
+
     def _modify_svg_file(self, color: str | None, thickness: str | None) -> str:
         """
         Create modified SVG in cache.
@@ -575,7 +587,8 @@ class ModifySVGInputDialog:
         """
         dialog = QDialog()
         dialog.setWindowTitle("Modify SVG")
-        dialog.resize(800, 600)
+        dialog.setMinimumWidth(800)
+        dialog.adjustSize()
 
         # Create main layout
         main_layout = QHBoxLayout(dialog)
@@ -615,6 +628,10 @@ class ModifySVGInputDialog:
 
         color_scroll.setWidget(color_container)
         right_layout.addWidget(color_scroll)
+
+        pick_color_btn = QPushButton("Pick Color...")
+        pick_color_btn.clicked.connect(self._pick_color_from_dialog)
+        right_layout.addWidget(pick_color_btn)
 
         # Color input
         right_layout.addWidget(QLabel("Color (hex without #):"))

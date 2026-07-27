@@ -139,13 +139,15 @@ class PdfMediaObject(TiledMediaObject):
         if not was_loaded and self._loaded and self._pending_nav_direction is not None:
             direction = self._pending_nav_direction
             self._pending_nav_direction = None
-            viewport_w, viewport_h = self._scene.viewport_size
+            _viewport_w, viewport_h = self._scene.viewport_size
             if direction > 0:
                 current_tl = self.topleft
-                self.move(-current_tl[0], -current_tl[1])
+                # place "-current_tl[0]" in the first argument to get topleft behaviour
+                self.move(0, -current_tl[1])
             else:
                 current_br = self.bottomright
-                self.move(viewport_w - current_br[0], viewport_h - current_br[1])
+                # place "viewport_w - current_br[0]" in the first argument to get bottomright behaviour
+                self.move(0, viewport_h - current_br[1])
 
     def go_to_page(self, page_number: int) -> None:
         """Jump directly to a page (1-indexed)."""

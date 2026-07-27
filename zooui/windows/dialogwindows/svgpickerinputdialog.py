@@ -25,6 +25,7 @@ from PySide6 import QtSvg
 from PySide6.QtCore import QRectF, Qt
 from PySide6.QtGui import QBrush, QColor, QKeySequence, QPainter, QPen, QShortcut
 from PySide6.QtWidgets import (
+    QColorDialog,
     QDialog,
     QDialogButtonBox,
     QFrame,
@@ -560,6 +561,15 @@ class OpenSVGPickerInputDialog:
             if self.selected_svg in self._svg_buttons:
                 self._svg_buttons[self.selected_svg].update()
 
+    def _pick_color_from_dialog(self) -> None:
+        """Open a QColorDialog to pick a custom color."""
+        color = QColorDialog.getColor()
+        if color.isValid():
+            hex_color = color.name()[1:]
+            self.shape_color = hex_color
+            if self.custom_color_input:
+                self.custom_color_input.setText(hex_color)
+
     def _main_dialog(self) -> QDialog:
         """
         Method :
@@ -644,6 +654,10 @@ class OpenSVGPickerInputDialog:
             btn = self._color_button(code)
             btn.setFixedWidth(120)
             color_layout.addWidget(btn)
+
+        pick_color_btn = QPushButton("Pick Color...")
+        pick_color_btn.clicked.connect(self._pick_color_from_dialog)
+        color_layout.addWidget(pick_color_btn)
 
         # Add apply button to preview SVG with selected color and thickness
         apply_button = QPushButton("Apply Changes")

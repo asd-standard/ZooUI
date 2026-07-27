@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor, QFont, QKeySequence, QPainter, QShortcut
 from PySide6.QtWidgets import (
+    QColorDialog,
     QDialog,
     QDialogButtonBox,
     QHBoxLayout,
@@ -207,6 +208,14 @@ class ModifyStringInputDialog:
 
         return color_widget
 
+    def _pick_color_from_dialog(self) -> None:
+        """Open a QColorDialog to pick a custom color."""
+        color = QColorDialog.getColor()
+        if color.isValid():
+            hex_color = color.name()[1:]
+            self.string_color = hex_color
+            self.custom_color_input.setText(hex_color)
+
     def _main_dialog(self) -> QDialog:
         """
         Method :
@@ -251,6 +260,10 @@ class ModifyStringInputDialog:
             btn = self._color_button(code)
             btn.setFixedWidth(120)
             color_layout.addWidget(btn)
+
+        pick_color_btn = QPushButton("Pick Color...")
+        pick_color_btn.clicked.connect(self._pick_color_from_dialog)
+        color_layout.addWidget(pick_color_btn)
 
         color_layout.addStretch()
 
