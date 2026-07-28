@@ -4,8 +4,38 @@ Project structure
 For human readability the project has been subdivided into the following folder structure::
 
   zooui/
+  ├── app.py
+  ├── __main__.py
   ├── config.py
   ├── logger.py
+  ├── utils/
+  │   ├── _packaging.py
+  │   └── _xdg.py
+  ├── resources/
+  │   └── _usage_rst.py
+  ├── data/
+  │   ├── home.pzs
+  │   ├── home.png
+  │   ├── icon.png
+  │   ├── test_pdf.pdf
+  │   ├── zooui.desktop
+  │   ├── 01_red_stripes.png ... 07_climb.png
+  │   └── SVG/
+  │       ├── circle.svg
+  │       ├── square.svg
+  │       ├── up_triangle.svg
+  │       ├── down_triangle.svg
+  │       ├── up_arrow.svg
+  │       ├── down_arrow.svg
+  │       ├── left_arrow.svg
+  │       ├── right_arrow.svg
+  │       ├── topleft_arrow.svg
+  │       ├── topright_arrow.svg
+  │       ├── bottomleft_arrow.svg
+  │       ├── bottomright_arrow.svg
+  │       ├── vertical_stick.svg
+  │       ├── horizontal_stick.svg
+  │       └── diagonal_stick.svg
   ├── converters/
   │   ├── converter.py
   │   ├── converterrunner.py
@@ -20,6 +50,7 @@ For human readability the project has been subdivided into the following folder 
   │   │       └── zoommanager.py
   │   ├── mediaobjects/
   │   │   ├── mediaobject.py
+  │   │   ├── pdfmediaobject.py
   │   │   ├── stringmediaobject.py
   │   │   ├── svgmediaobject.py
   │   │   ├── tiledmediaobject.py
@@ -184,9 +215,13 @@ Core Components::
 
   | Component           | Responsibility                      | Key Files |
   |---------------------|-------------------------------------|-----------|
-  | **main.py**         | Application entry, initialization   | main.py |
+  | **zooui/app.py**     | Application entry, initialization, dep check | zooui/app.py |
+  | **__main__.py**       | ``python -m zooui`` module entry point     | zooui/__main__.py |
   | **ConfigManager**   | User configuration management       | zooui/config.py |
   | **LoggerConfig**    | Centralized logging system          | zooui/logger.py |
+  | **_packaging**      | Source/pip/frozen path resolution   | zooui/utils/_packaging.py |
+  | **_xdg**            | XDG Base Directory writable paths   | zooui/utils/_xdg.py |
+  | **_usage_rst**      | Embedded usage instructions (RST)   | zooui/resources/_usage_rst.py |
   | **MainWindow**      | Qt main window and menus            | zooui/windows/mainwindow.py |
   | **QZUI**            | Rendering widget, input handling    | zooui/objects/scene/qzui.py |
   | **Scene**           | MediaObject container, autosave     | zooui/objects/scene/scene.py |
@@ -208,10 +243,10 @@ Complete Application Lifecycle::
 
      START                                        |    Enter Qt Event Loop ←──────────┐
        ↓                                          |      ↓                            │
-     Parse Args → Load Config → Init Logging      |      │  ┌─────────────────────┐   │
+     Check System Deps → Parse Args → Init Logging|      │  ┌─────────────────────┐   │
        ↓                        ↑                 |      ├─→│ User Input Events   │───┤
      ConfigManager reads       │                  |      │  └─────────────────────┘   │
-     zooui_config.json ←───────┘                  |      │                            │
+     ~/.config/zooui/config.json ←──────────┘      |      │                            │
        ↓                                          |      │  ┌─────────────────────┐   │
      Init TileManager                             |      ├─→│ QZUI Render Loop    │───┤
        ↓                                          |      │  │ • Update physics    │   │
@@ -248,13 +283,14 @@ Complete Application Lifecycle::
 Program schematic::
 
     ┌─────────────────────────────────────────────────────────────────┐
-    │                         main.py                                 │
-    │  • Parse CLI arguments                                          │
-    │  • Load configuration via ConfigManager                         │
-    │  • Initialize logging system                                    │
-    │  • Initialize TileManager                                       │
-    │  • Create MainWindow & QZUI                                     │
-    │  • Start process pools (Converter / Tiler)                      │
+    │                      zooui/app.py                                │
+    │  • Check system dependencies (libvips, pdftoppm)                 │
+    │  • Parse CLI arguments                                           │
+    │  • Load configuration via ConfigManager                          │
+    │  • Initialize logging system                                     │
+    │  • Initialize TileManager                                        │
+    │  • Create MainWindow & QZUI                                      │
+    │  • Start process pools (Converter / Tiler)                       │
     └─────────────┬───────────────────────────────────────────────────┘
                   │
                   ├──────────────────────────────────────────────────────────────┐
