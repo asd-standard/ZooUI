@@ -80,7 +80,7 @@ The window system consists of the following components:
     │       • Preserves original text
     │
     ├── OpenSVGPickerInputDialog
-    │       • Browse SVG files from data/SVG/
+    │       • Browse SVG files from zooui/data/SVG/
     │       • Scrollable SVG preview panels
     │       • Color selection (24 recent colors)
     │       • Thickness control

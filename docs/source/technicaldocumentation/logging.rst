@@ -105,7 +105,7 @@ Load the configuration with:
 
 .. code-block:: bash
 
-   python main.py --config zooui_config.json
+   python main.py --config zooui_config_example.json
 
 Programmatic Configuration
 ---------------------------
@@ -652,7 +652,7 @@ Common Issues
 -------------
 
 **No logs appearing**
-    - Verify logging is initialized (should be automatic in main.py)
+    - Verify logging is initialized (should be automatic in zooui.app)
     - Check log level is appropriate for the messages
     - Ensure handlers are configured:
 

@@ -428,9 +428,9 @@ results are logged.
 
 .. code-block:: bash
 
-    ./main.py --no-cleanup          # Disable cleanup entirely
-    ./main.py --cleanup-age 30      # Clean tiles older than 30 days
-    ./main.py --fast-cleanup        # Skip detailed statistics
+    python main.py --no-cleanup          # Disable cleanup entirely
+    python main.py --cleanup-age 30      # Clean tiles older than 30 days
+    python main.py --fast-cleanup        # Skip detailed statistics
 
 Standalone Cleanup CLI (cleanuptilestore)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

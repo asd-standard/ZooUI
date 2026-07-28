@@ -358,7 +358,7 @@ JSON with 2-space indentation:
 CLI Integration
 ---------------
 
-Configuration is loaded in ``main.py`` after argument parsing:
+Configuration is loaded in :mod:`zooui.app` after argument parsing:
 
 .. code-block:: text
 

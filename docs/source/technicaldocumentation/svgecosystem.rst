@@ -568,7 +568,7 @@ Programmatic Shape Detection and Elongation
         elongate_square,
     )
 
-    svg_path = "data/SVG/red_square.svg"
+    svg_path = "zooui/data/SVG/red_square.svg"
 
     # Detect shape type
     if is_square_svg(svg_path):

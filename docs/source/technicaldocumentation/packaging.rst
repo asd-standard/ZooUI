@@ -16,7 +16,7 @@ Build Configuration
 
    [project]
    name = "zooui"
-   version = "0.6.2"
+    version = "0.7.0"
    requires-python = ">=3.12"
    dependencies = [
        "PySide6>=6.7",

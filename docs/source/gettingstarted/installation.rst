@@ -80,11 +80,7 @@ Optional Wayland support::
 
     conda install -c conda-forge qt6-wayland=6.7.2
 
-Then install ZooUI itself::
-
-    pip install zooui
-
-Or for development (editable install from a source checkout)::
+Then install ZooUI from the source checkout (editable install)::
 
     pip install -e /path/to/zooui
 
@@ -144,9 +140,10 @@ Running ZooUI
 After installation, launch from the command line::
 
     zooui
+    python -m zooui
 
-If installed via pip, the ``zooui`` command is available. If installed from
-source or conda without pip install, run from the project directory::
+If running from a source checkout without pip install, the root ``main.py``
+script can be used (it is a thin launcher that delegates to :mod:`zooui.app`)::
 
     python main.py
 
