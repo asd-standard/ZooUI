@@ -44,29 +44,54 @@ https://github.com/davidar/pyzui
 
 ### Pip Install
 
-ZooUI is available on PyPI and can be installed via pip:
+Clone the repository and install in editable mode:
 
 ```bash
-pip install zooui
+git clone https://github.com/asd-standard/ZooUI.git
+cd ZooUI
+pip install -e .
 ```
 
-This installs all Python dependencies (PySide6, Pillow, pyvips, platformdirs).
-The following **system-level dependencies** must be installed separately via your
-package manager:
+Install the system C library that pyvips binds to:
 
-```bash
-# Debian / Ubuntu
-apt install libvips42 poppler-utils
+  **Debian / Ubuntu**:
 
-# Optional: Wayland native support
-apt install qt6-wayland
-```
+      sudo apt install libvips42 poppler-utils
+
+  **Fedora**:
+
+      sudo dnf install vips poppler-utils
+
+  **macOS (Homebrew)**:
+
+      brew install vips poppler
 
 After installation, launch with:
 
 ```bash
 zooui
 ```
+
+or:
+
+```bash
+zooui-gui
+```
+
+Or via the module:
+
+```bash
+python -m zooui
+```
+
+The application creates its configuration and data directories automatically
+on first launch (following the [XDG Base Directory specification](https://specifications.freedesktop.org/basedir-spec/latest/)):
+
+- Config: `~/.config/zooui/config.json`
+- Backups: `~/.local/share/zooui/backups/`
+- Tile cache: `~/.cache/zooui/tilestore/`
+- SVG cache: `~/.cache/zooui/svg/`
+- Logs: `~/.local/state/zooui/logs/`
 
 ## Dependencies
 

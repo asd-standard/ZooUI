@@ -17,9 +17,11 @@ ZooUI requires the following system libraries to be installed:
 pip Install
 -----------
 
-Install ZooUI from PyPI::
+Clone the repository and install in editable mode::
 
-    pip install zooui
+    git clone https://github.com/asd-standard/ZooUI.git
+    cd ZooUI
+    pip install -e .
 
 Install the system C library that pyvips binds to:
 
