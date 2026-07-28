@@ -42,6 +42,32 @@ with a miniconda environment managing all dependencies.
 This project is a fork, original project can be found at:
 https://github.com/davidar/pyzui
 
+### Pip Install
+
+ZooUI is available on PyPI and can be installed via pip:
+
+```bash
+pip install zooui
+```
+
+This installs all Python dependencies (PySide6, Pillow, pyvips, platformdirs).
+The following **system-level dependencies** must be installed separately via your
+package manager:
+
+```bash
+# Debian / Ubuntu
+apt install libvips42 poppler-utils
+
+# Optional: Wayland native support
+apt install qt6-wayland
+```
+
+After installation, launch with:
+
+```bash
+zooui
+```
+
 ## Dependencies
 
 ZooUI has been developed with the following python version
@@ -98,32 +124,6 @@ using Wayland as display server you can also install:
 - qt6-wayland-6.7.2
 
   This allow the project to run natively and take advantage of hardware acceleration
-
-### Pip Install
-
-ZooUI is available on PyPI and can be installed via pip:
-
-```bash
-pip install zooui
-```
-
-This installs all Python dependencies (PySide6, Pillow, pyvips, platformdirs).
-The following **system-level dependencies** must be installed separately via your
-package manager:
-
-```bash
-# Debian / Ubuntu
-apt install libvips42 poppler-utils
-
-# Optional: Wayland native support
-apt install qt6-wayland
-```
-
-After installation, launch with:
-
-```bash
-zooui
-```
 
 ### Ubuntu/Debian, AArch64, specific instructions
 
