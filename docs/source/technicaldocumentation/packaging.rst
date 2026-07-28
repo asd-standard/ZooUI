@@ -16,7 +16,7 @@ Build Configuration
 
    [project]
    name = "zooui"
-    version = "0.7.0"
+   version = "X.Y.Z"
    requires-python = ">=3.12"
    dependencies = [
        "PySide6>=6.7",
@@ -30,6 +30,8 @@ Build Configuration
 
    [project.gui-scripts]
    zooui-gui = "zooui.app:main"
+
+The current release version is |release|.
 
 Entry Points
 ------------
