@@ -37,8 +37,38 @@
 <h1>Project structure<a class="headerlink" href="#project-structure" title="Link to this heading">¶</a></h1>
 <p>For human readability the project has been subdivided into the following folder structure:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>zooui/
+├── app.py
+├── __main__.py
 ├── config.py
 ├── logger.py
+├── utils/
+│   ├── _packaging.py
+│   └── _xdg.py
+├── resources/
+│   └── _usage_rst.py
+├── data/
+│   ├── home.pzs
+│   ├── home.png
+│   ├── icon.png
+│   ├── test_pdf.pdf
+│   ├── zooui.desktop
+│   ├── 01_red_stripes.png ... 07_climb.png
+│   └── SVG/
+│       ├── circle.svg
+│       ├── square.svg
+│       ├── up_triangle.svg
+│       ├── down_triangle.svg
+│       ├── up_arrow.svg
+│       ├── down_arrow.svg
+│       ├── left_arrow.svg
+│       ├── right_arrow.svg
+│       ├── topleft_arrow.svg
+│       ├── topright_arrow.svg
+│       ├── bottomleft_arrow.svg
+│       ├── bottomright_arrow.svg
+│       ├── vertical_stick.svg
+│       ├── horizontal_stick.svg
+│       └── diagonal_stick.svg
 ├── converters/
 │   ├── converter.py
 │   ├── converterrunner.py
@@ -53,6 +83,7 @@
 │   │       └── zoommanager.py
 │   ├── mediaobjects/
 │   │   ├── mediaobject.py
+│   │   ├── pdfmediaobject.py
 │   │   ├── stringmediaobject.py
 │   │   ├── svgmediaobject.py
 │   │   ├── tiledmediaobject.py
@@ -272,35 +303,39 @@ core components and design patterns.</p>
 </ul>
 </div></blockquote>
 <p>Core Components:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span> <span class="n">Component</span>           <span class="o">|</span> <span class="n">Responsibility</span>                      <span class="o">|</span> <span class="n">Key</span> <span class="n">Files</span> <span class="o">|</span>
-<span class="o">|---------------------|-------------------------------------|-----------|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">main</span><span class="o">.</span><span class="n">py</span><span class="o">**</span>         <span class="o">|</span> <span class="n">Application</span> <span class="n">entry</span><span class="p">,</span> <span class="n">initialization</span>   <span class="o">|</span> <span class="n">main</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">ConfigManager</span><span class="o">**</span>   <span class="o">|</span> <span class="n">User</span> <span class="n">configuration</span> <span class="n">management</span>       <span class="o">|</span> <span class="n">zooui</span><span class="o">/</span><span class="n">config</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">LoggerConfig</span><span class="o">**</span>    <span class="o">|</span> <span class="n">Centralized</span> <span class="n">logging</span> <span class="n">system</span>          <span class="o">|</span> <span class="n">zooui</span><span class="o">/</span><span class="n">logger</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">MainWindow</span><span class="o">**</span>      <span class="o">|</span> <span class="n">Qt</span> <span class="n">main</span> <span class="n">window</span> <span class="ow">and</span> <span class="n">menus</span>            <span class="o">|</span> <span class="n">zooui</span><span class="o">/</span><span class="n">windows</span><span class="o">/</span><span class="n">mainwindow</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">QZUI</span><span class="o">**</span>            <span class="o">|</span> <span class="n">Rendering</span> <span class="n">widget</span><span class="p">,</span> <span class="nb">input</span> <span class="n">handling</span>    <span class="o">|</span> <span class="n">zooui</span><span class="o">/</span><span class="n">objects</span><span class="o">/</span><span class="n">scene</span><span class="o">/</span><span class="n">qzui</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">Scene</span><span class="o">**</span>           <span class="o">|</span> <span class="n">MediaObject</span> <span class="n">container</span><span class="p">,</span> <span class="n">autosave</span>     <span class="o">|</span> <span class="n">zooui</span><span class="o">/</span><span class="n">objects</span><span class="o">/</span><span class="n">scene</span><span class="o">/</span><span class="n">scene</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">Autosave</span><span class="o">**</span>        <span class="o">|</span> <span class="n">Timer</span><span class="o">-</span><span class="n">based</span> <span class="n">per</span><span class="o">-</span><span class="n">scene</span> <span class="n">backups</span>       <span class="o">|</span> <span class="n">zooui</span><span class="o">/</span><span class="n">objects</span><span class="o">/</span><span class="n">scene</span><span class="o">/</span><span class="n">sceneutils</span><span class="o">/</span><span class="n">autosave</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">Clipboard</span><span class="o">**</span>       <span class="o">|</span> <span class="n">Copy</span><span class="o">/</span><span class="n">paste</span> <span class="k">with</span> <span class="n">grid</span> <span class="n">alignment</span>      <span class="o">|</span> <span class="n">zooui</span><span class="o">/</span><span class="n">objects</span><span class="o">/</span><span class="n">scene</span><span class="o">/</span><span class="n">sceneutils</span><span class="o">/</span><span class="n">clipboard</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">MediaObject</span><span class="o">**</span>     <span class="o">|</span> <span class="n">Displayable</span> <span class="n">media</span> <span class="ow">in</span> <span class="n">ZUI</span>            <span class="o">|</span> <span class="n">zooui</span><span class="o">/</span><span class="n">objects</span><span class="o">/</span><span class="n">mediaobjects</span><span class="o">/</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">ZoomManager</span><span class="o">**</span>     <span class="o">|</span> <span class="n">Zoom</span> <span class="n">level</span> <span class="n">tracking</span> <span class="ow">and</span> <span class="n">physics</span>     <span class="o">|</span> <span class="n">zooui</span><span class="o">/</span><span class="n">objects</span><span class="o">/</span><span class="n">objectsutils</span><span class="o">/</span><span class="n">zoom</span><span class="o">/</span><span class="n">zoommanager</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">PriorityBatcher</span><span class="o">**</span> <span class="o">|</span> <span class="n">Priority</span><span class="o">-</span><span class="n">based</span> <span class="n">tile</span> <span class="n">request</span> <span class="n">batching</span><span class="o">|</span> <span class="n">zooui</span><span class="o">/</span><span class="n">objects</span><span class="o">/</span><span class="n">scene</span><span class="o">/</span><span class="n">sceneutils</span><span class="o">/</span><span class="n">prioritybatcher</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">TileManager</span><span class="o">**</span>     <span class="o">|</span> <span class="n">Tile</span> <span class="n">coordination</span> <span class="ow">and</span> <span class="n">caching</span>       <span class="o">|</span> <span class="n">zooui</span><span class="o">/</span><span class="n">tilesystem</span><span class="o">/</span><span class="n">tilemanager</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">TileProvider</span><span class="o">**</span>    <span class="o">|</span> <span class="n">Tile</span> <span class="n">loading</span><span class="o">/</span><span class="n">generation</span>             <span class="o">|</span> <span class="n">zooui</span><span class="o">/</span><span class="n">tilesystem</span><span class="o">/</span><span class="n">tileproviders</span><span class="o">/</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">TileStore</span><span class="o">**</span>       <span class="o">|</span> <span class="n">Persistent</span> <span class="n">tile</span> <span class="n">storage</span>             <span class="o">|</span> <span class="n">zooui</span><span class="o">/</span><span class="n">tilesystem</span><span class="o">/</span><span class="n">tilestore</span><span class="o">/</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">Converter</span><span class="o">**</span>       <span class="o">|</span> <span class="n">Media</span> <span class="nb">format</span> <span class="n">conversion</span>             <span class="o">|</span> <span class="n">zooui</span><span class="o">/</span><span class="n">converters</span><span class="o">/</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">ConverterRunner</span><span class="o">**</span> <span class="o">|</span> <span class="n">Process</span><span class="o">-</span><span class="n">based</span> <span class="n">parallel</span> <span class="n">conversion</span>   <span class="o">|</span> <span class="n">zooui</span><span class="o">/</span><span class="n">converters</span><span class="o">/</span><span class="n">converterrunner</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">TilerRunner</span><span class="o">**</span>     <span class="o">|</span> <span class="n">Process</span><span class="o">-</span><span class="n">based</span> <span class="n">parallel</span> <span class="n">tiling</span>       <span class="o">|</span> <span class="n">zooui</span><span class="o">/</span><span class="n">tilesystem</span><span class="o">/</span><span class="n">tiler</span><span class="o">/</span><span class="n">tilerrunner</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
-<span class="o">|</span> <span class="o">**</span><span class="n">BackupManager</span><span class="o">**</span>   <span class="o">|</span> <span class="n">Per</span><span class="o">-</span><span class="n">scene</span> <span class="n">backup</span> <span class="n">creation</span><span class="o">/</span><span class="n">rotation</span>  <span class="o">|</span> <span class="n">zooui</span><span class="o">/</span><span class="n">backup</span><span class="o">/</span><span class="n">backupmanager</span><span class="o">.</span><span class="n">py</span> <span class="o">|</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>| Component           | Responsibility                      | Key Files |
+|---------------------|-------------------------------------|-----------|
+| **zooui/app.py**     | Application entry, initialization, dep check | zooui/app.py |
+| **__main__.py**       | ``python -m zooui`` module entry point     | zooui/__main__.py |
+| **ConfigManager**   | User configuration management       | zooui/config.py |
+| **LoggerConfig**    | Centralized logging system          | zooui/logger.py |
+| **_packaging**      | Source/pip/frozen path resolution   | zooui/utils/_packaging.py |
+| **_xdg**            | XDG Base Directory writable paths   | zooui/utils/_xdg.py |
+| **_usage_rst**      | Embedded usage instructions (RST)   | zooui/resources/_usage_rst.py |
+| **MainWindow**      | Qt main window and menus            | zooui/windows/mainwindow.py |
+| **QZUI**            | Rendering widget, input handling    | zooui/objects/scene/qzui.py |
+| **Scene**           | MediaObject container, autosave     | zooui/objects/scene/scene.py |
+| **Autosave**        | Timer-based per-scene backups       | zooui/objects/scene/sceneutils/autosave.py |
+| **Clipboard**       | Copy/paste with grid alignment      | zooui/objects/scene/sceneutils/clipboard.py |
+| **MediaObject**     | Displayable media in ZUI            | zooui/objects/mediaobjects/ |
+| **ZoomManager**     | Zoom level tracking and physics     | zooui/objects/objectsutils/zoom/zoommanager.py |
+| **PriorityBatcher** | Priority-based tile request batching| zooui/objects/scene/sceneutils/prioritybatcher.py |
+| **TileManager**     | Tile coordination and caching       | zooui/tilesystem/tilemanager.py |
+| **TileProvider**    | Tile loading/generation             | zooui/tilesystem/tileproviders/ |
+| **TileStore**       | Persistent tile storage             | zooui/tilesystem/tilestore/ |
+| **Converter**       | Media format conversion             | zooui/converters/ |
+| **ConverterRunner** | Process-based parallel conversion   | zooui/converters/converterrunner.py |
+| **TilerRunner**     | Process-based parallel tiling       | zooui/tilesystem/tiler/tilerrunner.py |
+| **BackupManager**   | Per-scene backup creation/rotation  | zooui/backup/backupmanager.py |
 </pre></div>
 </div>
 <p>Complete Application Lifecycle:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>START                                        |    Enter Qt Event Loop ←──────────┐
   ↓                                          |      ↓                            │
-Parse Args → Load Config → Init Logging      |      │  ┌─────────────────────┐   │
+Check System Deps → Parse Args → Init Logging|      │  ┌─────────────────────┐   │
   ↓                        ↑                 |      ├─→│ User Input Events   │───┤
 ConfigManager reads       │                  |      │  └─────────────────────┘   │
-zooui_config.json ←───────┘                  |      │                            │
+~/.config/zooui/config.json ←──────────┘      |      │                            │
   ↓                                          |      │  ┌─────────────────────┐   │
 Init TileManager                             |      ├─→│ QZUI Render Loop    │───┤
   ↓                                          |      │  │ • Update physics    │   │
@@ -336,13 +371,14 @@ Show Window                                  |      ↓
 </div>
 <p>Program schematic:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────────────────────────────────────────────────────────┐
-│                         main.py                                 │
-│  • Parse CLI arguments                                          │
-│  • Load configuration via ConfigManager                         │
-│  • Initialize logging system                                    │
-│  • Initialize TileManager                                       │
-│  • Create MainWindow &amp; QZUI                                     │
-│  • Start process pools (Converter / Tiler)                      │
+│                      zooui/app.py                                │
+│  • Check system dependencies (libvips, pdftoppm)                 │
+│  • Parse CLI arguments                                           │
+│  • Load configuration via ConfigManager                          │
+│  • Initialize logging system                                     │
+│  • Initialize TileManager                                        │
+│  • Create MainWindow &amp; QZUI                                      │
+│  • Start process pools (Converter / Tiler)                       │
 └─────────────┬───────────────────────────────────────────────────┘
               │
               ├──────────────────────────────────────────────────────────────┐
