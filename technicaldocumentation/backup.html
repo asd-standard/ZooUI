@@ -5,16 +5,16 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Backup System &#8212; ZooUI 0.6.2 documentation</title>
+    <title>Backup System &#8212; ZooUI 0.7.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cc7d0dec" />
-    <script src="../_static/documentation_options.js?v=1c28bd9a"></script>
+    <script src="../_static/documentation_options.js?v=fe7df9b0"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Unit Testing Guide" href="../testingdocumentation/unittest.html" />
+    <link rel="next" title="Packaging System" href="packaging.html" />
     <link rel="prev" title="Logging System" href="logging.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -40,7 +40,7 @@ per-scene directories, configurable interval, rotation, and expiration policies.
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
 <p>The backup system creates timestamped backups of scene files in per-scene
-directories under <code class="docutils literal notranslate"><span class="pre">~/.zooui/backups/</span></code>. Each scene file gets its own
+directories under <code class="docutils literal notranslate"><span class="pre">~/.local/share/zooui/backups/</span></code>. Each scene file gets its own
 backup directory named <code class="docutils literal notranslate"><span class="pre">{scene_filename}_{4char_path_hash}/</span></code>, containing
 backups named <code class="docutils literal notranslate"><span class="pre">yy_mm_dd_hh_mm_filename_hash.pzs</span></code> with chronological sorting.</p>
 <p>Scene directories expire after a configurable number of days of inactivity
@@ -66,7 +66,7 @@ filenames include a timestamp hash to prevent collisions</p></li>
 <section id="backup-directory-structure">
 <h2>Backup Directory Structure<a class="headerlink" href="#backup-directory-structure" title="Link to this heading">¶</a></h2>
 <p>Backups are stored with per-scene subdirectories:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>~/.zooui/backups/
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>~/.local/share/zooui/backups/
 ├── myscene_a1b2/
 │   ├── 26_05_03_14_30_myscene_c3d4.pzs    # Backup file (timestamp_filename_hash.pzs)
 │   ├── 26_05_03_14_35_myscene_e5f6.pzs
@@ -128,7 +128,7 @@ Empty directories (no <code class="docutils literal notranslate"><span class="pr
 <span class="w">        </span><span class="nt">&quot;enabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
 <span class="w">        </span><span class="nt">&quot;interval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">300</span><span class="p">,</span>
 <span class="w">        </span><span class="nt">&quot;max_backups&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;backup_dir&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;~/.zooui/backups&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;backup_dir&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;~/.local/share/zooui/backups&quot;</span><span class="p">,</span>
 <span class="w">        </span><span class="nt">&quot;expire_days&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">7</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
@@ -145,7 +145,7 @@ Empty directories (no <code class="docutils literal notranslate"><span class="pr
 <li><p><strong>Interval</strong>: 300 seconds (5 minutes)</p></li>
 <li><p><strong>Max backups</strong>: 20 backups per scene</p></li>
 <li><p><strong>Expire days</strong>: 7 days (inactive scene directories are deleted)</p></li>
-<li><p><strong>Backup location</strong>: <code class="docutils literal notranslate"><span class="pre">~/.zooui/backups/</span></code></p></li>
+<li><p><strong>Backup location</strong>: <code class="docutils literal notranslate"><span class="pre">~/.local/share/zooui/backups/</span></code></p></li>
 </ul>
 </section>
 <section id="usage-flow">
@@ -196,7 +196,7 @@ application operation.</p>
 </dl>
 <p>BackupManager(config) –&gt; None</p>
 <p>Backup manager that creates per-scene backup directories under
-~/.zooui/backups/ with naming convention:
+the XDG data directory with naming convention:
 {scene_filename}_{4char_path_hash}/</p>
 <p>Each scene directory contains backups named:
 yy_mm_dd_hh_mm_filename_hash.pzs</p>
@@ -217,7 +217,7 @@ since the last backup was written.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>config</strong> – Configuration dictionary with ‘max_backups’ (default: 20),
-‘expire_days’ (default: 7), ‘backup_dir’ (default: ~/.zooui/backups)</p>
+‘expire_days’ (default: 7), ‘backup_dir’ (default: XDG data dir / backups)</p>
 </dd>
 </dl>
 <dl class="py method">
@@ -681,7 +681,7 @@ backup system to the new per-scene directory structure.</p>
 <p>The backup system is accessible through:</p>
 <ul class="simple">
 <li><p><strong>Settings menu</strong>: Settings → Autosave Settings dialog</p></li>
-<li><p><strong>Configuration</strong>: User preferences stored in <code class="docutils literal notranslate"><span class="pre">~/.zooui/config.json</span></code></p></li>
+<li><p><strong>Configuration</strong>: User preferences stored in <code class="docutils literal notranslate"><span class="pre">~/.config/zooui/config.json</span></code></p></li>
 </ul>
 </section>
 <section id="testing">
@@ -774,10 +774,8 @@ python<span class="w"> </span>main.py<span class="w"> </span>--backup-expire-day
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html">ZooUI installation instructions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html">ZooUI Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
 <ul>
@@ -801,6 +799,7 @@ python<span class="w"> </span>main.py<span class="w"> </span>--backup-expire-day
 <li class="toctree-l1"><a class="reference internal" href="windowsystem.html">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="logging.html">Logging System</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Backup System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="packaging.html">Packaging System</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
 <ul>
@@ -827,7 +826,7 @@ python<span class="w"> </span>main.py<span class="w"> </span>--backup-expire-day
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
       <li>Previous: <a href="logging.html" title="previous chapter">Logging System</a></li>
-      <li>Next: <a href="../testingdocumentation/unittest.html" title="next chapter">Unit Testing Guide</a></li>
+      <li>Next: <a href="packaging.html" title="next chapter">Packaging System</a></li>
   </ul></li>
 </ul>
 </div>

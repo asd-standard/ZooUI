@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>ZooUI installation instructions &#8212; ZooUI 0.6.2 documentation</title>
+    <title>ZooUI Installation &#8212; ZooUI 0.7.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cc7d0dec" />
-    <script src="../_static/documentation_options.js?v=1c28bd9a"></script>
+    <script src="../_static/documentation_options.js?v=fe7df9b0"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -33,185 +33,168 @@
 
           <div class="body" role="main">
             
-  <section id="zooui-installation-instructions">
-<h1>ZooUI installation instructions<a class="headerlink" href="#zooui-installation-instructions" title="Link to this heading">¶</a></h1>
-<p>This ZooUI fork was developed with debian 13 “trixie” as d.e and a miniconda for
-dependencies management. It has also been tested on AArch64 and Win11, always
-with a miniconda enviroment managing all dependencies.</p>
-<p>This project is a fork, original project can be found at:
-<a class="reference external" href="https://github.com/davidar/pyzui">https://github.com/davidar/pyzui</a></p>
+  <section id="zooui-installation">
+<h1>ZooUI Installation<a class="headerlink" href="#zooui-installation" title="Link to this heading">¶</a></h1>
+<p>ZooUI can be installed via pip or conda. Pip is the simplest method; conda
+provides tighter control over dependency versions and handles system C libraries
+automatically.</p>
+<section id="system-dependencies-all-methods">
+<h2>System Dependencies (all methods)<a class="headerlink" href="#system-dependencies-all-methods" title="Link to this heading">¶</a></h2>
+<p>ZooUI requires the following system libraries to be installed:</p>
+<ul class="simple">
+<li><p><strong>libvips</strong> — the C library for image processing (required)</p></li>
+<li><p><strong>poppler-utils</strong> — for PDF support (optional)</p></li>
+<li><p><strong>qt6-wayland</strong> — native Wayland rendering (optional, Linux only)</p></li>
+</ul>
 </section>
-<section id="dependencies">
-<h1>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading">¶</a></h1>
-<p>ZooUI has been developed with the following python version</p>
+<section id="pip-install">
+<h2>pip Install<a class="headerlink" href="#pip-install" title="Link to this heading">¶</a></h2>
+<p>Install ZooUI from PyPI:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">zooui</span>
+</pre></div>
+</div>
+<p>Install the system C library that pyvips binds to:</p>
+<blockquote>
+<div><p><strong>Debian / Ubuntu</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span> <span class="n">install</span> <span class="n">libvips42</span> <span class="n">poppler</span><span class="o">-</span><span class="n">utils</span>
+</pre></div>
+</div>
+<p><strong>Fedora</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">dnf</span> <span class="n">install</span> <span class="n">vips</span> <span class="n">poppler</span><span class="o">-</span><span class="n">utils</span>
+</pre></div>
+</div>
+<p><strong>macOS (Homebrew)</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">brew</span> <span class="n">install</span> <span class="n">vips</span> <span class="n">poppler</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>After installation, launch with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zooui</span>
+</pre></div>
+</div>
+<p>or:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zooui</span><span class="o">-</span><span class="n">gui</span>
+</pre></div>
+</div>
+<p>Or via the module:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">zooui</span>
+</pre></div>
+</div>
+<p>The application creates its configuration and data directories automatically
+on first launch (following the <a class="reference external" href="https://specifications.freedesktop.org/basedir-spec/latest/">XDG Base Directory specification</a>):</p>
 <ul class="simple">
-<li><p>python=3.12.12</p></li>
+<li><p>Config: <code class="docutils literal notranslate"><span class="pre">~/.config/zooui/config.json</span></code></p></li>
+<li><p>Backups: <code class="docutils literal notranslate"><span class="pre">~/.local/share/zooui/backups/</span></code></p></li>
+<li><p>Tile cache: <code class="docutils literal notranslate"><span class="pre">~/.cache/zooui/tilestore/</span></code></p></li>
+<li><p>SVG cache: <code class="docutils literal notranslate"><span class="pre">~/.cache/zooui/svg/</span></code></p></li>
+<li><p>Logs: <code class="docutils literal notranslate"><span class="pre">~/.local/state/zooui/logs/</span></code></p></li>
 </ul>
-<p>All dependencies have been installed in a miniconda enviroment, for all 3
-platforms tested the procedure has always been to install miniconda, create an
-enviroment:</p>
-<blockquote>
-<div><p>conda create -n “enviroment name” python=3.12.12</p>
-</div></blockquote>
-<p>And activate such enviroment</p>
-<blockquote>
-<div><p>conda activate “enviroment name”</p>
-</div></blockquote>
-<p>with all the core dependencies installed trough the default Anaconda channel:</p>
-<blockquote>
-<div><p>conda install “package”=”version number”</p>
-</div></blockquote>
-<p>ZooUI depends on the following Python packages:</p>
+</section>
+<section id="conda-install">
+<h2>conda Install<a class="headerlink" href="#conda-install" title="Link to this heading">¶</a></h2>
+<p>Create and activate a conda environment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">zooui</span> <span class="n">python</span><span class="o">=</span><span class="mf">3.12</span>
+<span class="n">conda</span> <span class="n">activate</span> <span class="n">zooui</span>
+</pre></div>
+</div>
+<p>Install core Python dependencies from default channels:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="n">pyside6</span><span class="o">=</span><span class="mf">6.7.2</span> <span class="n">pillow</span><span class="o">=</span><span class="mf">12.0.0</span>
+</pre></div>
+</div>
+<p>Install system-level packages from conda-forge:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="n">pyvips</span><span class="o">=</span><span class="mf">3.0.0</span> <span class="n">libvips</span> <span class="n">poppler</span><span class="o">=</span><span class="mf">24.12.0</span>
+</pre></div>
+</div>
+<p>Optional Wayland support:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="n">qt6</span><span class="o">-</span><span class="n">wayland</span><span class="o">=</span><span class="mf">6.7.2</span>
+</pre></div>
+</div>
+<p>Then install ZooUI itself:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">zooui</span>
+</pre></div>
+</div>
+<p>Or for development (editable install from a source checkout):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">zooui</span>
+</pre></div>
+</div>
+<p>Launch with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zooui</span>
+</pre></div>
+</div>
+</section>
+<section id="from-source">
+<h2>From Source<a class="headerlink" href="#from-source" title="Link to this heading">¶</a></h2>
+<p>Clone the repository and install in editable mode:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">asd</span><span class="o">-</span><span class="n">standard</span><span class="o">/</span><span class="n">ZooUI</span><span class="o">.</span><span class="n">git</span>
+<span class="n">cd</span> <span class="n">ZooUI</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="o">.</span>
+</pre></div>
+</div>
+<p>Install the required system libraries (see System Dependencies above).</p>
+<p>To run without installing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">main</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>Build the documentation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">docs</span>
+<span class="n">make</span> <span class="n">clean</span>
+<span class="n">make</span> <span class="n">html</span>
+</pre></div>
+</div>
+</section>
+<section id="python-dependencies-summary">
+<h2>Python Dependencies (summary)<a class="headerlink" href="#python-dependencies-summary" title="Link to this heading">¶</a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Package</p></th>
+<th class="head"><p>Version</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>PySide6</p></td>
+<td><p>≥ 6.7</p></td>
+</tr>
+<tr class="row-odd"><td><p>Pillow</p></td>
+<td><p>≥ 12.0</p></td>
+</tr>
+<tr class="row-even"><td><p>pyvips</p></td>
+<td><p>≥ 3.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>platformdirs</p></td>
+<td><p>≥ 3</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="platform-support">
+<h2>Platform Support<a class="headerlink" href="#platform-support" title="Link to this heading">¶</a></h2>
+<p>ZooUI is tested on:</p>
 <ul class="simple">
-<li><p>pyside6=6.7.2</p></li>
-<li><p>pillow=12.0.0</p></li>
-</ul>
-<p>The following non-Python packages are also required by certain features of the
-application, those are installed trough the Conda-Forge Anaconda channel.
-Especially if you run linux those packages may already be present on your system
-and may work, it’s nevertheless highly reccomended to install them in the conda
-enviroment:</p>
-<blockquote>
-<div><p>conda install -c conda-forge “package”=”version number”</p>
-</div></blockquote>
-<ul>
-<li><p>pyvips=3.0.0</p>
-<p>Poppler usually gets installed with pyvips so it’s not necessary to
-install it’s anyway an explicit codebase dependency for pdf management.</p>
-</li>
-<li><p>poppler=24.12.0</p></li>
-</ul>
-<p>pdftoppm from Poppler or Xpdf (optional if you do not intend viewing PDFs);</p>
-<p>These are the bare minimum dependencies for the project to run, on linux DE’s
-using Wayland as display server you can also install:</p>
-<ul>
-<li><p>qt6-wayland-6.7.2</p>
-<p>This allow the project to run natively and take advantage of hardware acceleration</p>
-</li>
-</ul>
-<section id="ubuntu-debian-aarch64-specific-instructions">
-<h2>Ubuntu/Debian, AArch64, specific instructions<a class="headerlink" href="#ubuntu-debian-aarch64-specific-instructions" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p>Install miniconda and follow the instructions in the DEPENDENCIES section</p></li>
+<li><p><strong>Linux</strong> (Debian 13, AArch64) — primary development platform</p></li>
+<li><p><strong>Windows</strong> (Windows 11, WSL) — via PyInstaller standalone executable or WSL</p></li>
+<li><p><strong>macOS</strong> — untested; Qt/PySide6 should work, but native library installation
+paths may differ</p></li>
 </ul>
 </section>
 </section>
 <section id="running-zooui">
 <h1>Running ZooUI<a class="headerlink" href="#running-zooui" title="Link to this heading">¶</a></h1>
-<ul>
-<li><p>ZooUI can be run by activating the enviroment as explained in the DEPENDENCIES
-section:</p>
-<p>conda activate “enviroment name”</p>
-</li>
-<li><p>Then executing ‘main.py’ with python interpreter:</p>
-<p>python main.py</p>
-</li>
-<li><p>It is not necessary to run this from the command-line (unless you want to view
-the logging), and it can be run from any directory (the script will set the
-working directory appropriately by itself).</p></li>
-</ul>
-<section id="windows-specific-instructions">
-<h2>Windows specific instructions<a class="headerlink" href="#windows-specific-instructions" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p>You have to install Windows subsystem for linux, (wsl), the default linux
-distribution should work, nevertheless if you want to be 100% sure th ZooUI
-have been tested with ubuntu 24.04.</p></li>
-<li><p>Once you have wsl installed you need to install miniconda on it, then you can
-create an enviroment and install all the dependencies as explained in the
-DEPENDENCIES section.</p></li>
-</ul>
-</section>
-<section id="running-zooui-windows">
-<h2>Running ZooUI (Windows)<a class="headerlink" href="#running-zooui-windows" title="Link to this heading">¶</a></h2>
-<ul>
-<li><p>You can then run ZooUI by launching your wsl enviroment, navigate to the root
-of the zooui project and run:</p>
-<p>python main.py</p>
-</li>
-</ul>
-</section>
-</section>
-<section id="generating-documentation">
-<h1>Generating Documentation<a class="headerlink" href="#generating-documentation" title="Link to this heading">¶</a></h1>
-<ul class="simple">
-<li><p>Install sphinx on the conda enviroment you have created for the ZooUI project.</p></li>
-</ul>
-<blockquote>
-<div><p>conda activate “enviroment name”
-conda install sphinx</p>
-</div></blockquote>
-<ul class="simple">
-<li><p>Once installed sphinx on the ZooUI project enviroment go to the project root
-and then:</p></li>
-</ul>
-<blockquote>
-<div><p>./docs</p>
-<p>and run:</p>
-<p>make clean
-make html</p>
-</div></blockquote>
-<ul class="simple">
-<li><p>this will generate all the documentation adding changes to the project docstring
-you might have added. You can visualize documentation by opening</p></li>
-</ul>
-<blockquote>
-<div><p>./docs/build/html/index.html with any web browser</p>
-</div></blockquote>
-<section id="building-documentation">
-<h2>Building documentation<a class="headerlink" href="#building-documentation" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p>Be aware, building documentation cause certains docs project configuration
-files to be wiped, if you just wish to update documentation go to GENERATING
-DOCUMENTATION</p></li>
-<li><p>Install sphinx on the conda enviroment you have created for the ZooUI project.</p></li>
-</ul>
-<blockquote>
-<div><p>conda activate “enviroment name”
-conda install sphinx</p>
-</div></blockquote>
-<ul class="simple">
-<li><p>Once installed sphinx on the ZooUI project enviroment go to “project root”/docs
-and run:</p></li>
-</ul>
-<blockquote>
-<div><p>sphinx-quickstart</p>
-</div></blockquote>
-<ul>
-<li><p>This will guide you through a few prompts:</p>
-<p>Project name: your project’s name
-Author name: your name or org
-Project release: version
-Separate source and build dirs: usually Yes</p>
-</li>
-<li><p>This creates a structure like:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docs</span><span class="o">/</span>
-<span class="o">|</span><span class="n">__</span> <span class="n">build</span><span class="o">/</span>
-<span class="o">|</span><span class="n">__</span> <span class="n">source</span><span class="o">/</span>
-<span class="o">|</span>   <span class="o">|</span><span class="n">__</span> <span class="n">conf</span><span class="o">.</span><span class="n">py</span>
-<span class="o">|</span>   <span class="o">|</span><span class="n">__</span> <span class="n">index</span><span class="o">.</span><span class="n">rst</span>
-<span class="o">|</span>   <span class="o">|</span><span class="n">__</span> <span class="n">_static</span><span class="o">/</span>
-<span class="o">|</span><span class="n">__</span> <span class="n">Makefile</span>
+<p>After installation, launch from the command line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zooui</span>
 </pre></div>
 </div>
-</li>
-<li><p>Then navigate to ./docs and run</p>
-<p>sphinx-apidoc -e -o source/ ..
-sphinx-apidoc -e -o source/ ../zooui</p>
-</li>
-<li><p>Then open ./docs/source/conf.py and add</p>
-<p>import os
-import sys
-sys.path.insert(0, os.path.abspath(‘../..’))
-sys.path.insert(0, os.path.abspath(‘..’))</p>
-</li>
-<li><p>insert there all’the sphinx stilings and then run:</p>
-<p>make clean
-make html</p>
-</li>
-<li><p>this will generate all’the documentation adding changes to the project docstring
-you might have added. You can visualize documentation by opening ./docs/build/html/index.html with any web browser</p></li>
-</ul>
-</section>
+<p>If installed via pip, the <code class="docutils literal notranslate"><span class="pre">zooui</span></code> command is available. If installed from
+source or conda without pip install, run from the project directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">main</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>The application can also be started via:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zooui</span><span class="o">-</span><span class="n">gui</span>       <span class="c1"># same as &#39;zooui&#39; on Linux, avoids console window on Windows</span>
+<span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">zooui</span> <span class="c1"># module entry point (pip install only)</span>
+</pre></div>
+</div>
+<p>ZooUI is not tied to the current working directory — it resolves paths using
+XDG standards and packaged data, so it can be launched from any location.</p>
 </section>
 
 
@@ -233,10 +216,8 @@ you might have added. You can visualize documentation by opening ./docs/build/ht
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">ZooUI installation instructions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ZooUI Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#running-zooui">Running ZooUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#generating-documentation">Generating Documentation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
 <ul>
@@ -260,6 +241,7 @@ you might have added. You can visualize documentation by opening ./docs/build/ht
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/windowsystem.html">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/logging.html">Logging System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/backup.html">Backup System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/packaging.html">Packaging System</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
 <ul>

@@ -4,11 +4,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>zooui.backup.backupmanager &#8212; ZooUI 0.6.2 documentation</title>
+    <title>zooui.backup.backupmanager &#8212; ZooUI 0.7.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=cc7d0dec" />
-    <script src="../../../_static/documentation_options.js?v=1c28bd9a"></script>
+    <script src="../../../_static/documentation_options.js?v=fe7df9b0"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -60,6 +60,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">PySide6</span><span class="w"> </span><span class="kn">import</span> <span class="n">QtWidgets</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">zooui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zooui.utils._xdg</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_data_dir</span>
 
 
 <div class="viewcode-block" id="BackupManager">
@@ -75,7 +76,7 @@
 <span class="sd">    BackupManager(config) --&gt; None</span>
 
 <span class="sd">    Backup manager that creates per-scene backup directories under</span>
-<span class="sd">    ~/.zooui/backups/ with naming convention:</span>
+<span class="sd">    the XDG data directory with naming convention:</span>
 <span class="sd">    {scene_filename}_{4char_path_hash}/</span>
 
 <span class="sd">    Each scene directory contains backups named:</span>
@@ -100,13 +101,13 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            config: Configuration dictionary with &#39;max_backups&#39; (default: 20),</span>
-<span class="sd">                    &#39;expire_days&#39; (default: 7), &#39;backup_dir&#39; (default: ~/.zooui/backups)</span>
+<span class="sd">                    &#39;expire_days&#39; (default: 7), &#39;backup_dir&#39; (default: XDG data dir / backups)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;BackupManager&quot;</span><span class="p">)</span>
 
         <span class="c1"># Default configuration</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;backup_dir&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;.zooui&quot;</span> <span class="o">/</span> <span class="s2">&quot;backups&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;backup_dir&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">get_data_dir</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;backups&quot;</span><span class="p">),</span>
             <span class="s2">&quot;max_backups&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
             <span class="s2">&quot;expire_days&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
         <span class="p">}</span>
@@ -532,10 +533,8 @@
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html">ZooUI installation instructions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html">ZooUI Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
 <ul>
@@ -559,6 +558,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/windowsystem.html">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/logging.html">Logging System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/backup.html">Backup System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/packaging.html">Packaging System</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
 <ul>

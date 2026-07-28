@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>zooui.tilesystem.tile module &#8212; ZooUI 0.6.2 documentation</title>
+    <title>zooui.tilesystem.tile module &#8212; ZooUI 0.7.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=cc7d0dec" />
-    <script src="../../_static/documentation_options.js?v=1c28bd9a"></script>
+    <script src="../../_static/documentation_options.js?v=fe7df9b0"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -100,8 +100,11 @@ height : int</p>
 </dd>
 </dl>
 <p>Tile.save(filename) –&gt; None</p>
-<p>Save the tile to the location given by <cite>filename</cite> calling ImageQt.save()
-method.</p>
+<p>Save the tile to the location given by <cite>filename</cite>.</p>
+<p>Converts the QImage to a PIL Image and saves via Pillow, avoiding
+QImage.save() which can segfault when a QApplication is live
+(known PySide6 issue when tiling runs after a QApplication is
+created, e.g. in test suites).</p>
 </dd></dl>
 
 <dl class="py method">
@@ -206,10 +209,8 @@ case they will be ignored.</p>
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../gettingstarted/installation.html">ZooUI installation instructions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../gettingstarted/installation.html">ZooUI Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
 <ul>
@@ -233,6 +234,7 @@ case they will be ignored.</p>
 <li class="toctree-l1"><a class="reference internal" href="../../technicaldocumentation/windowsystem.html">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../technicaldocumentation/logging.html">Logging System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../technicaldocumentation/backup.html">Backup System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../technicaldocumentation/packaging.html">Packaging System</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
 <ul>

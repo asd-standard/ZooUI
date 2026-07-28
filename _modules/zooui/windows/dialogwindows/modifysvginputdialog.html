@@ -4,11 +4,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>zooui.windows.dialogwindows.modifysvginputdialog &#8212; ZooUI 0.6.2 documentation</title>
+    <title>zooui.windows.dialogwindows.modifysvginputdialog &#8212; ZooUI 0.7.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=cc7d0dec" />
-    <script src="../../../../_static/documentation_options.js?v=1c28bd9a"></script>
+    <script src="../../../../_static/documentation_options.js?v=fe7df9b0"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -76,6 +76,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">zooui.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_svg_cache</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zooui.utils._xdg</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_cache_dir</span><span class="p">,</span> <span class="n">get_colorstore_dir</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">PySide6.QtGui</span><span class="w"> </span><span class="kn">import</span> <span class="n">QPaintEvent</span>
@@ -129,8 +130,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">is_tmp_file</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_cache_file</span><span class="p">:</span>
-            <span class="c1"># Check if file path is in /tmp/zooui_svg_</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">is_tmp_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_media_id</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;/tmp/zooui_svg_&quot;</span><span class="p">)</span>
+            <span class="c1"># Check if file path is in SVG cache directory</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_tmp_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_media_id</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">get_cache_dir</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;svg&quot;</span><span class="p">))</span>
 
         <span class="c1"># Current values (extract from SVG content)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">current_color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_current_color</span><span class="p">()</span>
@@ -159,10 +160,7 @@
 <a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifysvginputdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifySVGInputDialog._load_color_history">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">_load_color_history</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Load color history from color store file.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="s2">&quot;APPDATA&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
-            <span class="n">color_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;APPDATA&quot;</span><span class="p">],</span> <span class="s2">&quot;zooui&quot;</span><span class="p">,</span> <span class="s2">&quot;colorstore&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">color_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">),</span> <span class="s2">&quot;.zooui&quot;</span><span class="p">,</span> <span class="s2">&quot;colorstore&quot;</span><span class="p">)</span>
+        <span class="n">color_dir</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">get_colorstore_dir</span><span class="p">())</span>
 
         <span class="n">color_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">color_dir</span><span class="p">,</span> <span class="s2">&quot;color_list.txt&quot;</span><span class="p">)</span>
 
@@ -185,7 +183,7 @@
 <a class="viewcode-back" href="../../../../zooui/windows/dialogwindows/modifysvginputdialog.html#zooui.windows.dialogwindows.dialogwindows.ModifySVGInputDialog._validate_svg_source">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">_validate_svg_source</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check if SVG is from safe source (``/tmp/zooui_svg_``).</span>
+<span class="sd">        Check if SVG is from safe source (SVG cache directory).</span>
 <span class="sd">        Show warning dialog for other sources.</span>
 
 <span class="sd">        Returns:</span>
@@ -203,7 +201,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_show_source_warning_dialog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Warning: This SVG was not added via SVG Picker dialog.</span>
-<span class="sd">        The modify dialog is designed for simple shapes from data/SVG/.</span>
+<span class="sd">        The modify dialog is designed for simple shapes from zooui/data/SVG/.</span>
 
 <span class="sd">        Default values will be used: color=black, stroke-width=10</span>
 <span class="sd">        Continue anyway?</span>
@@ -818,10 +816,7 @@
                 <span class="k">if</span> <span class="n">final_color</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">color_codes</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">color_codes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">final_color</span><span class="p">)</span>
                     <span class="c1"># Save color list</span>
-                    <span class="k">if</span> <span class="s2">&quot;APPDATA&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
-                        <span class="n">color_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;APPDATA&quot;</span><span class="p">],</span> <span class="s2">&quot;zooui&quot;</span><span class="p">,</span> <span class="s2">&quot;colorstore&quot;</span><span class="p">)</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">color_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">),</span> <span class="s2">&quot;.zooui&quot;</span><span class="p">,</span> <span class="s2">&quot;colorstore&quot;</span><span class="p">)</span>
+                    <span class="n">color_dir</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">get_colorstore_dir</span><span class="p">())</span>
 
                     <span class="n">color_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">color_dir</span><span class="p">,</span> <span class="s2">&quot;color_list.txt&quot;</span><span class="p">)</span>
                     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">color_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -857,10 +852,8 @@
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html">ZooUI installation instructions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html">ZooUI Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
 <ul>
@@ -884,6 +877,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/windowsystem.html">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/logging.html">Logging System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/backup.html">Backup System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../technicaldocumentation/packaging.html">Packaging System</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
 <ul>

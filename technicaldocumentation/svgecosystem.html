@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>SVG Utility Ecosystem &#8212; ZooUI 0.6.2 documentation</title>
+    <title>SVG Utility Ecosystem &#8212; ZooUI 0.7.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cc7d0dec" />
-    <script src="../_static/documentation_options.js?v=1c28bd9a"></script>
+    <script src="../_static/documentation_options.js?v=fe7df9b0"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -95,7 +95,7 @@ and non-destructive (hash-returning) transformation pipelines.</p>
               │
 ┌─────────────▼───────────────────────────────────────────────────┐
 │                       SVGCache                                  │
-│  • Storage: /tmp/zooui_svg_/ (flat directory)                   │
+│  • Storage: ~/.cache/zooui/svg/ (flat directory)                   │
 │  • Addressing: svg_{8-char SHA1} content hash                   │
 │  • store_svg() — deduplicate, validate, write                   │
 │  • get_svg_content() — read by hash                             │
@@ -122,7 +122,7 @@ and non-destructive (hash-returning) transformation pipelines.</p>
 <p><code class="xref py py-class docutils literal notranslate"><span class="pre">SVGCache</span></code> provides a content-addressable disk cache for SVG data.
 All elongation results and picker-created SVGs are stored here.</p>
 <p><strong>Storage Layout:</strong></p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>/tmp/zooui_svg_/
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>~/.cache/zooui/svg/
 ├── svg_a1b2c3d4.svg
 ├── svg_e5f6a7b8.svg
 └── ...
@@ -506,7 +506,7 @@ classify the orientation of the shape:</p>
 <section id="opensvgpickerinputdialog">
 <h3>OpenSVGPickerInputDialog<a class="headerlink" href="#opensvgpickerinputdialog" title="Link to this heading">¶</a></h3>
 <p>The SVG picker dialog (<strong>File &gt; Open new SVG</strong>, Ctrl+G) creates new SVG
-objects from a browser of <code class="docutils literal notranslate"><span class="pre">data/SVG/</span></code> files. It performs <strong>inline XML
+objects from a browser of <code class="docutils literal notranslate"><span class="pre">zooui/data/SVG/</span></code> files. It performs <strong>inline XML
 manipulation</strong> (not using the shape utility modules) for color/thickness:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>1. User selects SVG file + color + thickness
 2. _modify_svg_file() parses SVG with ET
@@ -628,7 +628,7 @@ general SVG content rather than detecting specific shapes.</p>
 
 <span class="c1"># Get file path for QSvgRenderer</span>
 <span class="n">path</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span><span class="n">svg_hash</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;On disk: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># /tmp/zooui_svg_/svg_a1b2c3d4.svg</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;On disk: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># ~/.cache/zooui/svg/svg_a1b2c3d4.svg</span>
 
 <span class="c1"># Compute hash without storing</span>
 <span class="n">hash_only</span> <span class="o">=</span> <span class="n">compute_svg_hash</span><span class="p">(</span><span class="s2">&quot;&lt;svg&gt;...&lt;/svg&gt;&quot;</span><span class="p">)</span>
@@ -675,10 +675,8 @@ general SVG content rather than detecting specific shapes.</p>
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html">ZooUI installation instructions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html">ZooUI Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
 <ul>
@@ -702,6 +700,7 @@ general SVG content rather than detecting specific shapes.</p>
 <li class="toctree-l1"><a class="reference internal" href="windowsystem.html">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="logging.html">Logging System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="backup.html">Backup System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="packaging.html">Packaging System</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
 <ul>

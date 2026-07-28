@@ -4,11 +4,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>zooui.windows.mainwindow &#8212; ZooUI 0.6.2 documentation</title>
+    <title>zooui.windows.mainwindow &#8212; ZooUI 0.7.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=cc7d0dec" />
-    <script src="../../../_static/documentation_options.js?v=1c28bd9a"></script>
+    <script src="../../../_static/documentation_options.js?v=fe7df9b0"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -68,6 +68,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">zooui.objects.scene</span><span class="w"> </span><span class="kn">import</span> <span class="n">scene</span> <span class="k">as</span> <span class="n">Scene</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">zooui.objects.scene.qzui</span><span class="w"> </span><span class="kn">import</span> <span class="n">QZUI</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">zooui.objects.scene.qzui</span><span class="w"> </span><span class="kn">import</span> <span class="n">QZUI</span> <span class="k">as</span> <span class="n">QZUIType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zooui.utils._packaging</span><span class="w"> </span><span class="kn">import</span> <span class="n">data_dir</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">zooui.windows.dialogwindows.dialogwindows</span><span class="w"> </span><span class="kn">import</span> <span class="n">DialogWindows</span>
 
 <span class="c1"># Type aliases</span>
@@ -458,7 +459,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">zui</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_zui</span>
-            <span class="n">zui</span><span class="o">.</span><span class="n">scene</span> <span class="o">=</span> <span class="n">Scene</span><span class="o">.</span><span class="n">load_scene</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;home.pzs&quot;</span><span class="p">))</span>
+            <span class="n">zui</span><span class="o">.</span><span class="n">scene</span> <span class="o">=</span> <span class="n">Scene</span><span class="o">.</span><span class="n">load_scene</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">(),</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;home.pzs&quot;</span><span class="p">))</span>
             <span class="n">current_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tab_widget</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__tab_widget</span><span class="o">.</span><span class="n">setTabText</span><span class="p">(</span><span class="n">current_index</span><span class="p">,</span> <span class="s2">&quot;Home&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__update_window_title</span><span class="p">()</span>
@@ -1289,10 +1290,8 @@
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html">ZooUI installation instructions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html">ZooUI Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
 <ul>
@@ -1316,6 +1315,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/windowsystem.html">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/logging.html">Logging System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/backup.html">Backup System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/packaging.html">Packaging System</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
 <ul>

@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>zooui.windows.dialogwindows.modifysvginputdialog module &#8212; ZooUI 0.6.2 documentation</title>
+    <title>zooui.windows.dialogwindows.modifysvginputdialog module &#8212; ZooUI 0.7.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=cc7d0dec" />
-    <script src="../../../_static/documentation_options.js?v=1c28bd9a"></script>
+    <script src="../../../_static/documentation_options.js?v=fe7df9b0"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -120,7 +120,7 @@ that were added via svgpickerinputdialog.py.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._validate_svg_source">
 <span class="sig-name descname"><span class="pre">_validate_svg_source</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/modifysvginputdialog.html#ModifySVGInputDialog._validate_svg_source"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._validate_svg_source" title="Link to this definition">¶</a></dt>
-<dd><p>Check if SVG is from safe source (<code class="docutils literal notranslate"><span class="pre">/tmp/zooui_svg_</span></code>).
+<dd><p>Check if SVG is from safe source (SVG cache directory).
 Show warning dialog for other sources.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -133,7 +133,7 @@ Show warning dialog for other sources.</p>
 <dt class="sig sig-object py" id="zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._show_source_warning_dialog">
 <span class="sig-name descname"><span class="pre">_show_source_warning_dialog</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/zooui/windows/dialogwindows/modifysvginputdialog.html#ModifySVGInputDialog._show_source_warning_dialog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zooui.windows.dialogwindows.modifysvginputdialog.ModifySVGInputDialog._show_source_warning_dialog" title="Link to this definition">¶</a></dt>
 <dd><p>Warning: This SVG was not added via SVG Picker dialog.
-The modify dialog is designed for simple shapes from data/SVG/.</p>
+The modify dialog is designed for simple shapes from zooui/data/SVG/.</p>
 <p>Default values will be used: color=black, stroke-width=10
 Continue anyway?</p>
 </dd></dl>
@@ -287,10 +287,8 @@ Returns string value (e.g., ‘8’).</p>
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html">ZooUI installation instructions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html">ZooUI Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
 <ul>
@@ -314,6 +312,7 @@ Returns string value (e.g., ‘8’).</p>
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/windowsystem.html">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/logging.html">Logging System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/backup.html">Backup System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../technicaldocumentation/packaging.html">Packaging System</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
 <ul>

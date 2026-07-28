@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Object System &#8212; ZooUI 0.6.2 documentation</title>
+    <title>Object System &#8212; ZooUI 0.7.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cc7d0dec" />
-    <script src="../_static/documentation_options.js?v=1c28bd9a"></script>
+    <script src="../_static/documentation_options.js?v=fe7df9b0"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -392,7 +392,7 @@ scene files. Located at <span class="xref std std-doc">../zooui/autosave</span>.
 <p><strong>Key Features:</strong></p>
 <ul class="simple">
 <li><p><strong>Timer-based</strong>: Configurable interval (default: 5 minutes)</p></li>
-<li><p><strong>Per-scene directories</strong>: <code class="docutils literal notranslate"><span class="pre">~/.zooui/backups/{filename}_{4char_hash}/</span></code></p></li>
+<li><p><strong>Per-scene directories</strong>: <code class="docutils literal notranslate"><span class="pre">~/.local/share/zooui/backups/{filename}_{4char_hash}/</span></code></p></li>
 <li><p><strong>Rotation</strong>: Keeps last N backups, deletes oldest automatically (default: 20)</p></li>
 <li><p><strong>Expiration</strong>: Inactive scene directories expire after N days (default: 7)</p></li>
 <li><p><strong>Enabled by default</strong>: Autosave starts automatically after scene load</p></li>
@@ -1041,7 +1041,7 @@ prevent data loss. See <span class="xref std std-doc">../zooui/autosave</span> a
 </pre></div>
 </div>
 <p><strong>Storage Layout:</strong></p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>~/.zooui/backups/
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>~/.local/share/zooui/backups/
 ├── scene1_a1b2/           ← Per-scene directory (filename + 4-char hash)
 │   ├── 26_05_09_14_30_c3d4.pzs
 │   ├── 26_05_09_14_35_e5f6.pzs
@@ -1356,10 +1356,8 @@ of a file path. This enables:</p>
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html">ZooUI installation instructions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html">ZooUI Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
 <ul>
@@ -1383,6 +1381,7 @@ of a file path. This enables:</p>
 <li class="toctree-l1"><a class="reference internal" href="windowsystem.html">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="logging.html">Logging System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="backup.html">Backup System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="packaging.html">Packaging System</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
 <ul>

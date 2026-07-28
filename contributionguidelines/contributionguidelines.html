@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Contribution Guidelines &#8212; ZooUI 0.6.2 documentation</title>
+    <title>Contribution Guidelines &#8212; ZooUI 0.7.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cc7d0dec" />
-    <script src="../_static/documentation_options.js?v=1c28bd9a"></script>
+    <script src="../_static/documentation_options.js?v=fe7df9b0"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -72,7 +72,7 @@ is encouraged for any purpose that respect the GNU General Public License v3 ter
 </div>
 </li>
 <li><p><strong>Set Up the Development Environment</strong></p>
-<p>Follow the installation instructions in the <a class="reference internal" href="../gettingstarted/installation.html"><span class="doc">ZooUI installation instructions</span></a> section:</p>
+<p>Follow the installation instructions in the <a class="reference internal" href="../gettingstarted/installation.html"><span class="doc">ZooUI Installation</span></a> section:</p>
 <ul>
 <li><p>Install Miniconda and create a Python 3.12.12 environment:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>&lt;env-name&gt;<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.12.12
@@ -670,7 +670,7 @@ heading with the release date</p></li>
 <li><p>Run the bump script. This updates <strong>three</strong> locations automatically:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">zooui/__init__.py</span></code> — the canonical <code class="docutils literal notranslate"><span class="pre">__version__</span></code> string</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">data/home.pzs</span></code> — the version text displayed in the default scene</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zooui/data/home.pzs</span></code> — the version text displayed in the default scene</p></li>
 </ul>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>scripts/bump_version.py<span class="w"> </span>patch<span class="w">   </span><span class="c1"># for fixes</span>
 python<span class="w"> </span>scripts/bump_version.py<span class="w"> </span>minor<span class="w">   </span><span class="c1"># for features</span>
@@ -895,10 +895,8 @@ contributions (fork, branch, pull request). Ensure your documentation:</p>
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html">ZooUI installation instructions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html">ZooUI Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#running-zooui">Running ZooUI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted/installation.html#generating-documentation">Generating Documentation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Usage Instructions</span></p>
 <ul>
@@ -922,6 +920,7 @@ contributions (fork, branch, pull request). Ensure your documentation:</p>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/windowsystem.html">Window System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/logging.html">Logging System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/backup.html">Backup System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technicaldocumentation/packaging.html">Packaging System</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Testing Documentation</span></p>
 <ul>
