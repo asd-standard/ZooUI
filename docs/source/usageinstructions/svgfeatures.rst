@@ -22,7 +22,7 @@ supports interactivity and animation. In ZooUI, SVG files can be:
 Key Features
 ------------
 
-1. **SVG Picker Dialog**: Browse and select SVG files from the ``data/SVG/`` directory
+1. **SVG Picker Dialog**: Browse and select SVG files from the ``zooui/data/SVG/`` directory
 2. **Color Customization**: Apply any color to SVG strokes and fills
 3. **Thickness Adjustment**: Modify line/stroke thickness
 4. **Modification Dialog**: Edit existing SVG objects in the scene
@@ -37,7 +37,7 @@ There are two main ways to add SVG objects to your ZooUI scene:
 **Method 1: Using the SVG Picker Dialog**
 
 1. Open the SVG picker dialog from the main menu or toolbar
-2. Browse available SVG files in the ``data/SVG/`` directory
+2. Browse available SVG files in the ``zooui/data/SVG/`` directory
 3. Select an SVG file to preview it
 4. Choose a color from the color history or enter a custom hex color
 5. Adjust the stroke thickness if needed
@@ -74,7 +74,7 @@ interface for selecting and customizing SVG files:
 
 **Available SVG Files:**
 
-ZooUI includes a collection of basic shapes in the ``data/SVG/`` directory:
+ZooUI includes a collection of basic shapes in the ``zooui/data/SVG/`` directory:
 
 - Arrows (various directions)
 - Geometric shapes (circles, squares, triangles)
@@ -121,7 +121,7 @@ ZooUI maintains a color history system that persists across sessions:
 **Color History Features:**
 
 - Stores up to 24 recently used colors
-- Colors saved in ``~/.zooui/colorstore/color_list.txt``
+- Colors saved in ``~/.local/share/zooui/colorstore/color_list.txt``
 - Colors shared between SVG picker and modify dialogs
 - Default colors: white (ffffff), red (ff0000), green (00ff00), blue (0000ff)
 
@@ -138,7 +138,7 @@ ZooUI uses an efficient SVG cache system to store modified SVG files:
 
 **Cache Features:**
 
-- **Location**: ``/tmp/zooui_svg_/`` directory (temporary storage)
+- **Location**: ``~/.cache/zooui/svg/`` directory (temporary storage)
 - **Format**: ``svg_{8_char_sha1_hash}.svg`` files
 - **Deduplication**: Same content = same hash (saves storage)
 - **Flat Structure**: All files in single directory (no subfolders)
@@ -238,7 +238,7 @@ Best Practices
 - **SVG Not Rendering**: Check if file is valid XML, try opening in browser
 - **Colors Not Applying**: Some SVGs use CSS classes instead of inline attributes
 - **Performance Issues**: Reduce number of SVG objects or simplify complex SVGs
-- **Cache Issues**: Clear ``/tmp/zooui_svg_/`` directory and restart ZooUI
+- **Cache Issues**: Clear ``~/.cache/zooui/svg/`` directory and restart ZooUI
 
 Advanced Usage
 --------------
@@ -269,7 +269,7 @@ SVG objects can be added programmatically:
 
 To use your own SVG files:
 
-1. Create a ``data/SVG/`` directory in your ZooUI installation
+1. Create a ``zooui/data/SVG/`` directory in your ZooUI installation
 2. Add ``.svg`` files to this directory
 3. Restart ZooUI to see new files in the picker dialog
 
@@ -280,13 +280,13 @@ Advanced users can manage the SVG cache:
 .. code-block:: bash
 
     # List cached SVG files
-    ls /tmp/zooui_svg_/
+    ls ~/.cache/zooui/svg/
     
     # Clear cache (will be recreated as needed)
-    rm -rf /tmp/zooui_svg_/
+    rm -rf ~/.cache/zooui/svg/
     
     # Monitor cache size
-    du -sh /tmp/zooui_svg_/
+    du -sh ~/.cache/zooui/svg/
 
 Examples
 --------

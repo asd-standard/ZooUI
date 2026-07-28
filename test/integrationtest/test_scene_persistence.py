@@ -87,6 +87,7 @@ def temp_tilestore(tmp_path):
 
     yield temp_dir
 
+    tilemanager.shutdown()
     ts_module.tile_dir = original_tile_dir
     tilestore.tile_dir = original_tile_dir
     if os.path.exists(temp_dir):

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 ## ZooUI - Zooming User Interface
 ## Copyright (C) 2009 David Roberts <d@vidr.cc>
 ##
@@ -15,12 +14,4 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program; if not, see <https://www.gnu.org/licenses/>.
 
-"""Thin launcher for running ZooUI from a source checkout.
-
-Delegates to the importable entry point in :mod:`zooui.app`.
-"""
-
-from zooui.app import main
-
-if __name__ == "__main__":
-    main()
+"""Bundled resource data for the ZooUI package."""

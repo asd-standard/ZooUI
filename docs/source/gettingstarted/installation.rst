@@ -1,176 +1,157 @@
-ZooUI installation instructions
-===============================
+ZooUI Installation
+==================
 
-This ZooUI fork was developed with debian 13 "trixie" as d.e and a miniconda for 
-dependencies management. It has also been tested on AArch64 and Win11, always 
-with a miniconda enviroment managing all dependencies.
+ZooUI can be installed via pip or conda. Pip is the simplest method; conda
+provides tighter control over dependency versions and handles system C libraries
+automatically.
 
-This project is a fork, original project can be found at:
-https://github.com/davidar/pyzui
+System Dependencies (all methods)
+---------------------------------
 
-Dependencies
-============
+ZooUI requires the following system libraries to be installed:
 
-ZooUI has been developed with the following python version
+- **libvips** — the C library for image processing (required)
+- **poppler-utils** — for PDF support (optional)
+- **qt6-wayland** — native Wayland rendering (optional, Linux only)
 
-- python=3.12.12
+pip Install
+-----------
 
-All dependencies have been installed in a miniconda enviroment, for all 3 
-platforms tested the procedure has always been to install miniconda, create an 
-enviroment:
+Install ZooUI from PyPI::
 
-  conda create -n "enviroment name" python=3.12.12
-  
-And activate such enviroment
+    pip install zooui
 
-  conda activate "enviroment name"
+Install the system C library that pyvips binds to:
 
-with all the core dependencies installed trough the default Anaconda channel:
+  **Debian / Ubuntu**::
 
-  conda install "package"="version number"
+      sudo apt install libvips42 poppler-utils
 
-ZooUI depends on the following Python packages:
+  **Fedora**::
 
-- pyside6=6.7.2 
-- pillow=12.0.0
+      sudo dnf install vips poppler-utils
 
-The following non-Python packages are also required by certain features of the
-application, those are installed trough the Conda-Forge Anaconda channel. 
-Especially if you run linux those packages may already be present on your system 
-and may work, it's nevertheless highly reccomended to install them in the conda 
-enviroment:
+  **macOS (Homebrew)**::
 
-  conda install -c conda-forge "package"="version number"
+      brew install vips poppler
 
-- pyvips=3.0.0
-    
-  Poppler usually gets installed with pyvips so it's not necessary to 
-  install it's anyway an explicit codebase dependency for pdf management. 
+After installation, launch with::
 
-- poppler=24.12.0
+    zooui
 
-pdftoppm from Poppler or Xpdf (optional if you do not intend viewing PDFs);
+or::
 
-These are the bare minimum dependencies for the project to run, on linux DE's 
-using Wayland as display server you can also install:
+    zooui-gui
 
-- qt6-wayland-6.7.2
+Or via the module::
 
-  This allow the project to run natively and take advantage of hardware acceleration
+    python -m zooui
 
-Ubuntu/Debian, AArch64, specific instructions
----------------------------------------------
+The application creates its configuration and data directories automatically
+on first launch (following the `XDG Base Directory specification`_):
 
-- Install miniconda and follow the instructions in the DEPENDENCIES section
+- Config: ``~/.config/zooui/config.json``
+- Backups: ``~/.local/share/zooui/backups/``
+- Tile cache: ``~/.cache/zooui/tilestore/``
+- SVG cache: ``~/.cache/zooui/svg/``
+- Logs: ``~/.local/state/zooui/logs/``
+
+.. _XDG Base Directory specification: https://specifications.freedesktop.org/basedir-spec/latest/
+
+conda Install
+-------------
+
+Create and activate a conda environment::
+
+    conda create -n zooui python=3.12
+    conda activate zooui
+
+Install core Python dependencies from default channels::
+
+    conda install pyside6=6.7.2 pillow=12.0.0
+
+Install system-level packages from conda-forge::
+
+    conda install -c conda-forge pyvips=3.0.0 libvips poppler=24.12.0
+
+Optional Wayland support::
+
+    conda install -c conda-forge qt6-wayland=6.7.2
+
+Then install ZooUI itself::
+
+    pip install zooui
+
+Or for development (editable install from a source checkout)::
+
+    pip install -e /path/to/zooui
+
+Launch with::
+
+    zooui
+
+From Source
+-----------
+
+Clone the repository and install in editable mode::
+
+    git clone https://github.com/asd-standard/ZooUI.git
+    cd ZooUI
+    pip install -e .
+
+Install the required system libraries (see System Dependencies above).
+
+To run without installing::
+
+    python main.py
+
+Build the documentation::
+
+    cd docs
+    make clean
+    make html
+
+Python Dependencies (summary)
+-----------------------------
+
++------------------+--------------------+
+| Package          | Version            |
++==================+====================+
+| PySide6          | ≥ 6.7              |
++------------------+--------------------+
+| Pillow           | ≥ 12.0             |
++------------------+--------------------+
+| pyvips           | ≥ 3.0              |
++------------------+--------------------+
+| platformdirs     | ≥ 3                |
++------------------+--------------------+
+
+Platform Support
+----------------
+
+ZooUI is tested on:
+
+- **Linux** (Debian 13, AArch64) — primary development platform
+- **Windows** (Windows 11, WSL) — via PyInstaller standalone executable or WSL
+- **macOS** — untested; Qt/PySide6 should work, but native library installation
+  paths may differ
 
 Running ZooUI
 =============
 
-- ZooUI can be run by activating the enviroment as explained in the DEPENDENCIES 
-  section:
+After installation, launch from the command line::
 
-  conda activate "enviroment name"
+    zooui
 
-- Then executing 'main.py' with python interpreter:
+If installed via pip, the ``zooui`` command is available. If installed from
+source or conda without pip install, run from the project directory::
 
-  python main.py
- 
-- It is not necessary to run this from the command-line (unless you want to view
-  the logging), and it can be run from any directory (the script will set the 
-  working directory appropriately by itself).
+    python main.py
 
-Windows specific instructions
------------------------------
+The application can also be started via::
 
-- You have to install Windows subsystem for linux, (wsl), the default linux 
-  distribution should work, nevertheless if you want to be 100% sure th ZooUI 
-  have been tested with ubuntu 24.04.
+    zooui-gui       # same as 'zooui' on Linux, avoids console window on Windows
+    python -m zooui # module entry point (pip install only)
 
-- Once you have wsl installed you need to install miniconda on it, then you can 
-  create an enviroment and install all the dependencies as explained in the 
-  DEPENDENCIES section.  
-
-Running ZooUI (Windows)
------------------------
-
-- You can then run ZooUI by launching your wsl enviroment, navigate to the root 
-  of the zooui project and run:
-
-  python main.py 
-
-Generating Documentation
-========================
-
-- Install sphinx on the conda enviroment you have created for the ZooUI project.
-
- conda activate "enviroment name"
- conda install sphinx
-
-- Once installed sphinx on the ZooUI project enviroment go to the project root 
-  and then: 
-  
- ./docs
-  
- and run:
-
- make clean
- make html
-
-- this will generate all the documentation adding changes to the project docstring
-  you might have added. You can visualize documentation by opening 
-
- ./docs/build/html/index.html with any web browser 
-
-
-Building documentation
-----------------------
-
-- Be aware, building documentation cause certains docs project configuration 
-  files to be wiped, if you just wish to update documentation go to GENERATING 
-  DOCUMENTATION  
-- Install sphinx on the conda enviroment you have created for the ZooUI project.
-
- conda activate "enviroment name"
- conda install sphinx
-
-- Once installed sphinx on the ZooUI project enviroment go to "project root"/docs
-  and run:
-
- sphinx-quickstart
-
-- This will guide you through a few prompts:
-
-  Project name: your project’s name
-  Author name: your name or org
-  Project release: version
-  Separate source and build dirs: usually Yes
-
-- This creates a structure like::
-
-    docs/
-    |__ build/
-    |__ source/
-    |   |__ conf.py
-    |   |__ index.rst
-    |   |__ _static/
-    |__ Makefile
-
-- Then navigate to ./docs and run
-
-  sphinx-apidoc -e -o source/ ..
-  sphinx-apidoc -e -o source/ ../zooui
-
-- Then open ./docs/source/conf.py and add
-  
-  import os
-  import sys
-  sys.path.insert(0, os.path.abspath('../..'))
-  sys.path.insert(0, os.path.abspath('..'))
-
-- insert there all'the sphinx stilings and then run:
-
-  make clean
-  make html
-
-- this will generate all'the documentation adding changes to the project docstring
-  you might have added. You can visualize documentation by opening ./docs/build/html/index.html with any web browser
+ZooUI is not tied to the current working directory — it resolves paths using
+XDG standards and packaged data, so it can be launched from any location.

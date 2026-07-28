@@ -121,7 +121,7 @@ class AutosaveSettingsDialog(QtWidgets.QDialog):
         # Info label
         info_label = QtWidgets.QLabel(
             "Autosave is enabled by default at application start\n"
-            "Each scene gets its own backup directory: ~/.zooui/backups/<scene>_<hash>/\n"
+            "Each scene gets its own backup directory under the XDG data directory\n"
             "Backup naming: yy_mm_dd_hh_mm_filename_hash.pzs\n"
             "Oldest backups are automatically deleted when limit is reached.\n"
             "Inactive scene directories are deleted after expiration."

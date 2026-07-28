@@ -75,7 +75,7 @@ GUIINTEGRATION_PARENT = Path(__file__).parent.parent.resolve()
 sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(GUIINTEGRATION_PARENT))
 
-# Change to project root so relative paths (like 'data/home.pzs') work correctly
+# Change to project root so relative paths (like 'zooui/data/home.pzs') work correctly
 os.chdir(PROJECT_ROOT)
 
 from guiintegration.conf import SHORT_DELAY_MS  # noqa: E402

@@ -1,3 +1,4 @@
+USAGE_RST = """\
 User Interface
 ==============
 
@@ -194,3 +195,4 @@ Mouse/Keyboard actions:
     - **Ctrl+Shift + Scrollwheel** on squares/circles/triangles: scale Y-axis
       only
 
+"""

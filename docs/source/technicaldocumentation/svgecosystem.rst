@@ -68,7 +68,7 @@ Architecture
                   │
     ┌─────────────▼───────────────────────────────────────────────────┐
     │                       SVGCache                                  │
-    │  • Storage: /tmp/zooui_svg_/ (flat directory)                   │
+    │  • Storage: ~/.cache/zooui/svg/ (flat directory)                   │
     │  • Addressing: svg_{8-char SHA1} content hash                   │
     │  • store_svg() — deduplicate, validate, write                   │
     │  • get_svg_content() — read by hash                             │
@@ -98,7 +98,7 @@ All elongation results and picker-created SVGs are stored here.
 
 .. code-block:: text
 
-    /tmp/zooui_svg_/
+    ~/.cache/zooui/svg/
     ├── svg_a1b2c3d4.svg
     ├── svg_e5f6a7b8.svg
     └── ...
@@ -483,7 +483,7 @@ OpenSVGPickerInputDialog
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 The SVG picker dialog (**File > Open new SVG**, Ctrl+G) creates new SVG
-objects from a browser of ``data/SVG/`` files. It performs **inline XML
+objects from a browser of ``zooui/data/SVG/`` files. It performs **inline XML
 manipulation** (not using the shape utility modules) for color/thickness:
 
 .. code-block:: text
@@ -609,7 +609,7 @@ Working with SVGCache
 
     # Get file path for QSvgRenderer
     path = cache.get_cache_path(svg_hash)
-    print(f"On disk: {path}")  # /tmp/zooui_svg_/svg_a1b2c3d4.svg
+    print(f"On disk: {path}")  # ~/.cache/zooui/svg/svg_a1b2c3d4.svg
 
     # Compute hash without storing
     hash_only = compute_svg_hash("<svg>...</svg>")

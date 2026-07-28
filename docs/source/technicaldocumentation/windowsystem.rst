@@ -483,7 +483,7 @@ View Settings
 
     def __action_toggle_render_order(self) -> None:
         """Toggle render order between smaller_on_top and larger_on_top.
-        Persists setting to ~/.zooui/config.json."""
+        Persists setting to ~/.config/zooui/config.json."""
         action = self.__action["render_order_smaller_top"]
         new_mode = "smaller_on_top" if action.isChecked() else "larger_on_top"
         scene = self.current_zui.scene
@@ -986,7 +986,7 @@ Dialog for creating new text objects with color selection.
 - **Text Input**: Multi-line text editor with 16pt font
 - **Color Selection**: Grid of 24 recently used colors
 - **Custom Colors**: Hex color input field (e.g., #ff5733)
-- **Color Persistence**: Recent colors saved to ``~/.zooui/colorstore/color_list.txt``
+- **Color Persistence**: Recent colors saved to ``~/.local/share/zooui/colorstore/color_list.txt``
 - **Color Display**: Visual color squares next to hex codes
 
 **Dialog Layout:**
@@ -1029,7 +1029,7 @@ Dialog for creating new text objects with color selection.
 Colors are stored in a deque (max 24 items) and persisted to disk:
 
 - **Windows**: ``%APPDATA%\zooui\colorstore\color_list.txt``
-- **Unix/Linux**: ``~/.zooui/colorstore/color_list.txt``
+- **Unix/Linux**: ``~/.local/share/zooui/colorstore/color_list.txt``
 
 Format: One hex color per line (e.g., ``ff0000``)
 
@@ -1076,17 +1076,17 @@ Dialog for editing existing text objects.
 
 OpenSVGPickerInputDialog
 
-Dialog for browsing and selecting SVG files from ``data/SVG/``, with color
+Dialog for browsing and selecting SVG files from ``zooui/data/SVG/``, with color
 and thickness customization. Triggered by **File > Open new SVG** (Ctrl+G).
 
 **Features:**
 
-- **SVG Browser**: Scrollable grid of SVG file previews loaded from ``data/SVG/``
+- **SVG Browser**: Scrollable grid of SVG file previews loaded from ``zooui/data/SVG/``
 - **Preview Panels**: Each SVG is rendered at 64×64 for visual selection
 - **Color Selection**: Grid of 24 recently used colors (shared with string dialogs)
 - **Custom Colors**: Hex color input field
 - **Thickness Control**: Line thickness for the selected SVG shape
-- **Color Persistence**: Recent colors saved to ``~/.zooui/colorstore/color_list.txt``
+- **Color Persistence**: Recent colors saved to ``~/.local/share/zooui/colorstore/color_list.txt``
 
 **Dialog Layout:**
 
@@ -1414,7 +1414,7 @@ Dialog for configuring the autosave backup system. Accessed via
     │  Expire After (days):        [7  ]         │
     │                                            │
     │  Backups are stored in:                    │
-    │  ~/.zooui/backups/                         │
+    │  ~/.local/share/zooui/backups/                         │
     │  Each scene has its own subdirectory.      │
     │  Oldest backups are rotated automatically. │
     │                                            │

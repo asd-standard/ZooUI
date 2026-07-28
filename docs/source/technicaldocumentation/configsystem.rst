@@ -12,7 +12,7 @@ Overview
 
 The configuration system is responsible for:
 
-1. Loading user configuration from ``~/.zooui/config.json``
+1. Loading user configuration from ``~/.config/zooui/config.json``
 2. Validating all values against a schema of 43+ rules across 6 sections
 3. Merging CLI overrides (``--config``) with per-key granularity
 4. Auto-creating the config file and directory on first run
@@ -32,7 +32,7 @@ Architecture
     │                     ConfigManager                           │
     │  • DEFAULT_CONFIG — 6 sections with factory defaults        │
     │  • VALIDATION_SCHEMA — 43+ per-key validation rules         │
-    │  • ~/.zooui/config.json — single source of truth            │
+    │  • ~/.config/zooui/config.json — single source of truth            │
     └─────────────┬───────────────────────────────────────────────┘
                   │
                   │ load() / save() / merge_override()
@@ -87,7 +87,7 @@ supported configuration key:
             "log_to_file": True,
             "log_to_console": True,
             "colored_output": True,
-            "log_dir": "logs",
+            "log_dir": "~/.local/state/zooui/logs",
         },
         "tilestore": {
             "auto_cleanup": True,
@@ -110,7 +110,7 @@ supported configuration key:
             "enabled": True,
             "interval": 300,
             "max_backups": 20,
-            "backup_dir": "~/.zooui/backups",
+            "backup_dir": "~/.local/share/zooui/backups",
             "expire_days": 7,
         },
         "zoom": {"min_zoomlevel": -12.0, "max_zoomlevel": 10.0,
@@ -207,8 +207,8 @@ The ``load()`` method is called at application startup:
 
 .. code-block:: text
 
-    1. Create ~/.zooui/ directory if missing
-    2. If ~/.zooui/config.json does not exist:
+    1. Create XDG config directory if missing
+    2. If ~/.config/zooui/config.json does not exist:
        → Write DEFAULT_CONFIG and return it
     3. Parse config.json as JSON
        → On parse failure: raise ValidationError
@@ -218,7 +218,7 @@ The ``load()`` method is called at application startup:
        → Unknown sections (not in DEFAULT_CONFIG) are rejected
        → Unknown keys within known sections are rejected
     5. Expand tilde paths in string values (recursively)
-       → ~/.zooui/backups becomes /home/user/.zooui/backups
+       → ~/.local/share/zooui/backups becomes /home/user/.local/share/zooui/backups
     6. Validate merged config against VALIDATION_SCHEMA
        → On failure: raise ValidationError with all errors listed
     7. Save validated config (writes missing fields back to disk)
@@ -244,7 +244,7 @@ Merge Override (``merge_override()``)
 
 The ``--config`` CLI flag loads a separate JSON file and merges it into
 the current configuration. The merge is **temporary** — it does not
-persist to ``~/.zooui/config.json``. This is useful for:
+persist to ``~/.config/zooui/config.json``. This is useful for:
 
 - Testing configuration changes without modifying the persistent config
 - Per-session overrides (e.g., enable debug logging for one run)
@@ -296,13 +296,13 @@ The ``save()`` method persists configuration to disk:
 1. If a config dict is provided: merge it with defaults (fill missing sections)
 2. Expand tilde paths
 3. Validate the merged config
-4. Write to ``~/.zooui/config.json`` as indented JSON (``indent=2``)
+4. Write to ``~/.config/zooui/config.json`` as indented JSON (``indent=2``)
 5. Return ``True`` on success, ``False`` on ``OSError``
 
 Config File Format
 ------------------
 
-The configuration file lives at ``~/.zooui/config.json`` and uses standard
+The configuration file lives at ``~/.config/zooui/config.json`` and uses standard
 JSON with 2-space indentation:
 
 .. code-block:: json
@@ -314,7 +314,7 @@ JSON with 2-space indentation:
         "log_to_file": true,
         "log_to_console": true,
         "colored_output": true,
-        "log_dir": "logs"
+        "log_dir": "~/.local/state/zooui/logs"
       },
       "tilestore": {
         "auto_cleanup": true,
@@ -341,7 +341,7 @@ JSON with 2-space indentation:
         "enabled": true,
         "interval": 300,
         "max_backups": 20,
-        "backup_dir": "/home/user/.zooui/backups",
+        "backup_dir": "/home/user/.local/share/zooui/backups",
         "expire_days": 7
       },
       "zoom": {
@@ -365,7 +365,7 @@ Configuration is loaded in ``main.py`` after argument parsing:
     Parse CLI Args → Load Config → Merge Override → Distribute to Subsystems
 
     1. argparse parses --config, --debug, --verbose, --no-console, etc.
-    2. ConfigManager.load() reads ~/.zooui/config.json
+    2. ConfigManager.load() reads ~/.config/zooui/config.json
     3. If --config FILE is provided:
        → Load FILE as JSON
        → config.merge_override(override_config)
@@ -505,7 +505,7 @@ ConfigManager
 
 .. py:class:: ConfigManager
 
-   Central configuration manager. Defaults to ``~/.zooui/config.json``.
+   Central configuration manager. Defaults to ``~/.config/zooui/config.json``.
 
    .. py:attribute:: DEFAULT_CONFIG
       :type: dict

@@ -7,6 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-07-28
+### Added
+- **XDG Base Directory compliance** — all writable runtime paths migrated from
+  `~/.zooui/` to XDG standard locations: config → `~/.config/zooui/`, data
+  (backups, colorstore) → `~/.local/share/zooui/`, cache (tiles, SVG) →
+  `~/.cache/zooui/`, state (logs) → `~/.local/state/zooui/logs/`.
+- **Pip packaging** — `pyproject.toml` with hatchling build backend, entry
+  points (`zooui` and `zooui-gui` CLI commands, `python -m zooui`),
+  pinned dependencies, and `MANIFEST.in` for sdist.
+- **`zooui.app` entry point** — importable `main()` function replacing the
+  root `main.py` script. Root `main.py` is now a thin launcher.
+- **System dependency check** — `_check_system_deps()` verifies libvips
+  (required) is present and loadable via `ctypes.CDLL` before any heavy
+  imports, with platform-specific install instructions. pdftoppm is
+  optional (warning only).
+- **Embedded usage instructions** — `zooui/resources/_usage_rst.py` bundles
+  the user interface RST content in the package, eliminating the runtime
+  dependency on the `docs/` tree. Sphinx-only roles (`:kbd:`, `:file:`,
+  `:doc:`, `:ref:`) are auto-sanitized by the bump script.
+- **Packaging test suite** — 77 new tests under `test/unittest/packaging/`
+  covering metadata validation, entry points, system deps, bundled data,
+  and full wheel build + twine check.
+- **Documentation** — new `technicaldocumentation/packaging.rst` covering
+  the build system, entry points, path resolution, and release workflow.
+  Rewritten `gettingstarted/installation.rst` with pip, conda, and source
+  install instructions.
+
+### Changed
+- **`data/` moved to `zooui/data/`** — bundled resources are now inside
+  the Python package so they work identically from source, pip, and
+  frozen installations.
+- **`_packaging.data_dir()`** returns the `zooui/` package directory
+  (was project root). Added `importlib.resources` fallback for pip mode.
+- **`os.chdir()` removed** from the application entry point — all paths
+  resolved via XDG or `data_dir()`. No CWD dependency.
+- **`mainwindow.py` and `svgpickerinputdialog.py`** use `data_dir()` for
+  all bundled data paths.
+- **Removed `sys.path.insert` hacks** in `tilestore.py` and
+  `cleanuptilestore.py` (now use absolute package imports).
+- **`zooui.sh` launcher paths** updated for the new directory structure.
+- **Desktop file** icon path updated for `zooui/data/`.
+- **Colorstore** duplicated path logic (6 occurrences across 4 dialog
+  files) consolidated into `get_colorstore_dir()`.
+- **Documentation** — ~73 occurrences of old paths replaced across 14 `.rst`
+  files, `LOGGING.md`, `AGENTS.md`, `packaging/README.md`, and
+  `zooui_config_example.json`.
+
 ## [0.6.0] - 2026-07-22
 ### Added
 - **Per-page PDF support** — PDFs are now rendered as individually tiled pages

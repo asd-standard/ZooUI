@@ -97,16 +97,17 @@ class TestModifySVGInputDialog:
 
     def test_init_with_tmp_file(self, qapp):
         """
-        Scenario: Initialize dialog with /tmp file
+        Scenario: Initialize dialog with cache svg file
 
-        Given an SVGMediaObject with /tmp/zooui_svg_ file path
+        Given an SVGMediaObject with an SVG cache file path
         When creating ModifySVGInputDialog
         Then it should recognize it as a tmp file
         """
+        from zooui.utils._xdg import get_cache_dir
         from zooui.windows.dialogwindows.modifysvginputdialog import ModifySVGInputDialog
 
         mock_svg = Mock()
-        mock_svg._media_id = "/tmp/zooui_svg_/test.svg"
+        mock_svg._media_id = str(get_cache_dir() / "svg" / "test.svg")
         mock_svg.get_svg_content.return_value = '''<?xml version="1.0" encoding="UTF-8"?>
 <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
     <circle cx="100" cy="100" r="70" stroke="blue" stroke-width="3" fill="none"/>

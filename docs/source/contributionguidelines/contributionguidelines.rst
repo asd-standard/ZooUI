@@ -651,7 +651,7 @@ or public API.
 2. Run the bump script. This updates **three** locations automatically:
 
    - ``zooui/__init__.py`` — the canonical ``__version__`` string
-   - ``data/home.pzs`` — the version text displayed in the default scene
+   - ``zooui/data/home.pzs`` — the version text displayed in the default scene
 
    .. code-block:: bash
 

@@ -18,10 +18,10 @@
 
 import json
 import os
-from pathlib import Path
 from typing import Any
 
 from zooui.logger import get_logger
+from zooui.utils._xdg import get_config_file, get_data_dir, get_state_dir
 
 
 class ValidationError(Exception):
@@ -32,7 +32,7 @@ class ValidationError(Exception):
 
 class ConfigManager:
     """
-    Manages ZooUI configuration with ~/.zooui/config.json as single source of truth.
+    Manages ZooUI configuration following the XDG Base Directory specification.
 
     Features:
     - Creates default config file if missing
@@ -49,7 +49,7 @@ class ConfigManager:
             "log_to_file": True,
             "log_to_console": True,
             "colored_output": True,
-            "log_dir": "logs",
+            "log_dir": str(get_state_dir() / "logs"),
         },
         "tilestore": {
             "auto_cleanup": True,
@@ -72,7 +72,7 @@ class ConfigManager:
             "enabled": True,
             "interval": 300,
             "max_backups": 20,
-            "backup_dir": str(Path.home() / ".zooui" / "backups"),
+            "backup_dir": str(get_data_dir() / "backups"),
             "expire_days": 7,
         },
         "zoom": {"min_zoomlevel": -12.0, "max_zoomlevel": 10.0, "clamp_enabled": True, "default_zoomlevel": -4.0},
@@ -152,7 +152,7 @@ class ConfigManager:
         self._logger = get_logger("ConfigManager")
 
         if config_file is None:
-            self._config_file = str(Path.home() / ".zooui" / "config.json")
+            self._config_file = str(get_config_file())
         else:
             self._config_file = config_file
 
@@ -180,7 +180,7 @@ class ConfigManager:
 
     def load(self) -> dict[str, Any]:
         """
-        Load configuration from ~/.zooui/config.json.
+        Load configuration from the XDG config dir.
 
         Returns:
             Validated configuration dictionary
@@ -229,7 +229,7 @@ class ConfigManager:
 
     def save(self, config: dict[str, Any] | None = None) -> bool:
         """
-        Save configuration to ~/.zooui/config.json.
+        Save configuration to the XDG config dir.
 
         Args:
             config: Configuration to save (uses current config if None)

@@ -310,7 +310,7 @@ Test with real dependencies:
 
     def test_small_image_conversion(self):
         """Integration test for PNG conversion."""
-        infile = "data/test.png"
+        infile = "zooui/data/test.png"
 
         if not os.path.exists(infile):
             pytest.skip(f"Test file not found: {infile}")
@@ -1273,7 +1273,7 @@ real (unmockable) Python stdlib resources.
 Tests that call ``tilemanager.init(auto_cleanup=True)`` register a real
 ``atexit`` handler (``atexit.register`` is stdlib and cannot be mocked).
 After all ``@patch`` decorators are undone, that handler fires on the
-**real** ``~/.zooui/tilestore/`` directory, which can contain tens of
+**real** ``~/.cache/zooui/tilestore/`` directory, which can contain tens of
 thousands of files (over 80,000 in a heavily-used installation).
 Walking and ``stat``-ing every file can take several minutes, which
 masquerades as a hang.

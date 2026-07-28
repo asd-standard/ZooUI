@@ -18,10 +18,9 @@
 Feature: Usage Instructions Dialog
 
 Provides a read-only dialog that displays the user interface usage
-instructions from the reStructuredText documentation file.
+instructions from the embedded reStructuredText content.
 """
 
-from pathlib import Path
 from unittest.mock import patch
 
 from zooui.windows.dialogwindows.usagedialog import UsageDialog
@@ -31,26 +30,29 @@ class TestUsageDialog:
     """
     Feature: Usage Dialog Operations
 
-    The UsageDialog reads the user interface RST documentation, converts
-    it to HTML via docutils, and displays it in a QTextBrowser.
+    The UsageDialog loads the embedded RST content, converts it to HTML
+    via docutils, and displays it in a QTextBrowser.
     """
 
-    def test_rst_path_resolves_to_existing_file(self):
+    def test_usage_rst_is_non_empty_string(self):
         """
-        Scenario: RST path resolves to an existing file
+        Scenario: Embedded usage RST is available
 
-        Given the UsageDialog class constant
-        When _RST_PATH is resolved
-        Then it should point to an existing .rst file
+        Given the USAGE_RST module constant
+        When it is imported
+        Then it should be a non-empty string
         """
-        assert Path(UsageDialog._RST_PATH).exists()
-        assert Path(UsageDialog._RST_PATH).suffix == ".rst"
+        from zooui.resources._usage_rst import USAGE_RST
+
+        assert isinstance(USAGE_RST, str)
+        assert len(USAGE_RST) > 0
+        assert "User Interface" in USAGE_RST
 
     def test_load_html_returns_html_content(self):
         """
-        Scenario: Load HTML content from the RST file
+        Scenario: Load HTML content from embedded RST
 
-        Given the RST file exists and docutils is available
+        Given the embedded RST content and docutils is available
         When _load_html() is called
         Then it should return a non-empty HTML string
         """
@@ -65,7 +67,7 @@ class TestUsageDialog:
         """
         Scenario: HTML output has heading and image stripped
 
-        Given the RST file is converted to HTML
+        Given the embedded RST is converted to HTML
         When _load_html() is called
         Then the output should start with menu actions, not the header or image
         """
@@ -77,60 +79,18 @@ class TestUsageDialog:
         )
         assert "<img " not in html
 
-    def test_load_html_file_not_found(self):
-        """
-        Scenario: RST file is missing
-
-        Given the RST file does not exist at the expected path
-        When _load_html() is called
-        Then it should return a file-not-found message
-        """
-        dialog = UsageDialog.__new__(UsageDialog)
-
-        with patch.object(dialog, "_RST_PATH", "/nonexistent/path/file.rst"):
-            html = dialog._load_html()
-
-        assert html == "<p>Usage instructions file not found.</p>"
-
     def test_load_html_docutils_unavailable(self):
         """
         Scenario: docutils is not installed
 
-        Given the RST file exists but docutils cannot be imported
+        Given the embedded RST but docutils cannot be imported
         When _load_html() is called
         Then it should return raw RST content wrapped in <pre> tags
         """
         dialog = UsageDialog.__new__(UsageDialog)
 
-        rst_mock = "Sample RST content"
-        with (
-            patch.object(Path, "read_text", return_value=rst_mock),
-            patch("builtins.__import__", side_effect=ImportError("docutils missing")),
-        ):
+        with patch("builtins.__import__", side_effect=ImportError("docutils missing")):
             html = dialog._load_html()
 
-        assert html == f"<pre>{rst_mock}</pre>"
-
-    def test_load_html_resolves_relative_image_src(self):
-        """
-        Scenario: Relative src paths are resolved to absolute paths
-
-        Given docutils outputs HTML containing a relative src attribute
-        When _load_html() processes the HTML
-        Then relative src paths should be resolved to absolute file paths
-        """
-        dialog = UsageDialog.__new__(UsageDialog)
-
-        fake_rst = "Some RST content"
-        fake_rst_path = str(Path(__file__).parent / "test.rst")
-        mock_html = '<p>Section.</p>\n<source src="relative/path/test.png" />\n<p>Text.</p>'
-
-        with (
-            patch.object(Path, "read_text", return_value=fake_rst),
-            patch.object(UsageDialog, "_RST_PATH", fake_rst_path),
-            patch("docutils.core.publish_parts", return_value={"html_body": mock_html}),
-        ):
-            html = dialog._load_html()
-
-        assert 'src="relative/path/test.png"' not in html
-        assert 'src="' + str(Path(fake_rst_path).parent / "relative/path/test.png") + '"' in html
+        assert html.startswith("<pre>")
+        assert html.endswith("</pre>")

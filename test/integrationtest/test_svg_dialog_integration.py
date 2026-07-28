@@ -65,7 +65,7 @@ class TestSVGDialogIntegration:
     @pytest.fixture
     def mock_svg_directory(self, test_svg_file, tmp_path):
         """Create mock SVG directory structure."""
-        svg_dir = tmp_path / "data" / "SVG"
+        svg_dir = tmp_path / "zooui" / "data" / "SVG"
         svg_dir.mkdir(parents=True, exist_ok=True)
 
         # Copy test SVG to mock directory
@@ -296,7 +296,7 @@ class TestSVGDialogIntegration:
         And modify dialog is opened later
         Then the same color should appear in color history
         """
-        color_dir = tmp_path / ".zooui" / "colorstore"
+        color_dir = tmp_path / "zooui" / "colorstore"
         color_dir.mkdir(parents=True, exist_ok=True)
         color_file = color_dir / "color_list.txt"
 
@@ -305,10 +305,9 @@ class TestSVGDialogIntegration:
             f.write("ff0000\n00ff00\n0000ff\n")
 
         # Test picker dialog loads colors
-        with patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.isfile', return_value=True), \
-             patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.isdir', return_value=True), \
-             patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.environ', {}), \
-             patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.expanduser', return_value=str(tmp_path)):
+        with patch('zooui.windows.dialogwindows.svgpickerinputdialog.get_colorstore_dir', return_value=color_dir), \
+             patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.isfile', return_value=True), \
+             patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.isdir', return_value=True):
 
             picker_dialog = OpenSVGPickerInputDialog()
 
@@ -326,9 +325,8 @@ class TestSVGDialogIntegration:
                     f.write(str(code) + '\n')
 
         # Test modify dialog loads updated colors
-        with patch('zooui.windows.dialogwindows.modifysvginputdialog.os.path.isfile', return_value=True), \
-             patch('zooui.windows.dialogwindows.modifysvginputdialog.os.environ', {}), \
-             patch('zooui.windows.dialogwindows.modifysvginputdialog.os.path.expanduser', return_value=str(tmp_path)):
+        with patch('zooui.windows.dialogwindows.modifysvginputdialog.get_colorstore_dir', return_value=color_dir), \
+             patch('zooui.windows.dialogwindows.modifysvginputdialog.os.path.isfile', return_value=True):
 
             mock_svg_object = Mock()
             mock_svg_object._media_id = "test.svg"

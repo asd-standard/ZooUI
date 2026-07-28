@@ -3,19 +3,19 @@
 Program Configuration
 =====================
 
-ZooUI uses a single source of truth configuration system with `~/.zooui/config.json`
+ZooUI uses a single source of truth configuration system with `~/.config/zooui/config.json`
 as the primary configuration file. Configuration options can be overridden via:
 
 Configuration Hierarchy::
 
-    1. User Configuration File (~/.zooui/config.json) - Primary source
+    1. User Configuration File (~/.config/zooui/config.json) - Primary source
               ↓
     2. Temporary Configuration File (--config zooui.json) - Session override
               ↓
     3. Command-Line Arguments - Highest priority (temporary)
 
 This design provides a consistent configuration experience where user preferences
-are stored in `~/.zooui/config.json` and can be temporarily overridden for testing
+are stored in `~/.config/zooui/config.json` and can be temporarily overridden for testing
 or debugging via command-line arguments.
 
 Configuration Categories
@@ -33,7 +33,7 @@ Configuration Categories
     - ``log_to_file`` (bool): Write logs to rotating log files (default: ``True``)
     - ``log_to_console`` (bool): Display logs in the terminal (default: ``False``)
     - ``colored_output`` (bool): Use ANSI color codes in console output
-    - ``log_dir`` (str): Directory path for log files (default: ``./logs``)
+    - ``log_dir`` (str): Directory path for log files (default: ``~/.local/state/zooui/logs``)
 
 **Tilestore Configuration**
     Controls the tile caching system's automatic cleanup behavior.
@@ -64,7 +64,7 @@ Configuration Categories
     - ``enabled`` (bool): Enable autosave functionality (default: ``True``)
     - ``interval`` (int): Autosave interval in seconds (default: 300 = 5 minutes)
     - ``max_backups`` (int): Maximum number of backups to keep per scene (default: 20)
-    - ``backup_dir`` (str): Root directory for per-scene backup directories (default: ``~/.zooui/backups``)
+    - ``backup_dir`` (str): Root directory for per-scene backup directories (default: ``~/.local/share/zooui/backups``)
     - ``expire_days`` (int): Days of inactivity before a scene's backup directory is deleted (default: 7)
 
 **Zoom Limits Configuration**
@@ -100,7 +100,7 @@ Configuration Categories
 Using Configuration Files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-ZooUI uses `~/.zooui/config.json` as its primary configuration file. This file is
+ZooUI uses `~/.config/zooui/config.json` as its primary configuration file. This file is
 automatically created with default values if it doesn't exist.
 
 You can also create a temporary configuration file (e.g., ``zooui_config.json``) with
@@ -115,7 +115,7 @@ your preferred settings for testing or specific sessions:
             "log_to_file": true,
             "log_to_console": true,
             "colored_output": true,
-            "log_dir": "logs"
+            "log_dir": "~/.local/state/zooui/logs"
         },
         "tilestore": {
             "auto_cleanup": true,
@@ -142,7 +142,7 @@ your preferred settings for testing or specific sessions:
             "enabled": true,
             "interval": 300,
             "max_backups": 20,
-            "backup_dir": "~/.zooui/backups",
+            "backup_dir": "~/.local/share/zooui/backups",
             "expire_days": 7
         },
         "zoom_limits": {
@@ -162,8 +162,8 @@ Then launch ZooUI with the temporary configuration file:
 
 .. note::
     The ``--config`` file provides temporary overrides for the current session only.
-    Settings from this file are not saved to `~/.zooui/config.json`. To make permanent
-    changes, edit `~/.zooui/config.json` directly.
+    Settings from this file are not saved to `~/.config/zooui/config.json`. To make permanent
+    changes, edit `~/.config/zooui/config.json` directly.
 
 Command-Line Arguments
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -219,7 +219,7 @@ Configuration Examples
     # - DEBUG level console output
     # - DEBUG level file logging
     # - Colored console output
-    # - File logging to ./logs/zooui.log
+    # - File logging to ~/.local/state/zooui/logs/zooui.log
 
 **Example 2: Production Mode with Custom Log Directory**
 
@@ -326,7 +326,7 @@ Run with temporary debug override and console output:
 Default Configuration
 ~~~~~~~~~~~~~~~~~~~~~
 
-When ZooUI starts for the first time (or when `~/.zooui/config.json` doesn't exist),
+When ZooUI starts for the first time (or when `~/.config/zooui/config.json` doesn't exist),
 it creates the configuration file with these default values:
 
 .. code-block:: python
@@ -338,7 +338,7 @@ it creates the configuration file with these default values:
             'log_to_file': True,
             'log_to_console': False,
             'colored_output': True,
-            'log_dir': 'logs'
+            'log_dir': '~/.local/state/zooui/logs'
         },
         'tilestore': {
             'auto_cleanup': True,
@@ -365,14 +365,14 @@ it creates the configuration file with these default values:
             'enabled': True,
             'interval': 300,
             'max_backups': 20,
-            'backup_dir': '~/.zooui/backups',
+            'backup_dir': '~/.local/share/zooui/backups',
             'expire_days': 7
         }
     }
 
 This results in:
     - No console logging (silent operation)
-    - File logging at INFO level to ./logs/zooui.log
+    - File logging at INFO level to ~/.local/state/zooui/logs/zooui.log
     - Automatic tilestore cleanup on startup
     - Tiles older than 3 days are removed
     - Parallel rendering enabled for performance
@@ -411,7 +411,7 @@ console output with ``--console`` or check the log file:
     python main.py --console
 
     # Or check the log file
-    tail -f logs/zooui.log
+    tail -f ~/.local/state/zooui/logs/zooui.log
 
 Look for output like:
 

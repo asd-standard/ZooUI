@@ -5,7 +5,7 @@
     "log_to_file": true,
     "log_to_console": true,
     "colored_output": true,
-    "log_dir": "logs"
+    "log_dir": "~/.local/state/zooui/logs"
   },
   "tilestore": {
     "auto_cleanup": true,
@@ -32,7 +32,7 @@
     "enabled": true,
     "interval": 300,
     "max_backups": 20,
-    "backup_dir": "~/.zooui/backups",
+    "backup_dir": "~/.local/share/zooui/backups",
     "expire_days": 7
   },
   "zoom": {

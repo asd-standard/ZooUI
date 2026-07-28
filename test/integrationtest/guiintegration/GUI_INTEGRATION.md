@@ -270,7 +270,7 @@ Increase the timing constants in `guiintegration/conf.py`. The default values ar
 
 ### Test Crashes on Startup
 
-Ensure you're running from the project root directory, or that the script can find `data/home.pzs` and other required files.
+Ensure you're running from the project root directory, or that the script can find `zooui/data/home.pzs` and other required files.
 
 ### Can't See Visual Output
 

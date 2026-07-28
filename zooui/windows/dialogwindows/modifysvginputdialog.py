@@ -43,6 +43,7 @@ from PySide6.QtWidgets import (
 
 from zooui.logger import get_logger
 from zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
+from zooui.utils._xdg import get_cache_dir, get_colorstore_dir
 
 if TYPE_CHECKING:
     from PySide6.QtGui import QPaintEvent
@@ -92,8 +93,8 @@ class ModifySVGInputDialog:
         self.is_tmp_file = False
 
         if not self.is_cache_file:
-            # Check if file path is in /tmp/zooui_svg_
-            self.is_tmp_file = self.original_media_id.startswith("/tmp/zooui_svg_")
+            # Check if file path is in SVG cache directory
+            self.is_tmp_file = self.original_media_id.startswith(str(get_cache_dir() / "svg"))
 
         # Current values (extract from SVG content)
         self.current_color = self._extract_current_color()
@@ -119,10 +120,7 @@ class ModifySVGInputDialog:
 
     def _load_color_history(self) -> None:
         """Load color history from color store file."""
-        if "APPDATA" in os.environ:
-            color_dir = os.path.join(os.environ["APPDATA"], "zooui", "colorstore")
-        else:
-            color_dir = os.path.join(os.path.expanduser("~"), ".zooui", "colorstore")
+        color_dir = str(get_colorstore_dir())
 
         color_file = os.path.join(color_dir, "color_list.txt")
 
@@ -142,7 +140,7 @@ class ModifySVGInputDialog:
 
     def _validate_svg_source(self) -> bool:
         """
-        Check if SVG is from safe source (``/tmp/zooui_svg_``).
+        Check if SVG is from safe source (SVG cache directory).
         Show warning dialog for other sources.
 
         Returns:
@@ -157,7 +155,7 @@ class ModifySVGInputDialog:
     def _show_source_warning_dialog(self) -> bool:
         """
         Warning: This SVG was not added via SVG Picker dialog.
-        The modify dialog is designed for simple shapes from data/SVG/.
+        The modify dialog is designed for simple shapes from zooui/data/SVG/.
 
         Default values will be used: color=black, stroke-width=10
         Continue anyway?
@@ -727,10 +725,7 @@ class ModifySVGInputDialog:
                 if final_color not in self.color_codes:
                     self.color_codes.append(final_color)
                     # Save color list
-                    if "APPDATA" in os.environ:
-                        color_dir = os.path.join(os.environ["APPDATA"], "zooui", "colorstore")
-                    else:
-                        color_dir = os.path.join(os.path.expanduser("~"), ".zooui", "colorstore")
+                    color_dir = str(get_colorstore_dir())
 
                     color_file = os.path.join(color_dir, "color_list.txt")
                     with open(color_file, "w") as f:

@@ -146,6 +146,7 @@ def initialized_tilemanager(temp_tilestore):
     tilemanager.init(total_cache_size=100, auto_cleanup=False)
     yield
     tilemanager.purge()
+    tilemanager.shutdown()
 
 
 @pytest.fixture

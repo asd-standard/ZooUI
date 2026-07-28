@@ -36,6 +36,8 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from zooui.utils._xdg import get_colorstore_dir
+
 if TYPE_CHECKING:
     from PySide6.QtGui import QPaintEvent
     from PySide6.QtWidgets import QLineEdit, QTextEdit
@@ -79,13 +81,7 @@ class OpenNewStringInputDialog:
         self.text_edit: QTextEdit
         self.custom_color_input: QLineEdit
 
-        ## set the default tilestore directory, this can be overridden if required
-        if "APPDATA" in os.environ:
-            ## Windows
-            self.color_dir = os.path.join(os.environ["APPDATA"], "zooui", "colorstore")
-        else:
-            ## Unix
-            self.color_dir = os.path.join(os.path.expanduser("~"), ".zooui", "colorstore")
+        self.color_dir = str(get_colorstore_dir())
 
         if os.path.isfile(self.color_dir + "/color_list.txt"):
             with open(self.color_dir + "/color_list.txt") as f:

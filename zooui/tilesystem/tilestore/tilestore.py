@@ -16,31 +16,22 @@
 
 """Module for managing the disk-based tile storage facility."""
 
-import os
-import sys
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-
 import hashlib
+import os
 import shutil
 import time
 from threading import RLock
 from typing import TYPE_CHECKING, Any, Optional
 
-from logger import get_logger  # type: ignore[import-not-found]
+from zooui.logger import get_logger
+from zooui.utils._xdg import get_cache_dir
 
 if TYPE_CHECKING:
     from logging import Logger
 
 TileID = tuple[str, int, int, int]
 
-## set the default tilestore directory, this can be overridden if required
-if "APPDATA" in os.environ:
-    ## Windows
-    tile_dir = os.path.join(os.environ["APPDATA"], "zooui", "tilestore")
-else:
-    ## Unix
-    tile_dir = os.path.join(os.path.expanduser("~"), ".zooui", "tilestore")
+tile_dir = str(get_cache_dir() / "tilestore")
 
 ## threads which intend performing disk-access-intensive activities should
 ## acquire this lock first to reduce stress on the disk

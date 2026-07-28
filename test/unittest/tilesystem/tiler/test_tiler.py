@@ -16,6 +16,8 @@
 from threading import Thread
 from unittest.mock import Mock, patch
 
+import pytest
+
 from zooui.tilesystem.tiler.tiler import Tiler
 
 
@@ -667,6 +669,12 @@ class TestTilerThreadPool:
     The Tiler class uses ThreadPoolExecutor for parallel tile creation when
     multiple tiles are processed per row, optimizing performance for wide images.
     """
+
+    @pytest.fixture(autouse=True)
+    def _no_qapp(self):
+        """Ensure QApplication.instance() returns None so the thread pool is used."""
+        with patch("PySide6.QtWidgets.QApplication.instance", return_value=None):
+            yield
 
     @patch("zooui.tilesystem.tiler.tiler.ThreadPoolExecutor")
     @patch("zooui.tilesystem.tiler.tiler.os.cpu_count")

@@ -30,7 +30,7 @@ from zooui.objects.scene import scene as Scene
 from zooui.objects.scene.qzui import QZUI
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def qapp_session():
     app = QtWidgets.QApplication.instance()
     if app is None:

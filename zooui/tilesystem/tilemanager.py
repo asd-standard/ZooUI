@@ -56,6 +56,7 @@ __logger: Optional["Logger"] = None
 __cleanup_enabled: bool = False
 __cleanup_max_age_days: int = 3
 __cleanup_executed: bool = False
+__atexit_registered: bool = False
 
 
 def init(
@@ -93,7 +94,7 @@ def init(
     """
 
     global __tilecache, __temptilecache, __tp_static, __tp_dynamic, __logger
-    global __cleanup_enabled, __cleanup_max_age_days, __cleanup_executed
+    global __cleanup_enabled, __cleanup_max_age_days, __cleanup_executed, __atexit_registered
 
     # Shut down any previous threads before re-initializing to prevent
     # thread leaks when init() is called multiple times (e.g. in tests).
@@ -127,10 +128,18 @@ def init(
     # set up TileManager logger
     __logger = get_logger("TileManager")
 
+    import atexit
+
+    # Register thread shutdown at exit — ensures background threads are
+    # stopped before Python destroys Qt internals.  Registered only once
+    # even if init() is called multiple times (e.g. in tests).
+    global __atexit_registered
+    if not __atexit_registered:
+        atexit.register(_shutdown_threads)
+        __atexit_registered = True
+
     # Register shutdown cleanup if enabled
     if auto_cleanup:
-        import atexit
-
         atexit.register(_shutdown_cleanup)
         __logger.info("Tilestore cleanup registered for shutdown execution")
     else:

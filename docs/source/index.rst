@@ -6,7 +6,7 @@
 Welcome to ZooUI Documentation!
 ===============================
 
-.. image:: ../../data/home.png
+.. image:: ../../zooui/data/home.png
    :align: right
    :width: 540px
    :alt: ZooUI logo
@@ -79,6 +79,7 @@ be under COPYING.txt on project root, otherwise visit `gnu.org <https://www.gnu.
    technicaldocumentation/windowsystem
    technicaldocumentation/logging
    technicaldocumentation/backup
+   technicaldocumentation/packaging
 
 .. toctree::
    :maxdepth: 2

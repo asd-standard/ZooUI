@@ -42,6 +42,7 @@ from PySide6.QtWidgets import (
 from zooui.logger import get_logger
 from zooui.objects.mediaobjects.mediaobjectsutils.svg.svgcache.svgcache import get_svg_cache
 from zooui.utils._packaging import data_dir
+from zooui.utils._xdg import get_colorstore_dir
 
 if TYPE_CHECKING:
     from PySide6.QtGui import QPaintEvent
@@ -63,9 +64,6 @@ class OpenSVGPickerInputDialog:
     Gather SVG file selection through a dialog with color selection.
     Also gives a selection column of the last 20 used colors.
     """
-
-    # SVG directory relative to project root
-    SVG_DIR: str = "../data/SVG"
 
     # All available SVG files (populated in __init__)
     SVG_FILES: list[str] = []
@@ -126,13 +124,7 @@ class OpenSVGPickerInputDialog:
         # Initialize SVG cache
         self._svg_cache = get_svg_cache()
 
-        ## set the default tilestore directory, this can be overridden if required
-        if "APPDATA" in os.environ:
-            ## Windows
-            self.color_dir = os.path.join(os.environ["APPDATA"], "zooui", "colorstore")
-        else:
-            ## Unix
-            self.color_dir = os.path.join(os.path.expanduser("~"), ".zooui", "colorstore")
+        self.color_dir = str(get_colorstore_dir())
 
         if os.path.isfile(self.color_dir + "/color_list.txt"):
             with open(self.color_dir + "/color_list.txt") as f:

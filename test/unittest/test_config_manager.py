@@ -17,8 +17,8 @@
 """
 Feature: Configuration Management
 
-The ConfigManager class manages ZooUI configuration with ~/.zooui/config.json
-as single source of truth. It provides validation, default creation, and
+The ConfigManager class manages ZooUI configuration using the XDG Base Directory
+specification. It provides validation, default creation, and
 temporary overrides.
 """
 
@@ -46,11 +46,13 @@ class TestConfigManager:
 
         Given no config_file parameter
         When ConfigManager is created
-        Then it should use ~/.zooui/config.json
+        Then it should use the XDG config path
         """
+        from zooui.utils._xdg import get_config_file
+
         manager = ConfigManager()
 
-        expected_path = str(Path.home() / ".zooui" / "config.json")
+        expected_path = str(get_config_file())
         assert manager.get_config_path() == expected_path
 
     def test_init_custom_path(self):
@@ -480,17 +482,15 @@ class TestConfigManager:
         Scenario: DEFAULT_CONFIG has expanded backup directory
 
         Given ConfigManager.DEFAULT_CONFIG
-        Then backup_dir should not contain tilde
+        Then backup_dir should be an absolute path under XDG_DATA_HOME
         """
-        from zooui.config import ConfigManager
+        from zooui.utils._xdg import get_data_dir
 
-        # Check that DEFAULT_CONFIG has expanded path
         backup_dir = ConfigManager.DEFAULT_CONFIG['autosave']['backup_dir']
         assert '~' not in backup_dir, f"backup_dir should not contain tilde: {backup_dir}"
 
-        # Should be a valid expanded path
         assert backup_dir.startswith(str(Path.home()))
-        assert '.zooui/backups' in backup_dir or '.zooui\\backups' in backup_dir
+        assert str(get_data_dir()) in backup_dir
 
     def test_load_expands_tilde_paths(self):
         """

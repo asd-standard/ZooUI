@@ -40,7 +40,7 @@ if TYPE_CHECKING:
 def run(ctx: GUITestContext) -> None:
     ctx.log.section("PDF PAGE NAVIGATION")
 
-    test_pdf_path = os.path.join(ctx.project_root, "data", "test_pdf.pdf")
+    test_pdf_path = os.path.join(ctx.project_root, "zooui", "data", "test_pdf.pdf")
     if not os.path.exists(test_pdf_path):
         ctx.log.warning(f"Test PDF not found: {test_pdf_path}")
         return

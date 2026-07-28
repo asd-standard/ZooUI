@@ -343,7 +343,7 @@ The ``TileStore`` module manages disk-based tile storage and metadata persistenc
 
 Tiles are organized by media ID using SHA1 hashing::
 
-    ~/.zooui/tilestore/
+    ~/.cache/zooui/tilestore/
     └── <sha1_hash_of_media_id>/
         ├── metadata
         ├── 00/

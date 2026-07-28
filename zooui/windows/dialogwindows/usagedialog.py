@@ -17,13 +17,14 @@
 """Usage Instructions Dialog
 
 Provides a read-only dialog that displays the user interface instructions
-from the reStructuredText documentation file.
+from the embedded reStructuredText content.
 """
 
 import re
-from pathlib import Path
 
 from PySide6 import QtWidgets
+
+from zooui.resources._usage_rst import USAGE_RST
 
 
 class UsageDialog(QtWidgets.QDialog):
@@ -36,11 +37,9 @@ class UsageDialog(QtWidgets.QDialog):
 
     UsageDialog(parent=None) --> None
 
-    Dialog that reads and displays the user interface usage instructions
-    from ``docs/source/usageinstructions/userinterface.rst``.
+    Dialog that displays the user interface usage instructions
+    from the embedded reStructuredText source.
     """
-
-    _RST_PATH: str = str(Path(__file__).parents[3] / "docs" / "source" / "usageinstructions" / "userinterface.rst")
 
     def __init__(self, parent: QtWidgets.QWidget | None = None) -> None:
         super().__init__(parent)
@@ -56,7 +55,6 @@ class UsageDialog(QtWidgets.QDialog):
 
         browser = QtWidgets.QTextBrowser()
         browser.setOpenExternalLinks(True)
-        browser.setSearchPaths([str(Path(self._RST_PATH).parent)])
         browser.setHtml(self._load_html())
 
         layout.addWidget(browser)
@@ -66,12 +64,7 @@ class UsageDialog(QtWidgets.QDialog):
         layout.addWidget(button_box)
 
     def _load_html(self) -> str:
-        try:
-            rst_content = Path(self._RST_PATH).read_text()
-        except FileNotFoundError:
-            return "<p>Usage instructions file not found.</p>"
-
-        rst_dir = Path(self._RST_PATH).parent
+        rst_content = USAGE_RST
 
         try:
             from docutils.core import publish_parts
@@ -80,7 +73,6 @@ class UsageDialog(QtWidgets.QDialog):
                 source=rst_content,
                 writer_name="html",
                 settings_overrides={
-                    "source_path": self._RST_PATH,
                     "output_encoding": "unicode",
                 },
             )
@@ -88,12 +80,7 @@ class UsageDialog(QtWidgets.QDialog):
         except ImportError:
             return f"<pre>{rst_content}</pre>"
 
-        html = re.sub(
-            r'src="((?!https?://|data:|file://|qrc:)[^"]+)"',
-            lambda m: 'src="' + str((rst_dir / m.group(1)).resolve()) + '"',
-            html,
-        )
-
+        # Strip the first <img> tag (home.png screenshot reference)
         html = re.sub(r"^.*?<img[^>]*>", "", html, count=1, flags=re.DOTALL)
 
         return html

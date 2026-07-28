@@ -42,13 +42,13 @@ Run a benchmark on a single image:
 .. code-block:: bash
 
    cd /path/to/zooui
-   python test/benchmarks/converterbenchmark.py data/sample.jpg
+   python test/benchmarks/converterbenchmark.py zooui/data/sample.jpg
 
 Benchmark multiple images:
 
 .. code-block:: bash
 
-   for file in data/*.jpg; do
+   for file in zooui/data/*.jpg; do
        python test/benchmarks/converterbenchmark.py "$file"
    done
 
@@ -409,7 +409,7 @@ Test multiple images:
 .. code-block:: bash
 
    #!/bin/bash
-   for img in data/*.jpg; do
+   for img in zooui/data/*.jpg; do
        echo "===== Testing $img ====="
        python test/benchmarks/converterbenchmark.py "$img"
        echo ""

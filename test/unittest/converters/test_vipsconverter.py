@@ -21,7 +21,7 @@ import pytest
 
 from zooui.converters.vipsconverter import VipsConverter
 
-_DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "data"))
+_DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "zooui", "data"))
 
 
 class TestVipsConverter:

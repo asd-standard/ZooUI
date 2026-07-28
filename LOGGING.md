@@ -36,7 +36,7 @@ Options:
   -d, --debug           Enable debug mode (maximum logging detail)
   -v, --verbose         Enable verbose mode (detailed info logging)
   --config FILE         Load settings from config file (JSON)
-  --log-dir DIR         Directory for log files (default: ./logs)
+  --log-dir DIR         Directory for log files (default: ~/.local/state/zooui/logs)
   --no-console          Disable console logging
   --no-file             Disable file logging
   --no-color            Disable colored console output
@@ -71,7 +71,7 @@ You can configure logging via a JSON configuration file:
     "log_to_file": true,
     "log_to_console": true,
     "colored_output": true,
-    "log_dir": "logs"
+    "log_dir": "~/.local/state/zooui/logs"
   }
 }
 ```
@@ -101,9 +101,10 @@ By default:
 
 ## Log File Location
 
-Log files are stored in the `logs/` directory by default:
-- Main log: `logs/zooui.log`
-- Rotated logs: `logs/zooui.log.1`, `logs/zooui.log.2`, etc.
+Log files are stored under the XDG state directory by default:
+- Default location: `~/.local/state/zooui/logs/`
+- Main log: `~/.local/state/zooui/logs/zooui.log`
+- Rotated logs: `~/.local/state/zooui/logs/zooui.log.1`, `zooui.log.2`, etc.
 
 Each log file has a maximum size of 10 MB, and up to 5 backup files are kept.
 
@@ -295,8 +296,8 @@ All existing logger calls (`.debug()`, `.info()`, `.warning()`, `.error()`, `.cr
 For issues or questions about the logging system, please check the logs first:
 ```bash
 # View recent logs
-tail -f logs/zooui.log
+tail -f ~/.local/state/zooui/logs/zooui.log
 
 # Search for errors
-grep ERROR logs/zooui.log
+grep ERROR ~/.local/state/zooui/logs/zooui.log
 ```

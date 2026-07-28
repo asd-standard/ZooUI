@@ -22,7 +22,7 @@ import pytest
 from zooui.tilesystem.tiler import ppm
 from zooui.tilesystem.tiler.ppm import PPMTiler, read_ppm_header
 
-_DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "data"))
+_DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "zooui", "data"))
 
 
 class TestReadPPMHeader:

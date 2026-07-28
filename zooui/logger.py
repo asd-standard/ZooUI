@@ -22,6 +22,8 @@ from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from typing import cast
 
+from zooui.utils._xdg import get_state_dir
+
 
 class LoggerConfig:
     """
@@ -107,7 +109,7 @@ class LoggerConfig:
         if log_dir:
             cls._log_dir = Path(log_dir).expanduser()
         else:
-            cls._log_dir = Path.cwd() / "logs"
+            cls._log_dir = get_state_dir() / "logs"
 
         if log_to_file:
             cls._log_dir.mkdir(parents=True, exist_ok=True)

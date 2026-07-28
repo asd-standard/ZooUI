@@ -21,14 +21,10 @@ It can be run standalone without starting the full ZooUI application.
 """
 
 import argparse
-import os
 import sys
 
-# Add zooui to path (go up two directories to get to project root)
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-
-import tilestore as TileStore  # type: ignore[import-not-found]
-from logger import LoggerConfig, get_logger  # type: ignore[import-not-found]
+from zooui.logger import LoggerConfig, get_logger
+from zooui.tilesystem import tilestore as TileStore
 
 
 def main() -> int:

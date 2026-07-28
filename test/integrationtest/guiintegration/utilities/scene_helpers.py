@@ -79,7 +79,7 @@ def add_svg_to_scene(ctx: GUITestContext, svg_filename: str, position: tuple | N
 
     ctx.log.detail(f"Adding SVG: {svg_filename}")
     try:
-        svg_path = os.path.join(ctx.project_root, "data", "SVG", svg_filename)
+        svg_path = os.path.join(ctx.project_root, "zooui", "data", "SVG", svg_filename)
         if not os.path.exists(svg_path):
             ctx.log.warning(f"SVG not found: {svg_path}")
             return None

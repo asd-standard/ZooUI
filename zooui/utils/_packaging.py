@@ -14,13 +14,16 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program; if not, see <https://www.gnu.org/licenses/>.
 
-"""Frozen-mode path utilities for PyInstaller / Nuitka bundles.
+"""Path utilities for data files across source, pip, and frozen deployments.
 
-When the application is bundled into a standalone executable, file paths
-that rely on ``__file__`` or the current working directory must be resolved
-relative to the extraction directory (``sys._MEIPASS``) instead.
+Resolves the application data directory (``zooui/data/``) in three modes:
+
+- **Source checkout**: ``__file__``-relative, ``zooui/utils/`` → ``zooui/``
+- **Pip install**: ``importlib.resources.files("zooui")`` → package directory
+- **Frozen** (PyInstaller / Nuitka): ``sys._MEIPASS`` → extraction root
 """
 
+import importlib.resources
 import os
 import sys
 
@@ -34,18 +37,22 @@ def is_frozen() -> bool:
 
 
 def data_dir() -> str:
-    """Return the absolute path to the bundled data directory.
+    """Return the absolute path to the ``zooui/`` package directory.
+
+    This is the directory that directly contains the ``data/`` subdirectory
+    with bundled resources (icon, home scene, SVGs, etc.).
 
     In frozen mode (PyInstaller ``--onefile``), this is ``sys._MEIPASS``
     -- the temporary directory where the executable extracts its payload.
-
-    When running from source, this is the project root (two directories
-    above this module, i.e. the directory containing ``zooui/``, ``data/``,
-    and ``main.py``).
+    Callers append ``"data"`` to reach bundled resources.
     """
     if is_frozen():
         return sys._MEIPASS  # type: ignore[attr-defined]
-    return os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    try:
+        return str(importlib.resources.files("zooui"))
+    except Exception:
+        pass
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 
 def binary_dir() -> str:

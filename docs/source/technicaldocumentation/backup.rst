@@ -8,7 +8,7 @@ Overview
 --------
 
 The backup system creates timestamped backups of scene files in per-scene
-directories under ``~/.zooui/backups/``. Each scene file gets its own
+directories under ``~/.local/share/zooui/backups/``. Each scene file gets its own
 backup directory named ``{scene_filename}_{4char_path_hash}/``, containing
 backups named ``yy_mm_dd_hh_mm_filename_hash.pzs`` with chronological sorting.
 
@@ -38,7 +38,7 @@ Backups are stored with per-scene subdirectories:
 
 .. code-block:: text
 
-    ~/.zooui/backups/
+    ~/.local/share/zooui/backups/
     ├── myscene_a1b2/
     │   ├── 26_05_03_14_30_myscene_c3d4.pzs    # Backup file (timestamp_filename_hash.pzs)
     │   ├── 26_05_03_14_35_myscene_e5f6.pzs
@@ -104,7 +104,7 @@ Autosave behavior can be configured through:
                "enabled": true,
                "interval": 300,
                "max_backups": 20,
-               "backup_dir": "~/.zooui/backups",
+               "backup_dir": "~/.local/share/zooui/backups",
                "expire_days": 7
            }
        }
@@ -118,7 +118,7 @@ Default Settings
 - **Interval**: 300 seconds (5 minutes)
 - **Max backups**: 20 backups per scene
 - **Expire days**: 7 days (inactive scene directories are deleted)
-- **Backup location**: ``~/.zooui/backups/``
+- **Backup location**: ``~/.local/share/zooui/backups/``
 
 Usage Flow
 ----------
@@ -189,7 +189,7 @@ UI Integration
 The backup system is accessible through:
 
 - **Settings menu**: Settings → Autosave Settings dialog
-- **Configuration**: User preferences stored in ``~/.zooui/config.json``
+- **Configuration**: User preferences stored in ``~/.config/zooui/config.json``
 
 Testing
 -------

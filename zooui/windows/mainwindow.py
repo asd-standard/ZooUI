@@ -35,6 +35,7 @@ from zooui.objects.mediaobjects.tiledmediaobject import TiledMediaObject
 from zooui.objects.scene import scene as Scene
 from zooui.objects.scene.qzui import QZUI
 from zooui.objects.scene.qzui import QZUI as QZUIType
+from zooui.utils._packaging import data_dir
 from zooui.windows.dialogwindows.dialogwindows import DialogWindows
 
 # Type aliases
@@ -405,7 +406,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         try:
             zui = self.current_zui
-            zui.scene = Scene.load_scene(os.path.join("data", "home.pzs"))
+            zui.scene = Scene.load_scene(os.path.join(data_dir(), "data", "home.pzs"))
             current_index = self.__tab_widget.currentIndex()
             self.__tab_widget.setTabText(current_index, "Home")
             self.__update_window_title()

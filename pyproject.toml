@@ -1,7 +1,51 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "zooui"
 version = "0.6.2"
 requires-python = ">=3.12"
+description = "Python Zooming User Interface"
+readme = "README.md"
+license = {text = "GPL-3.0-or-later"}
+authors = [
+    {name = "Andrea Silvestri", email = "asd.standard@gmail.com"},
+]
+classifiers = [
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3 :: Only",
+    "Operating System :: POSIX :: Linux",
+    "Environment :: X11 Applications :: Qt",
+]
+keywords = [
+    "UI",
+    "Interface",
+    "zui",
+    "zoomable",
+    "viewer",
+    "notes",
+    "images",
+    "pdf",
+    "svg",
+]
+dependencies = [
+    "PySide6>=6.7",
+    "Pillow>=12.0",
+    "pyvips>=3.0",
+    "platformdirs>=3",
+]
+
+[project.urls]
+Homepage = "https://asd-standard.github.io/ZooUI/"
+Repository = "https://github.com/asd-standard/ZooUI"
+
+[project.scripts]
+zooui = "zooui.app:main"
+
+[project.gui-scripts]
+zooui-gui = "zooui.app:main"
 
 [tool.ruff]
 target-version = "py312"

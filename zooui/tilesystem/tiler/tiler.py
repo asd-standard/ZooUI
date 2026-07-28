@@ -439,13 +439,24 @@ class Tiler(Thread):
             # avoiding overhead for single-tile rows. Worker count is capped at the
             # smaller of the number of tiles per row and the available CPU cores.
             # See __load_row_from_file for where the executor is used.
-            if self.__numtiles_across_total > 1:
+            #
+            # IMPORTANT: When a QApplication is active, QImage operations must run
+            # on the main thread.  Parallel creation via ThreadPoolExecutor would
+            # segfault Qt.  Skip the executor in that case to keep tiling safe.
+            _qapp = None
+            try:
+                from PySide6 import QtWidgets
+
+                _qapp = QtWidgets.QApplication.instance()
+            except Exception:
+                pass
+            if self.__numtiles_across_total > 1 and _qapp is None:
                 max_workers = min(self.__numtiles_across_total, os.cpu_count() or 1)
                 self.__executor = ThreadPoolExecutor(max_workers=max_workers)
                 self.__logger.debug(f"created ThreadPoolExecutor with {max_workers} workers")
             else:
                 self.__executor = None
-                self.__logger.debug("skipping ThreadPoolExecutor (single tile per row)")
+                self.__logger.debug("skipping ThreadPoolExecutor (single tile per row or QApplication active)")
 
             with TileStore.disk_lock:
                 ## recursively tile the image

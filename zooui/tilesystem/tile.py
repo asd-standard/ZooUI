@@ -110,10 +110,35 @@ class Tile:
 
         Tile.save(filename) --> None
 
-        Save the tile to the location given by `filename` calling ImageQt.save()
-        method.
+        Save the tile to the location given by `filename`.
+
+        Converts the QImage to a PIL Image and saves via Pillow, avoiding
+        QImage.save() which can segfault when a QApplication is live
+        (known PySide6 issue when tiling runs after a QApplication is
+        created, e.g. in test suites).
         """
-        self.__image.save(filename)
+        if self.__image.width() == 0 or self.__image.height() == 0:
+            raise ValueError("Cannot save empty tile")
+
+        ptr = self.__image.constBits()
+        if ptr:
+            fmt_str = "RGBA" if self.__image.hasAlphaChannel() else "RGB"
+            # QImage Format_RGB32 stores pixels as 0xBBGGRRxx in memory
+            # on little-endian systems, so use BGRA / BGR raw mode
+            raw_mode = "BGRA" if self.__image.hasAlphaChannel() else "BGR"
+            pil_image = Image.frombuffer(
+                fmt_str,
+                (self.__image.width(), self.__image.height()),
+                ptr,
+                "raw",
+                raw_mode,
+                self.__image.bytesPerLine(),
+                1,
+            )
+            pil_image.save(filename)
+        else:
+            # Fallback for images backed by GPU or non-standard memory
+            self.__image.save(filename)
 
     def draw(self, painter: "QPainter", x: int, y: int) -> None:
         """

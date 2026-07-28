@@ -196,7 +196,7 @@ Integration tests produce detailed logs. View them with:
 
 .. code-block:: bash
 
-    tail -f logs/zooui.log
+    tail -f ~/.local/state/zooui/logs/zooui.log
 
 GUI Integration Tests
 ~~~~~~~~~~~~~~~~~~~~~
@@ -375,6 +375,7 @@ Initializes TileManager with test settings:
         tilemanager.init(total_cache_size=100, auto_cleanup=False)
         yield
         tilemanager.purge()
+        tilemanager.shutdown()
 
 **Configuration:**
 
@@ -1531,6 +1532,10 @@ Test Design
 - Allow appropriate timing for async operations
 - Isolate tests with fixtures
 - Verify both success and failure paths
+- Always call ``tilemanager.shutdown()`` in fixture teardown after
+  ``tilemanager.init()``
+- Patch ``QApplication.instance()`` to return ``None`` in unit tests
+  that validate ``ThreadPoolExecutor`` behaviour in the tiling pipeline
 
 **Don't:**
 
@@ -1539,6 +1544,8 @@ Test Design
 - Share state between tests (use fixtures)
 - Skip cleanup (use try/finally or fixtures)
 - Test trivial integrations (use unit tests)
+- Create ``QApplication`` in a session-scoped fixture (it outlives its
+  test and breaks non-GUI tests that use ``QImage`` operations in threads)
 
 Timing Considerations
 ~~~~~~~~~~~~~~~~~~~~~
@@ -1739,6 +1746,86 @@ Common Issues
     import threading
     print(f"Active threads: {threading.active_count()}")
     print(f"Thread list: {threading.enumerate()}")
+
+**Segfaults with QApplication and QImage Operations:**
+
+Segfaults in the tiling pipeline that appear only when integration tests
+are run together (but never in isolation) are almost always caused by an
+orphaned ``QApplication`` instance created by a prior test.
+
+**Root Cause:**
+
+- ``QApplication`` is a process-wide singleton.  Once any test creates one
+  (e.g. a ``qapp`` fixture, a ``QZUI`` widget, or any ``QDialog`` subclass),
+  it persists for all subsequent tests in the pytest session.
+- The :class:`Tiler` internally uses a ``ThreadPoolExecutor`` to parallelise
+  tile creation.  Worker threads construct ``Tile`` objects, which internally
+  call ``ImageQt.ImageQt()`` — a Qt operation that creates ``QImage`` objects.
+- When a ``QApplication`` is alive, Qt enforces that many ``QImage`` operations
+  happen on the **main thread**.  Executing them on worker threads causes
+  segmentation faults (SIGSEGV) with no Python traceback.
+- A similar segfault can occur in :meth:`Tile.save` when calling
+  ``QImage.save()`` after a ``QApplication`` has been created.  ZooUI
+  mitigates this by converting ``QImage`` → PIL ``Image`` and saving via
+  Pillow (see :file:`zooui/tilesystem/tile.py`), but the
+  ``ThreadPoolExecutor`` issue in the Tiler remains the primary risk.
+
+**Symptoms:**
+
+- Segfault at :meth:`Tile.save` → ``QImage.save()`` or inside
+  :meth:`Tiler.run` → ``__tiles``.
+- Tests pass in isolation but crash when the full suite is run.
+- ``Fatal Python error: Segmentation fault`` with backtrace showing
+  ``shiboken6.Shiboken``, ``PySide6.QtCore``, or ``PySide6.QtGui`` among
+  the extension modules.
+- Worker threads listed in the backtrace (``ThreadPoolExecutor`` workers,
+  ``TileProvider`` threads, ``TileCache`` periodic cleaners).
+
+**Prevention Checklist:**
+
+1. **Never use session-scoped QApplication fixtures.**
+   Use ``scope="function"`` so the fixture's lifecycle is limited.  Even
+   though the singleton survives function scope, using the correct scope
+   signals intent and prevents accidental dependencies.
+
+2. **Place QApplication tests last in the test order.**
+   Pytest runs files alphabetically.  Name GUI-dependent test files so
+   they sort after pure-data tests (e.g. ``test_home_point_*`` after
+   ``test_converter_*``).  This limits the number of non-GUI tests
+   that run with a live ``QApplication``.
+
+3. **Use PIL for tile I/O whenever possible.**
+   The :meth:`Tile.save` method now converts ``QImage`` → PIL ``Image``
+   and writes via Pillow rather than calling ``QImage.save()``.  Any new
+   tile I/O code should follow this pattern.
+
+4. **Patch QApplication away in thread-pool tests.**
+   Unit tests that validate ``ThreadPoolExecutor`` behaviour in the
+   Tiler must ensure no ``QApplication`` is present::
+
+       @pytest.fixture(autouse=True)
+       def _no_qapp(self):
+           with patch("PySide6.QtWidgets.QApplication.instance",
+                      return_value=None):
+               yield
+
+5. **Always shut down TileManager in fixture teardown.**
+   Every fixture that calls ``tilemanager.init()`` MUST call
+   ``tilemanager.shutdown()`` in its teardown.  This stops background
+   ``TileProvider`` and ``TileCache`` threads before the next test::
+
+       @pytest.fixture
+       def initialized_tilemanager(temp_tilestore):
+           tilemanager.init(total_cache_size=100, auto_cleanup=False)
+           yield
+           tilemanager.purge()
+           tilemanager.shutdown()
+
+6. **Register atexit thread cleanup.**
+   The :func:`tilemanager.init` function now registers an ``atexit``
+   handler that calls ``_shutdown_threads()``.  This ensures background
+   threads are joined before the interpreter tears down Qt singletons,
+   preventing exit-time segfaults even when tests forget to shut down.
 
 Performance Tips
 ~~~~~~~~~~~~~~~~

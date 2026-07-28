@@ -73,7 +73,7 @@ Here is the complete lifecycle of a TiledMediaObject, from creation to rendering
         │    • Reads PPM header: read_ppm_header(f)                       │
         │    • Gets image dimensions (width, height)                      │
         │    • Sets __outpath = TileStore.get_media_path(media_id)        │
-        │      → ~/.zooui/tilestore/<media_id_hash>/                      │
+        │      → ~/.cache/zooui/tilestore/<media_id_hash>/                      │
         └────────────────────┬────────────────────────────────────────────┘
                              │
         ┌────────────────────▼────────────────────────────────────────────┐
@@ -126,7 +126,7 @@ Here is the complete lifecycle of a TiledMediaObject, from creation to rendering
         │ 9. TILE STORAGE: TileStore.get_tile_path()                      │ 
         │                                                                 │
         │    Directory structure created:                                 │
-        │    ~/.zooui/tilestore/                                          │
+        │    ~/.cache/zooui/tilestore/                                          │
         │    └── <media_id_hash>/                                         │
         │        ├── metadata.json  (width, height, tilesize, etc.)       │
         │        ├── 0/             (Level 0: full resolution)            │
@@ -149,7 +149,7 @@ Here is the complete lifecycle of a TiledMediaObject, from creation to rendering
         │ 10. METADATA STORAGE                                            │
         │     TileStore.write_metadata(media_id, ...)                     │
         │                                                                 │
-        │     Saves to: ~/.zooui/tilestore/<hash>/metadata.json           │
+        │     Saves to: ~/.cache/zooui/tilestore/<hash>/metadata.json           │
         │     Content:                                                    │
         │     {                                                           │
         │       "filext": "jpg",                                          │
@@ -450,7 +450,7 @@ from the saved values.
 Unlike ``SVGMediaObject``, which stores editable content in memory and
 requires ``from_dict`` for clipboard copy/paste operations,
 ``TiledMediaObject`` references an external file whose tile data is
-persisted in the ``~/.zooui/tilestore/`` directory. The ``media_id``
+persisted in the ``~/.cache/zooui/tilestore/`` directory. The ``media_id``
 reference is the only state that needs to be preserved.
 
 TileStore Persistence
@@ -459,7 +459,7 @@ TileStore Persistence
 Tile data survives across scene saves because:
 
 1. Converted and tiled data is stored persistently in
-   ``~/.zooui/tilestore/<media_id_hash>/``
+   ``~/.cache/zooui/tilestore/<media_id_hash>/``
 2. The scene ``.pzs`` file stores only the ``media_id`` reference, not the
    tile data itself
 3. On reload, ``TileManager.tiled(media_id)`` at init time detects

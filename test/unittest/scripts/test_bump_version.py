@@ -49,7 +49,7 @@ def temp_init_file(tmp_path):
 @pytest.fixture
 def temp_home_pzs(tmp_path):
     """Create a temporary home.pzs with a version string embedded."""
-    path = tmp_path / "data" / "home.pzs"
+    path = tmp_path / "zooui" / "data" / "home.pzs"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         "-5.0\t620.0 350.0\n"
@@ -208,7 +208,7 @@ class TestBumpForward:
         init.parent.mkdir(parents=True, exist_ok=True)
         init.write_text('__version__ = "0.5.2"\n', encoding="utf-8")
 
-        pzs = tmp_path / "data" / "home.pzs"
+        pzs = tmp_path / "zooui" / "data" / "home.pzs"
         pzs.parent.mkdir(parents=True, exist_ok=True)
         pzs.write_text(
             "-5.0\t620.0 350.0\n"
@@ -290,7 +290,7 @@ class TestBumpBackwards:
         init.parent.mkdir(parents=True, exist_ok=True)
         init.write_text(f'__version__ = "{version}"\n', encoding="utf-8")
 
-        pzs = tmp_path / "data" / "home.pzs"
+        pzs = tmp_path / "zooui" / "data" / "home.pzs"
         pzs.parent.mkdir(parents=True, exist_ok=True)
         pzs.write_text(
             "-5.0\t620.0 350.0\n"
@@ -369,7 +369,7 @@ class TestBumpCurrent:
         init.parent.mkdir(parents=True, exist_ok=True)
         init.write_text('__version__ = "0.5.2"\n', encoding="utf-8")
 
-        pzs = tmp_path / "data" / "home.pzs"
+        pzs = tmp_path / "zooui" / "data" / "home.pzs"
         pzs.parent.mkdir(parents=True, exist_ok=True)
         pzs.write_text(
             "-5.0\t620.0 350.0\n"
@@ -419,7 +419,7 @@ class TestBumpFileIntegrity:
         init.parent.mkdir(parents=True, exist_ok=True)
         init.write_text('__version__ = "0.5.2"\n', encoding="utf-8")
 
-        pzs = tmp_path / "data" / "home.pzs"
+        pzs = tmp_path / "zooui" / "data" / "home.pzs"
         pzs.parent.mkdir(parents=True, exist_ok=True)
         pzs.write_text(
             "-5.0\t620.0 350.0\n"

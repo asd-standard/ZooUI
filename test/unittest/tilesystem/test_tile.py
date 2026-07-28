@@ -109,19 +109,22 @@ class TestTile:
         resized = t.resize(50, 50)
         assert resized.size == (50, 50)
 
-    @patch("zooui.tilesystem.tile.QtGui.QImage.save")
-    def test_save(self, mock_save):
+    @patch("zooui.tilesystem.tile.Image.frombuffer")
+    def test_save(self, mock_frombuffer):
         """
         Scenario: Save tile to disk
 
-        Given a tile instance
+        Given a tile instance with pixel data
         When save is called with a file path
-        Then QImage.save should be called with that path
+        Then a PIL Image should be created from the QImage buffer
+        And PIL's save should be called to write the file
         """
         qimage = QtGui.QImage(100, 100, QtGui.QImage.Format_RGB32)
+        qimage.fill(QtGui.QColor("red"))  # ensure constBits() is not null
         t = Tile(qimage)
         t.save("test.png")
-        mock_save.assert_called_once_with("test.png")
+        mock_frombuffer.assert_called_once()
+        mock_frombuffer.return_value.save.assert_called_once_with("test.png")
 
     def test_draw(self):
         """

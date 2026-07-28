@@ -97,7 +97,7 @@ Logging can also be configured via JSON configuration file:
        "log_to_file": true,
        "log_to_console": true,
        "colored_output": true,
-       "log_dir": "logs"
+       "log_dir": "~/.local/state/zooui/logs"
      }
    }
 
@@ -226,7 +226,7 @@ Example workflow:
    python main.py --debug
 
    # Step 4: Review detailed logs in file
-   tail -f logs/zooui.log | grep TileManager
+   tail -f ~/.local/state/zooui/logs/zooui.log | grep TileManager
 
 Debugging Specific Components
 ------------------------------
@@ -398,7 +398,7 @@ By default, logs are written to:
 
 .. code-block:: text
 
-   ./logs/zooui.log
+   ~/.local/state/zooui/logs/zooui.log
 
 Specify a custom location with:
 
@@ -435,22 +435,22 @@ Common commands for log analysis:
 .. code-block:: bash
 
    # View real-time logs
-   tail -f logs/zooui.log
+   tail -f ~/.local/state/zooui/logs/zooui.log
 
    # Search for errors
-   grep ERROR logs/zooui.log
+   grep ERROR ~/.local/state/zooui/logs/zooui.log
 
    # View recent errors
-   grep ERROR logs/zooui.log | tail -20
+   grep ERROR ~/.local/state/zooui/logs/zooui.log | tail -20
 
    # Find logs for specific module
-   grep TileManager logs/zooui.log
+   grep TileManager ~/.local/state/zooui/logs/zooui.log
 
    # View logs with context (5 lines before/after)
-   grep -C 5 "Exception" logs/zooui.log
+   grep -C 5 "Exception" ~/.local/state/zooui/logs/zooui.log
 
    # Count errors by type
-   grep ERROR logs/zooui.log | cut -d'|' -f4 | sort | uniq -c
+   grep ERROR ~/.local/state/zooui/logs/zooui.log | cut -d'|' -f4 | sort | uniq -c
 
 API Reference
 =============
@@ -469,7 +469,7 @@ LoggerConfig Class
       :param bool debug: Enable debug mode (sets console level to DEBUG)
       :param bool log_to_file: Enable logging to file
       :param bool log_to_console: Enable logging to console
-      :param str log_dir: Directory for log files (default: ./logs)
+      :param str log_dir: Directory for log files (default: ~/.local/state/zooui/logs)
       :param bool colored_output: Enable colored console output
       :param bool verbose: Enable verbose mode (shows more detailed info)
 
@@ -762,7 +762,7 @@ Here's a complete example of debugging a tile loading issue:
 
 .. code-block:: bash
 
-   $ grep "tile 12345" logs/zooui.log
+   $ grep "tile 12345" ~/.local/state/zooui/logs/zooui.log
    2025-12-09 14:23:45 | [DEBUG   ] | TileManager  | load_tile     | Loading tile 12345
    2025-12-09 14:23:45 | [ERROR   ] | TileManager  | load_tile     | Failed to load tile 12345
 

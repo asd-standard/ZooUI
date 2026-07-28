@@ -82,10 +82,10 @@ The output `.exe` is approximately **150–200 MB**, mostly due to Qt6 binaries.
 
 ## Runtime Behaviour
 
-- **Config**: `%USERPROFILE%\.zooui\config.json` (auto-created on first launch)
-- **Backups**: `%USERPROFILE%\.zooui\backups\`
-- **Logs**: `logs/` (relative to working directory)
-- **Tilestore**: `%APPDATA%\zooui\tlestore\`
+- **Config**: `%APPDATA%\zooui\config.json` (auto-created on first launch)
+- **Backups**: `%APPDATA%\zooui\backups\`
+- **Logs**: `%APPDATA%\zooui\state\logs\` (XDG state dir equivalent)
+- **Tilestore**: `%LOCALAPPDATA%\zooui\Cache\tilestore\`
 
 ## Troubleshooting
 

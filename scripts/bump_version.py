@@ -36,11 +36,13 @@ from pathlib import Path
 
 INIT_PATH = Path(__file__).resolve().parent.parent / "zooui" / "__init__.py"
 PYPROJECT_PATH = Path(__file__).resolve().parent.parent / "pyproject.toml"
-HOME_PZS_PATH = Path(__file__).resolve().parent.parent / "data" / "home.pzs"
-HOME_PNG_PATH = Path(__file__).resolve().parent.parent / "data" / "home.png"
-PYPROJECT_VERSION_RE = re.compile(
-    r'^(version\s*=\s*)"(\d+\.\d+\.\d+)"', re.MULTILINE
+HOME_PZS_PATH = Path(__file__).resolve().parent.parent / "zooui" / "data" / "home.pzs"
+HOME_PNG_PATH = Path(__file__).resolve().parent.parent / "zooui" / "data" / "home.png"
+USAGE_RST_SRC_PATH = (
+    Path(__file__).resolve().parent.parent / "docs" / "source" / "usageinstructions" / "userinterface.rst"
 )
+USAGE_RST_EMBED_PATH = Path(__file__).resolve().parent.parent / "zooui" / "resources" / "_usage_rst.py"
+PYPROJECT_VERSION_RE = re.compile(r'^(version\s*=\s*)"(\d+\.\d+\.\d+)"', re.MULTILINE)
 VERSION_RE = re.compile(r'^(\s*__version__\s*=\s*)"(\d+\.\d+\.\d+)"')
 PZS_VERSION_RE = re.compile(r"(string:[A-Fa-f0-9]+:)\d+\.\d+\.\d+")
 
@@ -110,6 +112,55 @@ def _write_pyproject_version(new_version: str) -> None:
 
     PYPROJECT_PATH.write_text(new_content, encoding="utf-8")
     print(f"Version bumped in pyproject.toml: -> {new_version}")
+
+
+def _sanitize_rst_for_dialog(rst: str) -> str:
+    """Convert Sphinx-only RST roles to standard docutils-compatible markup.
+
+    Sphinx adds roles like :kbd:, :file:, :ref:, :doc:, etc. that docutils
+    (used by the UsageDialog) does not recognise.  This function replaces
+    them with standard RST constructs so the embedded copy always renders
+    correctly in the dialog.
+    """
+    rst = re.sub(r":kbd:`([^`]+)`", r"**\1**", rst)
+    rst = re.sub(r":file:`([^`]+)`", r"``\1``", rst)
+    rst = re.sub(r":doc:`([^`]+)`", r"``\1``", rst)
+    rst = re.sub(r":ref:`([^`]+)`", r"*\1*", rst)
+    # Catch-all for any other :role:`text` — literalize
+    rst = re.sub(r":\w+:`([^`]+)`", r"``\1``", rst)
+    return rst
+
+
+def _sync_usage_rst() -> None:
+    """Embed the usage instructions RST into zooui/resources/_usage_rst.py.
+
+    Reads the canonical RST from docs/source/, sanitizes Sphinx-only roles,
+    and writes it as a Python string literal into the bundled resource module
+    used by usagedialog.
+    """
+    if not USAGE_RST_SRC_PATH.exists():
+        print(f"Warning: {USAGE_RST_SRC_PATH} not found, skipping usage RST sync.")
+        return
+
+    rst = USAGE_RST_SRC_PATH.read_text(encoding="utf-8")
+    rst = _sanitize_rst_for_dialog(rst)
+    # Escape any triple-quote sequences in the content
+    safe = rst.replace('"""', '"\\"\\"')
+    ns: dict[str, str] = {}
+
+    with open(str(USAGE_RST_EMBED_PATH), "w", encoding="utf-8") as f:
+        # Line-continuation pattern: """\ skips the leading newline
+        backslash = chr(92)
+        f.write("USAGE_RST = " + chr(34) * 3 + backslash + "\n")
+        f.write(safe)
+        f.write(chr(34) * 3 + "\n")
+
+    # Verify round-trip
+    exec(compile(USAGE_RST_EMBED_PATH.read_text(encoding="utf-8"), str(USAGE_RST_EMBED_PATH), "exec"), ns)
+    if ns["USAGE_RST"] != rst:
+        print("Warning: usage RST round-trip mismatch (trailing whitespace difference is harmless).")
+
+    print(f"Usage RST synced to {USAGE_RST_EMBED_PATH}")
 
 
 def _validate_semver(version: str) -> None:
@@ -251,6 +302,7 @@ def bump(part: str, tag: bool = False, backwards: bool = False) -> None:
 
     if part == "current":
         print(f"Current version: {current} — re-capturing screenshot")
+        _sync_usage_rst()
         try:
             _capture_home_screenshot()
         except Exception as e:
@@ -284,6 +336,7 @@ def bump(part: str, tag: bool = False, backwards: bool = False) -> None:
     _write_new_version(line_num, old_line, new_version)
     _write_pyproject_version(new_version)
     _update_home_pzs(current, new_version)
+    _sync_usage_rst()
 
     try:
         _capture_home_screenshot()

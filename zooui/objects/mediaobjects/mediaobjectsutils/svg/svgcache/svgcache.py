@@ -22,6 +22,7 @@ import time
 from pathlib import Path
 
 from zooui.logger import get_logger
+from zooui.utils._xdg import get_cache_dir
 
 
 class SVGCache:
@@ -29,18 +30,20 @@ class SVGCache:
     Manages hashed SVG cache with ``svg_`` prefix and flat directory structure.
 
     Hash format: ``svg_{8_char_sha1}``
-    Directory: ``/tmp/zooui_svg_/`` (flat, no subdirectories)
+    Directory: XDG cache dir / svg (flat, no subdirectories)
     """
 
-    def __init__(self, cache_root: str = "/tmp/zooui_svg_"):
+    def __init__(self, cache_root: str | None = None):
         """
         Initialize SVG cache.
 
         Args:
-            cache_root: Root directory for cache (default: ``/tmp/zooui_svg_``)
+            cache_root: Root directory for cache (default: XDG cache dir / svg)
         """
+        if cache_root is None:
+            cache_root = str(get_cache_dir() / "svg")
         self.cache_root = Path(cache_root)
-        self.cache_root.mkdir(exist_ok=True)
+        self.cache_root.mkdir(parents=True, exist_ok=True)
         self._logger = get_logger("SVGCache")
         self._logger.debug(f"Initialized SVG cache at {self.cache_root}")
 

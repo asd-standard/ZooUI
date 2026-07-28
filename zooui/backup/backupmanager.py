@@ -27,6 +27,7 @@ from typing import Any
 from PySide6 import QtWidgets
 
 from zooui.logger import get_logger
+from zooui.utils._xdg import get_data_dir
 
 
 class BackupManager:
@@ -40,7 +41,7 @@ class BackupManager:
     BackupManager(config) --> None
 
     Backup manager that creates per-scene backup directories under
-    ~/.zooui/backups/ with naming convention:
+    the XDG data directory with naming convention:
     {scene_filename}_{4char_path_hash}/
 
     Each scene directory contains backups named:
@@ -65,13 +66,13 @@ class BackupManager:
 
         Args:
             config: Configuration dictionary with 'max_backups' (default: 20),
-                    'expire_days' (default: 7), 'backup_dir' (default: ~/.zooui/backups)
+                    'expire_days' (default: 7), 'backup_dir' (default: XDG data dir / backups)
         """
         self._logger = get_logger("BackupManager")
 
         # Default configuration
         self._config = {
-            "backup_dir": str(Path.home() / ".zooui" / "backups"),
+            "backup_dir": str(get_data_dir() / "backups"),
             "max_backups": 20,
             "expire_days": 7,
         }

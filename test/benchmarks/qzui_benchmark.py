@@ -971,7 +971,7 @@ Examples:
     if args.data_dir:
         data_dir = args.data_dir
     else:
-        data_dir = os.path.join(os.path.dirname(__file__), "../../data")
+        data_dir = os.path.join(os.path.dirname(__file__), "../../zooui/data")
 
     test_images = find_test_images(data_dir)
 

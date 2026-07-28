@@ -36,7 +36,7 @@ conda create -n zooui python=3.12
 conda activate zooui
 
 # Install runtime dependencies
-pip install PySide6 Pillow pyvips
+pip install PySide6 Pillow pyvips platformdirs
 
 # Install development dependencies
 pip install pytest pytest-cov pytest-xdist ruff mypy pre-commit
@@ -333,7 +333,7 @@ test/
 └── benchmarks/           # Performance benchmarks
 
 docs/                     # Sphinx documentation
-data/                     # Application data files
+zooui/data/                # Application data files
 logs/                     # Log files (gitignored)
 ```
 
@@ -348,7 +348,7 @@ logs/                     # Log files (gitignored)
 ### Setting Up Development Environment
 1. Create conda environment: `conda create -n zooui python=3.12`
 2. Activate environment: `conda activate zooui`
-3. Install runtime deps: `pip install PySide6 Pillow pyvips`
+3. Install runtime deps: `pip install PySide6 Pillow pyvips platformdirs`
 4. Install dev dependencies: `pip install pytest pytest-cov pytest-xdist ruff mypy pre-commit`
 5. Install pre-commit hooks: `pre-commit install`
 
@@ -495,7 +495,7 @@ or public API.
 ### Release Workflow
 
 1. **Update CHANGELOG.md**: Move entries from `[Unreleased]` to a new version heading
-2. **Bump version** (updates `zooui/__init__.py`, `pyproject.toml`, and `data/home.pzs` automatically):
+2. **Bump version** (updates `zooui/__init__.py`, `pyproject.toml`, and `zooui/data/home.pzs` automatically):
    ```bash
    python scripts/bump_version.py patch    # fixes, minor features, refactors, docs, minor UI
    python scripts/bump_version.py minor    # major features (new modules), new architectures
@@ -517,7 +517,7 @@ or public API.
 - `zooui/__init__.py` — canonical version string (`__version__`)
 - `pyproject.toml` — project version metadata
 - `CHANGELOG.md` — per-version change log (Keep a Changelog format)
-- `data/home.pzs` — default scene file (version text updated automatically by bump script)
+- `zooui/data/home.pzs` — default scene file (version text updated automatically by bump script)
 - `scripts/bump_version.py` — version bump utility
 - `docs/source/conf.py` — reads version from `zooui.__version__`
 
@@ -527,7 +527,7 @@ or public API.
 The autosave feature provides automatic backup creation for scene files with per-scene directories, configurable interval, rotation, and expiration. Enabled by default.
 
 ### Configuration
-- **Root location**: `~/.zooui/backups/`
+- **Root location**: `~/.local/share/zooui/backups/`
 - **Per-scene directories**: `{scene_filename}_{4char_path_hash}/` under backup root
 - **File naming**: `yy_mm_dd_hh_mm_filename_hash.pzs` (timestamp first for chronological sorting)
 - **Rotation**: Keep last N backups per scene (configurable), delete oldest automatically

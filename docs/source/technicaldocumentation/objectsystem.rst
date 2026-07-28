@@ -398,7 +398,7 @@ scene files. Located at :doc:`../zooui/autosave`.
 **Key Features:**
 
 - **Timer-based**: Configurable interval (default: 5 minutes)
-- **Per-scene directories**: ``~/.zooui/backups/{filename}_{4char_hash}/``
+- **Per-scene directories**: ``~/.local/share/zooui/backups/{filename}_{4char_hash}/``
 - **Rotation**: Keeps last N backups, deletes oldest automatically (default: 20)
 - **Expiration**: Inactive scene directories expire after N days (default: 7)
 - **Enabled by default**: Autosave starts automatically after scene load
@@ -1119,7 +1119,7 @@ prevent data loss. See :doc:`../zooui/autosave` and :doc:`../zooui/backupmanager
 
 .. code-block:: text
 
-    ~/.zooui/backups/
+    ~/.local/share/zooui/backups/
     ├── scene1_a1b2/           ← Per-scene directory (filename + 4-char hash)
     │   ├── 26_05_09_14_30_c3d4.pzs
     │   ├── 26_05_09_14_35_e5f6.pzs

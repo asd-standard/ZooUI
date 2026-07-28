@@ -305,18 +305,17 @@ class TestOpenSVGPickerInputDialogSimple:
         When OpenSVGPickerInputDialog loads colors
         Then it should load color codes from the file
         """
-        color_dir = tmp_path / ".zooui" / "colorstore"
+        color_dir = tmp_path / "zooui" / "colorstore"
         color_dir.mkdir(parents=True, exist_ok=True)
         color_file = color_dir / "color_list.txt"
 
         with open(color_file, 'w') as f:
             f.write("ff0000\n00ff00\n0000ff\n")
 
-        # Mock the environment to use our temp directory
-        with patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.isfile', return_value=True), \
-             patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.isdir', return_value=True), \
-             patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.environ', {}), \
-             patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.expanduser', return_value=str(tmp_path)):
+        # Patch get_colorstore_dir instead of os.path.expanduser
+        mock_color_dir = str(color_dir)
+        with patch('zooui.windows.dialogwindows.svgpickerinputdialog.get_colorstore_dir', return_value=color_dir), \
+             patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.isfile', return_value=True):
 
             # Mock the SVG directory scan to avoid file system issues
             with patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.isdir', return_value=False):
@@ -335,12 +334,11 @@ class TestOpenSVGPickerInputDialogSimple:
         When OpenSVGPickerInputDialog is initialized
         Then it should create default colors
         """
-        tmp_path / ".zooui" / "colorstore"
+        color_dir = tmp_path / "zooui" / "colorstore"
 
-        with patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.isfile', return_value=False), \
-             patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.isdir', return_value=True), \
-             patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.environ', {}), \
-             patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.expanduser', return_value=str(tmp_path)):
+        with patch('zooui.windows.dialogwindows.svgpickerinputdialog.get_colorstore_dir', return_value=color_dir), \
+             patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.isfile', return_value=False), \
+             patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.isdir', return_value=True):
 
             # Mock the SVG directory scan to avoid file system issues
             with patch('zooui.windows.dialogwindows.svgpickerinputdialog.os.path.isdir', return_value=False), \

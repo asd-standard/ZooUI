@@ -1,0 +1,7 @@
+graft zooui
+include README.md
+include LICENSE
+include pyproject.toml
+global-exclude __pycache__
+global-exclude *.pyc
+global-exclude .DS_Store
