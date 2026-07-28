@@ -1,0 +1,26 @@
+# Sphinx build artifacts (should not be served)
+_sources/
+.doctrees/
+.buildinfo
+objects.inv
+
+# Sphinx build caches (accidentally copied from main)
+docs/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+
+# Build artifacts
+dist/
+build/
+*.whl
+*.tar.gz
+
+# Dev files
+test/
+zooui/
+scripts/
+MANIFEST.in
+pyproject.toml
