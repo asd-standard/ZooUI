@@ -122,19 +122,20 @@ class Tile:
 
         ptr = self.__image.constBits()
         if ptr:
-            fmt_str = "RGBA" if self.__image.hasAlphaChannel() else "RGB"
-            # QImage Format_RGB32 stores pixels as 0xBBGGRRxx in memory
-            # on little-endian systems, so use BGRA / BGR raw mode
-            raw_mode = "BGRA" if self.__image.hasAlphaChannel() else "BGR"
+            # QImage Format_RGB32 stores 4 bytes per pixel in memory:
+            # [B, G, R, X] on little-endian.  Always read as BGRA / RGBA
+            # (4 bytes per pixel) and then convert to RGB to discard the
+            # unused alpha/padding byte.
             pil_image = Image.frombuffer(
-                fmt_str,
+                "RGBA",
                 (self.__image.width(), self.__image.height()),
                 ptr,
                 "raw",
-                raw_mode,
+                "BGRA",
                 self.__image.bytesPerLine(),
                 1,
             )
+            pil_image = pil_image.convert("RGB")
             pil_image.save(filename)
         else:
             # Fallback for images backed by GPU or non-standard memory

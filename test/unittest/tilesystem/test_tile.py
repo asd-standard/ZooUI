@@ -119,12 +119,16 @@ class TestTile:
         Then a PIL Image should be created from the QImage buffer
         And PIL's save should be called to write the file
         """
+        mock_converted = Mock()
+        mock_frombuffer.return_value.convert.return_value = mock_converted
+
         qimage = QtGui.QImage(100, 100, QtGui.QImage.Format_RGB32)
-        qimage.fill(QtGui.QColor("red"))  # ensure constBits() is not null
+        qimage.fill(QtGui.QColor("red"))
         t = Tile(qimage)
         t.save("test.png")
         mock_frombuffer.assert_called_once()
-        mock_frombuffer.return_value.save.assert_called_once_with("test.png")
+        mock_frombuffer.return_value.convert.assert_called_once_with("RGB")
+        mock_converted.save.assert_called_once_with("test.png")
 
     def test_draw(self):
         """
