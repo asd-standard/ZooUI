@@ -4,11 +4,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; ZooUI 0.7.0 documentation</title>
+    <title>Index &#8212; ZooUI 0.7.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=cc7d0dec" />
-    <script src="_static/documentation_options.js?v=fe7df9b0"></script>
+    <script src="_static/documentation_options.js?v=5a057da9"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="#" />
@@ -85,6 +85,8 @@
       <li><a href="zooui/windows/mainwindow.html#zooui.windows.mainwindow.MainWindow.__action_new_scene">__action_new_scene() (zooui.windows.mainwindow.MainWindow method)</a>
 </li>
       <li><a href="zooui/windows/mainwindow.html#zooui.windows.mainwindow.MainWindow.__action_new_tab">__action_new_tab() (zooui.windows.mainwindow.MainWindow method)</a>
+</li>
+      <li><a href="zooui/windows/mainwindow.html#zooui.windows.mainwindow.MainWindow.__action_ocr_screenshot">__action_ocr_screenshot() (zooui.windows.mainwindow.MainWindow method)</a>
 </li>
       <li><a href="zooui/windows/mainwindow.html#zooui.windows.mainwindow.MainWindow.__action_open_media_dir">__action_open_media_dir() (zooui.windows.mainwindow.MainWindow method)</a>
 </li>
@@ -165,6 +167,8 @@
       <li><a href="zooui/objects/scene/scene.html#zooui.objects.scene.scene.Scene.__get_viewport_size">__get_viewport_size() (zooui.objects.scene.scene.Scene method)</a>
 </li>
       <li><a href="zooui/objects/physicalobject.html#zooui.objects.physicalobject.PhysicalObject.__get_zoomlevel">__get_zoomlevel() (zooui.objects.physicalobject.PhysicalObject method)</a>
+</li>
+      <li><a href="zooui/windows/mainwindow.html#zooui.windows.mainwindow.MainWindow.__handle_ocr_region">__handle_ocr_region() (zooui.windows.mainwindow.MainWindow method)</a>
 </li>
       <li><a href="technicaldocumentation/configsystem.html#ConfigManager.__init__">__init__() (ConfigManager method)</a>
 
@@ -442,10 +446,12 @@
       </ul></li>
       <li><a href="zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI._dispatch_pdf_page_nav">_dispatch_pdf_page_nav() (zooui.objects.scene.qzui.QZUI method)</a>
 </li>
-      <li><a href="zooui/converters/pdfconverter.html#zooui.converters.pdfconverter.PDFConverter._draw_page_numbers">_draw_page_numbers() (zooui.converters.pdfconverter.PDFConverter method)</a>
+      <li><a href="zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI._do_ocr_capture">_do_ocr_capture() (zooui.objects.scene.qzui.QZUI method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="zooui/converters/pdfconverter.html#zooui.converters.pdfconverter.PDFConverter._draw_page_numbers">_draw_page_numbers() (zooui.converters.pdfconverter.PDFConverter method)</a>
+</li>
       <li><a href="zooui/converters/pdfconverter.html#zooui.converters.pdfconverter._DummyFont">_DummyFont (class in zooui.converters.pdfconverter)</a>
 </li>
       <li><a href="zooui/objects/scene/sceneutils/autosave.html#zooui.objects.scene.sceneutils.autosave.SceneAutosaveManager._enable_autosave_if_configured">_enable_autosave_if_configured() (zooui.objects.scene.sceneutils.autosave.SceneAutosaveManager method)</a>
@@ -1456,6 +1462,8 @@
       </ul></li>
       <li><a href="zooui/objects/mediaobjects/svgmediaobject.html#zooui.objects.mediaobjects.svgmediaobject.SVGMediaObject.is_modified">is_modified (zooui.objects.mediaobjects.svgmediaobject.SVGMediaObject property)</a>
 </li>
+      <li><a href="zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI.is_ocr_mode">is_ocr_mode() (zooui.objects.scene.qzui.QZUI method)</a>
+</li>
       <li><a href="zooui/objects/mediaobjects/mediaobject.html#zooui.objects.mediaobjects.mediaobject.MediaObject.is_size_visible">is_size_visible() (zooui.objects.mediaobjects.mediaobject.MediaObject method)</a>
 
       <ul>
@@ -1770,6 +1778,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="zooui/objects/scene/sceneutils/prioritybatcher.html#zooui.objects.scene.sceneutils.prioritybatcher.PrioritizedObject.object">object (zooui.objects.scene.sceneutils.prioritybatcher.PrioritizedObject attribute)</a>
 </li>
+      <li><a href="zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI.ocr_region_selected">ocr_region_selected (zooui.objects.scene.qzui.QZUI attribute)</a>
+</li>
       <li><a href="zooui/objects/mediaobjects/mediaobject.html#zooui.objects.mediaobjects.mediaobject.MediaObject.onscreen_area">onscreen_area (zooui.objects.mediaobjects.mediaobject.MediaObject property)</a>
 </li>
       <li><a href="zooui/objects/mediaobjects/mediaobject.html#zooui.objects.mediaobjects.mediaobject.MediaObject.onscreen_size">onscreen_size (zooui.objects.mediaobjects.mediaobject.MediaObject property)</a>
@@ -1786,10 +1796,10 @@
 </li>
       <li><a href="zooui/windows/dialogwindows/dialogwindows.html#zooui.windows.dialogwindows.dialogwindows.DialogWindows.open_new_string_input_dialog">open_new_string_input_dialog (zooui.windows.dialogwindows.dialogwindows.DialogWindows attribute)</a>
 </li>
-      <li><a href="zooui/windows/dialogwindows/dialogwindows.html#zooui.windows.dialogwindows.dialogwindows.DialogWindows.open_svg_picker_input_dialog">open_svg_picker_input_dialog (zooui.windows.dialogwindows.dialogwindows.DialogWindows attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="zooui/windows/dialogwindows/dialogwindows.html#zooui.windows.dialogwindows.dialogwindows.DialogWindows.open_svg_picker_input_dialog">open_svg_picker_input_dialog (zooui.windows.dialogwindows.dialogwindows.DialogWindows attribute)</a>
+</li>
       <li><a href="zooui/windows/dialogwindows/dialogwindows.html#zooui.windows.dialogwindows.dialogwindows.DialogWindows.open_zoom_sensitivity_input_dialog">open_zoom_sensitivity_input_dialog() (zooui.windows.dialogwindows.dialogwindows.DialogWindows method)</a>
 </li>
       <li><a href="zooui/windows/dialogwindows/dialogwindows.html#zooui.windows.dialogwindows.dialogwindows.OpenNewStringInputDialog">OpenNewStringInputDialog (class in zooui.windows.dialogwindows.dialogwindows)</a>
@@ -2022,6 +2032,8 @@
         <li><a href="zooui/logger.html#zooui.logger.LoggerConfig.set_level">(zooui.logger.LoggerConfig class method)</a>
 </li>
       </ul></li>
+      <li><a href="zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI.set_ocr_mode">set_ocr_mode() (zooui.objects.scene.qzui.QZUI method)</a>
+</li>
       <li><a href="zooui/objects/scene/scene.html#zooui.objects.scene.scene.Scene.set_render_order">set_render_order() (zooui.objects.scene.scene.Scene method)</a>
 </li>
       <li><a href="zooui/objects/mediaobjects/svgmediaobject.html#zooui.objects.mediaobjects.svgmediaobject.SVGMediaObject.set_svg_content">set_svg_content() (zooui.objects.mediaobjects.svgmediaobject.SVGMediaObject method)</a>
@@ -2046,10 +2058,10 @@
         <li><a href="zooui/tilesystem/tilecache.html#zooui.tilesystem.tilestore.tilecache.TileCache.shutdown">(zooui.tilesystem.tilestore.tilecache.TileCache method)</a>
 </li>
       </ul></li>
-      <li><a href="zooui/objects/mediaobjects/mediaobjectsutils/string/parallellayout.html#zooui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.shutdown_event">shutdown_event (zooui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="zooui/objects/mediaobjects/mediaobjectsutils/string/parallellayout.html#zooui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator.shutdown_event">shutdown_event (zooui.objects.mediaobjects.mediaobjectsutils.string.parallellayout.ParallelLayoutCalculator attribute)</a>
+</li>
       <li><a href="zooui/objects/scene/scene.html#zooui.objects.scene.scene.Scene.shutdown_threads">shutdown_threads() (zooui.objects.scene.scene.Scene method)</a>
 </li>
       <li><a href="zooui/tilesystem/tile.html#zooui.tilesystem.tile.Tile.size">size (zooui.tilesystem.tile.Tile property)</a>

@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>User Interface &#8212; ZooUI 0.7.0 documentation</title>
+    <title>User Interface &#8212; ZooUI 0.7.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=cc7d0dec" />
-    <script src="../_static/documentation_options.js?v=fe7df9b0"></script>
+    <script src="../_static/documentation_options.js?v=5a057da9"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -101,13 +101,18 @@ on top; when unchecked, larger objects render above smaller ones.</p></li>
 clipboard</p></li>
 <li><p><strong>Paste SVG (Ctrl+V)</strong> Paste the copied SVG at the current mouse
 position (or center of the viewport)</p></li>
-<li><p><strong>Set Home Point (Ctrl+Shift+H)</strong> Save the current view position
+<li><p><strong>Set Home Point (Ctrl+Alt+H)</strong> Save the current view position
 and zoom level as a <em>home point</em>. A cyan crosshair pulse appears at
 the viewport center as visual confirmation. The home point is per-tab
 and is cleared when a new scene is loaded.</p></li>
 <li><p><strong>Go to Home Point (Ctrl+J)</strong> Restore the view to the saved home
 point position and zoom level. Has no effect if no home point has
 been set.</p></li>
+<li><p><strong>OCR Screenshot (Ctrl+Alt+O)</strong> Enter OCR selection mode to extract text
+from the scene. Drag-select an area with the mouse; the selected region
+is captured and processed through Tesseract OCR. The detected text appears
+in a new String input dialog. Press Escape to cancel selection mode. Requires
+<code class="docutils literal notranslate"><span class="pre">tesseract-ocr</span></code> to be installed on the system.</p></li>
 </ul>
 </section>
 <section id="help-menu">
@@ -181,6 +186,11 @@ to the current selection and the entire scene will be moved</p></li>
 </dl>
 </li>
 <li><p><strong>Esc</strong> Deselect the currently selected media</p></li>
+<li><p><strong>Ctrl+Alt+O</strong> Enter OCR screenshot selection mode. The cursor changes to a
+crosshair. Click and drag to select a rectangular region. Upon release, the
+captured area is processed through Tesseract OCR and the extracted text is
+pre-filled into a new String input dialog. Press Escape to cancel the mode
+without capturing.</p></li>
 <li><dl class="simple">
 <dt><strong>PgUp/PgDn or Scrollwheel</strong> Zoom the currently selected media</dt><dd><ul class="simple">
 <li><p>if there is no currently selected media, or if the Shift key is currently

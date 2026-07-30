@@ -4,11 +4,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>zooui.objects.scene.qzui &#8212; ZooUI 0.7.0 documentation</title>
+    <title>zooui.objects.scene.qzui &#8212; ZooUI 0.7.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=cc7d0dec" />
-    <script src="../../../../_static/documentation_options.js?v=fe7df9b0"></script>
+    <script src="../../../../_static/documentation_options.js?v=5a057da9"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -95,6 +95,9 @@
     <span class="c1">#: link error variable to QtCore.Signal()</span>
     <span class="n">error</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
 
+    <span class="c1">#: OCR region selected signal, emitted with the captured QImage</span>
+    <span class="n">ocr_region_selected</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QImage</span><span class="p">)</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">parent</span><span class="p">:</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QWidget</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -142,6 +145,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__rect_start</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__rect_end</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
+        <span class="c1"># OCR screenshot selection mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ocr_mode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
         <span class="c1"># Deferred zoom animation for when widget hasn&#39;t been sized yet</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__scene_animation_pending</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -161,6 +167,37 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">setFocusPolicy</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ClickFocus</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setMouseTracking</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+<div class="viewcode-block" id="QZUI.set_ocr_mode">
+<a class="viewcode-back" href="../../../../zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI.set_ocr_mode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_ocr_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ocr_mode</span> <span class="o">=</span> <span class="n">enabled</span>
+        <span class="k">if</span> <span class="n">enabled</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setCursor</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">CursorShape</span><span class="o">.</span><span class="n">CrossCursor</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unsetCursor</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="QZUI.is_ocr_mode">
+<a class="viewcode-back" href="../../../../zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI.is_ocr_mode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_ocr_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ocr_mode</span></div>
+
+
+<div class="viewcode-block" id="QZUI._do_ocr_capture">
+<a class="viewcode-back" href="../../../../zooui/objects/scene/qzui.html#zooui.objects.scene.qzui.QZUI._do_ocr_capture">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_do_ocr_capture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">y1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">x2</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">y2</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">timer_active</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__timer</span><span class="o">.</span><span class="n">isActive</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">timer_active</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__timer</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">pixmap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grab</span><span class="p">()</span>
+            <span class="n">cropped</span> <span class="o">=</span> <span class="n">pixmap</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y2</span> <span class="o">-</span> <span class="n">y1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ocr_region_selected</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">cropped</span><span class="o">.</span><span class="n">toImage</span><span class="p">())</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">timer_active</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__timer</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">1000</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">framerate</span><span class="p">),</span> <span class="bp">self</span><span class="p">)</span></div>
+
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__zoom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_steps</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -282,7 +319,8 @@
 
             <span class="c1">## Draw selection rectangle if currently drawing</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__drawing_rect</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rect_start</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rect_end</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">action_draw_rect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__rect_start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rect_end</span><span class="p">,</span> <span class="n">painter</span><span class="p">,</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">green</span><span class="p">)</span>
+                <span class="n">color</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">blue</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ocr_mode</span> <span class="k">else</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">green</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">action_draw_rect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__rect_start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rect_end</span><span class="p">,</span> <span class="n">painter</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span>
 
             <span class="c1">## Draw home point marker pulse</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_home_point</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -823,6 +861,12 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__mouse_left_down</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__mousepos</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">position</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">()),</span> <span class="nb">int</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">position</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">()))</span>
 
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ocr_mode</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__drawing_rect</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__rect_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mousepos</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__rect_end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mousepos</span>
+                <span class="k">return</span>
+
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__control_held</span><span class="p">:</span>
                 <span class="c1"># Start rectangle drawing</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__drawing_rect</span> <span class="o">=</span> <span class="kc">True</span>
@@ -926,6 +970,26 @@
         <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">button</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">LeftButton</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mouse_left_down</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__mouse_left_down</span> <span class="o">=</span> <span class="kc">False</span>
 
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ocr_mode</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__drawing_rect</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rect_start</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rect_end</span><span class="p">:</span>
+                    <span class="n">x1</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__rect_start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rect_end</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">y1</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__rect_start</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rect_end</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">x2</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__rect_start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rect_end</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">y2</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__rect_start</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rect_end</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+                    <span class="k">if</span> <span class="n">x1</span> <span class="o">!=</span> <span class="n">x2</span> <span class="ow">and</span> <span class="n">y1</span> <span class="o">!=</span> <span class="n">y2</span><span class="p">:</span>
+                        <span class="n">QtCore</span><span class="o">.</span><span class="n">QTimer</span><span class="o">.</span><span class="n">singleShot</span><span class="p">(</span>
+                            <span class="mi">0</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x1</span><span class="o">=</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="o">=</span><span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="o">=</span><span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="o">=</span><span class="n">y2</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_ocr_capture</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">)</span>
+                        <span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">__rect_start</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__rect_end</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_ocr_mode</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+                <span class="k">return</span>
+
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__drawing_rect</span><span class="p">:</span>
                 <span class="c1"># Finish rectangle drawing</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__drawing_rect</span> <span class="o">=</span> <span class="kc">False</span>
@@ -966,7 +1030,11 @@
         <span class="n">modifiers</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">modifiers</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_Escape</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selection</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ocr_mode</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_ocr_mode</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selection</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_PageUp</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__zoom</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_PageDown</span><span class="p">:</span>
