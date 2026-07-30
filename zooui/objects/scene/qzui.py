@@ -60,6 +60,9 @@ class QZUI(QtWidgets.QWidget):
     #: link error variable to QtCore.Signal()
     error = QtCore.Signal(str)
 
+    #: OCR region selected signal, emitted with the captured QImage
+    ocr_region_selected = QtCore.Signal(QtGui.QImage)
+
     def __init__(
         self,
         parent: QtWidgets.QWidget | None = None,
@@ -107,6 +110,9 @@ class QZUI(QtWidgets.QWidget):
         self.__rect_start: tuple[int, int] | None = None
         self.__rect_end: tuple[int, int] | None = None
 
+        # OCR screenshot selection mode
+        self.__ocr_mode: bool = False
+
         # Deferred zoom animation for when widget hasn't been sized yet
         self.__scene_animation_pending: bool = False
 
@@ -126,6 +132,28 @@ class QZUI(QtWidgets.QWidget):
 
         self.setFocusPolicy(QtCore.Qt.ClickFocus)
         self.setMouseTracking(True)
+
+    def set_ocr_mode(self, enabled: bool) -> None:
+        self.__ocr_mode = enabled
+        if enabled:
+            self.setCursor(QtCore.Qt.CursorShape.CrossCursor)
+        else:
+            self.unsetCursor()
+
+    def is_ocr_mode(self) -> bool:
+        return self.__ocr_mode
+
+    def _do_ocr_capture(self, x1: int, y1: int, x2: int, y2: int) -> None:
+        timer_active = self.__timer.isActive()
+        if timer_active:
+            self.__timer.stop()
+        try:
+            pixmap = self.grab()
+            cropped = pixmap.copy(x1, y1, x2 - x1, y2 - y1)
+            self.ocr_region_selected.emit(cropped.toImage())
+        finally:
+            if timer_active:
+                self.__timer.start(int(1000 / self.framerate), self)
 
     def __zoom(self, num_steps: float) -> None:
         """
@@ -239,7 +267,8 @@ class QZUI(QtWidgets.QWidget):
 
             ## Draw selection rectangle if currently drawing
             if self.__drawing_rect and self.__rect_start and self.__rect_end:
-                self.scene.action_draw_rect(self.__rect_start, self.__rect_end, painter, QtCore.Qt.green)
+                color = QtCore.Qt.blue if self.__ocr_mode else QtCore.Qt.green
+                self.scene.action_draw_rect(self.__rect_start, self.__rect_end, painter, color)
 
             ## Draw home point marker pulse
             if self._home_point is not None:
@@ -771,6 +800,12 @@ class QZUI(QtWidgets.QWidget):
             self.__mouse_left_down = True
             self.__mousepos = (int(event.position().x()), int(event.position().y()))
 
+            if self.__ocr_mode:
+                self.__drawing_rect = True
+                self.__rect_start = self.__mousepos
+                self.__rect_end = self.__mousepos
+                return
+
             if self.__control_held:
                 # Start rectangle drawing
                 self.__drawing_rect = True
@@ -868,6 +903,26 @@ class QZUI(QtWidgets.QWidget):
         if event.button() == QtCore.Qt.LeftButton and self.__mouse_left_down:
             self.__mouse_left_down = False
 
+            if self.__ocr_mode:
+                self.__drawing_rect = False
+                if self.__rect_start and self.__rect_end:
+                    x1 = min(self.__rect_start[0], self.__rect_end[0])
+                    y1 = min(self.__rect_start[1], self.__rect_end[1])
+                    x2 = max(self.__rect_start[0], self.__rect_end[0])
+                    y2 = max(self.__rect_start[1], self.__rect_end[1])
+
+                    if x1 != x2 and y1 != y2:
+                        QtCore.QTimer.singleShot(
+                            0, lambda x1=x1, y1=y1, x2=x2, y2=y2: self._do_ocr_capture(x1, y1, x2, y2)
+                        )
+
+                self.__rect_start = None
+                self.__rect_end = None
+                self.set_ocr_mode(False)
+                self.update()
+
+                return
+
             if self.__drawing_rect:
                 # Finish rectangle drawing
                 self.__drawing_rect = False
@@ -905,7 +960,11 @@ class QZUI(QtWidgets.QWidget):
         modifiers = event.modifiers()
 
         if key == QtCore.Qt.Key_Escape:
-            self.scene.selection = None
+            if self.__ocr_mode:
+                self.set_ocr_mode(False)
+                self.update()
+            else:
+                self.scene.selection = None
         elif key == QtCore.Qt.Key_PageUp:
             self.__zoom(1.0)
         elif key == QtCore.Qt.Key_PageDown:

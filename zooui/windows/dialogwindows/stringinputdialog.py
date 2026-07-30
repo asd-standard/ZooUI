@@ -60,16 +60,21 @@ class OpenNewStringInputDialog:
     Also gives a selection column of the last 20 used colors.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, initial_text: str = "") -> None:
         """
         Constructor :
-            OpenNewStringInputDialog()
+            OpenNewStringInputDialog(initial_text)
         Parameters :
-            None
+            initial_text : str
+                Optional text to pre-fill the text edit widget (e.g., OCR output).
 
-        OpenNewStringInputDialog() --> None
+        OpenNewStringInputDialog(initial_text="") --> None
 
         Create a new OpenNewStringInputDialog for gathering string input with color selection.
+
+        If *initial_text* is provided, the text edit will be pre-filled with that
+        content. This is used by the OCR screenshot feature to seed the dialog with
+        tesseract output.
 
         Initializes the dialog with empty string color, loads previously used colors
         from the color store file, or creates default colors (red, green, blue) if
@@ -80,6 +85,7 @@ class OpenNewStringInputDialog:
         self.color_codes: deque[ColorCode] = deque(maxlen=24)
         self.text_edit: QTextEdit
         self.custom_color_input: QLineEdit
+        self._initial_text: str = initial_text
 
         self.color_dir = str(get_colorstore_dir())
 
@@ -217,13 +223,16 @@ class OpenNewStringInputDialog:
         """
         dialog = QDialog()
         dialog.setWindowTitle("String input:")
-        dialog.resize(900, 600)
+        dialog.resize(1000, 600)
 
         # Create text edit widget
         self.text_edit = QTextEdit(dialog)  # Input string is going to be typed in here
         font = QFont()
         font.setPointSize(16)  # Set desired font size
         self.text_edit.setFont(font)
+
+        if self._initial_text:
+            self.text_edit.setPlainText(self._initial_text)
 
         # Align text to top-left (horizontal only by default)
         self.text_edit.setAlignment(Qt.AlignmentFlag.AlignLeft)

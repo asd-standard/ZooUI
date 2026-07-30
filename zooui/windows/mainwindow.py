@@ -181,6 +181,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         zui = QZUI(self, self.__framerate, self.__zoom_sensitivity, self.__config, self.__autosave_config)
         zui.error.connect(self.__show_error)
+        zui.ocr_region_selected.connect(self.__handle_ocr_region)
         self.__zui_tabs.append(zui)
         index = self.__tab_widget.addTab(zui, title)
         self.__tab_widget.setCurrentIndex(index)
@@ -213,6 +214,8 @@ class MainWindow(QtWidgets.QMainWindow):
                     mgr.disable_autosave()
             except Exception:
                 pass
+
+        scene.shutdown_threads()
 
         # Purge tiles for the closing scene
         from zooui.tilesystem import tilemanager as TileManager
@@ -325,6 +328,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 logger = get_logger("MainWindow")
                 logger.debug(f"Error stopping autosave on current scene: {e}")
 
+        zui.scene.shutdown_threads()
         zui.scene = Scene.new(config=self.__config)
         current_index = self.__tab_widget.currentIndex()
         self.__tab_widget.setTabText(current_index, "Untitled")
@@ -515,6 +519,65 @@ class MainWindow(QtWidgets.QMainWindow):
                 pixmap.save(filename[0])
             except Exception as e:
                 self.__show_error("Unable to save screenshot ERROR in mainwindow.__action_save_screenshot", e)
+
+    def __action_ocr_screenshot(self) -> None:
+        zui = self.current_zui
+        zui.set_ocr_mode(not zui.is_ocr_mode())
+
+    def __handle_ocr_region(self, image: QtGui.QImage) -> None:
+        import io
+
+        from PIL import Image as PILImage
+
+        try:
+            import pytesseract
+        except ImportError:
+            self.__show_error(
+                "Tesseract OCR not installed",
+                "Install pytesseract:  pip install pytesseract\n"
+                "Then install the Tesseract OCR engine:\n"
+                "  Debian/Ubuntu:  sudo apt install tesseract-ocr\n"
+                "  Fedora:         sudo dnf install tesseract\n"
+                "  Arch:           sudo pacman -S tesseract\n"
+                "  macOS:          brew install tesseract",
+            )
+            return
+
+        buffer = QtCore.QBuffer()
+        buffer.open(QtCore.QBuffer.OpenModeFlag.ReadWrite)
+        image.save(buffer, "PNG")
+        pil_image = PILImage.open(io.BytesIO(buffer.data()))
+
+        try:
+            text = pytesseract.image_to_string(pil_image).strip()
+        except pytesseract.TesseractNotFoundError:
+            self.__show_error(
+                "Tesseract OCR engine not found",
+                "The pytesseract Python package is installed, but the\n"
+                "Tesseract OCR binary was not found on the system PATH.\n\n"
+                "Install it with:\n"
+                "  Debian/Ubuntu:  sudo apt install tesseract-ocr\n"
+                "  Fedora:         sudo dnf install tesseract\n"
+                "  Arch:           sudo pacman -S tesseract\n"
+                "  macOS:          brew install tesseract",
+            )
+            return
+        except Exception as e:
+            self.__show_error("OCR processing failed", e)
+            return
+
+        if not text:
+            text = "no text detected"
+
+        dialog = DialogWindows.open_new_string_input_dialog(initial_text=text)
+        try:
+            ok, uri = dialog._run_dialog()
+        except Exception as e:
+            self.__show_error("Error loading Media String", e)
+            ok = False
+            uri = ""
+        if ok and uri:
+            self.__open_media(uri)
 
     @staticmethod
     def _get_pdf_page_count(pdf_path: str) -> int | None:
@@ -896,6 +959,8 @@ class MainWindow(QtWidgets.QMainWindow):
         response = dialog.exec()
 
         if response == QDialog.Accepted:
+            for zui in self.__zui_tabs:
+                zui.scene.shutdown_threads()
             QtWidgets.QApplication.closeAllWindows()
         elif response == QDialog.Rejected:
             dialog.close()
@@ -1134,8 +1199,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.__create_action("copy", "Copy &SVG", self.__action_copy, "Ctrl+C")
         self.__create_action("paste", "Paste &SVG", self.__action_paste, "Ctrl+V")
-        self.__create_action("set_home_point", "Set &Home Point", self.__action_set_home_point, "Ctrl+Shift+H")
+        self.__create_action("set_home_point", "Set &Home Point", self.__action_set_home_point, "Ctrl+Alt+H")
         self.__create_action("go_to_home_point", "&Go to Home Point", self.__action_go_to_home_point, "Ctrl+J")
+        self.__create_action("ocr_screenshot", "OCR Screens&hot", self.__action_ocr_screenshot, "Ctrl+Alt+O")
 
         self.__create_action("autosave_settings", "&Autosave Settings", self.__action_autosave_settings)
         self.__create_action("zoom_settings", "&Zoom Settings", self.__action_zoom_settings)
@@ -1187,6 +1253,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.__menu["actions"].addSeparator()
         self.__menu["actions"].addAction(self.__action["set_home_point"])
         self.__menu["actions"].addAction(self.__action["go_to_home_point"])
+        self.__menu["actions"].addSeparator()
+        self.__menu["actions"].addAction(self.__action["ocr_screenshot"])
 
         self.__menu["settings"] = self.menuBar().addMenu("&Settings")
         self.__menu["settings"].addAction(self.__action["autosave_settings"])

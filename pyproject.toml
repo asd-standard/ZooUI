@@ -35,6 +35,7 @@ dependencies = [
     "Pillow>=12.0",
     "pyvips>=3.0",
     "platformdirs>=3",
+    "pytesseract>=0.3",
 ]
 
 [project.urls]

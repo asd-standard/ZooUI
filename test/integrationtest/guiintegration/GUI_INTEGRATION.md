@@ -94,6 +94,8 @@ The test suite is organized into numbered steps grouped by functionality:
 | 45 | Mouse Right-Click - String Modification Dialog |
 | 46 | Mouse Right-Click - Image Modification Dialog |
 | 47 | Mouse Right-Click - SVG Modification Dialog |
+| 52 | PDF - Page Navigation (forward/backward/go-to) |
+| 53 | OCR - Screenshot PDF text selection |
 | **Keyboard Interactions** | |
 | 34 | Keyboard - Alt Fine Zoom Control |
 | 37 | Keyboard - Ctrl+C/V Copy Paste |
@@ -203,6 +205,7 @@ Log files are written to the `logs/` directory in the project root.
 - **Space**: Center the view
 - **Delete**: Remove selected media object
 - **Ctrl+C/Ctrl+V**: Copy and paste SVG objects only (SVGMediaObject)
+- **Ctrl+Alt+O**: OCR screenshot — drag-select a region, OCR via Tesseract, create StringMediaObject
 
 ## Architecture
 

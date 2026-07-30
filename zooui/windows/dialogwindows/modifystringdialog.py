@@ -224,7 +224,7 @@ class ModifyStringInputDialog:
         """
         dialog = QDialog()
         dialog.setWindowTitle("String input:")
-        dialog.resize(900, 600)
+        dialog.resize(1000, 600)
 
         # Create text edit widget
         self.text_edit = QTextEdit(dialog)  # Input string is going to be typed in here

@@ -109,6 +109,7 @@ from guiintegration.test import (  # noqa: E402
     new_string_dialog,
     new_string_dialog_shift_enter,
     new_tab,
+    ocr_screenshot,
     open_home_scene,
     open_local_media,
     open_scene,
@@ -225,6 +226,7 @@ class GUIIntegrationTest:
             (48, "Mouse Right-Click - String Modification (Ctrl+Enter Accept)", right_click_string_shift_enter.run),
             (46, "Mouse Right-Click - Image Modification Dialog", right_click_image.run),
             (52, "PDF - Page Navigation (forward/backward/go-to)", pdf_page_navigation.run),
+            (53, "OCR - Screenshot PDF text selection", ocr_screenshot.run),
             (90, "Complete Workflow", workflow.run),
             (99, "File Menu - Quit", quit_test.run),
         ]

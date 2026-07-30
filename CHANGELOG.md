@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- **OCR Screenshot (Ctrl+Alt+O)** — select an area of the scene view, capture
+  it, run through Tesseract OCR, and place the extracted text in a new
+  StringMediaObject via the string input dialog. The dialog can be pre‑filled
+  with the OCR result. OCR selection mode uses a crosshair cursor and blue
+  rectangle (distinct from the green multi‑select rectangle). Press Escape
+  to cancel. Requires ``tesseract-ocr`` system package and ``pytesseract``
+  Python package. ``OpenNewStringInputDialog`` gains ``initial_text``
+  parameter for pre‑filling text content.
+- GUI integration test step 53: OCR screenshot test on a PDF.
+- ``TileManager.purge()`` in ``__action_new_scene`` to prevent tile cache
+  staleness between scene switches.
 
 ## [0.7.0] - 2026-07-28
 ### Added

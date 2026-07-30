@@ -71,13 +71,18 @@ Actions menu:
   clipboard
 - **Paste SVG (Ctrl+V)** Paste the copied SVG at the current mouse
   position (or center of the viewport)
-- **Set Home Point (Ctrl+Shift+H)** Save the current view position
+- **Set Home Point (Ctrl+Alt+H)** Save the current view position
   and zoom level as a *home point*. A cyan crosshair pulse appears at
   the viewport center as visual confirmation. The home point is per-tab
   and is cleared when a new scene is loaded.
 - **Go to Home Point (Ctrl+J)** Restore the view to the saved home
   point position and zoom level. Has no effect if no home point has
   been set.
+- **OCR Screenshot (Ctrl+Alt+O)** Enter OCR selection mode to extract text
+  from the scene. Drag-select an area with the mouse; the selected region
+  is captured and processed through Tesseract OCR. The detected text appears
+  in a new String input dialog. Press Escape to cancel selection mode. Requires
+  ``tesseract-ocr`` to be installed on the system.
 
 Help menu:
 ~~~~~~~~~~
@@ -134,6 +139,12 @@ Mouse/Keyboard actions:
     - Clicking between selected objects maintains the selection for dragging
 
 - **Esc** Deselect the currently selected media
+
+- **Ctrl+Alt+O** Enter OCR screenshot selection mode. The cursor changes to a
+  crosshair. Click and drag to select a rectangular region. Upon release, the
+  captured area is processed through Tesseract OCR and the extracted text is
+  pre-filled into a new String input dialog. Press Escape to cancel the mode
+  without capturing.
 
 - **PgUp/PgDn or Scrollwheel** Zoom the currently selected media
     - if there is no currently selected media, or if the Shift key is currently

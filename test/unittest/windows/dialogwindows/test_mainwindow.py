@@ -15,6 +15,9 @@
 
 from unittest.mock import Mock, patch
 
+import pytest
+from PySide6 import QtCore, QtGui, QtWidgets
+
 from zooui.windows.mainwindow import MainWindow
 
 
@@ -283,3 +286,272 @@ class TestPdfPageDialog:
         mock_get_int.return_value = (0, False)
         result = MainWindow._MainWindow__show_pdf_page_dialog(Mock(), "large.pdf", 50)
         assert result is None
+
+
+class TestOcrAction:
+    """
+    Feature: OCR Screenshot Action Toggle
+
+    The Ctrl+Alt+O shortcut toggles OCR mode on the current QZUI widget.
+    """
+
+    def test_action_toggles_ocr_mode_on(self):
+        """
+        Scenario: Action toggles OCR mode on
+
+        Given a QZUI with OCR mode disabled
+        When __action_ocr_screenshot is called
+        Then set_ocr_mode(True) should be called
+        """
+        from zooui.windows.mainwindow import MainWindow
+
+        mock_self = Mock()
+        mock_zui = Mock()
+        mock_zui.is_ocr_mode.return_value = False
+        mock_self.current_zui = mock_zui
+
+        MainWindow._MainWindow__action_ocr_screenshot(mock_self)
+        mock_zui.set_ocr_mode.assert_called_once_with(True)
+
+    def test_action_toggles_ocr_mode_off(self):
+        """
+        Scenario: Action toggles OCR mode off
+
+        Given a QZUI with OCR mode enabled
+        When __action_ocr_screenshot is called
+        Then set_ocr_mode(False) should be called
+        """
+        from zooui.windows.mainwindow import MainWindow
+
+        mock_self = Mock()
+        mock_zui = Mock()
+        mock_zui.is_ocr_mode.return_value = True
+        mock_self.current_zui = mock_zui
+
+        MainWindow._MainWindow__action_ocr_screenshot(mock_self)
+        mock_zui.set_ocr_mode.assert_called_once_with(False)
+
+
+class TestOcrHandleRegion:
+    """
+    Feature: OCR Region Handler
+
+    The __handle_ocr_region method receives a QImage, runs it through
+    tesseract OCR, and opens a pre-filled string input dialog.
+    """
+
+    @pytest.fixture(scope="class")
+    def qapp(self):
+        app = QtWidgets.QApplication.instance()
+        if app is None:
+            app = QtWidgets.QApplication([])
+        yield app
+
+    @pytest.fixture
+    def qimage(self):
+        image = QtGui.QImage(10, 10, QtGui.QImage.Format_RGB32)
+        image.fill(QtGui.QColor(255, 255, 255))
+        return image
+
+    @pytest.fixture
+    def mock_self(self):
+        return Mock()
+
+    @pytest.fixture
+    def mock_pytesseract_module(self):
+        mod = Mock()
+        mod.TesseractNotFoundError = type(
+            "TesseractNotFoundError", (Exception,), {}
+        )
+        return mod
+
+    def test_handle_import_error(self, qapp, qimage, mock_self):
+        """
+        Scenario: pytesseract not installed shows error
+
+        Given a system without pytesseract installed
+        When __handle_ocr_region is called
+        Then __show_error should be called with tesseract install instructions
+        And __open_media should NOT be called
+        """
+        from zooui.windows.mainwindow import MainWindow
+
+        original_import = __import__
+
+        def blocking_import(name, *args, **kwargs):
+            if name == "pytesseract":
+                raise ImportError("No module named 'pytesseract'")
+            return original_import(name, *args, **kwargs)
+
+        with patch("builtins.__import__", blocking_import):
+            MainWindow._MainWindow__handle_ocr_region(mock_self, qimage)
+
+        mock_self._MainWindow__show_error.assert_called_once()
+        assert "tesseract" in mock_self._MainWindow__show_error.call_args[0][0].lower()
+        mock_self._MainWindow__open_media.assert_not_called()
+
+    def test_handle_tesseract_not_found_error(
+        self, qapp, qimage, mock_self, mock_pytesseract_module
+    ):
+        """
+        Scenario: tesseract binary not on PATH shows error
+
+        Given pytesseract is installed but the tesseract binary is not found
+        When __handle_ocr_region is called
+        Then __show_error should be called with engine-not-found instructions
+        And __open_media should NOT be called
+        """
+        from zooui.windows.mainwindow import MainWindow
+
+        mock_pytesseract_module.image_to_string.side_effect = (
+            mock_pytesseract_module.TesseractNotFoundError()
+        )
+
+        with patch.dict("sys.modules", {"pytesseract": mock_pytesseract_module}):
+            MainWindow._MainWindow__handle_ocr_region(mock_self, qimage)
+
+        mock_self._MainWindow__show_error.assert_called_once()
+        assert "engine" in mock_self._MainWindow__show_error.call_args[0][0].lower()
+        mock_self._MainWindow__open_media.assert_not_called()
+
+    def test_handle_ocr_exception(
+        self, qapp, qimage, mock_self, mock_pytesseract_module
+    ):
+        """
+        Scenario: OCR processing throws generic exception
+
+        Given pytesseract raises a runtime error during processing
+        When __handle_ocr_region is called
+        Then __show_error should be called with "OCR processing failed"
+        And __open_media should NOT be called
+        """
+        from zooui.windows.mainwindow import MainWindow
+
+        mock_pytesseract_module.image_to_string.side_effect = Exception(
+            "segmentation fault"
+        )
+
+        with patch.dict("sys.modules", {"pytesseract": mock_pytesseract_module}):
+            MainWindow._MainWindow__handle_ocr_region(mock_self, qimage)
+
+        mock_self._MainWindow__show_error.assert_called_once()
+        assert "ocr processing failed" in mock_self._MainWindow__show_error.call_args[0][0].lower()
+        mock_self._MainWindow__open_media.assert_not_called()
+
+    def test_handle_empty_ocr_result(
+        self, qapp, qimage, mock_self, mock_pytesseract_module
+    ):
+        """
+        Scenario: OCR returns empty string shows "no text detected"
+
+        Given pytesseract returns whitespace only
+        When __handle_ocr_region is called
+        Then the dialog should open with initial_text="no text detected"
+        """
+        from zooui.windows.mainwindow import MainWindow
+
+        mock_pytesseract_module.image_to_string.return_value = "   \n  \t  "
+
+        mock_dialog = Mock()
+        mock_dialog._run_dialog.return_value = (False, "")
+
+        with (
+            patch.dict("sys.modules", {"pytesseract": mock_pytesseract_module}),
+            patch(
+                "zooui.windows.mainwindow.DialogWindows.open_new_string_input_dialog",
+                return_value=mock_dialog,
+            ) as mock_dialog_class,
+        ):
+            MainWindow._MainWindow__handle_ocr_region(mock_self, qimage)
+
+        mock_dialog_class.assert_called_once_with(initial_text="no text detected")
+        mock_self._MainWindow__open_media.assert_not_called()
+
+    def test_handle_successful_ocr(
+        self, qapp, qimage, mock_self, mock_pytesseract_module
+    ):
+        """
+        Scenario: OCR successfully extracts text
+
+        Given pytesseract returns "Hello World"
+        When __handle_ocr_region is called and the user accepts the dialog
+        Then __open_media should be called with the resulting URI
+        """
+        from zooui.windows.mainwindow import MainWindow
+
+        mock_pytesseract_module.image_to_string.return_value = "Hello World"
+
+        mock_dialog = Mock()
+        mock_dialog._run_dialog.return_value = (True, "string:ffffff:Hello World")
+
+        with (
+            patch.dict("sys.modules", {"pytesseract": mock_pytesseract_module}),
+            patch(
+                "zooui.windows.mainwindow.DialogWindows.open_new_string_input_dialog",
+                return_value=mock_dialog,
+            ) as mock_dialog_class,
+        ):
+            MainWindow._MainWindow__handle_ocr_region(mock_self, qimage)
+
+        mock_dialog_class.assert_called_once_with(initial_text="Hello World")
+        mock_self._MainWindow__open_media.assert_called_once_with("string:ffffff:Hello World")
+
+    def test_handle_user_cancels_dialog(
+        self, qapp, qimage, mock_self, mock_pytesseract_module
+    ):
+        """
+        Scenario: User cancels the string input dialog
+
+        Given pytesseract extracts text successfully
+        When the user cancels the dialog
+        Then __open_media should NOT be called
+        """
+        from zooui.windows.mainwindow import MainWindow
+
+        mock_pytesseract_module.image_to_string.return_value = "Some Text"
+
+        mock_dialog = Mock()
+        mock_dialog._run_dialog.return_value = (False, "")
+
+        with (
+            patch.dict("sys.modules", {"pytesseract": mock_pytesseract_module}),
+            patch(
+                "zooui.windows.mainwindow.DialogWindows.open_new_string_input_dialog",
+                return_value=mock_dialog,
+            ) as mock_dialog_class,
+        ):
+            MainWindow._MainWindow__handle_ocr_region(mock_self, qimage)
+
+        mock_dialog_class.assert_called_once_with(initial_text="Some Text")
+        mock_self._MainWindow__open_media.assert_not_called()
+
+    def test_handle_dialog_raises_exception(
+        self, qapp, qimage, mock_self, mock_pytesseract_module
+    ):
+        """
+        Scenario: Dialog throws an exception
+
+        Given pytesseract extracts text successfully
+        But the dialog raises an exception
+        Then __show_error should be called with the exception details
+        And __open_media should NOT be called
+        """
+        from zooui.windows.mainwindow import MainWindow
+
+        mock_pytesseract_module.image_to_string.return_value = "Some Text"
+
+        mock_dialog = Mock()
+        mock_dialog._run_dialog.side_effect = RuntimeError("dialog crash")
+
+        with (
+            patch.dict("sys.modules", {"pytesseract": mock_pytesseract_module}),
+            patch(
+                "zooui.windows.mainwindow.DialogWindows.open_new_string_input_dialog",
+                return_value=mock_dialog,
+            ) as mock_dialog_class,
+        ):
+            MainWindow._MainWindow__handle_ocr_region(mock_self, qimage)
+
+        mock_dialog_class.assert_called_once_with(initial_text="Some Text")
+        mock_self._MainWindow__show_error.assert_called_once()
+        mock_self._MainWindow__open_media.assert_not_called()
