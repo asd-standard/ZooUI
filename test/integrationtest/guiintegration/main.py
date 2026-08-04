@@ -184,6 +184,7 @@ class GUIIntegrationTest:
             (5, "File Menu - Save Screenshot", save_screenshot.run),
             (6, "File Menu - Save Scene", save_scene.run),
             (7, "File Menu - Open Saved Scene", open_scene.run),
+            (2, "File Menu - New Scene", new_scene.run),
             (8, "File Menu - Open New String Dialog", new_string_dialog.run),
             (38, "File Menu - Open New String Dialog (Ctrl+Enter Accept)", new_string_dialog_shift_enter.run),
             (9, "File Menu - Open Local Media", open_local_media.run),

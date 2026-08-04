@@ -22,7 +22,6 @@ from typing import TYPE_CHECKING
 
 from guiintegration.conf import DEFAULT_DELAY_MS, SHORT_DELAY_MS
 from guiintegration.utilities.qt_simulation import trigger_action, wait
-from guiintegration.utilities.scene_helpers import ensure_test_scene_loaded
 from PySide6 import QtCore
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QDialog, QTextEdit
@@ -33,7 +32,6 @@ if TYPE_CHECKING:
 
 def run(ctx: GUITestContext) -> None:
     ctx.log.section("FILE MENU - OPEN NEW STRING DIALOG (Ctrl+Enter ACCEPT)")
-    ensure_test_scene_loaded(ctx)
 
     def _type_text_and_accept() -> None:
         for widget in QApplication.topLevelWidgets():

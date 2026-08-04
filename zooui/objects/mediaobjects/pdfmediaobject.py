@@ -16,8 +16,10 @@
 
 """Multi-page PDF rendered as individually tiled pages with page navigation."""
 
+import atexit
 import glob as _glob
 import os
+import shutil
 import tempfile
 from typing import Any
 
@@ -93,6 +95,7 @@ class PdfMediaObject(TiledMediaObject):
         self._logger = get_logger(f"PdfMediaObject.{pdf_path}")
 
         self._outdir: str = tempfile.mkdtemp(prefix="zooui_pdf_")
+        atexit.register(lambda d=self._outdir: shutil.rmtree(d, ignore_errors=True))
 
         future = converterrunner.submit_pdf_conversion(pdf_path, self._outdir)
         self.__pdf_converter = converterrunner.ConversionHandle(future, pdf_path, self._outdir)

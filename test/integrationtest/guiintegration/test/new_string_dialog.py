@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING
 
 from guiintegration.conf import SHORT_DELAY_MS
 from guiintegration.utilities.qt_simulation import trigger_action, wait
-from guiintegration.utilities.scene_helpers import close_open_dialog, ensure_test_scene_loaded
+from guiintegration.utilities.scene_helpers import close_open_dialog
 
 if TYPE_CHECKING:
     from guiintegration.main import GUITestContext
@@ -30,7 +30,6 @@ if TYPE_CHECKING:
 
 def run(ctx: GUITestContext) -> None:
     ctx.log.section("FILE MENU - OPEN NEW STRING DIALOG")
-    ensure_test_scene_loaded(ctx)
     ctx.log.action("Opening new string input dialog")
     close_open_dialog(ctx)
     trigger_action(ctx, "open_media_string")

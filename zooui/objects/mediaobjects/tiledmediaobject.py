@@ -674,14 +674,13 @@ class TiledMediaObject(MediaObject):
                 # Setting to None allows garbage collection of the PPMTiler object
                 self.__tiler = None
 
-            # On Windows, clean up the temporary PPM file
-            # On Unix systems, the file can be unlinked even while open
-            if os.name == "nt":
+            # Clean up the temporary PPM file
+            if self.__tmpfile is not None:
                 try:
-                    # os.unlink() deletes the file from the filesystem
                     os.unlink(self.__tmpfile)
+                except FileNotFoundError:
+                    pass
                 except Exception:
-                    # Log but don't crash if temp file cleanup fails
                     self.__logger.exception(f"unable to unlink temporary file '{self.__tmpfile}'")
 
             # Save the current bounding box before updating dimensions
